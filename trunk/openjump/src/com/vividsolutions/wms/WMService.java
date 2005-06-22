@@ -46,18 +46,29 @@ import java.net.URL;
  * @author Chris Hodgson chodgson@refractions.net
  */
 public class WMService {
+    
+    public static final String WMS_1_0_0 = "1.0.0";
 
+    public static final String WMS_1_1_1 = "1.1.1";
   private String serverUrl;
-  private String wmsVersion;
+  private String wmsVersion = WMS_1_0_0;
   private Capabilities cap;
-
+  
+  /**
+   * Constructs a WMService object from a server URL.
+   * @param serverUrl the URL of the WMS server
+   */
+  public WMService( String serverUrl, String wmsVersion ) {
+    this.serverUrl = serverUrl;   
+    this.wmsVersion = wmsVersion;
+    this.cap = null;
+  }
   /**
    * Constructs a WMService object from a server URL.
    * @param serverUrl the URL of the WMS server
    */
   public WMService( String serverUrl ) {
     this.serverUrl = serverUrl;   
-    this.wmsVersion = null;
     this.cap = null;
   }
 
@@ -65,12 +76,17 @@ public class WMService {
    * Connect to the service and get the capabilities.
    * This must be called before anything else is done with this service.
    */
-  public void initialize() throws IOException {
-    String requestUrlString = this.serverUrl + "request=capabilities&WMTVER=1.0";
-    URL requestUrl = new URL( requestUrlString );
-    InputStream inStream = requestUrl.openStream();
-    Parser p = new Parser();
-    cap = p.parseCapabilities( this, inStream );
+	public void initialize() throws IOException {
+//    [UT]
+	    String req = "request=capabilities&WMTVER=1.0";
+	    if( WMS_1_1_1.equals(wmsVersion) ){
+	    	req = "SERVICE=WMS&VERSION=1.1.1&REQUEST=GetCapabilities";
+	    }
+	    String requestUrlString = this.serverUrl + req;
+	    URL requestUrl = new URL( requestUrlString );
+	    InputStream inStream = requestUrl.openStream();
+	    Parser p = new Parser();
+	    cap = p.parseCapabilities( this, inStream );
   }
 
 
@@ -106,8 +122,14 @@ public class WMService {
    * @return a MapRequest object which can be used to retrieve a map image
    *         from this service
    */
-  public MapRequest createMapRequest() {
-    return new MapRequest( this );
-  }
-
+  	public MapRequest createMapRequest() {
+//    [UT] 04.02.2005 changed
+  	    MapRequest mr = new MapRequest( this );
+  	    mr.setVersion( this.wmsVersion );
+        return mr;
+	}
+      
+  	public String getVersion(){
+  	    return wmsVersion;
+	}
 }

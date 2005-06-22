@@ -70,43 +70,11 @@ public class Parser {
    * @return the MapDescriptor object created from the specified XML InputStream
    */
   public Capabilities parseCapabilities( WMService service, InputStream inStream ) throws IOException {
-    MapLayer topLayer = null;
-    String title = null;
-    LinkedList formatList = new LinkedList();
-    Document doc;
-    
-    try {
-      DOMParser parser = new DOMParser();
-      parser.setFeature( "http://xml.org/sax/features/validation", false );
-      parser.parse( new InputSource( inStream ) );
-      doc = parser.getDocument();
-      // DEBUG: XMLTools.printNode( doc, "" );
-    } catch( SAXException saxe ) {
-      throw new IOException( saxe.toString() );
-    }
-    
-    // get the title
-    try {
-      title = ((CharacterData)XMLTools.simpleXPath( doc, "WMT_MS_Capabilities/Service/Title" ).getFirstChild()).getData();
-    } catch (Exception e) {
-      // possible NullPointerException if there is no firstChild()
-      // also possible miscast causing an Exception
-    }
-    
-    // get the supported file formats
-    Node formatNode = XMLTools.simpleXPath( doc, "WMT_MS_Capabilities/Capability/Request/Map/Format" );
-    NodeList nl = formatNode.getChildNodes();
-    for( int i=0; i < nl.getLength(); i++ ) {
-      Node n = nl.item( i );
-      if( n.getNodeType() == Node.ELEMENT_NODE ) {
-        formatList.add( n.getNodeName() );
+      if ( WMService.WMS_1_1_1.equals( service.getVersion()) ){
+          return parseCapabilities_1_1_1(service, inStream);
       }
-    }
-    
-    // get the top layer
-    topLayer = wmsLayerFromNode( XMLTools.simpleXPath( doc, "WMT_MS_Capabilities/Capability/Layer" ) );
-    
-    return new Capabilities( service, title, topLayer, formatList );
+      
+      return parseCapabilities_1_0_0(service, inStream);  
   }
   
   /**
@@ -217,5 +185,89 @@ public class Parser {
       throw new Exception( I18N.get("Parser.invalid-bounding-box-element-node")+": " + e.toString() );
     }    
   }
+  private Capabilities parseCapabilities_1_0_0( WMService service, InputStream inStream ) throws IOException {
+      MapLayer topLayer = null;
+      String title = null;
+      LinkedList formatList = new LinkedList();
+      Document doc;
+      
+      try {
+        DOMParser parser = new DOMParser();
+        parser.setFeature( "http://xml.org/sax/features/validation", false );
+        parser.parse( new InputSource( inStream ) );
+        doc = parser.getDocument();
+        // DEBUG: XMLTools.printNode( doc, "" );
+      } catch( SAXException saxe ) {
+        throw new IOException( saxe.toString() );
+      }
+      
+      // get the title
+      try {
+        title = ((CharacterData)XMLTools.simpleXPath( doc, "WMT_MS_Capabilities/Service/Title" ).getFirstChild()).getData();
+      } catch (Exception e) {
+        // possible NullPointerException if there is no firstChild()
+        // also possible miscast causing an Exception
+      }
+      
+      // get the supported file formats
+      Node formatNode = XMLTools.simpleXPath( doc, "WMT_MS_Capabilities/Capability/Request/Map/Format" );
+      NodeList nl = formatNode.getChildNodes();
+      for( int i=0; i < nl.getLength(); i++ ) {
+        Node n = nl.item( i );
+        if( n.getNodeType() == Node.ELEMENT_NODE ) {
+          formatList.add( n.getNodeName() );
+        }
+      }
+      
+      // get the top layer
+      topLayer = wmsLayerFromNode( XMLTools.simpleXPath( doc, "WMT_MS_Capabilities/Capability/Layer" ) );
+      
+      return new Capabilities( service, title, topLayer, formatList );
+    }
+  
+  //UT TODO move this into a common method (
+  // private Capabilities parseCapabilities( WMService service, InputStream inStream, 
+  	// String version)
+  
+  private Capabilities parseCapabilities_1_1_1( WMService service, InputStream inStream ) throws IOException {
+      MapLayer topLayer = null;
+      String title = null;
+      LinkedList formatList = new LinkedList();
+      Document doc;
+      
+      try {
+        DOMParser parser = new DOMParser();
+        parser.setFeature( "http://xml.org/sax/features/validation", false );
+        parser.parse( new InputSource( inStream ) );
+        doc = parser.getDocument();
+//XMLTools.printNode( doc, "" );
+      } catch( SAXException saxe ) {
+        throw new IOException( saxe.toString() );
+      }
+      
+      // get the title
+      try {
+        title = ((CharacterData)XMLTools.simpleXPath( doc, "WMT_MS_Capabilities/Service/Title" ).getFirstChild()).getData();
+      } catch (Exception e) {
+        // possible NullPointerException if there is no firstChild()
+        // also possible miscast causing an Exception
+      }
+      
+      // get the supported file formats			// UT was "WMT_MS_Capabilities/Capability/Request/Map/Format"
+      Node formatNode = XMLTools.simpleXPath( doc, "WMT_MS_Capabilities/Capability/Request/GetMap" );
+
+      NodeList nl = formatNode.getChildNodes();
+      for( int i=0; i < nl.getLength(); i++ ) {
+        Node n = nl.item( i );
+        if( n.getNodeType() == Node.ELEMENT_NODE && "Format".equals( n.getNodeName() )) {
+            formatList.add( n.getFirstChild().getNodeValue() );              
+        }
+      }
+      
+      // get the top layer
+      topLayer = wmsLayerFromNode( XMLTools.simpleXPath( doc, "WMT_MS_Capabilities/Capability/Layer" ) );
+      
+      return new Capabilities( service, title, topLayer, formatList );
+    }
   
 }

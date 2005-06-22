@@ -81,7 +81,7 @@ public class SRSWizardPanel extends JPanel implements WizardPanel {
     }
 
     void jbInit() throws Exception {
-        srsLabel.setText(I18N.get("ui.plugin.wms.coordinate-reference-system"));
+        srsLabel.setText(I18N.get("ui.plugin.wms.SRSWizardPanel.coordinate-reference-system"));
         this.setLayout(gridBagLayout1);
         this.add(srsLabel,
             new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,

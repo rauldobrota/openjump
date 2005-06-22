@@ -32,17 +32,22 @@
 
 package com.vividsolutions.jump.workbench.ui.plugin.wms;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
@@ -65,7 +70,9 @@ public class URLWizardPanel extends JPanel implements WizardPanel {
     private JLabel urlLabel = new JLabel();
     private JTextField urlTextField = new JTextField();
     private JPanel fillerPanel = new JPanel();
-
+//  [UT]
+    public static final String VERSION_KEY = "WMS_VERSION";
+    
     public URLWizardPanel(String initialURL) {
         try {
             jbInit();
@@ -110,6 +117,11 @@ public class URLWizardPanel extends JPanel implements WizardPanel {
             new GridBagConstraints(2, 10, 1, 1, 1.0, 1.0,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                 new Insets(0, 0, 0, 0), 0, 0));
+//      [UT]
+        this.add(createVersionButtons(new String[]{WMService.WMS_1_0_0, WMService.WMS_1_1_1}),
+                new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                    new Insets(0, 0, 0, 0), 0, 0));    
     }
 
     public String getInstructions() {
@@ -142,13 +154,18 @@ public class URLWizardPanel extends JPanel implements WizardPanel {
 
     public void exitingToRight() throws IOException, WorkbenchException {
         dataMap.put(URL_KEY, urlTextField.getText());
-
+//      [UT]
+        String ver = (String)dataMap.get(VERSION_KEY);
+        
         String url = fixUrlForWMService( urlTextField.getText() );
-        WMService service = new WMService( url );
+        //[UT] 20.04.2005 
+        WMService service = new WMService( url, ver );
+        //WMService service = new WMService( url );
+        
         service.initialize();
         dataMap.put(SERVICE_KEY, service);
-
-        MapImageFormatChooser formatChooser = new MapImageFormatChooser();
+//[UT] 20.04.2005 added version
+        MapImageFormatChooser formatChooser = new MapImageFormatChooser(ver);
         String format = formatChooser.chooseFormat(service.getCapabilities()
                                                           .getMapFormats());
 
@@ -164,6 +181,8 @@ public class URLWizardPanel extends JPanel implements WizardPanel {
 
     public void enteredFromLeft(Map dataMap) {
         this.dataMap = dataMap;
+        //[UT] 20.04.2005 
+        dataMap.put( VERSION_KEY, WMService.WMS_1_1_1);
         urlTextField.setCaretPosition(0);
         urlTextField.moveCaretPosition(urlTextField.getText().length());
     }
@@ -183,4 +202,27 @@ public class URLWizardPanel extends JPanel implements WizardPanel {
     public String getNextID() {
         return MapLayerWizardPanel.class.getName();
     }
+    //[UT] 10.01.2005 
+    private Component createVersionButtons(String[] versions){
+        JPanel p = new JPanel();
+        
+        ActionListener al = new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                JRadioButton jb = (JRadioButton)e.getSource();
+                dataMap.put( VERSION_KEY, jb.getText());
+            }	
+        };
+        
+        ButtonGroup group = new ButtonGroup();        
+        JRadioButton[] buttons = new JRadioButton[ versions.length ];
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i] = new JRadioButton(versions[i]);
+            buttons[i].addActionListener(al);
+            group.add(buttons[i]);
+            p.add(buttons[i]);
+        }
+        group.setSelected(buttons[1].getModel(), true);        
+        
+        return p;
+    }    
 }

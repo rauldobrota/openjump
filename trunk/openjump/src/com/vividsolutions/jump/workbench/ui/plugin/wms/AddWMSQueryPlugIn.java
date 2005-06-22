@@ -51,7 +51,7 @@ import java.util.List;
 
 
 public class AddWMSQueryPlugIn extends AbstractPlugIn {
-    private String cachedURL = "http://";
+    private String cachedURL = "http://demo.deegree.org:8080/deegree/wms";
 
     public AddWMSQueryPlugIn() {
     }

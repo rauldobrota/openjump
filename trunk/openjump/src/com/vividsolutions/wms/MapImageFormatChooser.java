@@ -46,29 +46,51 @@ public class MapImageFormatChooser {
   
   private boolean transparencyRequired;
   private boolean useLossy;
-  
+//[UT]
+  public static final String[][] IMAGE_FORMATS = {
+          {"GIF", "PNG", "JPEG"},        			// for WMS 1.0.0
+          {"image/gif", "image/png", "image/jpeg"}	// for WMS 1.1.1
+  };
+
+  // set image formats to the default WMS (1.0.0)
+  private String[] imageFormats = IMAGE_FORMATS[0];
+
   /** 
    * Creates a new instance of MapImageFormatChooser.
    */
   public MapImageFormatChooser() {
+      //[UT]
+      this( WMService.WMS_1_0_0 ); // 1.0.0 is the default WMS, anyway...
+  }
+  /** 
+   * Creates a new instance of MapImageFormatChooser.
+   */
+  public MapImageFormatChooser(String wmsVersion) {
     this.transparencyRequired = false;
     this.useLossy = false;
+    if( WMService.WMS_1_1_1.equals( wmsVersion ) ){
+        imageFormats = IMAGE_FORMATS[1];
+    }
   }
   
-  /*
+  /**
    * Returns true if the specified format is known by the MapFormatChooser, false 
    * otherwise. The MapFormatChooser can only reliably select between formats 
    * which it knows; it will only return an unknown format if there are no known 
-   * formats to select from.
+   * formats to select from. [UT] changed to accept WMS 1.0 and 1.1.1 image formats 
    * @param format the format which is in question
    * @return true if the specified format is known by the MapFormatChooser, false 
    *         otherwise
    */
   static public boolean isKnownFormat( String format ) {
-    if( format.equals( "GIF" ) || format.equals( "PNG" ) || format.equals( "JPEG" ) ) {
-      return true;
-    }
-    return false;
+      for (int i = 0; i < IMAGE_FORMATS.length; i++) {
+          for (int j = 0; j < IMAGE_FORMATS[i].length; j++) {
+              if( format.equals( IMAGE_FORMATS[i][j] ) ) {
+                  return true;
+                }
+          }
+      }
+      return false;
   }
   
   /*
@@ -104,30 +126,29 @@ public class MapImageFormatChooser {
    *         if none of the available formats are known
    */
   public String chooseFormat( String[] formats ) {
-    if( formats.length == 0 ) {
-      throw new IllegalArgumentException();
-    }
-    String[] order = new String[3];
-    if( transparencyRequired ) {
-      order[0] = "PNG";
-      order[1] = "GIF";
-      order[2] = "JPEG";
-    } else if( useLossy ) {
-      order[0] = "JPEG";
-      order[1] = "PNG";
-      order[2] = "GIF";
-    } else {
-      order[0] = "PNG";
-      order[1] = "JPEG";
-      order[2] = "GIF";
-    }
-    Arrays.sort( formats );
-    for( int i = 0; i < order.length; i++ ) {
-      if( Arrays.binarySearch( formats, order[i] ) >= 0 ) {
-        return order[i];
-      }
-    }
-    return null;
+      if( formats.length == 0 ) {
+          throw new IllegalArgumentException();
+        }
+        String[] order = new String[3];
+        if( transparencyRequired ) {
+          order[0] = imageFormats[1];
+          order[1] = imageFormats[0];
+          order[2] = imageFormats[2];
+        } else if( useLossy ) {
+          order[0] = imageFormats[2];
+          order[1] = imageFormats[1];
+          order[2] = imageFormats[0];
+        } else {
+          order[0] = imageFormats[1];
+          order[1] = imageFormats[2];
+          order[2] = imageFormats[0];
+        }
+        Arrays.sort( formats );
+        for( int i = 0; i < order.length; i++ ) {
+          if( Arrays.binarySearch( formats, order[i] ) >= 0 ) {
+            return order[i];
+          }
+        }
+        return null;
   }
-
 }

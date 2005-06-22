@@ -79,7 +79,7 @@ public class OneSRSWizardPanel extends JPanel implements WizardPanel {
     }
 
     void jbInit() throws Exception {
-        srsLabel.setText(I18N.get("ui.plugin.wms.OneSRSWizardPanel.OneSRSWizardPanel.select-coordinate-reference-system"));
+        srsLabel.setText(I18N.get("ui.plugin.wms.OneSRSWizardPanel.select-coordinate-reference-system"));
         this.setLayout(gridBagLayout1);
         textField.setEnabled(false);
         textField.setOpaque(false);

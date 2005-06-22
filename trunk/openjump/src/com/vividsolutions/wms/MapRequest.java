@@ -41,6 +41,8 @@ import java.awt.Toolkit;
 import java.net.*;
 import java.util.*;
 
+import org.deegree_impl.enterprise.WMSServlet;
+
 /**
  * Represents all of the parameters of a getMap request from a WMS server.
  * @author Chris Hodgson chodgson@refractions.net
@@ -53,7 +55,8 @@ public class MapRequest {
   private BoundingBox bbox;
   private boolean transparent;
   private String format;
-
+  //[UT]
+  private String version = WMService.WMS_1_0_0;
   /**
    * Creates a new MapRequest.
    * @param service the WMService which this MapRequest will use
@@ -221,7 +224,8 @@ public class MapRequest {
    * @param list the list to be returned as a coma-separated String
    * @return a comma-separted String of the items in the list
    */
-  private String listToString( List list ) {
+//[UT] 02.05.2005 made static and public
+  public static String listToString( List list ) {
     Iterator it = list.iterator();
     StringBuffer buf = new StringBuffer();
     while( it.hasNext() ) {
@@ -243,28 +247,40 @@ public class MapRequest {
   }
 
 /**
- * @returnthe URL for this request
+ * @return the URL for this request
  * @throws MalformedURLException if there is a problem building the URL for some reason
  */
-public URL getURL() throws MalformedURLException {
-    StringBuffer urlBuf = new StringBuffer();
-    urlBuf.append( service.getServerUrl() + "REQUEST=map&WMTVER=1.0&WIDTH=" + imgWidth + "&HEIGHT=" + imgHeight );
-    urlBuf.append( "&LAYERS=" + listToString( layerList ) );
-    if( transparent ) {
-      urlBuf.append( "&TRANSPARENT=TRUE" );
-    }
-    if( format != null ) {
-      urlBuf.append( "&FORMAT=" + format );
-    }
-    if( bbox != null ) {
-      urlBuf.append( "&BBOX=" + bbox.getMinX() + "," + bbox.getMinY()
-                    + "," + bbox.getMaxX() + "," + bbox.getMaxY() );
-      if( bbox.getSRS() != null && !bbox.getSRS().equals( "LatLon" ) ) {
-        urlBuf.append( "&SRS=" + bbox.getSRS() );
+  //[UT] changed to accept WMS 1.1.1
+  public URL getURL() throws MalformedURLException {
+      StringBuffer urlBuf = new StringBuffer();
+      String ver = "REQUEST=map&WMTVER=1.0";
+      if ( WMService.WMS_1_1_1.equals( version )){
+          ver = "REQUEST=GetMap&VERSION=1.1.1";
       }
+      urlBuf.append( service.getServerUrl() + ver + "&WIDTH=" + imgWidth + "&HEIGHT=" + imgHeight );
+      urlBuf.append( "&LAYERS=" + listToString( layerList ) );
+      if( transparent ) {
+        urlBuf.append( "&TRANSPARENT=TRUE" );
+      }
+      if( format != null ) {
+        urlBuf.append( "&FORMAT=" + format );
+      }
+      if( bbox != null ) {
+        urlBuf.append( "&BBOX=" + bbox.getMinX() + "," + bbox.getMinY()
+                      + "," + bbox.getMaxX() + "," + bbox.getMaxY() );
+        if( bbox.getSRS() != null && !bbox.getSRS().equals( "LatLon" ) ) {
+          urlBuf.append( "&SRS=" + bbox.getSRS() );
+        }
+      }
+      
+      String logger = System.getProperty( "LOGGER" );
+      if( Boolean.valueOf(logger).booleanValue() ){
+        System.out.println(urlBuf.toString());
+      }
+      
+      return new URL( urlBuf.toString() );
     }
-    return new URL( urlBuf.toString() );
-  }
+
 
   /**
    * Connect to the service and get an Image of the map.
@@ -289,5 +305,9 @@ public URL getURL() throws MalformedURLException {
     */
 
   }
-
+  
+  //UT
+  public void setVersion( String ver ){
+      this.version = ver;
+  }
 }
