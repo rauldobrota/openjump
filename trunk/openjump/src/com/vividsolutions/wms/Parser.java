@@ -42,7 +42,11 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.apache.xerces.parsers.DOMParser;
-import org.w3c.dom.*;
+import org.w3c.dom.CharacterData;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 

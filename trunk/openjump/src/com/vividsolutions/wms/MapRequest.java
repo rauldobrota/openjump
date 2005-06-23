@@ -38,10 +38,13 @@ package com.vividsolutions.wms;
 
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.net.*;
-import java.util.*;
-
-import org.deegree_impl.enterprise.WMSServlet;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Represents all of the parameters of a getMap request from a WMS server.
