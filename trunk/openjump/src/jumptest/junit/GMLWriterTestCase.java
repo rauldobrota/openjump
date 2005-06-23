@@ -29,19 +29,19 @@ public class GMLWriterTestCase extends TestCase {
     }
 
     public void testToString() throws Exception {
-        assert("ABC 123", "ABC 123", AttributeType.STRING);
-        assert("", null, AttributeType.STRING);
-        assert("", "", AttributeType.STRING);
-        assert(" ", " ", AttributeType.STRING);
-        assert("1.23", new Double(1.23), AttributeType.DOUBLE);
-        assert("", null, AttributeType.DOUBLE);
-        assert("4", new Integer(4), AttributeType.INTEGER);
-        assert("", null, AttributeType.INTEGER);
-        assert("1921-04-18", dateFormatter.parse("1921-04-18"), AttributeType.DATE);
-        assert("", null, AttributeType.DATE);
+        doAssert("ABC 123", "ABC 123", AttributeType.STRING);
+        doAssert("", null, AttributeType.STRING);
+        doAssert("", "", AttributeType.STRING);
+        doAssert(" ", " ", AttributeType.STRING);
+        doAssert("1.23", new Double(1.23), AttributeType.DOUBLE);
+        doAssert("", null, AttributeType.DOUBLE);
+        doAssert("4", new Integer(4), AttributeType.INTEGER);
+        doAssert("", null, AttributeType.INTEGER);
+        doAssert("1921-04-18", dateFormatter.parse("1921-04-18"), AttributeType.DATE);
+        doAssert("", null, AttributeType.DATE);
 
         try {
-            assert("", factory.createPoint(new Coordinate()),
+            doAssert("", factory.createPoint(new Coordinate()),
                 AttributeType.GEOMETRY);
             assertTrue(false);
         } catch (AssertionFailedException e) {
@@ -49,7 +49,7 @@ public class GMLWriterTestCase extends TestCase {
         }
     }
 
-    private void assert(String expectedString, Object attributeValue,
+    private void doAssert(String expectedString, Object attributeValue,
         AttributeType type) {
         FeatureSchema schema = new FeatureSchema();
         schema.addAttribute("x", type);
