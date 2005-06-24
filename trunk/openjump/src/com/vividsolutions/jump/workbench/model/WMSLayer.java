@@ -65,6 +65,7 @@ public class WMSLayer extends AbstractLayerable implements Cloneable {
 
 	private WMService service;
 
+	private String wmsVersion = WMService.WMS_1_0_0;
 	/**
 	 * Called by Java2XML
 	 */
@@ -72,21 +73,26 @@ public class WMSLayer extends AbstractLayerable implements Cloneable {
 	}
 
 	public WMSLayer(LayerManager layerManager, String serverURL, String srs,
-			List layerNames, String format) throws IOException {
-		this(layerManager, initializedService(serverURL), srs, layerNames,
+			List layerNames, String format, String version) throws IOException {
+		this(layerManager, initializedService(serverURL, version), srs, layerNames,
 				format);
 	}
 
-	private static WMService initializedService(String serverURL)
+	private static WMService initializedService(String serverURL, String version)
 			throws IOException {
-		WMService initializedService = new WMService(serverURL);
+		WMService initializedService = new WMService(serverURL,version);
 		initializedService.initialize();
 		return initializedService;
 	}
 
 	public WMSLayer(LayerManager layerManager, WMService initializedService,
 			String srs, List layerNames, String format) throws IOException {
-		super((String) layerNames.get(0), layerManager);
+		this(layerManager, initializedService, srs, layerNames, format, initializedService.getVersion());
+	}
+
+	public WMSLayer(LayerManager layerManager, WMService initializedService,
+			String srs, List layerNames, String format, String version){
+	    super((String) layerNames.get(0), layerManager);
 		setService(initializedService);
 		setSRS(srs);
 		this.layerNames = new ArrayList(layerNames);
@@ -94,8 +100,9 @@ public class WMSLayer extends AbstractLayerable implements Cloneable {
 		getBlackboard().put(
 				RenderingManager.USE_MULTI_RENDERING_THREAD_QUEUE_KEY, true);
 		getBlackboard().put(LayerNameRenderer.USE_CLOCK_ANIMATION_KEY, true);
+		this.wmsVersion = version;
 	}
-
+	
 	private void setService(WMService service) {
 		this.service = service;
 		this.serverURL = service.getServerUrl();
@@ -191,7 +198,7 @@ public class WMSLayer extends AbstractLayerable implements Cloneable {
 	public WMService getService() throws IOException {
 		if (service == null) {
 			Assert.isTrue(serverURL != null);
-			setService(initializedService(serverURL));
+			setService(initializedService(serverURL,wmsVersion));
 		}
 		return service;
 	}
@@ -205,4 +212,10 @@ public class WMSLayer extends AbstractLayerable implements Cloneable {
 		//Called by Java2XML [Jon Aquino 2004-02-23]
 		this.serverURL = serverURL;
 	}
+    public String getWmsVersion() {
+        return wmsVersion;
+    }
+    public void setWmsVersion(String wmsVersion) {
+        this.wmsVersion = wmsVersion;
+    }
 }
