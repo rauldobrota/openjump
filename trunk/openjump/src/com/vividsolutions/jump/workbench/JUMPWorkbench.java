@@ -31,6 +31,8 @@
  */
 package com.vividsolutions.jump.workbench;
 
+import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
+import com.jgoodies.looks.plastic.PlasticXPLookAndFeel;
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.util.Blackboard;
@@ -56,10 +58,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.*;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
 
 /**
  * This class is responsible for setting up and displaying the main JUMP
@@ -247,12 +245,16 @@ public class JUMPWorkbench {
 		//Apple stuff from Raj Singh's startup script [Jon Aquino 10/30/2003]
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
 		System.setProperty("apple.awt.showGrowBox", "true");
-		if (UIManager.getLookAndFeel() != null
+        // Use PlasticXPLookAndFeel rather than Plastic3DLookAndFeel, which uses a dark background
+        // for checkboxes, which doesn't look good in the layer panel (left side of task frames).
+        // [Jon Aquino 2005-07-06]
+		String lookAndFeelClassName = PlasticXPLookAndFeel.class.getName();
+        if (UIManager.getLookAndFeel() != null
 				&& UIManager.getLookAndFeel().getClass().getName().equals(
-						UIManager.getSystemLookAndFeelClassName())) {
+						lookAndFeelClassName)) {
 			return;
 		}
-		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		UIManager.setLookAndFeel(lookAndFeelClassName);
 	}
 
 	public DriverManager getDriverManager() {
