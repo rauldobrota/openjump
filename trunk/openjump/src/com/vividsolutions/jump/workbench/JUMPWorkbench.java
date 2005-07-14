@@ -249,7 +249,6 @@ public class JUMPWorkbench {
         // Use PlasticXPLookAndFeel rather than Plastic3DLookAndFeel, which uses a dark background
         // for checkboxes, which doesn't look good in the layer panel (left side of task frames).
         // [Jon Aquino 2005-07-06]
-        PlasticXPLookAndFeel.setMyCurrentTheme(new Silver());
 		String lookAndFeelClassName = PlasticXPLookAndFeel.class.getName();
         if (UIManager.getLookAndFeel() != null
 				&& UIManager.getLookAndFeel().getClass().getName().equals(
