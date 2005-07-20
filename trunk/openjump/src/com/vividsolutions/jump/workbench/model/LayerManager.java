@@ -614,6 +614,32 @@ public class LayerManager {
         return visibleLayers;
     }
 
+    // SIGLE start [obedel]
+    // To free the memory allocated for a layer
+    public void dispose(Layerable layerable) {
+    	for (Iterator i = categories.iterator(); i.hasNext();) {
+            Category c = (Category) i.next();
+            // deleting the layer from the category
+            int index = c.indexOf(layerable);
+            if (index != -1) {
+                c.remove(layerable);
+                for (Iterator j = layerReferencesToDispose.iterator(); j.hasNext();) {
+            		WeakReference reference = (WeakReference) j.next();
+                   	Layer layer = (Layer) reference.get();
+                   	if (layer == layerable) 
+                   	{
+                		// removing the reference to layer
+                   		layer.dispose();
+                	   	layerManagerCount--; 	
+                	}
+                }
+                // changing appearance of layer tree
+                fireLayerChanged(layerable, LayerEventType.REMOVED, c, index);
+            }
+        }
+    }
+    // SIGLE end
+    
     public void dispose() {
         for (Iterator i = layerReferencesToDispose.iterator(); i.hasNext();) {
             WeakReference reference = (WeakReference) i.next();
@@ -631,6 +657,7 @@ public class LayerManager {
         undoableEditReceiver.getUndoManager().discardAllEdits();
     }
 
+    
     public static int layerManagerCount() {
         return layerManagerCount;
     }
