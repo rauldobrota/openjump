@@ -54,9 +54,18 @@ public class RemoveSelectedLayersPlugIn extends AbstractPlugIn {
 
     public void remove(Layerable[] selectedLayers) {
         for (int i = 0; i < selectedLayers.length; i++) {
-            selectedLayers[i].getLayerManager().remove(selectedLayers[i]);
+            // SIGLE start [obedel]
+            // dispose layer immediately
+            //selectedLayers[i].getLayerManager().remove(selectedLayers[i]);
+            // ... becomes ...
+            selectedLayers[i].getLayerManager().dispose(selectedLayers[i]);
+            // SIGLE end
         }
-
+        // SIGLE start [obedel]
+        // forcing memory freeing
+        System.gc();
+        // SIGLE end
+        
         //Don't call LayerManager#setFiringEvents and
         //LayerManager#fireModelChanged, so that each
         //removed node is individually removed from the tree. [Jon Aquino]
