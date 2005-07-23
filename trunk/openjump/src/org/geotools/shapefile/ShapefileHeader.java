@@ -8,6 +8,8 @@ package org.geotools.shapefile;
 
 import java.io.IOException;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jump.io.EndianDataInputStream;
@@ -26,6 +28,11 @@ public class ShapefileHeader{
     private int shapeType = -1;
     //private double[] bounds = new double[4];
     private Envelope bounds;
+    // added by Michaël MICHAUD on 4 nov. 2004 in order to handle shapefile 3D
+    // the right way (zmin and z max may be used by arcgis data translator when
+    // transforming shapefiles to geodatabase)
+    private double zmin = 0.0;
+    private double zmax = 0.0;
     
     public ShapefileHeader(EndianDataInputStream file) throws IOException {
       //  file.setLittleEndianMode(false);
@@ -67,13 +74,30 @@ public class ShapefileHeader{
         }
         int numShapes = geometries.getNumGeometries();
         shapeType = handle.getShapeType();
+        // added by Michaël MICHAUD on 4 nov. 2004
+        boolean zvalues = false;
+        if (shapeType==11 || shapeType==13 || shapeType==15 || shapeType==18) {
+            zvalues = true;
+            zmin = Double.MAX_VALUE;
+            zmax = Double.MIN_VALUE;
+        }
         version = Shapefile.VERSION;
         fileCode = Shapefile.SHAPEFILE_ID;
         bounds = geometries.getEnvelopeInternal();
         fileLength = 0;
         for(int i=0;i<numShapes;i++){
-            fileLength+=handle.getLength(geometries.getGeometryN(i));
+            Geometry g = geometries.getGeometryN(i);
+            fileLength+=handle.getLength(g);
             fileLength+=4;//for each header
+            // added by Michaël MICHAUD on 4 nov. 2004
+            if (zvalues) {
+                Coordinate[] cc = g.getCoordinates();
+                for (int j = 0 ; j < cc.length ; j++) {
+                    if (Double.isNaN(cc[j].z)) continue;
+                    if (cc[j].z < zmin) zmin = cc[j].z;
+                    if (cc[j].z > zmax) zmax = cc[j].z;
+                }
+            }
         }
         fileLength+=50;//space used by this, the main header
         indexLength = 50+(4*numShapes);
@@ -108,12 +132,17 @@ public class ShapefileHeader{
         file.writeDoubleLE(bounds.getMaxY());
         pos+=8*4;
         
+        // added by Michaël MICHAUD on 4 nov. 2004
+        file.writeDoubleLE(zmin);
+        file.writeDoubleLE(zmax);
+        pos+=8*2;
         //skip remaining unused bytes
         //file.setLittleEndianMode(false);//well they may not be unused forever...
-        for(int i=0;i<4;i++){
-            file.writeDoubleLE(0.0);//Skip unused part of header
-            pos+=8;
-        }
+        //for(int i=0;i<2;i++){
+        file.writeDoubleLE(0.0);
+        file.writeDoubleLE(0.0);//Skip unused part of header
+        pos+=8;
+        //}
         
         if(DEBUG)System.out.println("Sfh->Position "+pos);
     }
