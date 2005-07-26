@@ -42,6 +42,10 @@ public class Range {
     private Object max;
     private Object min;
     
+    public String toString() {
+        return min + " - " + max;
+    }
+    
     public Range() {
         this(new NegativeInfinity(), false, new PositiveInfinity(), false);
     }
@@ -49,9 +53,16 @@ public class Range {
     //NegativeInfinity and PositiveInfinity are classes so they can be
     //serialized via Java2XML. [Jon Aquino]
     public static final class NegativeInfinity {
+        public String toString() {
+            // Empty string, for range display in TreeLayerNamePanel. [Jon Aquino 2005-07-25]
+            return "";
+        }
     }
     
     public static final class PositiveInfinity {
+        public String toString() {
+            return "";
+        }
     }    
 
     public Range(

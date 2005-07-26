@@ -35,6 +35,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
@@ -49,6 +52,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -80,12 +84,18 @@ import com.vividsolutions.jump.workbench.model.LayerEventType;
 import com.vividsolutions.jump.workbench.model.LayerListener;
 import com.vividsolutions.jump.workbench.model.LayerManager;
 import com.vividsolutions.jump.workbench.model.LayerManagerProxy;
+import com.vividsolutions.jump.workbench.model.LayerTreeModel;
 import com.vividsolutions.jump.workbench.model.Layerable;
 import com.vividsolutions.jump.workbench.model.WMSLayer;
 import com.vividsolutions.jump.workbench.ui.renderer.RenderingManager;
+import com.vividsolutions.jump.workbench.ui.renderer.style.BasicStyle;
 
-public class TreeLayerNamePanel extends JPanel implements LayerListener,
-        LayerNamePanel, LayerNamePanelProxy, PopupNodeProxy {
+public class TreeLayerNamePanel extends JPanel
+        implements
+            LayerListener,
+            LayerNamePanel,
+            LayerNamePanelProxy,
+            PopupNodeProxy {
     private Map nodeClassToPopupMenuMap = new HashMap();
 
     BorderLayout borderLayout1 = new BorderLayout();
@@ -100,10 +110,9 @@ public class TreeLayerNamePanel extends JPanel implements LayerListener,
                     || path.getLastPathComponent() instanceof Category;
         }
 
-        //Workaround for Java Bug 4199956 "JTree shows container can be
-        // expanded -
-        //even when empty", posted by bertrand.allo in the Java Bug Database.
-        // [Jon Aquino]
+        // Workaround for Java Bug 4199956 "JTree shows container can be
+        // expanded - even when empty", posted by bertrand.allo in the Java Bug
+        // Database. [Jon Aquino]
         public boolean hasBeenExpanded(TreePath path) {
             return super.hasBeenExpanded(path)
                     || !this.getModel().isLeaf(path.getLastPathComponent());
@@ -175,7 +184,7 @@ public class TreeLayerNamePanel extends JPanel implements LayerListener,
                             .getPathForLocation(e.getX(), e.getY());
                     // move only Layerables, not Categories
                     if (movingTreePath != null
-                            && movingTreePath.getLastPathComponent() instanceof Category)
+                            && ! (movingTreePath.getLastPathComponent() instanceof Layerable))
                         movingTreePath = null;
                 } else
                     movingTreePath = null;
@@ -191,11 +200,9 @@ public class TreeLayerNamePanel extends JPanel implements LayerListener,
                         .getX(), e.getY());
 
                 // Fix: When dragging a Layerable onto a Category, and then
-                // selecting a
-                // different layer, the last XOR placement of the dragbar would
-                // appear
-                // over the Category.
-                // Need to reset firstTimeDragging to true before returning.
+                // selecting a different layer, the last XOR placement of the
+                // dragbar would appear over the Category. Need to reset
+                // firstTimeDragging to true before returning.
                 movingTreePath = null;
                 firstTimeDragging = true;
 
@@ -205,8 +212,8 @@ public class TreeLayerNamePanel extends JPanel implements LayerListener,
 
                 // remove remnants of horizontal drag bar by refreshing display
                 tree.repaint();
-                //Changed #update to #repaint -- less flickery for some reason
-                //[Jon Aquino 2004-03-17]
+                // Changed #update to #repaint -- less flickery for some reason
+                // [Jon Aquino 2004-03-17]
 
                 // dragging a layerable
                 if (node instanceof Layerable) {
@@ -216,11 +223,9 @@ public class TreeLayerNamePanel extends JPanel implements LayerListener,
 
                     if (tpDestination.getLastPathComponent() instanceof Layerable) {
 
-                        //Fix: When shift-clicking to select a range of nodes,
-                        // last node
-                        //would unselect because the layer would get removed
-                        // then
-                        //re-added. [Jon Aquino 2004-03-11]
+                        // Fix: When shift-clicking to select a range of nodes,
+                        // last node would unselect because the layer would get
+                        // removed then re-added. [Jon Aquino 2004-03-11]
                         if (layerable == tpDestination.getLastPathComponent()) {
                             return;
                         }
@@ -235,14 +240,15 @@ public class TreeLayerNamePanel extends JPanel implements LayerListener,
                     } else if (tpDestination.getLastPathComponent() instanceof Category) {
                         cat = (Category) tpDestination.getLastPathComponent();
 
-                        //Prevent unnecessary removals and re-additions
-                        //[Jon Aquino 2004-03-11]
+                        // Prevent unnecessary removals and re-additions
+                        // [Jon Aquino 2004-03-11]
                         if (cat.contains(layerable)) {
                             return;
                         }
 
                     } else {
-                        Assert.shouldNeverReachHere();
+                        // Can get here if the node is, for example, a LayerTreeModel.ColorThemingValue [Jon Aquino 2005-07-25]
+                        return;
                     }
 
                     getLayerManager().remove(layerable);
@@ -270,8 +276,7 @@ public class TreeLayerNamePanel extends JPanel implements LayerListener,
                 rowNew = tree.getClosestRowForLocation(e.getX(), e.getY());
                 rowOld = tree.getRowForPath(movingTreePath);
                 // if the dragging of a row hasn't moved outside of the bounds
-                // of
-                // the currently selected row, don't show the horizontal drag
+                // of the currently selected row, don't show the horizontal drag
                 // bar.
                 if (rowNew == rowOld)
                     return;
@@ -282,9 +287,8 @@ public class TreeLayerNamePanel extends JPanel implements LayerListener,
                 g2.setColor(Color.RED);
                 g2.setXORMode(Color.WHITE);
                 // if this is the first time moving the dragbar, draw the
-                // dragbar
-                // so XOR drawing works properly
-                if (firstTimeDragging) { // 
+                // dragbar so XOR drawing works properly
+                if (firstTimeDragging) {
                     rowOld = rowNew;
                     dragBar = new Rectangle(0, 0, tree.getWidth(), 3);
                     g2.fill(dragBar);
@@ -344,7 +348,7 @@ public class TreeLayerNamePanel extends JPanel implements LayerListener,
             private DefaultTreeCellRenderer defaultRenderer = new DefaultTreeCellRenderer() {
 
                 {
-                    //Transparent. [Jon Aquino]
+                    // Transparent. [Jon Aquino]
                     setBackgroundNonSelectionColor(new Color(0, 0, 0, 0));
                 }
             };
@@ -365,8 +369,37 @@ public class TreeLayerNamePanel extends JPanel implements LayerListener,
         map.put(Layer.class, layerTreeCellRenderer);
         map.put(WMSLayer.class, layerTreeCellRenderer);
         map.put(Category.class, layerTreeCellRenderer);
-
+        map.put(LayerTreeModel.ColorThemingValue.class, createColorThemingValueRenderer());
         return map;
+    }
+
+    private TreeCellRenderer createColorThemingValueRenderer() {
+        return new TreeCellRenderer() {
+            private JPanel panel = new JPanel(new GridBagLayout());
+            private ColorPanel colorPanel = new ColorPanel();
+            private JLabel label = new JLabel();
+            {
+                panel.add(colorPanel, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0,0,0,0), 0, 0));
+                panel.add(label, new GridBagConstraints(1, 0, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0,5,0,0), 0, 0));
+            }
+            public Component getTreeCellRendererComponent(JTree tree,
+                    Object value, boolean selected, boolean expanded,
+                    boolean leaf, int row, boolean hasFocus) {
+                label.setText(((LayerTreeModel.ColorThemingValue) value)
+                        .toString());
+                BasicStyle style = ((LayerTreeModel.ColorThemingValue) value)
+                        .getStyle();
+                colorPanel.setLineColor(style.isRenderingLine()
+                        ? GUIUtil.alphaColor(style.getLineColor(), style
+                                .getAlpha())
+                        : GUIUtil.alphaColor(Color.BLACK, 0));
+                colorPanel.setFillColor(style.isRenderingFill()
+                        ? GUIUtil.alphaColor(style.getFillColor(), style
+                                .getAlpha())
+                        : GUIUtil.alphaColor(Color.BLACK, 0));
+                return panel;
+            }
+        };
     }
 
     void jbInit() throws Exception {
@@ -380,13 +413,13 @@ public class TreeLayerNamePanel extends JPanel implements LayerListener,
         tree.setEditable(true);
         tree.setRootVisible(false);
 
-        //Row height is set to -1 because otherwise, in Java 1.4, tree nodes
-        // will be
-        //"chopped off" at the bottom [Jon Aquino]
+        // Row height is set to -1 because otherwise, in Java 1.4, tree nodes
+        // will be "chopped off" at the bottom [Jon Aquino]
         tree.setRowHeight(-1);
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
         tree.setShowsRootHandles(true);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane
+                .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setBorder(BorderFactory.createEtchedBorder());
         scrollPane.getViewport().add(tree);
         this.add(scrollPane, BorderLayout.CENTER);
@@ -405,14 +438,11 @@ public class TreeLayerNamePanel extends JPanel implements LayerListener,
 
         popupNode = popupPath.getLastPathComponent();
 
-        //#isAltDown returns true on a middle-click; #isMetaDown returns true
-        // on
-        //a right-click[Jon Aquino]
-        //Third check can't simply user JTree#isPathSelected because the node
-        // wrappers are value
-        //objects and thus can't reliably be compared by reference (which is
-        // what #isPathSelected
-        //seems to do). [Jon Aquino]
+        // #isAltDown returns true on a middle-click; #isMetaDown returns true
+        // on a right-click[Jon Aquino]
+        // Third check can't simply user JTree#isPathSelected because the node
+        // wrappers are value objects and thus can't reliably be compared by
+        // reference (which is what #isPathSelected seems to do). [Jon Aquino]
         if (!(e.isControlDown() || e.isShiftDown() || selectedNodes(
                 Object.class).contains(popupNode))) {
             tree.getSelectionModel().clearSelection();
@@ -452,9 +482,9 @@ public class TreeLayerNamePanel extends JPanel implements LayerListener,
         Point layerNodeLocation = tree.getUI().getPathBounds(tree, path)
                 .getLocation();
 
-        //Initialize the LayerNameRenderer with the current node.
-        // checkBoxBounds
-        //will be different for Layers and WMSLayers. [Jon Aquino]
+        // Initialize the LayerNameRenderer with the current node.
+        // checkBoxBounds will be different for Layers and WMSLayers. [Jon
+        // Aquino]
         layerTreeCellRenderer.getLayerNameRenderer()
                 .getTreeCellRendererComponent(tree,
                         path.getLastPathComponent(), false, false, false, 0,
@@ -476,9 +506,7 @@ public class TreeLayerNamePanel extends JPanel implements LayerListener,
 
     public static Layer[] selectedLayers(LayerNamePanel layerNamePanel) {
         return (Layer[]) layerNamePanel.selectedNodes(Layer.class).toArray(
-                new Layer[] {
-
-                });
+                new Layer[]{});
     }
 
     public Collection getSelectedCategories() {
@@ -520,15 +548,15 @@ public class TreeLayerNamePanel extends JPanel implements LayerListener,
         tree.addSelectionPath(TreeUtil.findTreePath(layer, tree.getModel()));
     }
 
-    public void layerChanged(LayerEvent e) {
-        TreeModelEvent treeModelEvent = new TreeModelEvent(this, new Object[] {
-                tree.getModel().getRoot(), e.getCategory() }, new int[] { e
-                .getLayerableIndex() }, new Object[] { e.getLayerable() });
+    public void layerChanged(final LayerEvent e) {
+        TreeModelEvent treeModelEvent = new TreeModelEvent(this, new Object[]{
+                tree.getModel().getRoot(), e.getCategory()}, new int[]{e
+                .getLayerableIndex()}, new Object[]{e.getLayerable()});
 
         if (e.getType() == LayerEventType.ADDED) {
             firableTreeModelWrapper.fireTreeNodesInserted(treeModelEvent);
 
-            //firableTreeModelWrapper.fireTreeStructureChanged(treeModelEvent);
+            // firableTreeModelWrapper.fireTreeStructureChanged(treeModelEvent);
             if ((e.getType() == LayerEventType.ADDED)
                     && (getSelectedLayers().length == 0)
                     && e.getLayerable() instanceof Layer) {
@@ -545,8 +573,20 @@ public class TreeLayerNamePanel extends JPanel implements LayerListener,
         }
 
         if (e.getType() == LayerEventType.APPEARANCE_CHANGED) {
-            firableTreeModelWrapper.fireTreeNodesChanged(treeModelEvent);
-
+            // For some reason, if we don't use #invokeLater to call #fireTreeStructureChanged,
+            // blank lines get inserted into the JTree. For more information, see Java Bug 4498762,
+            // "When expandPath() is called by a JTree method, extra blank lines appear",
+            // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4498762
+            // [Jon Aquino 2005-07-25]
+            SwingUtilities.invokeLater(new Runnable(){
+                public void run() {
+                    // Specify the path of the subtree rooted at the layer -- the ColorThemingValues
+                    // may have changed. [Jon Aquino 2005-07-25]
+                    firableTreeModelWrapper.fireTreeStructureChanged(new TreeModelEvent(
+                            this, new Object[]{tree.getModel().getRoot(),
+                                    e.getCategory(), e.getLayerable()}));
+                }                
+            });
             return;
         }
 
@@ -567,10 +607,10 @@ public class TreeLayerNamePanel extends JPanel implements LayerListener,
 
     public void categoryChanged(CategoryEvent e) {
         TreeModelEvent treeModelEvent = new TreeModelEvent(this,
-                new Object[] { tree.getModel().getRoot() }, new int[] { e
+                new Object[]{tree.getModel().getRoot()}, new int[]{e
                         .getCategoryIndex()
-                        + indexOfFirstCategoryInTree() }, new Object[] { e
-                        .getCategory() });
+                        + indexOfFirstCategoryInTree()}, new Object[]{e
+                        .getCategory()});
 
         if (e.getType() == CategoryEventType.ADDED) {
             firableTreeModelWrapper.fireTreeNodesInserted(treeModelEvent);
@@ -594,7 +634,7 @@ public class TreeLayerNamePanel extends JPanel implements LayerListener,
     }
 
     private int indexOfFirstCategoryInTree() {
-        //Not 0 in ESE. [Jon Aquino]
+        // Not 0 in ESE. [Jon Aquino]
         for (int i = 0; i < tree.getModel().getChildCount(
                 tree.getModel().getRoot()); i++) {
             if (tree.getModel().getChild(tree.getModel().getRoot(), i) instanceof Category) {
@@ -611,10 +651,9 @@ public class TreeLayerNamePanel extends JPanel implements LayerListener,
     }
 
     public void dispose() {
-        //Layer events could still be fired after the TaskWindow containing
-        // this
-        //LayerNamePanel is closed (e.g. by clones of the TaskWindow, or
-        //by an attribute viewer). [Jon Aquino]
+        // Layer events could still be fired after the TaskWindow containing
+        // this LayerNamePanel is closed (e.g. by clones of the TaskWindow, or
+        // by an attribute viewer). [Jon Aquino]
         layerManagerProxy.getLayerManager().removeLayerListener(this);
     }
 
