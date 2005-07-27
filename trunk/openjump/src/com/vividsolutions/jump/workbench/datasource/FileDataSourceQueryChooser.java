@@ -170,7 +170,7 @@ public abstract class FileDataSourceQueryChooser
         chooser.addChoosableFileFilter(chooser.getAcceptAllFileFilter());
     }
 
-    protected DataSourceQuery toDataSourceQuery(File file) {
+    public DataSourceQuery toDataSourceQuery(File file) {
         DataSource dataSource = (DataSource) LangUtil.newInstance(dataSourceClass);
         dataSource.setProperties(toProperties(file));
 
@@ -195,7 +195,7 @@ public abstract class FileDataSourceQueryChooser
         f.setVisible(true);
     }
 
-    private FileFilter getFileFilter() {
+    public FileFilter getFileFilter() {
         return fileFilter;
     }
 

@@ -37,7 +37,6 @@ import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.coordsys.CoordinateSystemRegistry;
 import com.vividsolutions.jump.feature.FeatureCollection;
 import com.vividsolutions.jump.io.datasource.*;
-import com.vividsolutions.jump.io.datasource.Connection;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.util.CollectionUtil;
 import com.vividsolutions.jump.util.StringUtil;
@@ -66,24 +65,24 @@ import javax.swing.SwingUtilities;
  * Prompts the user to pick a dataset to load.
  * @see DataSourceQueryChooserDialog
  */
-public class LoadDatasetPlugIn extends ThreadedBasePlugIn {
-    private static Logger LOG = Logger.getLogger(LoadDatasetPlugIn.class);
-    
-    private static String LAST_FORMAT_KEY = LoadDatasetPlugIn.class.getName() +
-        " - LAST FORMAT";
-
-    private DataSourceQueryChooserDialog getDialog(PlugInContext context) {
+public class LoadDatasetPlugIn extends AbstractLoadDatasetPlugIn {
+    private WorkbenchContext context;
+    public void initialize(PlugInContext context) throws Exception {
+        this.context = context.getWorkbenchContext();
+        super.initialize(context);
+    }
+    private DataSourceQueryChooserDialog getDialog() {
         String KEY = getClass().getName() + " - DIALOG";
-        if (null == context.getWorkbenchContext().getWorkbench().getBlackboard()
+        if (null == context.getWorkbench().getBlackboard()
                                .get(KEY)) {
-            context.getWorkbenchContext().getWorkbench().getBlackboard().put(KEY,
+            context.getWorkbench().getBlackboard().put(KEY,
                 new DataSourceQueryChooserDialog(DataSourceQueryChooserManager.get(
-                        context.getWorkbenchContext().getWorkbench()
+                        context.getWorkbench()
                                .getBlackboard()).getLoadDataSourceQueryChoosers(),
-                    context.getWorkbenchFrame(), getName(), true));
+                    context.getWorkbench().getFrame(), getName(), true));
         }
 
-        return (DataSourceQueryChooserDialog) context.getWorkbenchContext()
+        return (DataSourceQueryChooserDialog) context
                                                      .getWorkbench()
                                                      .getBlackboard().get(KEY);
     }
@@ -93,117 +92,15 @@ public class LoadDatasetPlugIn extends ThreadedBasePlugIn {
         return I18N.get("datasource.LoadDatasetPlugIn.load-dataset");
     }
 
-    public void initialize(final PlugInContext context) throws Exception {
-        //Give other plug-ins a chance to add DataSourceQueryChoosers
-        //before the dialog is realized. [Jon Aquino]
-        context.getWorkbenchFrame().addWindowListener(new WindowAdapter() {
-            public void windowOpened(WindowEvent e) {
-                String format = (String) PersistentBlackboardPlugIn.get(context.getWorkbenchContext())
-                                                                   .get(LAST_FORMAT_KEY);
-                if (format != null) {
-                    getDialog(context).setSelectedFormat(format);
-                }
-			}
-        });
+    protected void setSelectedFormat(String format) {
+        getDialog().setSelectedFormat(format);
     }
-
-    public boolean execute(PlugInContext context) throws Exception {
-        GUIUtil.centreOnWindow(getDialog(context));
-        getDialog(context).setVisible(true);
-        if (getDialog(context).wasOKPressed()) {
-            PersistentBlackboardPlugIn.get(context.getWorkbenchContext()).put(LAST_FORMAT_KEY,
-			getDialog(context).getSelectedFormat());
-        }
-
-        return getDialog(context).wasOKPressed();
+    protected Collection showDialog(WorkbenchContext context) {
+        GUIUtil.centreOnWindow(getDialog());
+        getDialog().setVisible(true);
+        return getDialog().wasOKPressed() ? getDialog().getCurrentChooser().getDataSourceQueries() : null;        
     }
-
-    public void run(TaskMonitor monitor, PlugInContext context)
-        throws Exception {
-        //Seamus Thomas Carroll [mailto:carrolls@cpsc.ucalgary.ca]
-        //was concerned when he noticed that #getDataSourceQueries
-        //was being called twice. So call it once only. [Jon Aquino 2004-02-05]
-        Collection dataSourceQueries = getDialog(context).getCurrentChooser()
-                              .getDataSourceQueries();
-        Assert.isTrue(!dataSourceQueries.isEmpty());
-
-        boolean exceptionsEncountered = false;
-        for (Iterator i = dataSourceQueries.iterator(); i.hasNext();) {
-            DataSourceQuery dataSourceQuery = (DataSourceQuery) i.next();
-            ArrayList exceptions = new ArrayList();
-            Assert.isTrue(dataSourceQuery.getDataSource().isReadable());
-            monitor.report(I18N.get("datasource.LoadDatasetPlugIn.loading")+" " + dataSourceQuery.toString() + "...");
-
-            Connection connection = dataSourceQuery.getDataSource()
-                                                   .getConnection();
-            try {
-                FeatureCollection dataset = dataSourceQuery.getDataSource().installCoordinateSystem(
-                        													connection.executeQuery(dataSourceQuery.getQuery(),
-                        											        exceptions, 
-                        											        monitor), 
-                        											        CoordinateSystemRegistry.instance(
-                        											                context.getWorkbenchContext().getBlackboard()));
-                if (dataset != null) {
-                    context.getLayerManager()
-                           .addLayer(chooseCategory(context),
-                        dataSourceQuery.toString(), dataset)
-                           .setDataSourceQuery(dataSourceQuery)
-                           .setFeatureCollectionModified(false);
-                }
-            } finally {
-                connection.close();
-            }
-            if (!exceptions.isEmpty()) {
-                if (!exceptionsEncountered) {
-                    context.getOutputFrame().createNewDocument();
-                    exceptionsEncountered = true;
-                }
-                reportExceptions(exceptions, dataSourceQuery, context);
-            }
-        }
-        if (exceptionsEncountered) {
-            context.getWorkbenchFrame().warnUser(I18N.get("datasource.LoadDatasetPlugIn.problems-were-encountered"));
-        }
-    }
-
-    private void reportExceptions(ArrayList exceptions,
-        DataSourceQuery dataSourceQuery, PlugInContext context) {
-        context.getOutputFrame().addHeader(1,
-            exceptions.size() + " "+I18N.get("datasource.LoadDatasetPlugIn.problem") + StringUtil.s(exceptions.size()) +
-            " "+ I18N.get("datasource.LoadDatasetPlugIn.loading")  + " " + dataSourceQuery.toString() + "." +
-            ((exceptions.size() > 10) ? " "+I18N.get("datasource.LoadDatasetPlugIn.first-and-last-five") : ""));
-        context.getOutputFrame().addText(I18N.get("datasource.LoadDatasetPlugIn.see-view-log"));
-        context.getOutputFrame().append("<ul>");
-
-        Collection exceptionsToReport = exceptions.size() <= 10 ? exceptions
-                                                                : CollectionUtil.concatenate(Arrays.asList(
-                    new Collection[] {
-                        exceptions.subList(0, 5),
-                        exceptions.subList(exceptions.size() - 5,
-                            exceptions.size())
-                    }));
-        for (Iterator j = exceptionsToReport.iterator(); j.hasNext();) {
-            Exception exception = (Exception) j.next();
-            context.getWorkbenchFrame().log(StringUtil.stackTrace(exception));
-            context.getOutputFrame().append("<li>");
-            context.getOutputFrame().append(GUIUtil.escapeHTML(
-                    WorkbenchFrame.toMessage(exception), true, true));
-            context.getOutputFrame().append("</li>");
-        }
-        context.getOutputFrame().append("</ul>");
-    }
-
-    private String chooseCategory(PlugInContext context) {
-        return context.getLayerNamePanel().getSelectedCategories().isEmpty()
-        ? StandardCategoryNames.WORKING
-        : context.getLayerNamePanel().getSelectedCategories().iterator().next()
-                 .toString();
-    }
-
-    public static MultiEnableCheck createEnableCheck(
-        final WorkbenchContext workbenchContext) {
-        EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
-
-        return new MultiEnableCheck().add(checkFactory.createWindowWithLayerManagerMustBeActiveCheck());
+    protected String getSelectedFormat() {
+        return getDialog().getSelectedFormat();
     }
 }

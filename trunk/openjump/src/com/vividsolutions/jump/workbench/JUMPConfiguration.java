@@ -42,7 +42,9 @@ import javax.swing.JToggleButton;
 
 import com.vividsolutions.jts.util.Assert;
 import com.vividsolutions.jump.I18N;
+import com.vividsolutions.jump.workbench.datasource.AbstractLoadDatasetPlugIn;
 import com.vividsolutions.jump.workbench.datasource.InstallStandardDataSourceQueryChoosersPlugIn;
+import com.vividsolutions.jump.workbench.datasource.LoadDatasetFromFilePlugIn;
 import com.vividsolutions.jump.workbench.datasource.LoadDatasetPlugIn;
 import com.vividsolutions.jump.workbench.datasource.SaveDatasetAsPlugIn;
 import com.vividsolutions.jump.workbench.plugin.*;
@@ -139,7 +141,7 @@ public class JUMPConfiguration implements Setup {
     private LayerStatisticsPlugIn layerStatisticsPlugIn = new LayerStatisticsPlugIn();
 
     private LoadDatasetPlugIn loadDatasetPlugIn = new LoadDatasetPlugIn();
-
+    private LoadDatasetFromFilePlugIn loadDatasetFromFilePlugIn = new LoadDatasetFromFilePlugIn();
     private SaveDatasetAsPlugIn saveDatasetAsPlugIn = new SaveDatasetAsPlugIn();
 
     private SaveImageAsPlugIn saveImageAsPlugIn = new SaveImageAsPlugIn();
@@ -256,6 +258,10 @@ public class JUMPConfiguration implements Setup {
 
     private void configureCategoryPopupMenu(WorkbenchContext workbenchContext,
             FeatureInstaller featureInstaller) {
+        featureInstaller.addPopupMenuItem(workbenchContext.getWorkbench()
+                .getFrame().getCategoryPopupMenu(), loadDatasetFromFilePlugIn,
+                loadDatasetFromFilePlugIn.getName() + "...", false, null,
+                LoadDatasetPlugIn.createEnableCheck(workbenchContext));
         featureInstaller.addPopupMenuItem(workbenchContext.getWorkbench()
                 .getFrame().getCategoryPopupMenu(), loadDatasetPlugIn,
                 loadDatasetPlugIn.getName() + "...", false, null,
@@ -485,6 +491,9 @@ public class JUMPConfiguration implements Setup {
                 saveProjectAsPlugIn.getName() + "...", null, checkFactory
                         .createTaskWindowMustBeActiveCheck());
         featureInstaller.addMenuSeparator(MenuNames.FILE); // ===================
+        featureInstaller.addMainMenuItem(loadDatasetFromFilePlugIn, MenuNames.FILE,
+                loadDatasetFromFilePlugIn.getName() + "...", null, AbstractLoadDatasetPlugIn
+                        .createEnableCheck(workbenchContext));
         featureInstaller.addMainMenuItem(loadDatasetPlugIn, MenuNames.FILE,
                 loadDatasetPlugIn.getName() + "...", null, LoadDatasetPlugIn
                         .createEnableCheck(workbenchContext));
