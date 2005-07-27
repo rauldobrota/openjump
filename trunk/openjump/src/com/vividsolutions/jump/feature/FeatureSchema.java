@@ -52,15 +52,25 @@ public class FeatureSchema implements Cloneable, Serializable {
     private ArrayList attributeNames = new ArrayList();
     private ArrayList attributeTypes = new ArrayList();
 
-    //<<TODO>> Deep-copy! [Jon Aquino]
+    //todo Deep-copy! [Jon Aquino]
+    //deep copy done 25. Juli 2005 [sstein] 
     public Object clone() {
         try {
-            return super.clone();
-        } catch (CloneNotSupportedException ex) {
+    		FeatureSchema fs = new FeatureSchema();
+    		for (int i = 0; i < this.attributeCount; i++) {
+    			AttributeType at = (AttributeType)this.attributeTypes.get(i);
+    			String aname = (String)this.attributeNames.get(i);
+    			fs.addAttribute(aname,at);
+    			fs.setCoordinateSystem(this.coordinateSystem);			
+    		}		
+    		return fs;
+        } 
+        catch (Exception ex) {
             Assert.shouldNeverReachHere();
             return null;
         }
-    }
+    }  
+
     /**
      * Returns the zero-based index of the attribute with the given name
      * (case-sensitive)
