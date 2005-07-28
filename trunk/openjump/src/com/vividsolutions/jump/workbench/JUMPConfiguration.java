@@ -265,10 +265,6 @@ public class JUMPConfiguration implements Setup {
                 loadDatasetFromFilePlugIn.getName() + "...", false, null,
                 LoadDatasetPlugIn.createEnableCheck(workbenchContext));
         featureInstaller.addPopupMenuItem(workbenchContext.getWorkbench()
-                .getFrame().getCategoryPopupMenu(), loadDatasetPlugIn,
-                loadDatasetPlugIn.getName() + "...", false, null,
-                LoadDatasetPlugIn.createEnableCheck(workbenchContext));
-        featureInstaller.addPopupMenuItem(workbenchContext.getWorkbench()
                 .getFrame().getCategoryPopupMenu(), addNewLayerPlugIn,
                 addNewLayerPlugIn.getName(), false, null, null);
         featureInstaller.addPopupMenuItem(workbenchContext.getWorkbench()
@@ -368,10 +364,6 @@ public class JUMPConfiguration implements Setup {
         layerNamePopupMenu.addSeparator(); // ===================
         featureInstaller.addPopupMenuItem(layerNamePopupMenu,
                 saveDatasetAsFilePlugIn, saveDatasetAsFilePlugIn.getName() + "...",
-                false, null, AbstractSaveDatasetAsPlugIn
-                        .createEnableCheck(workbenchContext));
-        featureInstaller.addPopupMenuItem(layerNamePopupMenu,
-                saveDatasetAsPlugIn, saveDatasetAsPlugIn.getName() + "...",
                 false, null, AbstractSaveDatasetAsPlugIn
                         .createEnableCheck(workbenchContext));
         layerNamePopupMenu.addSeparator(); // ===================

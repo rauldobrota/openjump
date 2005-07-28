@@ -1,5 +1,7 @@
 package com.vividsolutions.jump.workbench.datasource;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 
 import javax.swing.JFileChooser;
@@ -16,7 +18,8 @@ public class SaveDatasetAsFilePlugIn extends AbstractSaveDatasetAsPlugIn {
         return loadSaveDatasetFileMixin.getSelectedFormat();
     }
     protected Collection showDialog(WorkbenchContext context) {
-        JFileChooser fileChooser = GUIUtil.createJFileChooserWithOverwritePrompting();
+        JFileChooser fileChooser = GUIUtil
+                .createJFileChooserWithOverwritePrompting();
         fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
         return loadSaveDatasetFileMixin.showDialog(fileChooser,
                 LoadFileDataSourceQueryChooser.class, context);
@@ -28,9 +31,21 @@ public class SaveDatasetAsFilePlugIn extends AbstractSaveDatasetAsPlugIn {
         protected String getLastDirectoryKey() {
             return SaveDatasetAsFilePlugIn.this.getLastDirectoryKey();
         }
-        public boolean isAddingExtensionIfRequested() { return true; }
+        public boolean isAddingExtensionIfRequested() {
+            return true;
+        }
+        public File initiallySelectedFile(File currentDirectory) {
+            // Call #getCanonicalFile to validate that the layer name is a valid filename. [Jon Aquino 2005-07-28[]
+            try {
+                return new File(currentDirectory, getContext()
+                        .createPlugInContext().getSelectedLayer(0).getName()).getCanonicalFile();
+            } catch (IOException e) {
+                return null;
+            }
+        }
     };
     public String getName() {
-        return I18N.get("datasource.SaveDatasetAsFilePlugIn.save-dataset-as-file");
-    }    
+        return I18N
+                .get("datasource.SaveDatasetAsFilePlugIn.save-dataset-as-file");
+    }
 }

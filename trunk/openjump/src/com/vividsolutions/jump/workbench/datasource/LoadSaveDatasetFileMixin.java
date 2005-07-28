@@ -47,6 +47,7 @@ public abstract class LoadSaveDatasetFileMixin {
                 (String) PersistentBlackboardPlugIn.get(context).get(
                         getLastDirectoryKey(),
                         fileChooser.getCurrentDirectory().getCanonicalPath())));
+        fileChooser.setSelectedFile(initiallySelectedFile(fileChooser.getCurrentDirectory()));
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         GUIUtil.removeChoosableFileFilters(fileChooser);
         final Map fileFilterToFileDataSourceQueryChooserMap = new HashMap();
@@ -100,10 +101,11 @@ public abstract class LoadSaveDatasetFileMixin {
                 });
     }
 
+    public abstract File initiallySelectedFile(File currentDirectory);
+
     private File addExtensionIfRequested(File file, String extension) {
         return isAddingExtensionIfRequested() ? FileUtil.addExtensionIfNone(file,
                 extension) : file;
     }
-
     public abstract boolean isAddingExtensionIfRequested();
 }

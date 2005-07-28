@@ -41,6 +41,7 @@ public class LoadDatasetFromFilePlugIn extends AbstractLoadDatasetPlugIn {
             return LoadDatasetFromFilePlugIn.this.getLastDirectoryKey();
         }
         public boolean isAddingExtensionIfRequested() { return false; }
+        public File initiallySelectedFile(File currentDirectory) { return null; }
     };
     public String getName() {
         return I18N
