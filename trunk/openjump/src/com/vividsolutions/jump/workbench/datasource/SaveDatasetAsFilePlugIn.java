@@ -1,24 +1,14 @@
 package com.vividsolutions.jump.workbench.datasource;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
 
 import com.vividsolutions.jump.I18N;
-import com.vividsolutions.jump.util.Block;
-import com.vividsolutions.jump.util.CollectionUtil;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
-import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
 
-public class LoadDatasetFromFilePlugIn extends AbstractLoadDatasetPlugIn {
+public class SaveDatasetAsFilePlugIn extends AbstractSaveDatasetAsPlugIn {
     protected void setSelectedFormat(String format) {
         loadSaveDatasetFileMixin.setSelectedFormat(format);
     }
@@ -26,23 +16,20 @@ public class LoadDatasetFromFilePlugIn extends AbstractLoadDatasetPlugIn {
         return loadSaveDatasetFileMixin.getSelectedFormat();
     }
     protected Collection showDialog(WorkbenchContext context) {
-        final JFileChooser fileChooser = GUIUtil
-                .createJFileChooserWithExistenceChecking();
-        fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
-        fileChooser.setMultiSelectionEnabled(true);
+        JFileChooser fileChooser = GUIUtil.createJFileChooserWithOverwritePrompting();
+        fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
         return loadSaveDatasetFileMixin.showDialog(fileChooser,
                 LoadFileDataSourceQueryChooser.class, context);
     }
     private LoadSaveDatasetFileMixin loadSaveDatasetFileMixin = new LoadSaveDatasetFileMixin() {
         protected String getName() {
-            return LoadDatasetFromFilePlugIn.this.getName();
+            return SaveDatasetAsFilePlugIn.this.getName();
         }
         protected String getLastDirectoryKey() {
-            return LoadDatasetFromFilePlugIn.this.getLastDirectoryKey();
+            return SaveDatasetAsFilePlugIn.this.getLastDirectoryKey();
         }
     };
     public String getName() {
-        return I18N
-                .get("datasource.LoadDatasetFromFilePlugIn.load-dataset-from-file");
+        return I18N.get("datasource.SaveDatasetAsFilePlugIn.save-dataset-as-file");
     }
 }

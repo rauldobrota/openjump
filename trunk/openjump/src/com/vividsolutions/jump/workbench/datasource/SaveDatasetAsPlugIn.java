@@ -33,6 +33,9 @@ package com.vividsolutions.jump.workbench.datasource;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Collection;
+
+import sun.security.action.GetLongAction;
 
 import com.vividsolutions.jts.util.Assert;
 
@@ -52,82 +55,33 @@ import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
  * Prompts the user to pick a dataset to save.
  * @see DataSourceQueryChooserDialog
  */
-public class SaveDatasetAsPlugIn extends ThreadedBasePlugIn {
-    private static String LAST_FORMAT_KEY = SaveDatasetAsPlugIn.class.getName() +
-        " - LAST FORMAT";
-
-    private DataSourceQueryChooserDialog getDialog(PlugInContext context) {
+public class SaveDatasetAsPlugIn extends AbstractSaveDatasetAsPlugIn {
+    protected Collection showDialog(WorkbenchContext context) {
+        GUIUtil.centreOnWindow(getDialog());
+        getDialog().setVisible(true);
+        return getDialog().wasOKPressed() ? getDialog().getCurrentChooser().getDataSourceQueries() : null;        
+    }
+    protected void setSelectedFormat(String format) {
+        getDialog().setSelectedFormat(format);
+    }
+    protected String getSelectedFormat() {
+        return getDialog().getSelectedFormat();
+    }
+    private DataSourceQueryChooserDialog getDialog() {
         String KEY = getClass().getName() + " - DIALOG";
-        if (null == context.getWorkbenchContext().getWorkbench().getBlackboard()
-                               .get(KEY)) {
-            context.getWorkbenchContext().getWorkbench().getBlackboard().put(KEY,
-                new DataSourceQueryChooserDialog(DataSourceQueryChooserManager.get(
-                        context.getWorkbenchContext().getWorkbench()
-                               .getBlackboard()).getSaveDataSourceQueryChoosers(),
-                    context.getWorkbenchFrame(), getName(), true));
+        if (null == getContext().getWorkbench().getBlackboard().get(KEY)) {
+            getContext().getWorkbench().getBlackboard().put(
+                    KEY,
+                    new DataSourceQueryChooserDialog(
+                            DataSourceQueryChooserManager
+                                    .get(
+                                            getContext().getWorkbench()
+                                                    .getBlackboard())
+                                    .getSaveDataSourceQueryChoosers(),
+                            getContext().getWorkbench().getFrame(), getName(),
+                            true));
         }
-
-        return (DataSourceQueryChooserDialog) context.getWorkbenchContext()
-                                                     .getWorkbench()
-                                                     .getBlackboard().get(KEY);
-    }
-
-    public void initialize(final PlugInContext context) throws Exception {
-        //Give other plug-ins a chance to add DataSourceQueryChoosers
-        //before the dialog is realized. [Jon Aquino]
-        context.getWorkbenchFrame().addWindowListener(new WindowAdapter() {
-            public void windowOpened(WindowEvent e) {
-                String format = (String) PersistentBlackboardPlugIn.get(context.getWorkbenchContext())
-                                                                   .get(LAST_FORMAT_KEY);
-                if (format != null) {
-                    getDialog(context).setSelectedFormat(format);
-                }
-            }
-        });        
-    }
-
-    public boolean execute(PlugInContext context) throws Exception {
-        GUIUtil.centreOnWindow(getDialog(context));
-        getDialog(context).setVisible(true);
-        if (getDialog(context).wasOKPressed()) {
-            PersistentBlackboardPlugIn.get(context.getWorkbenchContext()).put(LAST_FORMAT_KEY,
-			getDialog(context).getSelectedFormat());
-        }
-
-        return getDialog(context).wasOKPressed();
-    }
-
-    public void run(TaskMonitor monitor, PlugInContext context)
-        throws Exception {
-        Assert.isTrue(getDialog(context).getCurrentChooser()
-                          .getDataSourceQueries().size() == 1);
-
-        DataSourceQuery dataSourceQuery = (DataSourceQuery) getDialog(context)
-                                                                .getCurrentChooser()
-                                                                .getDataSourceQueries()
-                                                                .iterator()
-                                                                .next();
-        Assert.isTrue(dataSourceQuery.getDataSource().isWritable());
-        monitor.report(I18N.get("datasource.SaveDatasetAsPlugIn.saving")+" " + dataSourceQuery.toString() + "...");
-
-        Connection connection = dataSourceQuery.getDataSource().getConnection();
-        try {
-            connection.executeUpdate(dataSourceQuery.getQuery(),
-                context.getSelectedLayer(0).getFeatureCollectionWrapper(),
-                monitor);
-        } finally {
-            connection.close();
-        }
-        context.getSelectedLayer(0).setDataSourceQuery(dataSourceQuery)
-               .setFeatureCollectionModified(false);
-    }
-
-    public static MultiEnableCheck createEnableCheck(
-        final WorkbenchContext workbenchContext) {
-        EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
-
-        return new MultiEnableCheck().add(checkFactory.createWindowWithLayerNamePanelMustBeActiveCheck())
-                                     .add(checkFactory.createExactlyNLayersMustBeSelectedCheck(
-                1));
+        return (DataSourceQueryChooserDialog) getContext().getWorkbench()
+                .getBlackboard().get(KEY);
     }
 }

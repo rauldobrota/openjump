@@ -66,23 +66,18 @@ import javax.swing.SwingUtilities;
  * @see DataSourceQueryChooserDialog
  */
 public class LoadDatasetPlugIn extends AbstractLoadDatasetPlugIn {
-    private WorkbenchContext context;
-    public void initialize(PlugInContext context) throws Exception {
-        this.context = context.getWorkbenchContext();
-        super.initialize(context);
-    }
     private DataSourceQueryChooserDialog getDialog() {
         String KEY = getClass().getName() + " - DIALOG";
-        if (null == context.getWorkbench().getBlackboard()
+        if (null == getContext().getWorkbench().getBlackboard()
                                .get(KEY)) {
-            context.getWorkbench().getBlackboard().put(KEY,
+            getContext().getWorkbench().getBlackboard().put(KEY,
                 new DataSourceQueryChooserDialog(DataSourceQueryChooserManager.get(
-                        context.getWorkbench()
+                        getContext().getWorkbench()
                                .getBlackboard()).getLoadDataSourceQueryChoosers(),
-                    context.getWorkbench().getFrame(), getName(), true));
+                    getContext().getWorkbench().getFrame(), getName(), true));
         }
 
-        return (DataSourceQueryChooserDialog) context
+        return (DataSourceQueryChooserDialog) getContext()
                                                      .getWorkbench()
                                                      .getBlackboard().get(KEY);
     }
@@ -103,4 +98,5 @@ public class LoadDatasetPlugIn extends AbstractLoadDatasetPlugIn {
     protected String getSelectedFormat() {
         return getDialog().getSelectedFormat();
     }
+
 }

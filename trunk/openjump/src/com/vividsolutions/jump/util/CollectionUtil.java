@@ -47,7 +47,12 @@ import java.util.TreeSet;
 public class CollectionUtil {
     public CollectionUtil() {
     }
-
+    public static Collection concatenate(Collection a, Collection b) {
+        ArrayList result = new ArrayList();
+        result.addAll(a);
+        result.addAll(b);
+        return result;
+    }
     public static List list(Object a, Object b) {
         ArrayList list = new ArrayList();
         list.add(a);

@@ -28,31 +28,16 @@ import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.WorkbenchFrame;
 import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
 
-public abstract class AbstractLoadDatasetPlugIn extends ThreadedBasePlugIn {
-    private String getLastFormatKey() { return getClass().getName() + " - LAST FORMAT"; }    
-    public void initialize(final PlugInContext context) throws Exception {
-        //Give other plug-ins a chance to add DataSourceQueryChoosers
-        //before the dialog is realized. [Jon Aquino]
-        context.getWorkbenchFrame().addWindowListener(new WindowAdapter() {
-            public void windowOpened(WindowEvent e) {
-                String format = (String) PersistentBlackboardPlugIn.get(context.getWorkbenchContext())
-                                                                   .get(getLastFormatKey());
-                if (format != null) {
-                    setSelectedFormat(format);
-                }
-            }
-        });
-    }
-    protected abstract void setSelectedFormat(String format);    
+public abstract class AbstractLoadDatasetPlugIn extends AbstractLoadSaveDatasetPlugIn { 
     public void run(TaskMonitor monitor, PlugInContext context)
         throws Exception {
         //Seamus Thomas Carroll [mailto:carrolls@cpsc.ucalgary.ca]
         //was concerned when he noticed that #getDataSourceQueries
         //was being called twice. So call it once only. [Jon Aquino 2004-02-05]
-        Assert.isTrue(!dataSourceQueries.isEmpty());
+        Assert.isTrue(!getDataSourceQueries().isEmpty());
 
         boolean exceptionsEncountered = false;
-        for (Iterator i = dataSourceQueries.iterator(); i.hasNext();) {
+        for (Iterator i = getDataSourceQueries().iterator(); i.hasNext();) {
             DataSourceQuery dataSourceQuery = (DataSourceQuery) i.next();
             ArrayList exceptions = new ArrayList();
             Assert.isTrue(dataSourceQuery.getDataSource().isReadable());
@@ -127,18 +112,7 @@ public abstract class AbstractLoadDatasetPlugIn extends ThreadedBasePlugIn {
     public static MultiEnableCheck createEnableCheck(
         final WorkbenchContext workbenchContext) {
         EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
-
         return new MultiEnableCheck().add(checkFactory.createWindowWithLayerManagerMustBeActiveCheck());
     }
-    private Collection dataSourceQueries;
-    public boolean execute(PlugInContext context) throws Exception {
-        dataSourceQueries = showDialog(context.getWorkbenchContext());
-        if (dataSourceQueries != null) {
-            PersistentBlackboardPlugIn.get(context.getWorkbenchContext()).put(getLastFormatKey(),
-                    getSelectedFormat());
-        }
-        return dataSourceQueries != null;
-    }
-    protected abstract String getSelectedFormat();
-    protected abstract Collection showDialog(WorkbenchContext context);
+
 }

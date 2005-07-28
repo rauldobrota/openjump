@@ -43,10 +43,12 @@ import javax.swing.JToggleButton;
 import com.vividsolutions.jts.util.Assert;
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.workbench.datasource.AbstractLoadDatasetPlugIn;
+import com.vividsolutions.jump.workbench.datasource.AbstractSaveDatasetAsPlugIn;
 import com.vividsolutions.jump.workbench.datasource.InstallStandardDataSourceQueryChoosersPlugIn;
 import com.vividsolutions.jump.workbench.datasource.LoadDatasetFromFilePlugIn;
 import com.vividsolutions.jump.workbench.datasource.LoadDatasetPlugIn;
 import com.vividsolutions.jump.workbench.datasource.SaveDatasetAsPlugIn;
+import com.vividsolutions.jump.workbench.datasource.SaveDatasetAsFilePlugIn;
 import com.vividsolutions.jump.workbench.plugin.*;
 import com.vividsolutions.jump.workbench.ui.*;
 import com.vividsolutions.jump.workbench.ui.cursortool.*;
@@ -143,7 +145,7 @@ public class JUMPConfiguration implements Setup {
     private LoadDatasetPlugIn loadDatasetPlugIn = new LoadDatasetPlugIn();
     private LoadDatasetFromFilePlugIn loadDatasetFromFilePlugIn = new LoadDatasetFromFilePlugIn();
     private SaveDatasetAsPlugIn saveDatasetAsPlugIn = new SaveDatasetAsPlugIn();
-
+    private SaveDatasetAsFilePlugIn saveDatasetAsFilePlugIn = new SaveDatasetAsFilePlugIn();
     private SaveImageAsPlugIn saveImageAsPlugIn = new SaveImageAsPlugIn();
 
     private GenerateLogPlugIn generateLogPlugIn = new GenerateLogPlugIn();
@@ -365,8 +367,12 @@ public class JUMPConfiguration implements Setup {
                 ViewSchemaPlugIn.createEnableCheck(workbenchContext));
         layerNamePopupMenu.addSeparator(); // ===================
         featureInstaller.addPopupMenuItem(layerNamePopupMenu,
+                saveDatasetAsFilePlugIn, saveDatasetAsFilePlugIn.getName() + "...",
+                false, null, AbstractSaveDatasetAsPlugIn
+                        .createEnableCheck(workbenchContext));
+        featureInstaller.addPopupMenuItem(layerNamePopupMenu,
                 saveDatasetAsPlugIn, saveDatasetAsPlugIn.getName() + "...",
-                false, null, SaveDatasetAsPlugIn
+                false, null, AbstractSaveDatasetAsPlugIn
                         .createEnableCheck(workbenchContext));
         layerNamePopupMenu.addSeparator(); // ===================
         featureInstaller.addPopupMenuItem(layerNamePopupMenu, moveUpPlugIn,
@@ -497,6 +503,9 @@ public class JUMPConfiguration implements Setup {
         featureInstaller.addMainMenuItem(loadDatasetPlugIn, MenuNames.FILE,
                 loadDatasetPlugIn.getName() + "...", null, LoadDatasetPlugIn
                         .createEnableCheck(workbenchContext));
+        featureInstaller.addMainMenuItem(saveDatasetAsFilePlugIn, MenuNames.FILE,
+                saveDatasetAsFilePlugIn.getName() + "...", null,
+                AbstractSaveDatasetAsPlugIn.createEnableCheck(workbenchContext));
         featureInstaller.addMainMenuItem(saveDatasetAsPlugIn, MenuNames.FILE,
                 saveDatasetAsPlugIn.getName() + "...", null,
                 SaveDatasetAsPlugIn.createEnableCheck(workbenchContext));
