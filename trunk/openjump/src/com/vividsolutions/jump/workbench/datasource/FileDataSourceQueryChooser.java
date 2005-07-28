@@ -63,6 +63,7 @@ public abstract class FileDataSourceQueryChooser
     private FileFilter fileFilter;
     private JPanel southComponent1 = new JPanel();
     private JPanel southComponent2 = new JPanel();
+    private String[] extensions;
 
     /**
      * @param extensions e.g. txt
@@ -71,6 +72,7 @@ public abstract class FileDataSourceQueryChooser
         String description, String[] extensions) {
         this.dataSourceClass = dataSourceClass;
         this.description = description;
+        this.extensions = extensions;
         fileFilter = GUIUtil.createFileFilter(description, extensions);
     }
 
@@ -302,5 +304,9 @@ public abstract class FileDataSourceQueryChooser
             }
             return null;
         }
+    }
+
+    public String[] getExtensions() {
+        return extensions;
     }
 }

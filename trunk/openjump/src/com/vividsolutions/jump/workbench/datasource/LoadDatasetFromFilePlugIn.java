@@ -40,6 +40,7 @@ public class LoadDatasetFromFilePlugIn extends AbstractLoadDatasetPlugIn {
         protected String getLastDirectoryKey() {
             return LoadDatasetFromFilePlugIn.this.getLastDirectoryKey();
         }
+        public boolean isAddingExtensionIfRequested() { return false; }
     };
     public String getName() {
         return I18N

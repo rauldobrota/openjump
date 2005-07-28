@@ -28,8 +28,9 @@ public class SaveDatasetAsFilePlugIn extends AbstractSaveDatasetAsPlugIn {
         protected String getLastDirectoryKey() {
             return SaveDatasetAsFilePlugIn.this.getLastDirectoryKey();
         }
+        public boolean isAddingExtensionIfRequested() { return true; }
     };
     public String getName() {
         return I18N.get("datasource.SaveDatasetAsFilePlugIn.save-dataset-as-file");
-    }
+    }    
 }

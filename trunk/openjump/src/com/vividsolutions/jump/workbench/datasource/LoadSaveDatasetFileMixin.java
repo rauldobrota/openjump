@@ -14,6 +14,7 @@ import javax.swing.filechooser.FileFilter;
 
 import com.vividsolutions.jump.util.Block;
 import com.vividsolutions.jump.util.CollectionUtil;
+import com.vividsolutions.jump.util.FileUtil;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
@@ -89,10 +90,20 @@ public abstract class LoadSaveDatasetFileMixin {
                 : Collections.singletonList(fileChooser.getSelectedFile()),
                 new Block() {
                     public Object yield(Object file) {
-                        return ((FileDataSourceQueryChooser) fileFilterToFileDataSourceQueryChooserMap
-                                .get(fileChooser.getFileFilter()))
-                                .toDataSourceQuery((File) file);
+                        FileDataSourceQueryChooser fileDataSourceQueryChooser = ((FileDataSourceQueryChooser) fileFilterToFileDataSourceQueryChooserMap
+                                .get(fileChooser.getFileFilter()));
+                        return fileDataSourceQueryChooser
+                                .toDataSourceQuery(addExtensionIfRequested(
+                                        (File) file, fileDataSourceQueryChooser
+                                                .getExtensions()[0]));
                     }
                 });
     }
+
+    private File addExtensionIfRequested(File file, String extension) {
+        return isAddingExtensionIfRequested() ? FileUtil.addExtensionIfNone(file,
+                extension) : file;
+    }
+
+    public abstract boolean isAddingExtensionIfRequested();
 }
