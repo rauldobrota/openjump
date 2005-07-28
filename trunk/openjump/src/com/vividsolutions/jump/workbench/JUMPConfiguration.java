@@ -484,6 +484,19 @@ public class JUMPConfiguration implements Setup {
     private void configureMainMenus(final WorkbenchContext workbenchContext,
             final EnableCheckFactory checkFactory,
             FeatureInstaller featureInstaller) throws Exception {
+        featureInstaller.addMainMenuItem(loadDatasetFromFilePlugIn, MenuNames.FILE,
+                loadDatasetFromFilePlugIn.getName() + "...", null, AbstractLoadDatasetPlugIn
+                        .createEnableCheck(workbenchContext));
+        featureInstaller.addMainMenuItem(saveDatasetAsFilePlugIn, MenuNames.FILE,
+                saveDatasetAsFilePlugIn.getName() + "...", null,
+                AbstractSaveDatasetAsPlugIn.createEnableCheck(workbenchContext));
+        featureInstaller.addMainMenuItem(loadDatasetPlugIn, MenuNames.FILE,
+                loadDatasetPlugIn.getName() + "...", null, LoadDatasetPlugIn
+                        .createEnableCheck(workbenchContext));        
+        featureInstaller.addMainMenuItem(saveDatasetAsPlugIn, MenuNames.FILE,
+                saveDatasetAsPlugIn.getName() + "...", null,
+                SaveDatasetAsPlugIn.createEnableCheck(workbenchContext));
+        featureInstaller.addMenuSeparator(MenuNames.FILE); // ===================
         featureInstaller.addMainMenuItem(newTaskPlugIn, MenuNames.FILE, newTaskPlugIn
                 .getName()
                 + "...", null, null);
@@ -496,19 +509,6 @@ public class JUMPConfiguration implements Setup {
         featureInstaller.addMainMenuItem(saveProjectAsPlugIn, MenuNames.FILE,
                 saveProjectAsPlugIn.getName() + "...", null, checkFactory
                         .createTaskWindowMustBeActiveCheck());
-        featureInstaller.addMenuSeparator(MenuNames.FILE); // ===================
-        featureInstaller.addMainMenuItem(loadDatasetFromFilePlugIn, MenuNames.FILE,
-                loadDatasetFromFilePlugIn.getName() + "...", null, AbstractLoadDatasetPlugIn
-                        .createEnableCheck(workbenchContext));
-        featureInstaller.addMainMenuItem(loadDatasetPlugIn, MenuNames.FILE,
-                loadDatasetPlugIn.getName() + "...", null, LoadDatasetPlugIn
-                        .createEnableCheck(workbenchContext));
-        featureInstaller.addMainMenuItem(saveDatasetAsFilePlugIn, MenuNames.FILE,
-                saveDatasetAsFilePlugIn.getName() + "...", null,
-                AbstractSaveDatasetAsPlugIn.createEnableCheck(workbenchContext));
-        featureInstaller.addMainMenuItem(saveDatasetAsPlugIn, MenuNames.FILE,
-                saveDatasetAsPlugIn.getName() + "...", null,
-                SaveDatasetAsPlugIn.createEnableCheck(workbenchContext));
         featureInstaller.addMenuSeparator(MenuNames.FILE); // ===================
         featureInstaller.addMainMenuItem(saveImageAsPlugIn, MenuNames.FILE,
                 saveImageAsPlugIn.getName() + "...", null, SaveImageAsPlugIn
