@@ -110,7 +110,6 @@ public class LayerTreeModel extends SimpleTreeModel {
                 Object value = (Object) i.next();
                 colorThemingValues.add(new ColorThemingValue(value, (BasicStyle)attributeValueToBasicStyleMap.get(value)));
             }
-            colorThemingValues.add(new ColorThemingValue("Other", ColorThemingStyle.get((Layer)parent).getDefaultStyle()));
             return colorThemingValues;
         }
         if (parent instanceof ColorThemingValue) { return Collections.EMPTY_LIST; }
