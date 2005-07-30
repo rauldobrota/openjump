@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import com.vividsolutions.jts.util.Assert;
@@ -98,7 +99,10 @@ public class LangUtil {
         ArrayList classesAndInterfaces = new ArrayList();
         classesAndInterfaces.add(c);
         superclasses(c, classesAndInterfaces);
-        classesAndInterfaces.addAll(Arrays.asList(c.getInterfaces()));
+        for (Iterator i = new ArrayList(classesAndInterfaces).iterator(); i.hasNext(); ) {
+            Class x = (Class) i.next();
+            classesAndInterfaces.addAll(Arrays.asList(x.getInterfaces()));
+        }
         return classesAndInterfaces;
     }
 
