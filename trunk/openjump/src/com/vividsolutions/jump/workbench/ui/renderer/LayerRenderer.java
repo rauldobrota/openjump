@@ -43,8 +43,6 @@ import com.vividsolutions.jump.workbench.model.Layer;
 import com.vividsolutions.jump.workbench.model.Layerable;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 
-//[sstein] : 30.07.2005 added variable set and getMaxFeatures() for super class
-
 public class LayerRenderer extends FeatureCollectionRenderer {
     private Layer layer;
 
@@ -162,23 +160,5 @@ public class LayerRenderer extends FeatureCollectionRenderer {
         return Collections.singletonMap(layer, layer
                 .getFeatureCollectionWrapper().query(viewportEnvelope));
     }
-
-    /**
-     * 
-     * @param n : The maximum number of Features to render
-	 * as vector graphic.
-     */
-    public void setMaxFeaturesToRender(int n){
-		super.setMaxFeatures(n);
-	}
-	
-    /**
-     * 
-     * @return The maximum number of Features to render
-	 * as vector graphic.
-     */
-	public int getMaxFeaturesToRender(){
-		return super.getMaxFeatures();
-	}
 
 }

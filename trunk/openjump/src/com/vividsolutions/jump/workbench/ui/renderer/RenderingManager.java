@@ -226,7 +226,7 @@ public class RenderingManager {
 		if (contentID instanceof Layer) {
 			//[sstein] new
 			LayerRenderer lr = new LayerRenderer((Layer) contentID, this.panel);
-			lr.setMaxFeatures(this.maxFeatures); 
+			lr.setMaxFeaturesToRender(this.maxFeatures); 
 			return  lr;
 			//[sstein] old
 			//return new LayerRenderer((Layer) contentID, panel);
