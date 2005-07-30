@@ -49,9 +49,15 @@ import com.vividsolutions.jump.workbench.model.Layerable;
 import com.vividsolutions.jump.workbench.model.WMSLayer;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 
+//[sstein] : 30.07.2005 added variable maxFeatures with getters and setters
+
 public class RenderingManager {
 	private LayerViewPanel panel;
-
+	private int maxFeatures=100; //this variable will be used for 
+								 //LayerRenderer.class which extends
+								 //FeatureCollectionRenderer.class
+								 //default in FeatureCollectionRenderer is 100 features.
+	
 	/**
 	 * @see multiRendererThreadQueue
 	 */
@@ -215,9 +221,15 @@ public class RenderingManager {
 		panel.superRepaint();
 	}
 
+	//this method is called by method render();
 	protected Renderer createRenderer(Object contentID) {
 		if (contentID instanceof Layer) {
-			return new LayerRenderer((Layer) contentID, panel);
+			//[sstein] new
+			LayerRenderer lr = new LayerRenderer((Layer) contentID, this.panel);
+			lr.setMaxFeatures(this.maxFeatures); 
+			return  lr;
+			//[sstein] old
+			//return new LayerRenderer((Layer) contentID, panel);
 		}
 
 		if (contentID instanceof WMSLayer) {
@@ -265,4 +277,22 @@ public class RenderingManager {
     public LayerViewPanel getPanel() {
         return panel;
     }
+        
+    //[sstein] added 30.07.2005 
+    
+	/**
+	 * @return Returns the number of maxFeatures to render
+	 * as vector graphic.
+	 */
+	public int getMaxFeatures() {
+		return maxFeatures;
+	}
+	/**
+	 * @param maxFeatures The maximum number of Features to render
+	 * as vector graphic.<p>
+	 * Use this method before using method render(Object contentID) or render(Object contentID, boolean clearImageCache)  
+	 */
+	public void setMaxFeatures(int maxFeatures) {
+		this.maxFeatures = maxFeatures;
+	}    
 }
