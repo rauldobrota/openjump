@@ -11,9 +11,9 @@
        - Tag CVS repository with the version number
       ======================================================================= -->
 <project name="openjump" default="dist-zip" basedir="..">
-        <property name="name" value="jump"/>
-        <property name="Name" value="JUMP"/>
-        <property name="version" value="20050725"/>
+        <property name="name" value="openjump"/>
+        <property name="Name" value="OpenJUMP"/>
+        <property name="version" value="20050728"/>
         <!-- The recommended setting for debug is "on", so that line numbers are included in stack traces. [Jon Aquino 2005-04-06] -->
         <property name="debug" value="on"/>
         <property name="deprecation" value="off"/>
