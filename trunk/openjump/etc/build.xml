@@ -25,7 +25,7 @@
         <property name="build.dir" value="build"/>
         <property name="build.classes" value="${build.dir}/classes"/>
         <property name="javadoc.dir" value="${build.dir}/javadoc"/>
-        <property name="workbench.jar" value="${build.dir}/$jump-workbench-${version}.jar"/>
+        <property name="workbench.jar" value="${build.dir}/jump-workbench-${version}.jar"/>
         <property name="api.jar" value="${build.dir}/jump-api-${version}.jar"/>
         <property name="dist.dir" value="dist"/>
         <property name="archive.dir" value="${dist.dir}/${name}-${version}"/>
