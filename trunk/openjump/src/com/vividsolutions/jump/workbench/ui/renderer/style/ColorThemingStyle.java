@@ -33,6 +33,7 @@ import java.util.Map;
 import com.vividsolutions.jts.util.Assert;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureSchema;
+import com.vividsolutions.jump.util.LangUtil;
 import com.vividsolutions.jump.workbench.model.Layer;
 import com.vividsolutions.jump.workbench.ui.Viewport;
 public class ColorThemingStyle implements Style {
@@ -69,13 +70,30 @@ public class ColorThemingStyle implements Style {
 	 *                  <code>null</code> to prevent drawing features with a null
 	 *                  attribute value
 	 */
+    public ColorThemingStyle(String attributeName,
+            Map attributeValueToBasicStyleMap, BasicStyle defaultStyle) {
+        this(attributeName, attributeValueToBasicStyleMap,
+                attributeValueToLabelMap(attributeValueToBasicStyleMap),
+                defaultStyle);
+    }
 	public ColorThemingStyle(String attributeName,
-			Map attributeValueToBasicStyleMap, BasicStyle defaultStyle) {
+			Map attributeValueToBasicStyleMap, Map attributeValueToLabelMap, BasicStyle defaultStyle) {
 		setAttributeName(attributeName);
 		setAttributeValueToBasicStyleMap(attributeValueToBasicStyleMap);
+        setAttributeValueToLabelMap(attributeValueToLabelMap);
 		setDefaultStyle(defaultStyle);
-	}
-	private BasicStyle defaultStyle;
+	}    
+	private static Map attributeValueToLabelMap(Map attributeValueToBasicStyleMap) {
+        // Be sure to use the same Map class -- it may be a RangeTreeMap [Jon Aquino 2005-07-30]
+        Map attributeValueToLabelMap = (Map) LangUtil.newInstance(attributeValueToBasicStyleMap.getClass());
+        for (Iterator i = attributeValueToBasicStyleMap.keySet().iterator(); i.hasNext(); ) {
+            Object value = i.next();
+            attributeValueToLabelMap.put(value, value.toString());
+        }
+        return attributeValueToLabelMap;
+    }
+
+    private BasicStyle defaultStyle;
 	public void paint(Feature f, Graphics2D g, Viewport viewport)
 			throws Exception {
 		getStyle(f).paint(f, g, viewport);
@@ -97,22 +115,24 @@ public class ColorThemingStyle implements Style {
 				.trim() : object;
 	}
 	private Layer layer;
-	private Map attributeValueToBasicStyleMap = new HashMap();
+	private Map attributeValueToBasicStyleMap;
+    private Map attributeValueToLabelMap;
 	private String attributeName;
 	public Object clone() {
 		try {
 			ColorThemingStyle clone = (ColorThemingStyle) super.clone();
 			//Deep-copy the map, to facilitate undo. [Jon Aquino]
-			Map mapClone = (Map) attributeValueToBasicStyleMap.getClass()
+            clone.attributeValueToBasicStyleMap = (Map) attributeValueToBasicStyleMap.getClass()
 					.newInstance();
 			for (Iterator i = attributeValueToBasicStyleMap.keySet().iterator(); i
 					.hasNext();) {
 				Object attribute = (Object) i.next();
-				mapClone.put(attribute,
+                clone.attributeValueToBasicStyleMap.put(attribute,
 						((BasicStyle) attributeValueToBasicStyleMap
 								.get(attribute)).clone());
 			}
-			clone.attributeValueToBasicStyleMap = mapClone;
+            clone.attributeValueToLabelMap = (Map) attributeValueToLabelMap.getClass().newInstance();
+            clone.attributeValueToLabelMap.putAll(attributeValueToLabelMap);
 			return clone;
 		} catch (InstantiationException e) {
 			Assert.shouldNeverReachHere();
@@ -137,15 +157,27 @@ public class ColorThemingStyle implements Style {
 	 * regard (i.e. to test whether or not there are ranges, only the first
 	 * attribute value is tested).
 	 */
-	public void setAttributeValueToBasicStyleMap(Map attributeValueToStyleMap) {
-		this.attributeValueToBasicStyleMap = attributeValueToStyleMap;
+	public void setAttributeValueToBasicStyleMap(Map attributeValueToBasicStyleMap) {
+		this.attributeValueToBasicStyleMap = attributeValueToBasicStyleMap;
 	}
+    /**
+     * You can set the keys to Ranges if the Map is a Range.RangeTreeMap. But
+     * don't mix Ranges and non-Ranges -- the UI expects homogeneity in this
+     * regard (i.e. to test whether or not there are ranges, only the first
+     * attribute value is tested).
+     */
+    public void setAttributeValueToLabelMap(Map attributeValueToLabelMap) {
+        this.attributeValueToLabelMap = attributeValueToLabelMap;
+    }
 	public void setAttributeName(String attributeName) {
 		this.attributeName = attributeName;
 	}
 	public Map getAttributeValueToBasicStyleMap() {
 		return attributeValueToBasicStyleMap;
 	}
+    public Map getAttributeValueToLabelMap() {
+        return attributeValueToLabelMap;
+    }
 	private boolean enabled = false;
 	public void initialize(Layer layer) {
 		this.layer = layer;

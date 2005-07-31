@@ -48,7 +48,7 @@ public class OKCancelPanel extends ButtonPanel {
     }
 
     public void setOKPressed(boolean okPressed) {
-        setSelectedButton(getButton(I18N.get("ui.OKCancelPanel.ok")));
+        setSelectedButton(okPressed ? getButton(I18N.get("ui.OKCancelPanel.ok")) : getButton(I18N.get("ui.OKCancelPanel.cancel")));
     }
     public void setOKEnabled(boolean okEnabled) {
         getButton(I18N.get("ui.OKCancelPanel.ok")).setEnabled(okEnabled);

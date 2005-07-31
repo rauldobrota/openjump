@@ -61,11 +61,11 @@ public class DiscreteColorThemingState
     public JComponent getPanel() {
         return panel;
     }
-    public Map toExternalFormat(Map attributeValueToBasicStyleMap) {
-        return attributeValueToBasicStyleMap;
+    public Map toExternalFormat(Map attributeValueToObjectMap) {
+        return attributeValueToObjectMap;
     }
-    public Map fromExternalFormat(Map attributeValueToBasicStyleMap) {
-        return attributeValueToBasicStyleMap;
+    public Map fromExternalFormat(Map attributeValueToObjectMap) {
+        return attributeValueToObjectMap;
     }
     public void applyColorScheme(ColorScheme colorScheme) {
         ((ColorThemingTableModel) table.getModel()).apply(colorScheme, false);

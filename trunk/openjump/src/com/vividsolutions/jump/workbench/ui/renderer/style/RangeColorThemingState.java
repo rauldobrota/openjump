@@ -187,29 +187,29 @@ public class RangeColorThemingState implements ColorThemingStylePanel.State {
     public JComponent getPanel() {
         return panel;
     }
-    public Map fromExternalFormat(Map attributeValueToBasicStyleMap) {
+    public Map fromExternalFormat(Map attributeValueToObjectMap) {
         //Table takes values, not ranges. [Jon Aquino]
         TreeMap newMap = new TreeMap();
-        for (Iterator i = attributeValueToBasicStyleMap.keySet().iterator();
+        for (Iterator i = attributeValueToObjectMap.keySet().iterator();
             i.hasNext();
             ) {
             Range range = (Range) i.next();
             newMap.put(
                 range.getMin(),
-                attributeValueToBasicStyleMap.get(range));
+                attributeValueToObjectMap.get(range));
         }
         return newMap;
     }
-    public Map toExternalFormat(Map attributeValueToBasicStyleMap) {
-        if (attributeValueToBasicStyleMap.isEmpty()) {
-            return attributeValueToBasicStyleMap;
+    public Map toExternalFormat(Map attributeValueToObjectMap) {
+        if (attributeValueToObjectMap.isEmpty()) {
+            return attributeValueToObjectMap;
         }
         //Turn the values into ranges. Validations have already ensured that
         //the values are unique and contain no nulls. [Jon Aquino]
-        Assert.isTrue(attributeValueToBasicStyleMap instanceof SortedMap);
+        Assert.isTrue(attributeValueToObjectMap instanceof SortedMap);
         TreeMap newMap = new Range.RangeTreeMap();
         Object previousValue = null;
-        for (Iterator i = attributeValueToBasicStyleMap.keySet().iterator();
+        for (Iterator i = attributeValueToObjectMap.keySet().iterator();
             i.hasNext();
             ) {
             Object value = i.next();
@@ -223,14 +223,14 @@ public class RangeColorThemingState implements ColorThemingStylePanel.State {
                 //overlaps. [Jon Aquino]
                 newMap.put(
                     new Range(previousValue, true, value, false),
-                    attributeValueToBasicStyleMap.get(previousValue));
+                    attributeValueToObjectMap.get(previousValue));
             } finally {
                 previousValue = value;
             }
         }
         newMap.put(
             new Range(previousValue, true, new Range.PositiveInfinity(), false),
-            attributeValueToBasicStyleMap.get(previousValue));
+            attributeValueToObjectMap.get(previousValue));
         return newMap;
     }
     public void applyColorScheme(ColorScheme colorScheme) {
@@ -250,10 +250,6 @@ public class RangeColorThemingState implements ColorThemingStylePanel.State {
         public void tableChanged(TableModelEvent e) {
             if (e
                 instanceof ColorThemingTableModel.AttributeValueTableModelEvent) {
-                Object attributeValue =
-                    stylePanel.tableModel().getValueAt(
-                        e.getFirstRow(),
-                        ColorThemingTableModel.ATTRIBUTE_COLUMN);
                 stylePanel.tableModel().sort(stylePanel.tableModel().wasLastSortAscending());
                 //I'd like to scroll to the row at this point, but the user probably
                 //finished the edit by clicking on another cell, so even if I scroll

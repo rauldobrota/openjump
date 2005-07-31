@@ -66,6 +66,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.EventObject;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -130,7 +131,9 @@ public class ColorThemingStylePanel extends JPanel implements StylePanel {
                 if ((row == 0) && (column == attributeColumn())) {
                     return allOtherValuesRenderer;
                 }
-
+                if ((row == 0) && (column == labelColumn())) {
+                    return allOtherValuesRenderer;
+                }
                 TableCellRenderer renderer = super.getCellRenderer(row, column);
 
                 if (renderer instanceof JLabel) {
@@ -359,7 +362,9 @@ public class ColorThemingStylePanel extends JPanel implements StylePanel {
     private int attributeColumn() {
         return table.convertColumnIndexToView(ColorThemingTableModel.ATTRIBUTE_COLUMN);
     }
-
+    private int labelColumn() {
+        return table.convertColumnIndexToView(ColorThemingTableModel.LABEL_COLUMN);
+    }
     private int colorColumn() {
         return table.convertColumnIndexToView(ColorThemingTableModel.COLOR_COLUMN);
     }
@@ -374,17 +379,20 @@ public class ColorThemingStylePanel extends JPanel implements StylePanel {
 
         try {
             layer.removeStyle(ColorThemingStyle.get(layer));
-            layer.addStyle(new ColorThemingStyle(getAttributeName(),
-                    state.toExternalFormat(tableModel()
-                                               .getAttributeValueToBasicStyleMap()),
-                    tableModel().getDefaultStyle()));
+            layer.addStyle(new ColorThemingStyle(getAttributeName(), state
+                    .toExternalFormat(tableModel()
+                            .getAttributeValueToBasicStyleMap()), state
+                    .toExternalFormat(tableModel()
+                            .getAttributeValueToLabelMap()), tableModel()
+                    .getDefaultStyle()));
             ColorThemingStyle.get(layer).setAlpha(getAlpha());
-            ColorThemingStyle.get(layer).setEnabled(enableColorThemingCheckBox.isSelected());
-            layer.getBasicStyle().setEnabled(!enableColorThemingCheckBox.isSelected());
+            ColorThemingStyle.get(layer).setEnabled(
+                    enableColorThemingCheckBox.isSelected());
+            layer.getBasicStyle().setEnabled(
+                    !enableColorThemingCheckBox.isSelected());
         } finally {
             layer.getLayerManager().setFiringEvents(firingEvents);
         }
-
         layer.fireAppearanceChanged();
     }
 
@@ -546,6 +554,7 @@ public class ColorThemingStylePanel extends JPanel implements StylePanel {
                                                                    .getDefaultStyle(),
                 ColorThemingStyle.get(layer).getAttributeName(),
                 attributeValueToBasicStyleMap(layer),
+                attributeValueToLabelMap(layer),                
                 layer.getFeatureCollectionWrapper().getFeatureSchema()) {
                 public Object getValueAt(int rowIndex, int columnIndex) {
                     //Don't use #attributeColumn() here because this is in the *model*,
@@ -555,7 +564,10 @@ public class ColorThemingStylePanel extends JPanel implements StylePanel {
                             (columnIndex == ColorThemingTableModel.ATTRIBUTE_COLUMN)) {
                         return state.getAllOtherValuesDescription();
                     }
-
+                    if ((rowIndex == 0) &&
+                            (columnIndex == ColorThemingTableModel.LABEL_COLUMN)) {
+                        return "";
+                    }
                     return super.getValueAt(rowIndex, columnIndex);
                 }
             });
@@ -614,20 +626,27 @@ public class ColorThemingStylePanel extends JPanel implements StylePanel {
     }
 
     private Map attributeValueToBasicStyleMap(Layer layer) {
-        if (ColorThemingStyle.get(layer).getAttributeName() == null) {
+        if (!colorThemingAttributeValid(layer)) {
             return new TreeMap();
         }
-
-        if (!layer.getFeatureCollectionWrapper().getFeatureSchema()
-                      .hasAttribute(ColorThemingStyle.get(layer)
-                                                         .getAttributeName())) {
-            //Schema won't have attribute name if user has deleted the attribute.
-            //[Jon Aquino]
-            return new TreeMap();
-        }
-
         return state.fromExternalFormat(ColorThemingStyle.get(layer)
                                                          .getAttributeValueToBasicStyleMap());
+    }
+    private Map attributeValueToLabelMap(Layer layer) {
+        if (!colorThemingAttributeValid(layer)) {
+            return new TreeMap();
+        }
+        return state.fromExternalFormat(ColorThemingStyle.get(layer)
+                                                         .getAttributeValueToLabelMap());
+    }
+    private boolean colorThemingAttributeValid(Layer layer) {
+        if (ColorThemingStyle.get(layer).getAttributeName() == null) { return false;}
+        //Schema won't have attribute name if user has deleted the attribute.
+        //[Jon Aquino]
+        if (!layer.getFeatureCollectionWrapper().getFeatureSchema()
+          .hasAttribute(ColorThemingStyle.get(layer)
+                                             .getAttributeName())) { return false;}
+        return true;
     }
 
     private void initColorSchemeComboBox(LayerManager layerManager) {
@@ -841,29 +860,43 @@ public class ColorThemingStylePanel extends JPanel implements StylePanel {
     }
 
     public void populateTable() {
-        if (!(enableColorThemingCheckBox.isSelected() &&
-                (attributeNameComboBox.getItemCount() > 0))) {
+        if (!(enableColorThemingCheckBox.isSelected() && (attributeNameComboBox
+                .getItemCount() > 0))) {
             return;
         }
-
         stopCellEditing();
         tableModel().clear();
-        tableModel().setAttributeValueToBasicStyleMap(toAttributeValueToBasicStyleMap(
-                state.filterAttributeValues(getNonNullAttributeValues())));
+        tableModel().setMaps(
+                toAttributeValueToBasicStyleMap(filteredAttributeValues()),
+                toAttributeValueToLabelMap(filteredAttributeValues()));
         tableModel().sort(tableModel().wasLastSortAscending());
         applyColorScheme();
     }
 
+    private Collection filteredAttributeValues() {
+        return state.filterAttributeValues(getNonNullAttributeValues());
+    }
+    private Map toAttributeValueToLabelMap(Collection attributeValues) {
+        Map attributeValueToAttributeValueMap = new TreeMap();
+        for (Iterator i = attributeValues.iterator(); i.hasNext(); ) {
+            Object attributeValue = i.next();
+            attributeValueToAttributeValueMap.put(attributeValue, attributeValue);
+        }
+        Map attributeValueToLabelMap = CollectionUtil.inverse(state.toExternalFormat(attributeValueToAttributeValueMap));
+        for (Iterator i = attributeValueToLabelMap.keySet().iterator(); i.hasNext(); ) {
+            Object attributeValue = i.next();
+            attributeValueToLabelMap.put(attributeValue, attributeValueToLabelMap.get(attributeValue).toString());
+        }
+        return attributeValueToLabelMap;
+    }
     private Map toAttributeValueToBasicStyleMap(Collection attributeValues) {
         Map attributeValueToBasicStyleMap = new TreeMap();
-
         for (Iterator i = attributeValues.iterator(); i.hasNext();) {
             Object attributeValue = i.next();
             attributeValueToBasicStyleMap.put(attributeValue, new BasicStyle());
         }
-
         return attributeValueToBasicStyleMap;
-    }
+    }    
 
     void colorSchemeComboBox_actionPerformed(ActionEvent e) {
         if (initializing) {
@@ -1026,9 +1059,9 @@ public class ColorThemingStylePanel extends JPanel implements StylePanel {
          * Performs any necessary modifications to the map before applying
          * it to the layer.
          */
-        public Map toExternalFormat(Map attributeValueToBasicStyleMap);
+        public Map toExternalFormat(Map attributeValueToObjectMap);
 
-        public Map fromExternalFormat(Map attributeValueToBasicStyleMap);
+        public Map fromExternalFormat(Map attributeValueToObjectMap);
     }
 
     private abstract class MyPlugIn extends AbstractPlugIn {

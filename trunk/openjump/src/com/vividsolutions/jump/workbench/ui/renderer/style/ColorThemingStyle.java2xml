@@ -7,4 +7,5 @@
   <element xml-name="attribute-name" java-name="attributeName"/>
   <element xml-name="default-style" java-name="defaultStyle"/>
   <element xml-name="attribute-value-to-style-map" java-name="attributeValueToBasicStyleMap"/>
+  <element xml-name="attribute-value-to-label-map" java-name="attributeValueToLabelMap"/>  
 </root>

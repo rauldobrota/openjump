@@ -44,58 +44,60 @@ import javax.swing.table.TableModel;
 
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.FeatureSchema;
+import com.vividsolutions.jump.util.Block;
 import com.vividsolutions.jump.util.CollectionUtil;
 import com.vividsolutions.jump.util.ImmutableFirstElementList;
 import com.vividsolutions.jump.workbench.ui.ColumnBasedTableModel;
 
 public class ColorThemingTableModel extends ColumnBasedTableModel {
 
-    public static final String COLOR_COLUMN_TITLE = I18N.get("ui.renderer.style.ColorThemingTableModel.attribute-value");
-
     public ColorThemingTableModel(
         BasicStyle defaultStyle,
         String attributeName,
         Map attributeValueToBasicStyleMap,
+        Map attributeValueToLabelMap,
         FeatureSchema schema) {
         //Value doesn't matter. [Jon Aquino]
         attributeMappings =
             new ImmutableFirstElementList(
-                new AttributeMapping(null, defaultStyle));
+                new AttributeMapping(null, defaultStyle, null));
         this.attributeName = attributeName;
-        setAttributeValueToBasicStyleMap(attributeValueToBasicStyleMap);
+        setMaps(attributeValueToBasicStyleMap, attributeValueToLabelMap);
         setColumns(createColumns(schema));
     }
 
     public static final int COLOR_COLUMN = 0;
     public static final int ATTRIBUTE_COLUMN = 1;
+    public static final int LABEL_COLUMN = 2;
 
-    public void setAttributeValueToBasicStyleMap(Map map) {
+    public void setMaps(Map attributeValueToBasicStyleMap, Map attributeValueToLabelMap) {
         attributeMappings.clear();
-        for (Iterator i = map.keySet().iterator(); i.hasNext();) {
+        for (Iterator i = attributeValueToBasicStyleMap.keySet().iterator(); i.hasNext();) {
             Object attributeValue = i.next();
             attributeMappings.add(
                 new AttributeMapping(
                     attributeValue,
-                    (BasicStyle) map.get(attributeValue)));
+                    (BasicStyle) attributeValueToBasicStyleMap.get(attributeValue),
+                    (String) attributeValueToLabelMap.get(attributeValue)));
         }
         fireTableChanged(new TableModelEvent(this));
     }
 
     protected static class AttributeMapping implements Comparable {
-        public AttributeMapping(Object attributeValue, BasicStyle basicStyle) {
+        private String label;
+        public AttributeMapping(Object attributeValue, BasicStyle basicStyle, String label) {
             this.attributeValue = attributeValue;
             this.basicStyle = basicStyle;
+            this.label = label;
         }
         private Object attributeValue;
         private BasicStyle basicStyle;
         public Object getAttributeValue() {
             return attributeValue;
         }
-
         public BasicStyle getBasicStyle() {
             return basicStyle;
         }
-
         public int compareTo(Object o) {
             AttributeMapping other = (AttributeMapping) o;
             if (attributeValue == null) {
@@ -107,15 +109,18 @@ public class ColorThemingTableModel extends ColumnBasedTableModel {
             return ((Comparable) attributeValue).compareTo(
                 (Comparable) other.attributeValue);
         }
-
         public void setAttributeValue(Object object) {
             attributeValue = object;
         }
-
         public void setBasicStyle(BasicStyle style) {
             basicStyle = style;
         }
-
+        protected String getLabel() {
+            return label;
+        }
+        protected void setLabel(String label) {
+            this.label = label;
+        }
     }
 
     public void clear() {
@@ -169,7 +174,7 @@ public class ColorThemingTableModel extends ColumnBasedTableModel {
 
     protected List createColumns(final FeatureSchema schema) {
         ArrayList columns = new ArrayList();
-        columns.add(new Column(COLOR_COLUMN_TITLE, BasicStyle.class) {
+        columns.add(new Column(I18N.get("ui.renderer.style.ColorThemingTableModel.attribute-value"), BasicStyle.class) {
             public Object getValueAt(int rowIndex) {
                 return attributeMapping(rowIndex).getBasicStyle();
             }
@@ -197,6 +202,18 @@ public class ColorThemingTableModel extends ColumnBasedTableModel {
             public void setValueAt(Object value, int rowIndex) {
                 attributeMapping(rowIndex).setAttributeValue(value);
                 //The validators need to know that the table has changed. [Jon Aquino]                            
+                fireTableChanged(
+                    new AttributeValueTableModelEvent(
+                        ColorThemingTableModel.this,
+                        rowIndex));
+            }
+        });
+        columns.add(new Column("Label", String.class) {
+            public Object getValueAt(int rowIndex) {
+                return attributeMapping(rowIndex).getLabel();
+            }
+            public void setValueAt(Object value, int rowIndex) {
+                attributeMapping(rowIndex).setLabel((String) value);                      
                 fireTableChanged(
                     new AttributeValueTableModelEvent(
                         ColorThemingTableModel.this,
@@ -238,19 +255,32 @@ public class ColorThemingTableModel extends ColumnBasedTableModel {
     public void setAttributeName(String attributeName) {
         this.attributeName = attributeName;
     }
-
     public Map getAttributeValueToBasicStyleMap() {
-        TreeMap attributeValueToBasicStyleMap = new TreeMap();
+        return attributeValueToObjectMap(new Block(){
+            public Object yield(Object attributeMapping) {
+                return ((AttributeMapping)attributeMapping).getBasicStyle();
+            }
+        });
+    }
+    public Map getAttributeValueToLabelMap() {
+        return attributeValueToObjectMap(new Block(){
+            public Object yield(Object attributeMapping) {
+                return ((AttributeMapping)attributeMapping).getLabel();
+            }
+        });
+    }
+    private Map attributeValueToObjectMap(Block getter) {
+        TreeMap attributeValueToObjectMap = new TreeMap();
         //Skip the first element, which is the default style. [Jon Aquino]
         for (Iterator i = nonDefaultAttributeMappings().iterator();
             i.hasNext();
             ) {
             AttributeMapping attributeMapping = (AttributeMapping) i.next();
-            attributeValueToBasicStyleMap.put(
+            attributeValueToObjectMap.put(
                 attributeMapping.getAttributeValue(),
-                attributeMapping.getBasicStyle());
+                getter.yield(attributeMapping));
         }
-        return attributeValueToBasicStyleMap;
+        return attributeValueToObjectMap;
     }
 
     private boolean lastSortAscending = true;
@@ -299,7 +329,7 @@ public class ColorThemingTableModel extends ColumnBasedTableModel {
     public int insertAttributeValue(int row, ColorScheme colorScheme) {
         attributeMappings.add(
             row,
-            new AttributeMapping(null, new BasicStyle(colorScheme.next())));
+            new AttributeMapping(null, new BasicStyle(colorScheme.next()), ""));
         fireTableChanged(
             new TableModelEvent(
                 this,
@@ -314,7 +344,9 @@ public class ColorThemingTableModel extends ColumnBasedTableModel {
 
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         //Any cell except the one that says "(All other values)" [Jon Aquino]
-        return !(rowIndex == 0 && columnIndex == ATTRIBUTE_COLUMN);
+        if (rowIndex == 0 && columnIndex == ATTRIBUTE_COLUMN) { return false;}
+        if (rowIndex == 0 && columnIndex == LABEL_COLUMN) { return false;}
+        return true;
     }
 
     protected List nonDefaultAttributeMappings() {

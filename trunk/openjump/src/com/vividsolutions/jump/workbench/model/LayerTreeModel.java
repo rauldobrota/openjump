@@ -68,12 +68,15 @@ public class LayerTreeModel extends SimpleTreeModel {
     public static class ColorThemingValue {
         private Object value;
         private BasicStyle style;
-        public ColorThemingValue(Object value, BasicStyle style) {
+        private String label;
+        public ColorThemingValue(Object value, BasicStyle style, String label) {
             this.value = value;
             this.style = style;
+            Assert.isTrue(label != null);
+            this.label = label;
         }
         public String toString() {
-            return value == null ? "" : value.toString();
+            return label;
         }
         public boolean equals(Object other) {
             return other instanceof ColorThemingValue
@@ -103,21 +106,29 @@ public class LayerTreeModel extends SimpleTreeModel {
         if (parent instanceof Category) {
             return ((Category) parent).getLayerables();
         }
-        if (parent instanceof Layer && ColorThemingStyle.get((Layer)parent).isEnabled()) {
-            Map attributeValueToBasicStyleMap = ColorThemingStyle.get((Layer)parent).getAttributeValueToBasicStyleMap();
+        if (parent instanceof Layer
+                && ColorThemingStyle.get((Layer) parent).isEnabled()) {
+            Map attributeValueToBasicStyleMap = ColorThemingStyle.get(
+                    (Layer) parent).getAttributeValueToBasicStyleMap();
+            Map attributeValueToLabelMap = ColorThemingStyle
+                    .get((Layer) parent).getAttributeValueToLabelMap();
             List colorThemingValues = new ArrayList();
-            for (Iterator i = attributeValueToBasicStyleMap.keySet().iterator(); i.hasNext(); ) {
+            for (Iterator i = attributeValueToBasicStyleMap.keySet().iterator(); i
+                    .hasNext();) {
                 Object value = (Object) i.next();
-                colorThemingValues.add(new ColorThemingValue(value, (BasicStyle)attributeValueToBasicStyleMap.get(value)));
+                colorThemingValues.add(new ColorThemingValue(value,
+                        (BasicStyle) attributeValueToBasicStyleMap.get(value),
+                        (String) attributeValueToLabelMap.get(value)));
             }
             return colorThemingValues;
         }
-        if (parent instanceof ColorThemingValue) { return Collections.EMPTY_LIST; }
+        if (parent instanceof ColorThemingValue) {
+            return Collections.EMPTY_LIST;
+        }
         if (parent instanceof Layerable) {
             return new ArrayList();
         }
         Assert.shouldNeverReachHere(parent.getClass().getName());
-
         return null;
     }
     
