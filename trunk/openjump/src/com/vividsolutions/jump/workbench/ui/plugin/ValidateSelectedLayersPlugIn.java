@@ -334,7 +334,7 @@ public class ValidateSelectedLayersPlugIn extends AbstractPlugIn
         dialog.addCheckBox(CHECK_NO_REPEATED_CONSECUTIVE_POINTS,
             false);
         dialog.addCheckBox(CHECK_POLYGON_ORIENTATION,
-            false, I18N.get("ui.plugin.ValidateSelectedLayersPlugIn.check-that-polygon-shells-are-oriented-cleckwise-and-holes-counterclockwise"));
+            false, I18N.get("ui.plugin.ValidateSelectedLayersPlugIn.check-that-polygon-shells-are-oriented-clockwise-and-holes-counterclockwise"));
         dialog.addCheckBox(CHECK_MIN_SEGMENT_LENGTH, false);
         dialog.addPositiveDoubleField(MIN_SEGMENT_LENGTH, 0.001,
             5);
