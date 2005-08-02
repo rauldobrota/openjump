@@ -163,6 +163,16 @@ public class XMLBinder {
                     return object.toString();
                 }
             });
+        classToCustomConverterMap.put(Long.class,
+                new CustomConverter() {
+                    public Object toJava(String value) {
+                        return new Long(value);
+                    }
+
+                    public String toXML(Object object) {
+                        return object.toString();
+                    }
+                });        
         classToCustomConverterMap.put(String.class,
             new CustomConverter() {
                 public Object toJava(String value) {
