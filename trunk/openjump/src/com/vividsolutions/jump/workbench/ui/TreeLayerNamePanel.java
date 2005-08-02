@@ -323,6 +323,9 @@ public class TreeLayerNamePanel extends JPanel
                             .pathByAddingChild(e.getChildren()[i]),
                             new TreeUtil.Visitor() {
                                 public void visit(Stack path) {
+                                    // When opening a task file, don't expand the ColorThemingValues. 
+                                    // [Jon Aquino 2005-08-01]
+                                    if (path.peek() instanceof LayerTreeModel.ColorThemingValue) { return; }
                                     tree.makeVisible(new TreePath(path
                                             .toArray()));
                                 }
