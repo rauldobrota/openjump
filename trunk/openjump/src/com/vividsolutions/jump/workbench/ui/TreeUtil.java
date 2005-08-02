@@ -33,6 +33,7 @@ package com.vividsolutions.jump.workbench.ui;
 
 import com.vividsolutions.jts.util.Assert;
 
+import com.vividsolutions.jump.util.Block;
 import com.vividsolutions.jump.util.StringUtil;
 
 import java.awt.Color;
@@ -184,9 +185,18 @@ public class TreeUtil {
     }
 
     public static void expandAll(final JTree tree, TreePath path) {
+        expand(tree, path, new Block() {
+            public Object yield(Object node) {
+                return Boolean.TRUE;
+            }
+        });
+    }
+
+    public static void expand(final JTree tree, TreePath path, final Block expandNodeCondition) {
         visit(tree.getModel(), path,
             new Visitor() {
                 public void visit(Stack path) {
+                    if (!((Boolean)expandNodeCondition.yield(path.peek())).booleanValue()) { return; }
                     tree.expandPath(findTreePath(path.peek(), tree.getModel()));
                 }
             });

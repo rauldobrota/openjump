@@ -72,6 +72,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.util.Assert;
+import com.vividsolutions.jump.util.Block;
 import com.vividsolutions.jump.util.CollectionUtil;
 import com.vividsolutions.jump.util.LangUtil;
 import com.vividsolutions.jump.workbench.model.Category;
@@ -280,8 +281,9 @@ public class TreeLayerNamePanel extends JPanel
                 // bar.
                 if (rowNew == rowOld)
                     return;
-
-                tree.expandRow(rowNew);
+                if (!(tree.getPathForRow(rowNew).getLastPathComponent() instanceof Layer)) {
+                    tree.expandRow(rowNew);
+                }
 
                 Graphics2D g2 = (Graphics2D) tree.getGraphics();
                 g2.setColor(Color.RED);
