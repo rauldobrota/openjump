@@ -148,7 +148,7 @@ public class Parser {
       } else if( n.getNodeName().equals( "BoundingBox" ) ) {
         srs = nm.getNamedItem( "SRS" ).getNodeValue();
       } else {
-        throw new Exception( I18N.get("Parser.not-a-latlon-boundingbox-element") );
+        throw new Exception( I18N.get("com.vividsolutions.wms.Parser.not-a-latlon-boundingbox-element") );
       }
       
       // could not parse when values equal "inf"
@@ -186,7 +186,7 @@ public class Parser {
     } catch( Exception e ) {
       // possible NullPointerException from getNamedItem returning a null
       // also possible NumberFormatException
-      throw new Exception( I18N.get("Parser.invalid-bounding-box-element-node")+": " + e.toString() );
+      throw new Exception( I18N.get("com.vividsolutions.wms.Parser.invalid-bounding-box-element-node")+": " + e.toString() );
     }    
   }
   private Capabilities parseCapabilities_1_0_0( WMService service, InputStream inStream ) throws IOException {
