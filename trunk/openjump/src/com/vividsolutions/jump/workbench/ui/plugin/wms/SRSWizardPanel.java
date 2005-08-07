@@ -120,7 +120,7 @@ public class SRSWizardPanel extends JPanel implements WizardPanel {
     }
 
     public String getTitle() {
-        return I18N.get("ui.plugin.wms.select-coordinate-reference-system_");
+        return I18N.get("ui.plugin.wms.SRSWizardPanel.select-coordinate-reference-system");
     }
 
     public String getID() {
