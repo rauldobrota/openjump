@@ -189,12 +189,15 @@ public class ChangeStylesPlugIn extends AbstractPlugIn {
     }
 
     public MultiEnableCheck createEnableCheck(
-        final WorkbenchContext workbenchContext) {
-        EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
+            final WorkbenchContext workbenchContext) {
+        EnableCheckFactory checkFactory = new EnableCheckFactory(
+                workbenchContext);
 
-        return new MultiEnableCheck().add(checkFactory.createWindowWithLayerNamePanelMustBeActiveCheck())
-                                     .add(checkFactory.createExactlyNLayersMustBeSelectedCheck(
-                1));
+        return new MultiEnableCheck().add(
+                checkFactory.createWindowWithLayerNamePanelMustBeActiveCheck())
+                // ScaledStylePanel assumes that the active window has a LayerViewPanel. [Jon Aquino 2005-08-09]
+                .add(checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck())                
+                .add(checkFactory.createExactlyNLayersMustBeSelectedCheck(1));
     }
 
     private class DummyColorThemingStylePanel extends JPanel
