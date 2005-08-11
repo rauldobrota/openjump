@@ -40,6 +40,8 @@ import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 
+import org.openjump.OpenJumpConfiguration;
+
 import com.vividsolutions.jts.util.Assert;
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.workbench.datasource.AbstractLoadDatasetPlugIn;
@@ -251,6 +253,12 @@ public class JUMPConfiguration implements Setup {
         configureLayerViewPanelPopupMenu(workbenchContext, checkFactory,
                 featureInstaller);
 
+        /********************************************
+         * [sstein] 11.08.2005
+         * the following line calls the new OpenJump plugins
+         *******************************************/
+        OpenJumpConfiguration.loadOpenJumpPlugIns(workbenchContext, checkFactory, featureInstaller);
+        
         //Call #initializeBuiltInPlugIns after #configureToolBar so that any
         // plug-ins that
         //add items to the toolbar will add them to the *end* of the toolbar.
