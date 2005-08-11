@@ -33,9 +33,7 @@ import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
  */
 public class OpenJumpConfiguration{
 
-	public static void loadOpenJumpPlugIns(final WorkbenchContext workbenchContext, 
-			 							   final EnableCheckFactory enableCheckFactory, 
-										   FeatureInstaller featureInstaller)throws Exception {
+	public static void loadOpenJumpPlugIns(final WorkbenchContext workbenchContext)throws Exception {
 		
 		
 		/*-----------------------------------------------

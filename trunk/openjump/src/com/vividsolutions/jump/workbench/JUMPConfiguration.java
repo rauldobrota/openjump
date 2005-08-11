@@ -257,7 +257,7 @@ public class JUMPConfiguration implements Setup {
          * [sstein] 11.08.2005
          * the following line calls the new OpenJump plugins
          *******************************************/
-        OpenJumpConfiguration.loadOpenJumpPlugIns(workbenchContext, checkFactory, featureInstaller);
+        OpenJumpConfiguration.loadOpenJumpPlugIns(workbenchContext);
         
         //Call #initializeBuiltInPlugIns after #configureToolBar so that any
         // plug-ins that
