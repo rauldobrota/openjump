@@ -259,7 +259,7 @@ public class FeatureInstaller {
         if (properties.get("pos") != null) {
             parent.insert(menuItem, Integer.parseInt((String) properties
                     .get("pos")));
-        } else if (parent.getText().equals("File")) {
+        } else if (parent.getText().equals(MenuNames.FILE)) {
             //If menu is File, insert menu item just before Exit and its
             // separator [Jon Aquino]
             parent.insert(menuItem, parent.getItemCount() - 2);
@@ -497,8 +497,8 @@ public class FeatureInstaller {
         // #helpMenu
         //*after* adding #menu, because #menu might be the Window or Help menu!
         // [Jon Aquino]
-        JMenu windowMenu = menuBarMenu("Window");
-        JMenu helpMenu = menuBarMenu("Help");
+        JMenu windowMenu = menuBarMenu(MenuNames.WINDOW);
+        JMenu helpMenu = menuBarMenu(MenuNames.HELP);
         //Customized workbenches may not have Window or Help menus [Jon Aquino]
         if (windowMenu != null) {
             menuBar().remove(windowMenu);
