@@ -169,7 +169,7 @@ public class ReplicateSelectedItemsPlugIn extends AbstractPlugIn implements Thre
 	    		}
 	    	    else{
 	    	    	context.getWorkbenchFrame().setStatusMessage(
-	    	    			statusMessage1 + ": " + i + statusMessage2);
+	    	    			statusMessage1 + ": " + i + " "+ statusMessage2);
 	    	    	if(hasBeenCalled == false){
 	    	    		this.askWhatToDo(context);
 	    	    		hasBeenCalled = true;
