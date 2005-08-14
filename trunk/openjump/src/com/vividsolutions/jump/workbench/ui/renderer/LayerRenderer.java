@@ -43,6 +43,8 @@ import com.vividsolutions.jump.workbench.model.Layer;
 import com.vividsolutions.jump.workbench.model.Layerable;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 
+//[sstein] : 14.08.2005 added variable maxFeatures with getters and setters
+
 public class LayerRenderer extends FeatureCollectionRenderer {
     private Layer layer;
 
