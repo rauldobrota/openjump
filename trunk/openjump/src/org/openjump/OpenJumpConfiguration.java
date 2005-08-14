@@ -14,13 +14,12 @@ import org.openjump.core.ui.plugin.edit.ReplicateSelectedItemsPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectAllLayerItemsPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectItemsByCircleFromSelectedLayersPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectItemsByFenceFromSelectedLayersPlugIn;
+import org.openjump.core.ui.plugin.file.SaveImageAsSVGPlugIn;
 import org.openjump.core.ui.plugin.view.ShowScalePlugIn;
 import org.openjump.core.ui.plugin.view.ZoomToScalePlugIn;
 
 import com.vividsolutions.jump.workbench.WorkbenchContext;
-import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
-import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 
 /**
  * @description:
@@ -57,5 +56,10 @@ public class OpenJumpConfiguration{
 		
 		ReplicateSelectedItemsPlugIn replicatePlugIn = new ReplicateSelectedItemsPlugIn();
 		replicatePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		//-- [sstein] working test plugin
+		SaveImageAsSVGPlugIn imageSvgPlugin= new SaveImageAsSVGPlugIn();
+		imageSvgPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
 	}
 }
