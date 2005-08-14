@@ -64,7 +64,7 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
     }
 
 	public String getName() {
-		return I18N.get("ui.plugin.OpenProjectPlugIn.open-task");
+		return I18N.get("ui.plugin.OpenProjectPlugIn.open-project");
 	}
 
     public void initialize(PlugInContext context) throws Exception {
@@ -73,7 +73,7 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
         //we sometimes get a WindowsFileChooserUI NullPointerException [Jon
         // Aquino 12/10/2003]
         fileChooser = GUIUtil.createJFileChooserWithExistenceChecking();
-        fileChooser.setDialogTitle("Open Task");
+        fileChooser.setDialogTitle(I18N.get("ui.plugin.OpenProjectPlugIn.open-project"));
         fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setMultiSelectionEnabled(false);

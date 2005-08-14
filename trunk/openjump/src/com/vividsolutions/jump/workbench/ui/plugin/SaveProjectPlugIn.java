@@ -44,7 +44,7 @@ public class SaveProjectPlugIn extends AbstractSaveProjectPlugIn {
     }
     
     public String getName() {
-        return I18N.get("ui.plugin.SaveProjectPlugIn.save-task");
+        return I18N.get("ui.plugin.SaveProjectPlugIn.save-project");
     }    
 
     public boolean execute(PlugInContext context) throws Exception {

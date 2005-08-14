@@ -34,7 +34,7 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 public class SaveProjectAsPlugIn extends AbstractSaveProjectPlugIn {
     public static final FileFilter JUMP_PROJECT_FILE_FILTER = GUIUtil
-            .createFileFilter(I18N.get("ui.plugin.SaveProjectAsPlugIn.jump-task-files"), new String[]{"jmp", "jcs"});
+            .createFileFilter(I18N.get("ui.plugin.SaveProjectAsPlugIn.jump-project-files"), new String[]{"jmp", "jcs"});
     private JFileChooser fileChooser;
     public void initialize(PlugInContext context) throws Exception {
         //Don't initialize fileChooser at field declaration; otherwise get
@@ -57,14 +57,14 @@ public class SaveProjectAsPlugIn extends AbstractSaveProjectPlugIn {
         //        at javax.swing.JFileChooser.<init>(JFileChooser.java:320)
         //[Jon Aquino 2004-01-12]
         fileChooser = GUIUtil.createJFileChooserWithOverwritePrompting();
-        fileChooser.setDialogTitle(I18N.get("ui.plugin.SaveProjectAsPlugIn.save-task"));
+        fileChooser.setDialogTitle(I18N.get("ui.plugin.SaveProjectAsPlugIn.save-project"));
         GUIUtil.removeChoosableFileFilters(fileChooser);
         fileChooser.addChoosableFileFilter(JUMP_PROJECT_FILE_FILTER);
         fileChooser.addChoosableFileFilter(GUIUtil.ALL_FILES_FILTER);
         fileChooser.setFileFilter(JUMP_PROJECT_FILE_FILTER);
     }
     public String getName() {
-        return I18N.get("ui.plugin.SaveProjectAsPlugIn.save-task-as");
+        return I18N.get("ui.plugin.SaveProjectAsPlugIn.save-project-as");
     }
     public boolean execute(PlugInContext context) throws Exception {
         reportNothingToUndoYet(context);
