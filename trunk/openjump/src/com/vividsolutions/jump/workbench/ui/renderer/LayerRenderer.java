@@ -160,5 +160,22 @@ public class LayerRenderer extends FeatureCollectionRenderer {
         return Collections.singletonMap(layer, layer
                 .getFeatureCollectionWrapper().query(viewportEnvelope));
     }
+    
+	/**
+	 * @return Returns the number of maxFeatures to render
+	 * as vector graphic.
+	 */
+	public int getMaxFeatures() {
+		return super.getMaxFeatures();
+	}
+	/**
+	 * @param maxFeatures The maximum number of Features to render
+	 * as vector graphic.<p>
+	 * Use this method before using method render(Object contentID) or render(Object contentID, boolean clearImageCache)  
+	 */
+	public void setMaxFeatures(int maxFeatures) {
+		super.setMaxFeatures(maxFeatures);
+	}    
+
 
 }
