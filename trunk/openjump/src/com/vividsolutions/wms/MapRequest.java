@@ -276,10 +276,7 @@ public class MapRequest {
         }
       }
       
-      String logger = System.getProperty( "LOGGER" );
-      if( Boolean.valueOf(logger).booleanValue() ){
-        System.out.println(urlBuf.toString());
-      }
+//      System.out.println(urlBuf.toString());
       
       return new URL( urlBuf.toString() );
     }
