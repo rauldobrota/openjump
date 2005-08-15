@@ -35,7 +35,7 @@ import com.vividsolutions.jump.workbench.ui.Viewport;
  */
 public class ZoomToScalePlugIn extends AbstractPlugIn{    
 
-    private String T1 = "scale:";
+    private String T1 = "scale";
     int scale = 0;
     double oldHorizontalScale = 0; // is calculated for panel-width (not heigth!!)
     double modelWidth = 0;
