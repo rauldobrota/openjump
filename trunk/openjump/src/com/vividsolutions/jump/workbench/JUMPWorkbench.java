@@ -235,21 +235,27 @@ public class JUMPWorkbench {
 		}
 	}
 
-    private static void initLookAndFeel() throws Exception {
-        if (LangUtil.ifNull(System.getProperty("initLookAndFeel"), "true")
-                .toString().equalsIgnoreCase("false")) {
-            return;
-        }
-        //Apple stuff from Raj Singh's startup script [Jon Aquino 10/30/2003]
-        System.setProperty("apple.laf.useScreenMenuBar", "true");
-        System.setProperty("apple.awt.showGrowBox", "true");
-        if (UIManager.getLookAndFeel() != null
-                && UIManager.getLookAndFeel().getClass().getName().equals(
-                        UIManager.getSystemLookAndFeelClassName())) {
-            return;
-        }
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    }
+	private static void initLookAndFeel() throws Exception {
+	    
+		if (LangUtil.ifNull(System.getProperty("initLookAndFeel"), "true")
+				.toString().equalsIgnoreCase("false")) {
+			return;
+		}
+		//Apple stuff from Raj Singh's startup script [Jon Aquino 10/30/2003]
+		System.setProperty("apple.laf.useScreenMenuBar", "true");
+		System.setProperty("apple.awt.showGrowBox", "true");
+		if (UIManager.getLookAndFeel() != null
+				&& UIManager.getLookAndFeel().getClass().getName().equals(
+						UIManager.getSystemLookAndFeelClassName())) {
+			return;
+		}
+		String laf = System.getProperty( "swing.defaultlaf" );
+		System.out.println("laf: " + laf );
+		if ( laf == null ){
+		    laf = UIManager.getSystemLookAndFeelClassName();
+		}
+		UIManager.setLookAndFeel( laf );
+	}
 
 	public DriverManager getDriverManager() {
 		return driverManager;

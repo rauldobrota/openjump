@@ -62,6 +62,7 @@ import com.vividsolutions.jump.workbench.ui.plugin.generate.BoundaryMatchDataPlu
 import com.vividsolutions.jump.workbench.ui.plugin.scalebar.InstallScaleBarPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.scalebar.ScaleBarPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.scalebar.ScaleBarRenderer;
+import com.vividsolutions.jump.workbench.ui.plugin.skin.InstallSkinsPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.test.RandomArrowsPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.test.RandomTrianglesPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.wms.AddWMSQueryPlugIn;
@@ -231,7 +232,9 @@ public class JUMPConfiguration implements Setup {
     private CombineSelectedFeaturesPlugIn combineSelectedFeaturesPlugIn = new CombineSelectedFeaturesPlugIn();
 
     private ExplodeSelectedFeaturesPlugIn explodeSelectedFeaturesPlugIn = new ExplodeSelectedFeaturesPlugIn();
-
+    
+    private InstallSkinsPlugIn installSkinsPlugIn = new InstallSkinsPlugIn(); 
+    
     public void setup(WorkbenchContext workbenchContext) throws Exception {
         configureStyles(workbenchContext);
         workbenchContext.getWorkbench().getBlackboard().put(
