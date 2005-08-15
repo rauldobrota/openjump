@@ -250,7 +250,6 @@ public class JUMPWorkbench {
 			return;
 		}
 		String laf = System.getProperty( "swing.defaultlaf" );
-		System.out.println("laf: " + laf );
 		if ( laf == null ){
 		    laf = UIManager.getSystemLookAndFeelClassName();
 		}
