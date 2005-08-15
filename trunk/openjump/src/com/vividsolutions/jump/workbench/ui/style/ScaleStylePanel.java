@@ -16,6 +16,7 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.util.MathUtil;
 import com.vividsolutions.jump.util.StringUtil;
 import com.vividsolutions.jump.workbench.model.Layer;
@@ -146,14 +147,14 @@ public class ScaleStylePanel extends JPanel implements StylePanel {
         this.setLayout(new GridBagLayout());
         gridBagConstraints1.gridx = 1;
         gridBagConstraints1.gridy = 4;
-        smallestScaleLabel.setText("Smallest Scale");
-        smallestScaleLabel.setToolTipText("Larger units/pixel");
+        smallestScaleLabel.setText(I18N.get("ui.style.ScaleStylePanel.smallest-scale"));
+        smallestScaleLabel.setToolTipText(I18N.get("ui.style.ScaleStylePanel.larger-units-pixel"));
         smallestScaleIconLabel.setIcon(MIN_SCALE_ICON);
         largestScaleIconLabel.setIcon(MAX_SCALE_ICON);
         gridBagConstraints5.gridx = 3;
         gridBagConstraints5.gridy = 6;
         smallestScale1Label.setText("1:");
-        currentScaleLabel.setText("Current Scale:");
+        currentScaleLabel.setText(I18N.get("ui.style.ScaleStylePanel.current-scale"));
         gridBagConstraints6.gridx = 3;
         gridBagConstraints6.gridy = 8;
         gridBagConstraints16.gridx = 3;
@@ -201,7 +202,7 @@ public class ScaleStylePanel extends JPanel implements StylePanel {
         gridBagConstraints12.insets = new java.awt.Insets(2, 2, 2, 2);
         gridBagConstraints13.gridx = 4;
         gridBagConstraints13.gridy = 5;
-        unitsPerPixelLabel.setText("Units/Pixel");
+        unitsPerPixelLabel.setText(I18N.get("ui.style.ScaleStylePanel.units-pixel"));
         gridBagConstraints14.gridx = 7;
         gridBagConstraints14.gridy = 6;
         gridBagConstraints14.insets = new java.awt.Insets(4, 4, 4, 4);
@@ -218,8 +219,8 @@ public class ScaleStylePanel extends JPanel implements StylePanel {
         GUIUtil.shrinkFont(getHideBelowCurrentScaleButton());
         GUIUtil.shrinkFont(getShowAtThisScaleButton());
         GUIUtil.shrinkFont(unitsPerPixelLabel);
-        largestScaleLabel.setText("Largest Scale");
-        largestScaleLabel.setToolTipText("Smaller units/pixel");
+        largestScaleLabel.setText(I18N.get("ui.style.ScaleStylePanel.largest-scale"));
+        largestScaleLabel.setToolTipText(I18N.get("ui.style.ScaleStylePanel.smaller-units-pixel"));
         gridBagConstraints2.gridx = 1;
         gridBagConstraints2.gridy = 6;
         gridBagConstraints31.gridx = 1;
@@ -255,7 +256,7 @@ public class ScaleStylePanel extends JPanel implements StylePanel {
     }
 
     public String getTitle() {
-        return "Scale";
+        return I18N.get("ui.style.ScaleStylePanel.scale");
     }
 
     public void updateStyles() {
@@ -276,13 +277,13 @@ public class ScaleStylePanel extends JPanel implements StylePanel {
                 && getLargestScale() != null
                 && getLargestScale().doubleValue() > getSmallestScale()
                         .doubleValue()) {
-            return "Units/Pixel at smallest scale must be larger than Units/Pixel at largest scale";
+            return I18N.get("ui.style.ScaleStylePanel.units-pixel-at-smallest-scale-must-be-larger-than-units-pixel-at-largest-scale");
         }
         if (getLargestScale() != null && getLargestScale().doubleValue() == 0) {
-            return "Units/Pixel at largest scale must be greater than 0";
+            return I18N.get("ui.style.ScaleStylePanel.units-pixel-at-largest-scale-must-be-greater-than-0");
         }
         if (getSmallestScale() != null && getSmallestScale().doubleValue() == 0) {
-            return "Units/Pixel at smallest scale must be greater than 0";
+            return I18N.get("ui.style.ScaleStylePanel.units-pixel-at-smallest-scale-must-be-greater-than-0");
         }
         return null;
     }
@@ -303,7 +304,7 @@ public class ScaleStylePanel extends JPanel implements StylePanel {
         if (enableScaleDependentRenderingCheckBox == null) {
             enableScaleDependentRenderingCheckBox = new JCheckBox();
             enableScaleDependentRenderingCheckBox
-                    .setText("Only show layer when scale is between:");
+                    .setText(I18N.get("ui.style.ScaleStylePanel.only-show-layer-when-scale-is-between"));
             enableScaleDependentRenderingCheckBox
                     .addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -411,7 +412,7 @@ public class ScaleStylePanel extends JPanel implements StylePanel {
     private JButton getHideAboveCurrentScaleButton() {
         if (hideAboveCurrentScaleButton == null) {
             hideAboveCurrentScaleButton = new JButton();
-            hideAboveCurrentScaleButton.setText("Hide above current scale");
+            hideAboveCurrentScaleButton.setText(I18N.get("ui.style.ScaleStylePanel.hide-above-current-scale"));
             hideAboveCurrentScaleButton
                     .addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -446,7 +447,7 @@ public class ScaleStylePanel extends JPanel implements StylePanel {
     private JButton getHideBelowCurrentScaleButton() {
         if (hideBelowCurrentScaleButton == null) {
             hideBelowCurrentScaleButton = new JButton();
-            hideBelowCurrentScaleButton.setText("Hide below current scale");
+            hideBelowCurrentScaleButton.setText(I18N.get("ui.style.ScaleStylePanel.hide-below-current-scale"));
             hideBelowCurrentScaleButton
                     .addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -481,7 +482,7 @@ public class ScaleStylePanel extends JPanel implements StylePanel {
     private JButton getShowAtThisScaleButton() {
         if (showAtThisScaleButton == null) {
             showAtThisScaleButton = new JButton();
-            showAtThisScaleButton.setText("Show at this scale");
+            showAtThisScaleButton.setText(I18N.get("ui.style.ScaleStylePanel.show-at-this-scale"));
             showAtThisScaleButton
                     .addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent e) {
