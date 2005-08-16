@@ -10,6 +10,7 @@
  ***********************************************/
 package org.openjump.core.ui.plugin.file;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.model.Layer;
@@ -51,11 +52,11 @@ public class SaveImageAsSVGPlugIn extends AbstractPlugIn implements ThreadedPlug
 
 	public void initialize(PlugInContext context) throws Exception {
     	
-		context.getFeatureInstaller().addMainMenuItem(this,
-		        new String[]
-				{MenuNames.FILE},
-				"save-image-as-svg",
-		        //I18NPlug.get(pluginname, "org.openjump.core.ui.plugin.file.SaveImageAsSVGPlugIn.Save-image-as-svg"), 
+		context.getFeatureInstaller().addMainMenuItem(this,		        
+				new String[] {MenuNames.FILE},
+				//new String[] {MenuNames.FILE, MenuNames.FILE_EXPORTLAYERVIEW},
+		        //I18N.get("org.openjump.core.ui.plugin.file.SaveImageAsSVGPlugIn.save-image-in-svg-format"),
+				I18N.get("org.openjump.core.ui.plugin.file.SaveImageAsSVGPlugIn.save-image-in-svg-format") + "{pos:10}",
 				false, 
 				null, 
                 createEnableCheck(context.getWorkbenchContext())); //enable check
@@ -65,7 +66,11 @@ public class SaveImageAsSVGPlugIn extends AbstractPlugIn implements ThreadedPlug
 		JFileChooser fc = new JFileChooser();
 		// Show save dialog; this method does not return until the dialog is closed
 		fc.showSaveDialog(context.getWorkbenchFrame());
-		this.selFile = fc.getSelectedFile();
+		File file = fc.getSelectedFile();
+		String name = file.getPath();		
+		name = this.addExtension(name,"svg");
+		File newFile = new File(name);
+		this.selFile = newFile;
 		return true;
 	}
 
@@ -138,7 +143,7 @@ public class SaveImageAsSVGPlugIn extends AbstractPlugIn implements ThreadedPlug
 		//Finally, stream out SVG to the your file
 		//Writer out = new FileWriter("MyMoMap.svg");
 		//FileWriter out = new FileWriter(selFile);
-		try{
+		try{			
 			FileOutputStream fos = new FileOutputStream(this.selFile, false);
 			OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
 			svgGenerator.stream(out, true);
@@ -156,5 +161,14 @@ public class SaveImageAsSVGPlugIn extends AbstractPlugIn implements ThreadedPlug
         .add(checkFactory.createWindowWithLayerNamePanelMustBeActiveCheck())
         .add(checkFactory.createAtLeastNLayersMustBeSelectedCheck(0));
     }
-    
+ 
+    private String addExtension(String path, String extension) {
+        if (path.toUpperCase().endsWith(extension.toUpperCase())) {
+            return path;
+        }
+        if (path.endsWith(".")) {
+            return path + extension;
+        }
+        return path + "." + extension;
+    }
 }

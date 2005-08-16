@@ -39,6 +39,7 @@ import com.vividsolutions.jump.I18N;
  */
 public interface MenuNames {
 	public static String FILE = I18N.get("ui.MenuNames.FILE");
+	public static String FILE_EXPORTLAYERVIEW = I18N.get("ui.MenuNames.FILE.EXPORTLAYERVIEW");
 	public static String EDIT = I18N.get("ui.MenuNames.EDIT");
 	public static String VIEW = I18N.get("ui.MenuNames.VIEW");
 	public static String LAYER = I18N.get("ui.MenuNames.LAYER");

@@ -57,7 +57,6 @@ public class OpenJumpConfiguration{
 		ReplicateSelectedItemsPlugIn replicatePlugIn = new ReplicateSelectedItemsPlugIn();
 		replicatePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
-		//-- [sstein] working test plugin
 		SaveImageAsSVGPlugIn imageSvgPlugin= new SaveImageAsSVGPlugIn();
 		imageSvgPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
