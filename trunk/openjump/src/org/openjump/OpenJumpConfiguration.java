@@ -39,12 +39,16 @@ public class OpenJumpConfiguration{
 		 *  add here first the field which holds the plugin
 		 *  and afterwards initialize it for the menu
 		 *-----------------------------------------------*/
-		ZoomToScalePlugIn myZoomToScalePlugIn = new ZoomToScalePlugIn();
-		myZoomToScalePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
-		ShowScalePlugIn myShowScalePlugIn = new ShowScalePlugIn();
-		myShowScalePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
-		
+		/***********************
+		 *  menu FILE
+		 **********************/
+		SaveImageAsSVGPlugIn imageSvgPlugin= new SaveImageAsSVGPlugIn();
+		imageSvgPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+
+		/***********************
+		 *  menu EDIT
+		 **********************/
 		SelectItemsByFenceFromSelectedLayersPlugIn selectItemsFromLayersPlugIn = new SelectItemsByFenceFromSelectedLayersPlugIn();
 		selectItemsFromLayersPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
@@ -57,8 +61,32 @@ public class OpenJumpConfiguration{
 		ReplicateSelectedItemsPlugIn replicatePlugIn = new ReplicateSelectedItemsPlugIn();
 		replicatePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
-		SaveImageAsSVGPlugIn imageSvgPlugin= new SaveImageAsSVGPlugIn();
-		imageSvgPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		/***********************
+		 *  menu VIEW
+		 **********************/
+		ZoomToScalePlugIn myZoomToScalePlugIn = new ZoomToScalePlugIn();
+		myZoomToScalePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		ShowScalePlugIn myShowScalePlugIn = new ShowScalePlugIn();
+		myShowScalePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		/***********************
+		 *  menu LAYER
+		 **********************/
+
+		/***********************
+		 *  menu TOOLS
+		 **********************/
+		
+		/***********************
+		 *  menu WINDOW
+		 **********************/
+
+		/***********************
+		 *  menu HELP
+		 **********************/
+
+
 		
 	}
 }
