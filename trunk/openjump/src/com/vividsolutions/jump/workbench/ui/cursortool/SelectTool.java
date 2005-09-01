@@ -111,10 +111,6 @@ public abstract class SelectTool extends DragTool {
                 if (wasShiftPressed()) {
                     selection.unselectItems(layer, featureToItemsToUnselectMap);
                 }
-                featureToItemsInFenceMap(
-                    (Collection) layerToFeaturesInFenceMap.get(layer),
-                    layer,
-                    true);
             } finally {
                 getPanel().getSelectionManager().setPanelUpdatesEnabled(
                     originalPanelUpdatesEnabled);
