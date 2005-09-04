@@ -40,6 +40,7 @@ import java.util.Iterator;
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureCollection;
+import com.vividsolutions.jump.feature.FeatureSchema;
 import com.vividsolutions.jump.feature.FeatureUtil;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.model.Layer;
@@ -65,11 +66,13 @@ public class AddNewFeaturesPlugIn extends WKTPlugIn {
     protected void apply(FeatureCollection c, final PlugInContext context) {
         //Can't use WeakHashMap, otherwise the features will vanish when the command
         //is undone! [Jon Aquino]
-        final ArrayList features = new ArrayList();
-
+        final ArrayList features = new ArrayList();               
+        
+        FeatureSchema fs = this.layer.getFeatureCollectionWrapper().getFeatureSchema();
+        
         for (Iterator i = c.iterator(); i.hasNext();) {
-            Feature feature = (Feature) i.next();
-            features.add(FeatureUtil.toFeature(feature.getGeometry(), c.getFeatureSchema()));
+            Feature feature = (Feature) i.next();      
+            features.add(FeatureUtil.toFeature(feature.getGeometry(), fs));
         }
 
         execute(new UndoableCommand(getName()) {
