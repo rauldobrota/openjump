@@ -33,11 +33,14 @@
 
 package com.vividsolutions.jump.workbench.ui.plugin;
 
+import javax.swing.ImageIcon;
+
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
+import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 
 public class ClearSelectionPlugIn extends AbstractPlugIn {
     public ClearSelectionPlugIn() {}
@@ -50,8 +53,12 @@ public class ClearSelectionPlugIn extends AbstractPlugIn {
 
     public MultiEnableCheck createEnableCheck(final WorkbenchContext workbenchContext) {
         EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
-        return new MultiEnableCheck().add(
-            checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck());
+        return new MultiEnableCheck()
+			.add(checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck())
+		    .add(checkFactory.createAtLeastNItemsMustBeSelectedCheck(1));
     }
 
+    public ImageIcon getIcon() {
+        return IconLoader.icon("deselect.gif");
+    }
 }

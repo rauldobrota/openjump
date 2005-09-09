@@ -498,7 +498,7 @@ public class JUMPConfiguration implements Setup {
                         .createEnableCheck(workbenchContext));        
         featureInstaller.addMainMenuItem(saveDatasetAsPlugIn, MenuNames.FILE,
                 saveDatasetAsPlugIn.getName() + "...", null,
-                SaveDatasetAsPlugIn.createEnableCheck(workbenchContext));
+                SaveDatasetAsPlugIn.createEnableCheck(workbenchContext));  
         featureInstaller.addMenuSeparator(MenuNames.FILE); // ===================
         featureInstaller.addMainMenuItem(newTaskPlugIn, MenuNames.FILE, newTaskPlugIn
                 .getName()
@@ -512,10 +512,14 @@ public class JUMPConfiguration implements Setup {
         featureInstaller.addMainMenuItem(saveProjectAsPlugIn, MenuNames.FILE,
                 saveProjectAsPlugIn.getName() + "...", null, checkFactory
                         .createTaskWindowMustBeActiveCheck());
+        featureInstaller.addMainMenuItem(
+        		saveImageAsPlugIn, 
+        		new String[] {MenuNames.FILE, MenuNames.FILE_EXPORTLAYERVIEW},				
+                saveImageAsPlugIn.getName() + "...", 
+				false,
+				null, 
+				SaveImageAsPlugIn.createEnableCheck(workbenchContext));          
         featureInstaller.addMenuSeparator(MenuNames.FILE); // ===================
-        featureInstaller.addMainMenuItem(saveImageAsPlugIn, MenuNames.FILE,
-                saveImageAsPlugIn.getName() + "...", null, SaveImageAsPlugIn
-                        .createEnableCheck(workbenchContext));
         featureInstaller.addMainMenuItem(undoPlugIn, MenuNames.EDIT, undoPlugIn
                 .getName(), GUIUtil.toSmallIcon(undoPlugIn.getIcon()),
                 undoPlugIn.createEnableCheck(workbenchContext));
@@ -867,6 +871,10 @@ public class JUMPConfiguration implements Setup {
         add(new QuasimodeTool(new SelectFeaturesTool()).add(
                 new QuasimodeTool.ModifierKeySpec(true, false, false), null),
                 workbenchContext);
+        frame.getToolBar().addPlugIn(clearSelectionPlugIn.getIcon(),
+        		clearSelectionPlugIn,
+				clearSelectionPlugIn.createEnableCheck(workbenchContext),
+				workbenchContext);
         add(new OrCompositeTool() {
 
             public String getName() {
