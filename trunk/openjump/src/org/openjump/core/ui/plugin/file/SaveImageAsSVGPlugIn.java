@@ -67,11 +67,16 @@ public class SaveImageAsSVGPlugIn extends AbstractPlugIn implements ThreadedPlug
 		// Show save dialog; this method does not return until the dialog is closed
 		fc.showSaveDialog(context.getWorkbenchFrame());
 		File file = fc.getSelectedFile();
-		String name = file.getPath();		
-		name = this.addExtension(name,"svg");
-		File newFile = new File(name);
-		this.selFile = newFile;
-		return true;
+		try{
+			String name = file.getPath();		
+			name = this.addExtension(name,"svg");
+			File newFile = new File(name);
+			this.selFile = newFile;
+			return true;
+		}
+		catch(Exception e){			
+			return false;
+		}
 	}
 
 	public void run(TaskMonitor monitor, PlugInContext context)
