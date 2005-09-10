@@ -1,3 +1,11 @@
+/*
+ * CVS header information:
+ *  $RCSfile$
+ *  $Revision$
+ *  $Date$
+ *  $Source$
+ */
+
 package org.geotools.dbffile;
 
 import com.vividsolutions.jump.io.EndianDataInputStream;
@@ -20,13 +28,9 @@ import java.util.Vector;
  *<hr>
  * @author <a href="mailto:ian@geog.leeds.ac.uk">Ian Turton</a> Centre for
  * Computaional Geography, University of Leeds, LS2 9JT, 1998.
+ * 
+ * @version $Revision$
  *
- * getFieldType() ParseRecordColumn(), ParseRecord(),... modified to handle
- * BOOLEAN, LONG, Decimal...
- * [Michaël MICHAUD - 3 nov. 2004]
- * getLongCol added
- * bug about field length of int/long : int is used when length < 12
- * [Michaël MICHAUD - 23 nov. 2004]
  */
 public class DbfFile implements DbfConsts {
     static final boolean DEBUG = false;
@@ -44,7 +48,9 @@ public class DbfFile implements DbfConsts {
     int numfields;
     public DbfFieldDef[] fielddef;
     public static final SimpleDateFormat DATE_PARSER = new SimpleDateFormat("yyyyMMdd") {
-        {setLenient(false);}
+        {
+            setLenient(false);
+        }
     };
 
     protected DbfFile() {
@@ -52,11 +58,11 @@ public class DbfFile implements DbfConsts {
     }
 
     /**
-     * Constructor, opens the file and reads the header infomation.
-     * @param file The file to be opened, includes path and .dbf
-     * @exception java.io.IOException If the file can't be opened.
-     * @exception DbfFileException If there is an error reading header.
-     */
+            * Constructor, opens the file and reads the header infomation.
+            * @param file The file to be opened, includes path and .dbf
+            * @exception java.io.IOException If the file can't be opened.
+            * @exception DbfFileException If there is an error reading header.
+            */
     public DbfFile(String file) throws java.io.IOException, DbfFileException {
         if (DEBUG) {
             System.out.println(
@@ -78,27 +84,29 @@ public class DbfFile implements DbfConsts {
             * Returns the date of the last update of the file as a string.
             */
     public String getLastUpdate() {
-        String date = last_update_d + "/" + last_update_m + "/" + last_update_y;
+        String date = last_update_d + "/" + last_update_m + "/" +
+            last_update_y;
+
         return date;
     }
 
     /**
-     * Returns the number of records in the database file.
-     */
+            * Returns the number of records in the database file.
+            */
     public int getLastRec() {
         return last_rec;
     }
 
     /**
-     * Returns the size of the records in the database file.
-     */
+            * Returns the size of the records in the database file.
+            */
     public int getRecSize() {
         return rec_size;
     }
 
     /**
-     * Returns the number of fields in the records in the database file.
-     */
+            * Returns the number of fields in the records in the database file.
+            */
     public int getNumFields() {
         return numfields;
     }
@@ -112,46 +120,51 @@ public class DbfFile implements DbfConsts {
         String realtype = "";
 
         switch (type) {
-            case 'C':
-                realtype = "STRING";
-                break;
+        case 'C':
+            realtype = "STRING";
 
-            case 'N':
-                if (fielddef[row].fieldnumdec == 0) {realtype = "INTEGER";}
-                else {realtype = "DOUBLE";}
-                break;
+            break;
 
-            case 'F':
+        case 'N':
+
+            if (fielddef[row].fieldnumdec == 0) {
+                realtype = "INTEGER";
+            } else {
                 realtype = "DOUBLE";
-                break;
+            }
 
-            case 'D': //Added by [Jon Aquino]
-                realtype = "DATE";
-                break;
+            break;
 
-            case 'L': //Added by [Michaël Michaud]
-                realtype = "BOOLEAN";
-                break;
+        case 'F':
+            realtype = "DOUBLE";
 
-            default:
-                realtype = "STRING";
-                break;
+            break;
 
+        case 'D': //Added by [Jon Aquino]
+            realtype = "DATE";
+
+            break;
+
+        default:
+            realtype = "STRING";
+
+            break;
         }
 
         return realtype;
     }
 
     /**
-     * Returns the size  of the database file.
-     */
+            * Returns the size  of the database file.
+            */
     public int getFileSize() {
         return filesize;
     }
 
-   /**
-    * initailizer, allows the use of multiple constructers in later versions.
-    */
+    /**
+      * initailizer, allows the use of multiple constructers in later
+            * versions.
+            */
     private void init(EndianDataInputStream sfile)
         throws IOException, DbfFileException {
         DbfFileHeader head = new DbfFileHeader(sfile);
@@ -175,12 +188,12 @@ public class DbfFile implements DbfConsts {
         sfile.skipBytes(1); // end of field defs marker
     }
 
-   /**
-    * gets the next record and returns it as a string. This method works on
-    * a sequential stream and can not go backwards. Only useful if you want
-    * to read the whole file in one.
-    * @exception java.io.IOException on read error.
-    */
+    /**
+            * gets the next record and returns it as a string. This method works on
+            * a sequential stream and can not go backwards. Only useful if you want
+            * to read the whole file in one.
+            * @exception java.io.IOException on read error.
+            */
     public StringBuffer GetNextDbfRec() throws java.io.IOException {
         StringBuffer record = new StringBuffer(rec_size + numfields);
 
@@ -192,11 +205,11 @@ public class DbfFile implements DbfConsts {
         return record;
     }
 
-   /**
-    * fetches the <i>row</i>th row of the file
-    * @param row - the row to fetch
-    * @exception java.io.IOException on read error.
-    */
+    /**
+     * fetches the <i>row</i>th row of the file
+     * @param row - the row to fetch
+     * @exception java.io.IOException on read error.
+     */
     public StringBuffer GetDbfRec(int row) throws java.io.IOException {
         StringBuffer record = new StringBuffer(rec_size + numfields);
 
@@ -212,12 +225,12 @@ public class DbfFile implements DbfConsts {
         return record;
     }
 
-   /**
-    * fetches the <i>row</i>th row of the file and parses it into an vector
-    * of objects.
-    * @param row - the row to fetch
-    * @exception java.io.IOException on read error.
-    */
+    /**
+            * fetches the <i>row</i>th row of the file and parses it into an vector
+            * of objects.
+            * @param row - the row to fetch
+            * @exception java.io.IOException on read error.
+            */
     public Vector ParseDbfRecord(int row) throws java.io.IOException {
         return ParseRecord(GetDbfRec(row));
     }
@@ -234,76 +247,60 @@ public class DbfFile implements DbfConsts {
         int end;
         start = fielddef[wantedCol].fieldstart;
         end = start + fielddef[wantedCol].fieldlen;
-        String colstring = rec.substring(start, end);
-        //System.out.println(colstring);
 
         switch (fielddef[wantedCol].fieldtype) {
-            case 'C': //character
-                return colstring;
-            // Michaël MICHAUD read 'F' as Double (same as before)
-            case 'F': //same as numeric, more or less
-                //while ((start < end) && (rec.charAt(start) == ' ')) start++;
-                //String numb = rec.substring(start, end);
-                try { return new Double(colstring.trim());}
-                catch (java.lang.NumberFormatException e) {
-                    // dBase can have numbers that look like '********' !!
-                    // This isn't ideal but at least reads them
-                    return new Double(Double.NaN);
-                }
-            // Michaël MICHAUD read 'N' as Long or as BigDecimal (new AttributeType)
-            case 'N': //numeric
-                // fields of type 'F' are always represented as Doubles
-                boolean isInteger = fielddef[wantedCol].fieldnumdec == 0
-                    && fielddef[wantedCol].fieldtype == 'N';
-                //while ((start < end) && (rec.charAt(start) == ' ')) start++;
-                //String numb = rec.substring(start, end);
-                if (fielddef[wantedCol].fieldnumdec == 0 && fielddef[wantedCol].fieldlen<12) {
-                //if (isInteger) { //its an int
-                    try {return new Integer(colstring.trim());}
-                    catch (java.lang.NumberFormatException e) {return new Integer(0);}
-                }
-                else if (fielddef[wantedCol].fieldnumdec == 0) {
-                //if (isInteger) { //its an int
-                    try {return new Long(colstring.trim());}
-                    catch (java.lang.NumberFormatException e) {return new Long(0);}
-                }
-                else { //its a decimal
-                    try {return new java.math.BigDecimal(colstring.trim());}
-                    catch (java.lang.NumberFormatException e) {
-                        // dBase can have numbers that look like '********' !!
-                        // This isn't ideal but at least reads them
-                        return new java.math.BigDecimal(0.0);
-                    }
-                }
+        case 'C': //character
+            return rec.substring(start, end);
 
-            case 'D': //date. Added by [Jon Aquino]
-                //return parseDate(rec.substring(start, end));
-                // modified by Michaël MICHAUD (2 nov 2004)
-                return parseDate(colstring);
-            
-            case 'L': //date. Added by [Michaël Michaud]
-                char c = rec.substring(start, end).charAt(0);
-                if(c=='T' || c=='t' || c=='Y' || c=='y') return new Boolean(true);
-                else if (c=='F' || c=='f' || c=='N' || c=='n') return new Boolean(false);
-                else return null;
-            
-            default:
+        case 'F': //same as numeric, more or less
+        case 'N': //numeric
+
+          // fields of type 'F' are always represented as Doubles
+          boolean isInteger = fielddef[wantedCol].fieldnumdec == 0
+                && fielddef[wantedCol].fieldtype == 'N';
+
+
+          // The number field should be trimed from the start AND the end.
+          // Added .trim() to 'String numb = rec.substring(start, end)' instead. [Kevin Neufeld]
+          // while ((start < end) && (rec.charAt(start) == ' '))
+          //    start++;
+          
+          String numb = rec.substring(start, end).trim();
+          if (isInteger) { //its an int
+
+              try {
+                  return new Integer(numb);
+              } catch (java.lang.NumberFormatException e) {
+                  return new Integer(0);
+              }
+          } else { //its a float
+
+              try {
+                  return new Double(numb);
+              } catch (java.lang.NumberFormatException e) {
+                  // dBase can have numbers that look like '********' !! This isn't ideal but at least reads them
+                  return new Double(Double.NaN);
+              }
+          }
+
+        case 'D': //date. Added by [Jon Aquino]
+            return parseDate(rec.substring(start, end));
+
+        default:
             return rec.substring(start, end);
         }
     }
 
-   /**
-    * Parses the record stored in the StringBuffer rec into a vector of
-    * objects
-    * @param StringBuffer rec - the record to be parsed.
-    */
+    /**
+            * Parses the record stored in the StringBuffer rec into a vector of
+            * objects
+            * @param StringBuffer rec - the record to be parsed.
+            */
     public Vector ParseRecord(StringBuffer rec) {
         Vector record = new Vector(numfields);
         String t;
         Integer I = new Integer(0);
-        Long L = new Long(0L);
         Double F = new Double(0.0);
-        Boolean B = new Boolean(false);
         t = rec.toString();
 
         for (int i = 0; i < numfields; i++) {
@@ -325,99 +322,84 @@ public class DbfFile implements DbfConsts {
             }
 
             switch (fielddef[i].fieldtype) {
-                case 'C':
-                    record.addElement(t.substring(fielddef[i].fieldstart,
+            case 'C':
+                record.addElement(t.substring(fielddef[i].fieldstart,
                         fielddef[i].fieldstart + fielddef[i].fieldlen));
-                    break;
-
-                case 'N':
-                    if (fielddef[i].fieldnumdec == 0 && fielddef[i].fieldlen<11) { //its an int
-                        try {
-                            String tt = t.substring(fielddef[i].fieldstart,
-                                fielddef[i].fieldstart + fielddef[i].fieldlen);
-                            record.addElement(I.valueOf(tt.trim()));
-                        } catch (java.lang.NumberFormatException e) {
-                            record.addElement(I);
-                        }
-                    }
-                    else if (fielddef[i].fieldnumdec == 0) { //its a long
-                        try {
-                            String tt = t.substring(fielddef[i].fieldstart,
-                                fielddef[i].fieldstart + fielddef[i].fieldlen);
-                            record.addElement(L.valueOf(tt.trim()));
-                        } catch (java.lang.NumberFormatException e) {
-                            record.addElement(L);
-                        }
-                    }
-                    else { //its a float
-                        try {
-                            record.addElement(new java.math.BigDecimal(t.substring(
-                                    fielddef[i].fieldstart,
-                                    fielddef[i].fieldstart +
-                                    fielddef[i].fieldlen).trim()));
-                        } catch (java.lang.NumberFormatException e) {
-                            record.addElement(new java.math.BigDecimal(0.0));
-                        }
-                    }
 
                 break;
 
-                case 'F':
+            case 'N':
+
+                if (fielddef[i].fieldnumdec == 0) { //its an int
+
+                    try {
+                        String tt = t.substring(fielddef[i].fieldstart,
+                                fielddef[i].fieldstart + fielddef[i].fieldlen);
+                        record.addElement(I.valueOf(tt.trim()));
+                    } catch (java.lang.NumberFormatException e) {
+                        record.addElement(new Integer(0));
+                    }
+                } else { //its a float
+
                     try {
                         record.addElement(F.valueOf(t.substring(
-                                fielddef[i].fieldstart,
-                                fielddef[i].fieldstart +
-                                fielddef[i].fieldlen).trim()));
+                                    fielddef[i].fieldstart,
+                                    fielddef[i].fieldstart +
+                                    fielddef[i].fieldlen).trim()));
                     } catch (java.lang.NumberFormatException e) {
-                        record.addElement(F);
+                        record.addElement(new Double(0.0));
                     }
-                    break;
+                }
 
-                case 'D':
-                    //Date formats. This method doesn't seem to be called anywhere in JUMP,
-                    //so I'm not going to spend time understanding this method. [Jon Aquino]
-                    //throw new UnsupportedOperationException();
-                    try {
-                        record.addElement(DATE_PARSER.parse(
-                            t.substring(fielddef[i].fieldstart,
-                            fielddef[i].fieldstart + fielddef[i].fieldlen).trim()));
-                    }
-                    catch(java.text.ParseException e) {record.addElement(null);}
-                    break;
+                break;
 
-                case 'L':
-                    record.addElement(new Boolean(t.substring(fielddef[i].fieldstart,
-                        fielddef[i].fieldstart + fielddef[i].fieldlen).trim()));
-                    break;
+            case 'F':
 
-                default:
-                    record.addElement(t.substring(fielddef[i].fieldstart,
+                try {
+                    record.addElement(F.valueOf(t.substring(
+                                fielddef[i].fieldstart,
+                                fielddef[i].fieldstart + fielddef[i].fieldlen)
+                                                 .trim()));
+                } catch (java.lang.NumberFormatException e) {
+                    record.addElement(new Double(0.0));
+                }
+
+                break;
+
+            case 'D':
+
+                //Date formats. This method doesn't seem to be called anywhere in JUMP,
+                //so I'm not going to spend time understanding this method. [Jon Aquino]
+                throw new UnsupportedOperationException();
+
+            default:
+                record.addElement(t.substring(fielddef[i].fieldstart,
                         fielddef[i].fieldstart + fielddef[i].fieldlen));
             }
         }
 
         return record;
     }
-    
+
     /**
-     * Fetches a column of Integers from the database file.
-     * @param int col - the column to fetch
-     * @exception java.io.IOException - on read error
-     * @exception DbfFileException - column is not an Integer.
-     */
+            * Fetches a column of Integers from the database file.
+            * @param int col - the column to fetch
+            * @exception java.io.IOException - on read error
+            * @exception DbfFileException - column is not an Integer.
+            */
     public Integer[] getIntegerCol(int col)
         throws java.io.IOException, DbfFileException {
         return getIntegerCol(col, 0, last_rec);
     }
 
     /**
-     * Fetches a part column of Integers from the database file.
-     * @param int col - the column to fetch
-     * @param int start - the row to start fetching from
-     * @param int end - the row to stop fetching at.
-     * @exception java.io.IOException - on read error
-     * @exception DbfFileException - column is not an Integer.
-     */
+            * Fetches a part column of Integers from the database file.
+            * @param int col - the column to fetch
+            * @param int start - the row to start fetching from
+            * @param int end - the row to stop fetching at.
+            * @exception java.io.IOException - on read error
+            * @exception DbfFileException - column is not an Integer.
+            */
     public Integer[] getIntegerCol(int col, int start, int end)
         throws java.io.IOException, DbfFileException {
         Integer[] column = new Integer[end - start];
@@ -454,76 +436,6 @@ public class DbfFile implements DbfConsts {
                                 fielddef[col].fieldlen));
                 } catch (java.lang.NumberFormatException e) {
                     column[i - start] = new Integer(0);
-                }
-            }
-        } catch (java.io.EOFException e) {
-            System.err.println("DbFi>" + e);
-            System.err.println("DbFi>record " + i + " byte " + k +
-                " file pos " + rFile.getFilePointer());
-        } catch (java.io.IOException e) {
-            System.err.println("DbFi>" + e);
-            System.err.println("DbFi>record " + i + " byte " + k +
-                " file pos " + rFile.getFilePointer());
-        }
-
-        return column;
-    }
-
-    /**
-     * Fetches a column of Longs from the database file.
-     * @param int col - the column to fetch
-     * @exception java.io.IOException - on read error
-     * @exception DbfFileException - column is not an Integer.
-     */
-    public Long[] getLongCol(int col)
-        throws java.io.IOException, DbfFileException {
-        return getLongCol(col, 0, last_rec);
-    }
-
-    /**
-     * Fetches a part column of Integers from the database file.
-     * @param int col - the column to fetch
-     * @param int start - the row to start fetching from
-     * @param int end - the row to stop fetching at.
-     * @exception java.io.IOException - on read error
-     * @exception DbfFileException - column is not an Integer.
-     */
-    public Long[] getLongCol(int col, int start, int end)
-        throws java.io.IOException, DbfFileException {
-        Long[] column = new Long[end - start];
-        String record = new String();
-        StringBuffer sb = new StringBuffer(numfields);
-        int k = 0;
-        int i = 0;
-
-        if (col >= numfields) {
-            throw new DbfFileException("DbFi>No Such Column in file: " + col);
-        }
-
-        if (fielddef[col].fieldtype != 'N') {
-            throw new DbfFileException("DbFi>Column " + col +
-                " is not Integer");
-        }
-
-        // move to start of data
-        try {
-            rFile.seek(data_offset + (rec_size * start));
-
-            for (i = start; i < end; i++) {
-                sb.setLength(0);
-
-                for (k = 0; k < rec_size; k++)
-                    sb.append((char) rFile.readUnsignedByte());
-
-                record = sb.toString();
-
-                try {
-                    column[i - start] = new Long(record.substring(
-                                fielddef[col].fieldstart,
-                                fielddef[col].fieldstart +
-                                fielddef[col].fieldlen));
-                } catch (java.lang.NumberFormatException e) {
-                    column[i - start] = new Long(0);
                 }
             }
         } catch (java.io.EOFException e) {
@@ -688,105 +600,21 @@ public class DbfFile implements DbfConsts {
 
         return column;
     }
-    
-    
-    //Added by [Michaël Michaud]
-    /**
-     * Fetches a column of Boolean from the database file.
-     * @param int col - the column to fetch
-     * @exception java.io.IOException - on read error
-     * @exception DbfFileException - column is not an Integer.
-     */
-    public Boolean[] getBooleanCol(int col)
-        throws DbfFileException, java.io.IOException {
-        return getBooleanCol(col, 0, last_rec);
-    }
-
-    //Added by [Michaël Michaud]
-    /**
-     * Fetches a part column of Boolean from the database file.
-     * @param int col - the column to fetch
-     * @param int start - the row to start fetching from
-     * @param int end - the row to stop fetching at.
-     * @exception java.io.IOException - on read error
-     * @exception DbfFileException - column is not an Integer.
-     */
-    public Boolean[] getBooleanCol(int col, int start, int end)
-        throws DbfFileException, java.io.IOException {
-        Boolean[] column = new Boolean[end - start];
-        String record;
-        String st;
-        StringBuffer sb = new StringBuffer(rec_size);
-        int k = 0;
-        int i = 0;
-
-        if (col >= numfields) {
-            throw new DbfFileException("DbFi>No Such Column in file: " + col);
-        }
-
-        if (fielddef[col].fieldtype != 'L') {
-            throw new DbfFileException("DbFi>Column " + col +
-                " is not Boolean " + fielddef[col].fieldtype);
-        }
-
-        // move to start of data
-        try {
-            rFile.seek(data_offset + (rec_size * start));
-
-            for (i = start; i < end; i++) {
-                sb.setLength(0);
-
-                // we should be able to skip to the start here.
-                for (k = 0; k < rec_size; k++)
-                    sb.append((char) rFile.readUnsignedByte());
-
-                record = sb.toString();
-                st = new String(record.substring(fielddef[col].fieldstart,
-                            fielddef[col].fieldstart + fielddef[col].fieldlen));
-                Boolean b;
-                if (st.equalsIgnoreCase("T") || st.equalsIgnoreCase("Y")) {
-                    b = new Boolean(true);
-                }
-                else if (st.equalsIgnoreCase("F") || st.equalsIgnoreCase("N")) {
-                    b = new Boolean(false);
-                }
-                else b = null;
-
-                try {
-                    column[i - start] = b;
-                } catch (java.lang.NumberFormatException e) {
-                    column[i - start] = new Boolean(false);
-                }
-            }
-        } catch (java.io.EOFException e) {
-            System.err.println("DbFi>" + e);
-            System.err.println("DbFi>record " + i + " byte " + k +
-                " file pos " + rFile.getFilePointer());
-        } catch (java.io.IOException e) {
-            System.err.println("DbFi>" + e);
-            System.err.println("DbFi>record " + i + " byte " + k +
-                " file pos " + rFile.getFilePointer());
-        }
-
-        return column;
-    }
-    
-    
 
     public void close() throws IOException {
         dFile.close();
         rFile.close();
     }
 
-   /**
-    * Internal Class to hold information from the header of the file
-    */
+    /**
+            * Internal Class to hold information from the header of the file
+            */
     class DbfFileHeader {
-       /**
-        * Reads the header of a dbf file.
-        * @param LEDataInputStream file Stream attached to the input file
-        * @exception IOException read error.
-        */
+        /**
+                * Reads the header of a dbf file.
+                * @param LEDataInputStream file Stream attached to the input file
+                * @exception IOException read error.
+                */
         public DbfFileHeader(EndianDataInputStream file)
             throws IOException {
             getDbfFileHeader(file);
@@ -915,3 +743,4 @@ public class DbfFile implements DbfConsts {
         }.parse("00010101"));
     }
 }
+
