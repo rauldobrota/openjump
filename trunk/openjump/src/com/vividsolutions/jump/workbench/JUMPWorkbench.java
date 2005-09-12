@@ -80,6 +80,7 @@ public class JUMPWorkbench {
 	public final static String PROPERTIES_OPTION = I18N.get("JUMPWorkbench.properties");
 	public final static String PLUG_IN_DIRECTORY_OPTION = I18N.get("JUMPWorkbench.plug-in-directory");
 	public final static String I18N_FILE = I18N.get("JUMPWorkbench.i18n-file");
+	public static final String INTIAL_TASK_FILE = "task";
 	
 	// Added by STanner to allow I18N to have access to this
 	public static String I18N_SETLOCALE = "";
@@ -163,6 +164,10 @@ public class JUMPWorkbench {
 			if (!extensionsDirectory.exists()) {
 				extensionsDirectory = null;
 			}
+		}
+		if (commandLine.hasOption( INTIAL_TASK_FILE )) {
+		    String task = commandLine.getOption( INTIAL_TASK_FILE ).getArg(0);
+		    this.getBlackboard().put( INTIAL_TASK_FILE, task );
 		}
 		
 		plugInManager = new PlugInManager(context, extensionsDirectory, monitor);
@@ -282,6 +287,8 @@ public class JUMPWorkbench {
 		commandLine.addOptionSpec(new OptionSpec(PROPERTIES_OPTION, 1));
 		commandLine.addOptionSpec(new OptionSpec(PLUG_IN_DIRECTORY_OPTION, 1));
 		commandLine.addOptionSpec(new OptionSpec(I18N_FILE, 1));
+		//[UT] 17.08.2005 
+		commandLine.addOptionSpec(new OptionSpec( INTIAL_TASK_FILE, 1));
 		
 		try {
 			commandLine.parse(args);

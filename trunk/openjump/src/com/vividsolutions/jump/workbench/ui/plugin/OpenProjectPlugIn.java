@@ -102,7 +102,7 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
                         .getBlackboard()), monitor);
     }
 
-    private void open(File file, WorkbenchFrame workbenchFrame)
+    protected void open(File file, WorkbenchFrame workbenchFrame)
             throws Exception {
         FileReader reader = new FileReader(file);
 
@@ -155,7 +155,9 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
 
             for (Iterator j = layerables.iterator(); j.hasNext();) {
                 Layerable layerable = (Layerable) j.next();
-                monitor.report(I18N.get("ui.plugin.OpenProjectPlugIn.loading") + " " + layerable.getName());
+                if ( monitor != null ){
+                    monitor.report(I18N.get("ui.plugin.OpenProjectPlugIn.loading") + " " + layerable.getName());
+                }
                 layerable.setLayerManager(newLayerManager);
 
                 if (layerable instanceof Layer) {

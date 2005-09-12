@@ -33,23 +33,57 @@ package com.vividsolutions.jump.workbench.ui.plugin;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.io.File;
 
+import org.apache.log4j.Logger;
+
+import com.vividsolutions.jump.I18N;
+import com.vividsolutions.jump.workbench.JUMPWorkbench;
+import com.vividsolutions.jump.workbench.WorkbenchContext;
+import com.vividsolutions.jump.workbench.WorkbenchException;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 /**
  * Opens a TaskFrame when the Workbench starts up
  */
-public class FirstTaskFramePlugIn extends AbstractPlugIn {
+public class FirstTaskFramePlugIn extends OpenProjectPlugIn {//AbstractPlugIn {
+    
+    private static Logger LOG = Logger.getLogger( FirstTaskFramePlugIn.class );
+    
     public FirstTaskFramePlugIn() {
     }
     private ComponentListener componentListener;
     public void initialize(final PlugInContext context) throws Exception {
+
         componentListener = new ComponentAdapter() {
             public void componentShown(ComponentEvent e) {
                 //Two reasons wait until the frame is shown before adding the task frame:
                 //(1) Otherwise the task frame won't be selected (2) Otherwise GUIUtil.setLocation
                 //will throw an IllegalComponentStateException. [Jon Aquino]
-                context.getWorkbenchFrame().addTaskFrame();
+                //UT skip this; see 1st if there is a filename available
+                // if so, load it
+                String filename = (String)context.getWorkbenchContext().getBlackboard().get( JUMPWorkbench.INTIAL_TASK_FILE );
+                
+                if( filename == null ){//create empty task
+                    context.getWorkbenchFrame().addTaskFrame();
+                } else {
+
+                    LOG.info( "Found initial project file: " + filename);
+
+                    File f = new File( filename );
+                    
+	        		try {
+	                    open( f, context.getWorkbenchFrame());
+	                    initialize(context);
+	                    run(null, context);
+	                } catch (Exception ex) {
+	                    String mesg = "Could not load initial file";
+	                    LOG.error( mesg );
+	                    context.getWorkbenchFrame().warnUser( mesg );
+	                    context.getWorkbenchFrame().addTaskFrame();
+	                }
+                }
+                
                 context.getWorkbenchFrame().removeComponentListener(componentListener);
             }
         };
