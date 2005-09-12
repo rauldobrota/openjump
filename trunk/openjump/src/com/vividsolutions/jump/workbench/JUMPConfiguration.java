@@ -512,14 +512,17 @@ public class JUMPConfiguration implements Setup {
         featureInstaller.addMainMenuItem(saveProjectAsPlugIn, MenuNames.FILE,
                 saveProjectAsPlugIn.getName() + "...", null, checkFactory
                         .createTaskWindowMustBeActiveCheck());
+        featureInstaller.addMenuSeparator(MenuNames.FILE); // ===================        
         featureInstaller.addMainMenuItem(
         		saveImageAsPlugIn, 
-        		new String[] {MenuNames.FILE, MenuNames.FILE_EXPORTLAYERVIEW},				
+				//TODO :unfortunately i am not able to define the menu position 
+				//      for sub-menus. so i comment it out [sstein: 12.09.2005]  
+        		//new String[] {MenuNames.FILE, MenuNames.FILE_EXPORTLAYERVIEW},
+        		new String[] {MenuNames.FILE},
                 saveImageAsPlugIn.getName() + "...", 
 				false,
 				null, 
 				SaveImageAsPlugIn.createEnableCheck(workbenchContext));          
-        featureInstaller.addMenuSeparator(MenuNames.FILE); // ===================
         featureInstaller.addMainMenuItem(undoPlugIn, MenuNames.EDIT, undoPlugIn
                 .getName(), GUIUtil.toSmallIcon(undoPlugIn.getIcon()),
                 undoPlugIn.createEnableCheck(workbenchContext));
