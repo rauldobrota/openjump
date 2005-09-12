@@ -46,11 +46,18 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
+import com.vividsolutions.jump.I18N;
+
 /**
  * Represents all of the parameters of a getMap request from a WMS server.
  * @author Chris Hodgson chodgson@refractions.net
  */
 public class MapRequest {
+    
+    private static Logger LOG = Logger.getLogger(MapRequest.class);
+	
   private WMService service;
   private int imgWidth;
   private int imgHeight;
@@ -276,7 +283,7 @@ public class MapRequest {
         }
       }
       
-//      System.out.println(urlBuf.toString());
+      LOG.info(urlBuf.toString());
       
       return new URL( urlBuf.toString() );
     }
