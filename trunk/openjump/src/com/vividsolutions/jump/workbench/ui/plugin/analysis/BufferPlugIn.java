@@ -47,8 +47,8 @@ public class BufferPlugIn
     extends AbstractPlugIn
     implements ThreadedPlugIn
 {
-  private final static String LAYER = I18N.get("ui.plugin.analysis.BufferPlugIn.layer");
-  private final static String DISTANCE = I18N.get("ui.plugin.analysis.BufferPlugIn.buffer-distance");
+  private final static String LAYER = "";
+  private final static String DISTANCE = "";
 
   private MultiInputDialog dialog;
   private Layer layer;
@@ -117,8 +117,8 @@ public class BufferPlugIn
     //dialog.setSideBarImage(new ImageIcon(getClass().getResource("DiffSegments.png")));
     dialog.setSideBarDescription(I18N.get("ui.plugin.analysis.BufferPlugIn.buffers-all-geometries-in-the-input-layer"));
     //Initial layer value is null
-    dialog.addLayerComboBox(LAYER, layer, context.getLayerManager());
-    dialog.addDoubleField(DISTANCE, bufferDistance, 10, null);
+    dialog.addLayerComboBox(I18N.get("ui.plugin.analysis.BufferPlugIn.layer"), layer, context.getLayerManager());
+    dialog.addDoubleField(I18N.get("ui.plugin.analysis.BufferPlugIn.buffer-distance"), bufferDistance, 10, null);
   }
 
   private void getDialogValues(MultiInputDialog dialog) {

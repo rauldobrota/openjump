@@ -71,7 +71,7 @@ import com.vividsolutions.jump.workbench.ui.renderer.style.VertexStyle;
 
 public class ValidateSelectedLayersPlugIn extends AbstractPlugIn
     implements ThreadedPlugIn {
-    private final static String CHECK_BASIC_TOPOLOGY = I18N.get("ui.plugin.ValidateSelectedLayersPlugIn.check-basic-topology");
+    private static String CHECK_BASIC_TOPOLOGY = "";
     private final static String CHECK_POLYGON_ORIENTATION = I18N.get("ui.plugin.ValidateSelectedLayersPlugIn.check-polygon-orientation");
     private final static String CHECK_LINESTRINGS_SIMPLE = I18N.get("ui.plugin.ValidateSelectedLayersPlugIn.check-that-linestrings-are-simple");
     private final static String CHECK_POLYGONS_HAVE_NO_HOLES = I18N.get("ui.plugin.ValidateSelectedLayersPlugIn.disallow-polygons-and-multipolygons-with-holes");
@@ -143,7 +143,7 @@ public class ValidateSelectedLayersPlugIn extends AbstractPlugIn
 
         Validator validator = new Validator();
         validator.setCheckingBasicTopology(dialog.getBoolean(
-                CHECK_BASIC_TOPOLOGY));
+        		CHECK_BASIC_TOPOLOGY));
         validator.setCheckingNoRepeatedConsecutivePoints(dialog.getBoolean(
                 CHECK_NO_REPEATED_CONSECUTIVE_POINTS));
         validator.setCheckingLineStringsSimple(dialog.getBoolean(
@@ -324,6 +324,8 @@ public class ValidateSelectedLayersPlugIn extends AbstractPlugIn
     }
 
     private void initDialog(PlugInContext context) {
+    	
+    	CHECK_BASIC_TOPOLOGY = I18N.get("ui.plugin.ValidateSelectedLayersPlugIn.check-basic-topology");
         dialog = new MultiInputDialog(context.getWorkbenchFrame(),
         		I18N.get("ui.plugin.ValidateSelectedLayersPlugIn.validate-selected-layers"), true);
         dialog.setSideBarImage(IconLoader.icon("Validate.gif"));
