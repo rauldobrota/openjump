@@ -62,7 +62,7 @@ public class FirstTaskFramePlugIn extends OpenProjectPlugIn {//AbstractPlugIn {
                 //will throw an IllegalComponentStateException. [Jon Aquino]
                 //UT skip this; see 1st if there is a filename available
                 // if so, load it
-                String filename = (String)context.getWorkbenchContext().getBlackboard().get( JUMPWorkbench.INTIAL_TASK_FILE );
+                String filename = (String)context.getWorkbenchContext().getBlackboard().get( JUMPWorkbench.INITIAL_PROJECT_FILE );
                 
                 if( filename == null ){//create empty task
                     context.getWorkbenchFrame().addTaskFrame();
