@@ -1,7 +1,4 @@
 
-
-
-
 /*
  * The Unified Mapping Platform (JUMP) is an extensible, interactive GUI 
  * for visualizing and manipulating spatial features with geometry and attributes.
@@ -34,6 +31,10 @@
  * www.vividsolutions.com
  */
 
+// Changed by Uwe Dalluege, uwe.dalluege@rzcn.haw-hamburg.de
+// to differ between LatLonBoundingBox and BoundingBox
+// 2005-07-29
+
 package com.vividsolutions.wms;
 
 import java.util.*;
@@ -55,6 +56,11 @@ public class MapLayer {
   private ArrayList subLayers;
   private BoundingBox bbox;
   
+// I think, bbox contains the information about LatLonBoundingBox
+// (see Parser.java)
+// I need a new list for <BoundingBox> [uwe dalluege]
+  private ArrayList boundingBoxList;
+  
   // user modifiable members
   private boolean enabled = false;
   
@@ -73,6 +79,45 @@ public class MapLayer {
     }
     this.bbox = bbox;
   }
+
+// ----------------------------------------------------- MapLayer MapLayer ( )
+  /**
+   * Creates a new instance of MapLayer with boundingBoxList [uwe dalluege]
+   */
+  public MapLayer
+  	( String name, String title, Collection srsList, Collection subLayers, 
+  		BoundingBox bbox, ArrayList boundingBoxList ) 
+  {
+  	this ( name, title, srsList, subLayers, bbox );
+  	this.boundingBoxList = boundingBoxList;
+  }
+// ----------------------------------------------------- MapLayer MapLayer ( )
+// ---------------------------------------- MapLayer getAllBoundingBoxList ( )
+/**
+* @return All BoundingBoxes
+* If there is no BoundingBox for this MapLayer the parent-BoundingBox
+* will be taken.
+* @author uwe dalluege
+*/  
+  public ArrayList getAllBoundingBoxList ( )
+  {
+  	ArrayList allBoundingBoxList = new ArrayList ( );
+  	MapLayer mapLayer = this;
+  	allBoundingBoxList = this.getBoundingBoxList ( );
+  	
+  	if ( allBoundingBoxList.size ( ) > 0 ) return allBoundingBoxList; 
+// ---------------------------------------- MapLayer getAllBoundingBoxList ( )  	
+		while ( mapLayer != null )
+		{
+			mapLayer = mapLayer.getParent ( );
+			if ( mapLayer == null ) return allBoundingBoxList;
+			allBoundingBoxList = mapLayer.getBoundingBoxList ( );
+			if ( allBoundingBoxList.size ( ) > 0 ) return allBoundingBoxList;
+		}  	
+// ---------------------------------------- MapLayer getAllBoundingBoxList ( )  	
+  	return allBoundingBoxList;
+  }
+// ---------------------------------------- MapLayer getAllBoundingBoxList ( )  
   
   /**
    * Returns the number of sub-layers that this MapLayer has.
@@ -157,6 +202,7 @@ public class MapLayer {
    * @return the BoundingBox for this layer, or null if the BBox is unknown
    */
   public BoundingBox getBoundingBox() {
+  	
     if( bbox != null ) {
       return bbox;
     } 
@@ -165,6 +211,43 @@ public class MapLayer {
     }
     return null;
   }
+  
+  
+//----------------------------------------- MapLayer getLatLonBoundingBox ( )   
+  /**
+   * I think this name is better [uwe dalluege]
+   * Gets the LatLonBoundingBox for this layer.
+   * If this layer doesn't have a LatLonBoundingBox specified, we recursively
+   * ask the parent layer for its bounding box. The WMS spec says that each
+   * layer should either have its own LatLonBoundingBox, or inherit one from
+   * its parent, so this recursive call should be successful. If not, null is
+   * returned. However, if a bounding box is returned, it will have the 
+   * SRS string "LatLon". 
+   * Note that the BoundingBox is not necessarily "tight".
+   * @return the BoundingBox for this layer, or null if the BBox is unknown
+   */
+  public BoundingBox getLatLonBoundingBox() {
+  	
+    if( bbox != null ) {
+      return bbox;
+    } 
+    if( parent != null ) {
+      return parent.getBoundingBox();
+    }
+    return null;
+  }
+// ----------------------------------------- MapLayer getLatLonBoundingBox ( )  
+//-------------------------------------------- MapLayer getBoundingBoxList ( )  
+  /**
+   * Gets the BoundingBoxList for this Layer
+   * @return the BoundingBoxList containing the BoundingBoxes
+   */
+// ------------------------------------------- MapLayer getBoundingBoxList ( )
+  public ArrayList getBoundingBoxList ( )
+  {// [uwe dalluege]
+  	return ( ArrayList ) boundingBoxList.clone ( ); 
+  }
+//--------------------------------------------- MapLayer getBoundingBoxList ( )  
   
   /**
    * Returns a copy of the list of supported SRS's. Each SRS is a string in the

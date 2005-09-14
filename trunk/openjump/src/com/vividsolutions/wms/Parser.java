@@ -34,11 +34,17 @@
  * www.vividsolutions.com
  */
 
+// Changed by Uwe Dalluege, uwe.dalluege@rzcn.haw-hamburg.de
+// to differ between LatLonBoundingBox and BoundingBox
+// 2005-08-09
+
 package com.vividsolutions.wms;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
+// For the ArrayList [uwe dalluege]
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.apache.xerces.parsers.DOMParser;
@@ -50,6 +56,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+
+import com.vividsolutions.jump.util.*; 
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.wms.util.XMLTools;
 
@@ -63,6 +71,7 @@ public class Parser {
   /** 
    * Creates a Parser for dealing with WMS XML.
    */
+  
   public Parser() {
   }
   
@@ -73,11 +82,12 @@ public class Parser {
    * @param inStream the inputStream containing the WMT_MS_Capabilities XML to parse
    * @return the MapDescriptor object created from the specified XML InputStream
    */
+  
   public Capabilities parseCapabilities( WMService service, InputStream inStream ) throws IOException {
       if ( WMService.WMS_1_1_1.equals( service.getVersion()) ){
           return parseCapabilities_1_1_1(service, inStream);
       }
-      
+
       return parseCapabilities_1_0_0(service, inStream);  
   }
   
@@ -96,17 +106,29 @@ public class Parser {
     LinkedList subLayers = new LinkedList();
     BoundingBox bbox = null;
     
+// I think, bbox is LatLonBoundingBox.
+// I need a new variable for BoundingBox.
+// It must be a list because in the OGC document
+// stands that Layers may have zero or more <BoundingBox> [uwe dalluege]
+    BoundingBox boundingBox = null;
+    ArrayList boundingBoxList = new ArrayList ( );
+    
     NodeList nl = layerNode.getChildNodes();
+
     for( int i = 0; i< nl.getLength(); i++ ) {
       Node n = nl.item( i );
       try {
+
         if( n.getNodeType() == Node.ELEMENT_NODE ) {
           if( n.getNodeName().equals( "Name" ) ) {
             name = ((CharacterData)n.getFirstChild()).getData();
           } else if( n.getNodeName().equals( "Title" ) ) {
             title = ((CharacterData)n.getFirstChild()).getData();
+            boundingBox = boundingBoxFromNode( n );
+            boundingBoxList.add ( boundingBox );
+            
           } else if( n.getNodeName().equals( "SRS" ) ) {
-            String srsStr = ((CharacterData)n.getFirstChild()).getData();
+            String srsStr = ((CharacterData)n.getFirstChild()).getData();      
             // split the srs String on spaces
             while( srsStr.length() > 0 ) {
               int ws = srsStr.indexOf( ' ' );
@@ -122,6 +144,12 @@ public class Parser {
             }
           } else if( n.getNodeName().equals( "LatLonBoundingBox" ) ) {
             bbox = boundingBoxFromNode( n );
+            
+// Check for BoundingBox [uwe dalluege]
+          } else if( n.getNodeName( ).equals( "BoundingBox" ) ) {
+            boundingBox = boundingBoxFromNode( n );
+            boundingBoxList.add ( boundingBox );
+
           } else if( n.getNodeName().equals( "Layer" ) ) {
             subLayers.add( wmsLayerFromNode( n ) );
           }
@@ -130,7 +158,10 @@ public class Parser {
         LOG.error( "Exception caught in wmsLayerFromNode(): " + e.toString() );
       }
     }
-    return new MapLayer( name, title, srsList, subLayers, bbox );
+    
+// call the new constructor with boundingBoxList in MapLayer [uwe dalluege]
+    return new MapLayer
+    	( name, title, srsList, subLayers, bbox, boundingBoxList );
   }
  
   /**
@@ -148,14 +179,14 @@ public class Parser {
       } else if( n.getNodeName().equals( "BoundingBox" ) ) {
         srs = nm.getNamedItem( "SRS" ).getNodeValue();
       } else {
-        throw new Exception( I18N.get("com.vividsolutions.wms.Parser.not-a-latlon-boundingbox-element") );
+        throw new Exception( I18N.get("Parser.not-a-latlon-boundingbox-element") );
       }
       
       // could not parse when values equal "inf"
-		//		double minx = Double.parseDouble(nm.getNamedItem("minx").getNodeValue());
-		//		double miny = Double.parseDouble(nm.getNamedItem("miny").getNodeValue());
-		//		double maxx = Double.parseDouble(nm.getNamedItem("maxx").getNodeValue());
-		//		double maxy = Double.parseDouble(nm.getNamedItem("maxy").getNodeValue());
+			//	double minx = Double.parseDouble(nm.getNamedItem("minx").getNodeValue());
+			//	double miny = Double.parseDouble(nm.getNamedItem("miny").getNodeValue());
+			//	double maxx = Double.parseDouble(nm.getNamedItem("maxx").getNodeValue());
+			//	double maxy = Double.parseDouble(nm.getNamedItem("maxy").getNodeValue());
 		
       // change "inf" values with +/-"Infinity"
       double minx;
@@ -181,12 +212,11 @@ public class Parser {
 			maxy = Double.parseDouble("+Infinity");
 		else
 			maxy = Double.parseDouble(nm.getNamedItem("maxy").getNodeValue()); 
-		
       return new BoundingBox( srs, minx, miny, maxx, maxy );
     } catch( Exception e ) {
       // possible NullPointerException from getNamedItem returning a null
       // also possible NumberFormatException
-      throw new Exception( I18N.get("com.vividsolutions.wms.Parser.invalid-bounding-box-element-node")+": " + e.toString() );
+      throw new Exception( I18N.get("Parser.invalid-bounding-box-element-node")+": " + e.toString() );
     }    
   }
   private Capabilities parseCapabilities_1_0_0( WMService service, InputStream inStream ) throws IOException {
@@ -211,6 +241,9 @@ public class Parser {
       } catch (Exception e) {
         // possible NullPointerException if there is no firstChild()
         // also possible miscast causing an Exception
+      	
+// [uwe dalluege]
+					throw new IOException( "Maybe wrong Capabilities Version! " );
       }
       
       // get the supported file formats
