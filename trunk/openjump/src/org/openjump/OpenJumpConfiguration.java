@@ -17,6 +17,7 @@ import org.openjump.core.ui.plugin.edit.SelectItemsByFenceFromSelectedLayersPlug
 import org.openjump.core.ui.plugin.file.SaveImageAsSVGPlugIn;
 import org.openjump.core.ui.plugin.view.ShowScalePlugIn;
 import org.openjump.core.ui.plugin.view.ZoomToScalePlugIn;
+import org.openjump.core.ui.plugin.wms.ZoomToWMSPlugIn;
 
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
@@ -64,6 +65,10 @@ public class OpenJumpConfiguration{
 		/***********************
 		 *  menu VIEW
 		 **********************/
+		
+		ZoomToWMSPlugIn myZoomToWMSPlugIn = new ZoomToWMSPlugIn();
+		myZoomToWMSPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
 		ZoomToScalePlugIn myZoomToScalePlugIn = new ZoomToScalePlugIn();
 		myZoomToScalePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
@@ -84,6 +89,10 @@ public class OpenJumpConfiguration{
 
 		/***********************
 		 *  menu HELP
+		 **********************/
+
+		/***********************
+		 *  Right click menus
 		 **********************/
 
 
