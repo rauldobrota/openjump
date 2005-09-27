@@ -15,6 +15,7 @@ import org.openjump.core.ui.plugin.edit.SelectAllLayerItemsPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectItemsByCircleFromSelectedLayersPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectItemsByFenceFromSelectedLayersPlugIn;
 import org.openjump.core.ui.plugin.file.SaveImageAsSVGPlugIn;
+import org.openjump.core.ui.plugin.queries.SimpleQueryPlugIn;
 import org.openjump.core.ui.plugin.view.ShowScalePlugIn;
 import org.openjump.core.ui.plugin.view.ZoomToScalePlugIn;
 import org.openjump.core.ui.plugin.wms.ZoomToWMSPlugIn;
@@ -82,6 +83,8 @@ public class OpenJumpConfiguration{
 		/***********************
 		 *  menu TOOLS
 		 **********************/
+		// SimpleQueryPlugIn mySimpleQueryPlugIn = new SimpleQueryPlugIn();
+		// mySimpleQueryPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
 		/***********************
 		 *  menu WINDOW
