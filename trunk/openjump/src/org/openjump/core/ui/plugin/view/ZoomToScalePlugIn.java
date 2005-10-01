@@ -1,6 +1,34 @@
+/*
+ * The Unified Mapping Platform (JUMP) is an extensible, interactive GUI 
+ * for visualizing and manipulating spatial features with geometry and attributes.
+ *
+ * JUMP is Copyright (C) 2003 Vivid Solutions
+ *
+ * This program implements extensions to JUMP and is
+ * Copyright (C) Stefan Steiniger.
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * 
+ * For more information, contact:
+ * Stefan Steiniger
+ * perriger@gmx.de
+ */
 /*****************************************************
  * created:  		04.01.2005
- * last modified:  	
+ * last modified:  	01.10.2005 [scale obtained now from other class 
+ * 								and change in layout]
  * 
  * description:
  *   zooms to a given map scale, which is received from an input dialog 
@@ -8,7 +36,8 @@
  *****************************************************/
 
 package org.openjump.core.ui.plugin.view;
-import java.awt.Toolkit;
+
+import org.openjump.core.ui.util.ScreenScale;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -35,14 +64,11 @@ import com.vividsolutions.jump.workbench.ui.Viewport;
  */
 public class ZoomToScalePlugIn extends AbstractPlugIn{    
 
-    private String T1 = "scale";
+    private String T1 = "scale"; //[sstein] this string is not used anymore
     int scale = 0;
     double oldHorizontalScale = 0; // is calculated for panel-width (not heigth!!)
     double modelWidth = 0;
     double panelWidth = 0; 
-    double SCREENRES = Toolkit.getDefaultToolkit().getScreenResolution(); //72 dpi or 96 dpi or ..     
-    double INCHTOCM = 2.54; //cm
-
 
     public void initialize(PlugInContext context) throws Exception {
     	
@@ -67,18 +93,8 @@ public class ZoomToScalePlugIn extends AbstractPlugIn{
     
 	public boolean execute(PlugInContext context) throws Exception{
 	    
-        Viewport port = context.getLayerViewPanel().getViewport();
-        this.panelWidth = port.getPanel().getWidth(); //pixel
-        this.modelWidth = port.getEnvelopeInModelCoordinates().getWidth(); //m
-        //-----
-        // example:
-        // screen resolution: 72 dpi
-        // 1 inch = 2.54 cm
-        // ratio = 2.54/72 (cm/pix) ~ 0.35mm
-        // mapLength[cm] = noPixel * ratio
-        // scale = realLength *100 [m=>cm] / mapLength
-        //-----                            
-        this.oldHorizontalScale = this.modelWidth*100 / (this.INCHTOCM / this.SCREENRES * this.panelWidth);
+		Viewport port = context.getLayerViewPanel().getViewport();
+        this.oldHorizontalScale = ScreenScale.getHorizontalMapScale(port);
         
 	    MultiInputDialog dialog = new MultiInputDialog(
 	            context.getWorkbenchFrame(), 
@@ -113,11 +129,10 @@ public class ZoomToScalePlugIn extends AbstractPlugIn{
     private void setDialogValues(MultiInputDialog dialog, PlugInContext context)
 	  {
         //dialog.addLabel("actual scale in horizontal direction: " + (int)this.oldHorizontalScale);
-        dialog.addLabel(I18N.get("org.openjump.core.ui.plugin.view.ZoomToScalePlugIn.actual-scale-in-horizontal-direction") + ": " +(int)this.oldHorizontalScale);
-        dialog.addSeparator();
+        dialog.addLabel(I18N.get("org.openjump.core.ui.plugin.view.ZoomToScalePlugIn.actual-scale-in-horizontal-direction") + " 1 : " +(int)this.oldHorizontalScale);
 	    //dialog.addLabel("set new scale to zoom:");
-	    dialog.addLabel(I18N.get("org.openjump.core.ui.plugin.view.ZoomToScalePlugIn.set-new-scale-to-zoom") + ":");
-	    dialog.addIntegerField(T1, 25000, 7,T1);	    
+	    String text =I18N.get("org.openjump.core.ui.plugin.view.ZoomToScalePlugIn.set-new-scale-to-zoom") + ":  1 : ";
+	    dialog.addIntegerField(text, 25000, 7,text);	    
 	  }
 
 	private void getDialogValues(MultiInputDialog dialog) {

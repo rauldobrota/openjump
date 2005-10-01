@@ -28,6 +28,7 @@
 /*****************************************************
  * created:  		original version by Vivid Solution
  * last modified:  	03.06.2005
+ * 					01.10.2005 [scale now obtained from other class]
  * 					
  * description:
  * 		calculates the actual scale and draws the text
@@ -38,13 +39,16 @@
 
 package org.openjump.core.ui.plugin.view.helpclassescale;
 
-import java.awt.*;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
+
+import org.openjump.core.ui.util.ScreenScale;
+
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.renderer.SimpleRenderer;
@@ -58,9 +62,6 @@ import com.vividsolutions.jump.workbench.ui.renderer.SimpleRenderer;
 **/
 public class ShowScaleRenderer extends SimpleRenderer {
 	
-    double SCREENRES = Toolkit.getDefaultToolkit().getScreenResolution(); //72 dpi or 96 dpi or ..     
-    double INCHTOCM = 2.54; //cm
-
     public final static String CONTENT_ID = "SCALE_SHOW";
     /**
      *  Height of the increment boxes, in view-space units.
@@ -103,7 +104,7 @@ public class ShowScaleRenderer extends SimpleRenderer {
         }
         //Override dashes set in GridRenderer [Jon Aquino]
         g.setStroke(stroke);
-        double screenScale = this.getCurrentScale(); 
+        double screenScale = ScreenScale.getHorizontalMapScale(panel.getViewport()); 
         paintScaleLabel(g, screenScale);
     }
 
@@ -145,22 +146,6 @@ public class ShowScaleRenderer extends SimpleRenderer {
                 (float) (panel.getWidth()- (length+11)*3.6),
                 (float) (barBottom() - textBottomMargin));
         	
-    }
-
-    private double getCurrentScale(){
-
-	    double panelWidth = panel.getWidth(); //pixel
-	    double modelWidth = panel.getViewport().getEnvelopeInModelCoordinates().getWidth(); //m
-	    //-----
-	    // example:
-	    // screen resolution: 72 dpi
-	    // 1 inch = 2.54 cm
-	    // ratio = 2.54/72 (cm/pix) ~ 0.35mm
-	    // mapLength[cm] = noPixel * ratio
-	    // scale = realLength *100 [m=>cm] / mapLength
-	    //-----                            
-	    double oldHorizontalScale = modelWidth*100 / (this.INCHTOCM / this.SCREENRES * panelWidth);
-	    return oldHorizontalScale;
     }
 
     /*********** getters and setters ******************/

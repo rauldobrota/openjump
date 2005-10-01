@@ -1,5 +1,7 @@
 package com.vividsolutions.jump.workbench.ui.style;
 
+//[sstein 01.10.2005] changed to be able to work with real scale values
+
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -18,7 +20,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.util.MathUtil;
-import com.vividsolutions.jump.util.StringUtil;
 import com.vividsolutions.jump.workbench.model.Layer;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
@@ -26,6 +27,8 @@ import com.vividsolutions.jump.workbench.ui.ValidatingTextField;
 import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 
 import javax.swing.JButton;
+
+import org.openjump.core.ui.util.ScreenScale;
 
 public class ScaleStylePanel extends JPanel implements StylePanel {
 
@@ -79,6 +82,8 @@ public class ScaleStylePanel extends JPanel implements StylePanel {
 
     private JButton showAtThisScaleButton = null;
 
+    private double scaleFactor = 0; 
+    
     private JPanel getFillerPanel() {
         if (fillerPanel == null) {
             fillerPanel = new JPanel();
@@ -91,11 +96,32 @@ public class ScaleStylePanel extends JPanel implements StylePanel {
         initialize();
         this.layer = layer;
         this.panel = panel;
-        smallestScaleTextField.setText(formatScaleLosslessly(layer
-                .getMinScale()));
+        
+        /**
+         * [sstein : 01.10.2005]
+         * modifications to show the real scale and not the internal values 
+         */
+        double internalScale = this.currentScale();
+		double realScale = ScreenScale.getHorizontalMapScale(panel.getViewport());
+		this.scaleFactor = internalScale / realScale;
+		
+		Double internalMinScale=layer.getMinScale();
+		Double realMinScale = null;
+		if (internalMinScale != null){
+			//-- not sure to use Math.floor (with respect to zoom into cm space
+			//   but somehow necessary to avoid display like 6379.9999999 [sstein]
+			realMinScale = new Double (Math.floor(internalMinScale.doubleValue()/this.scaleFactor));
+		}
+			
+		Double internalMaxScale = layer.getMaxScale();
+		Double realMaxScale = null;
+		if(internalMaxScale != null){
+			realMaxScale = new Double(Math.floor(internalMaxScale.doubleValue()/this.scaleFactor));
+		}		
+        smallestScaleTextField.setText(formatScaleLosslessly(realMinScale));
         largestScaleTextField
-                .setText(formatScaleLosslessly(layer.getMaxScale()));
-        currentScaleTextField.setText(formatScaleLossily(currentScale()));
+                .setText(formatScaleLosslessly(realMaxScale));
+        currentScaleTextField.setText(formatScaleLossily(realScale));
         enableScaleDependentRenderingCheckBox.setSelected(layer
                 .isScaleDependentRenderingEnabled());
         updateComponents();
@@ -289,14 +315,23 @@ public class ScaleStylePanel extends JPanel implements StylePanel {
     }
 
     private Double getLargestScale() {
+    	//[sstein 01.10.2005] 
+    	// change to be able to work with real scale values
+    	double realScale = largestScaleTextField.getDouble();
+    	double internalScale = realScale*this.scaleFactor;    	
+
         return largestScaleTextField.getText().trim().length() > 0 ? new Double(
-                largestScaleTextField.getDouble())
+                internalScale)
                 : null;
     }
 
     private Double getSmallestScale() {
+    	//[sstein 01.10.2005] 
+    	// change to be able to work with real scale values
+    	double realScale = smallestScaleTextField.getDouble();
+    	double internalScale = realScale*this.scaleFactor;    	
         return smallestScaleTextField.getText().trim().length() > 0 ? new Double(
-                smallestScaleTextField.getDouble())
+                internalScale)
                 : null;
     }
 
@@ -416,8 +451,10 @@ public class ScaleStylePanel extends JPanel implements StylePanel {
             hideAboveCurrentScaleButton
                     .addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent e) {
+                        	//[sstein] changed to show real scale instead currentScale
+                            double realScale = 1/scaleFactor*currentScale();  
                             smallestScaleTextField
-                                    .setText(formatScaleLossily(roundFirstSignificantFigureUp(currentScale())));
+                                    .setText(formatScaleLossily(roundFirstSignificantFigureUp(realScale)));
                         }
                     });
         }
@@ -451,8 +488,10 @@ public class ScaleStylePanel extends JPanel implements StylePanel {
             hideBelowCurrentScaleButton
                     .addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent e) {
+                        	//[sstein] changed to show real scale instead currentScale
+                            double realScale = 1/scaleFactor*currentScale();                            
                             largestScaleTextField
-                                    .setText(formatScaleLossily(roundFirstSignificantFigureDown(currentScale())));
+                                    .setText(formatScaleLossily(roundFirstSignificantFigureDown(realScale)));
                         }
                     });
         }
