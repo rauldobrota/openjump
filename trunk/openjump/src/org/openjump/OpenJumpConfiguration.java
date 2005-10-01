@@ -83,8 +83,8 @@ public class OpenJumpConfiguration{
 		/***********************
 		 *  menu TOOLS
 		 **********************/
-		SimpleQueryPlugIn mySimpleQueryPlugIn = new SimpleQueryPlugIn();
-		mySimpleQueryPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		//SimpleQueryPlugIn mySimpleQueryPlugIn = new SimpleQueryPlugIn();
+		//mySimpleQueryPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
 		/***********************
 		 *  menu WINDOW
