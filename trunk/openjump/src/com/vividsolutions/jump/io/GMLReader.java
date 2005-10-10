@@ -275,7 +275,10 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
     // low-level geometry objects
     Coordinate singleCoordinate = new Coordinate();
     String streamName; //result geometry  -
-    String tagBody;
+    //-- now we use StringBuffer since it is much faster [sstein, 10.10.2005]
+    //   thanx to Joe Desbonet
+    //String tagBody;
+    StringBuffer tagBody;
     XMLReader xr; //see above
     
     int SRID =0; // srid to give the created geometries
@@ -344,7 +347,8 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
         try {
             String part;
             part = new String(ch, start, length);
-            tagBody = tagBody + part;
+            //tagBody = tagBody + part; [sstein, 10.10.2005]
+            tagBody.append(ch,start,length);
         } catch (Exception e) {
             throw new SAXException(e.getMessage());
         }
@@ -374,8 +378,8 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
 
             // System.out.println("End element: " + qName);
             if (STATE == STATE_INIT) {
-                tagBody = "";
-
+                //tagBody = ""; [sstein, 10.10.2005]
+                tagBody = new StringBuffer();
                 return; //something wrong
             }
 
@@ -400,7 +404,8 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
                 }
 
                 if (GMLinput.isGeometryElement(qName)) {
-                    tagBody = "";
+                    //tagBody = ""; [sstein, 10.10.2005]
+                    tagBody = new StringBuffer();
                     STATE = STATE_GET_COLUMNS;
 
                     finalGeometry = geometryFactory.buildGeometry(geometry);
@@ -415,13 +420,19 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
                 //these correspond to <coord><X>0.0</X><Y>0.0</Y></coord>
                 if ((qName.compareToIgnoreCase("X") == 0) ||
                         (qName.compareToIgnoreCase("gml:X") == 0)) {
-                    singleCoordinate.x = (new Double(tagBody)).doubleValue();
+                    //singleCoordinate.x = (new Double(tagBody)).doubleValue(); [sstein, 10.10.2005]
+                    singleCoordinate.x = (new 
+                    		Double(tagBody.toString())).doubleValue();
                 } else if ((qName.compareToIgnoreCase("Y") == 0) ||
-                        (qName.compareToIgnoreCase("gml:y") == 0)) {
-                    singleCoordinate.y = (new Double(tagBody)).doubleValue();
+                        (qName.compareToIgnoreCase("gml:y") == 0)) {                	
+                    //singleCoordinate.y = (new Double(tagBody)).doubleValue(); [sstein, 10.10.2005]
+                	singleCoordinate.y = (new
+                			Double(tagBody.toString())).doubleValue();
                 } else if ((qName.compareToIgnoreCase("Z") == 0) ||
                         (qName.compareToIgnoreCase("gml:z") == 0)) {
-                    singleCoordinate.z = (new Double(tagBody)).doubleValue();
+                    //singleCoordinate.z = (new Double(tagBody)).doubleValue(); [sstein, 10.10.2005]
+                	singleCoordinate.z = (new
+                			Double(tagBody.toString())).doubleValue();
                 } else if ((qName.compareToIgnoreCase("COORD") == 0) ||
                         (qName.compareToIgnoreCase("gml:coord") == 0)) {
                     pointList.add(new Coordinate(singleCoordinate)); //remember it
@@ -432,7 +443,8 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
                     //tagBody has a wack-load of points in it - we need
                     // to parse them into the pointList list.
                     // assume that the x,y,z coordinate are "," separated, and the points are " " separated
-                    parsePoints(tagBody, geometryFactory);
+                    //parsePoints(tagBody, geometryFactory); [sstein, 10.10.2005]
+                    parsePoints(tagBody.toString(), geometryFactory);
                 } else if ((qName.compareToIgnoreCase("linearring") == 0) ||
                         (qName.compareToIgnoreCase("gml:linearring") == 0)) {
                     Coordinate[] c = new Coordinate[0];
@@ -471,7 +483,8 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
                 }
             } else if (STATE == STATE_GET_COLUMNS) {
                 if (qName.compareToIgnoreCase(GMLinput.featureTag) == 0) {
-                    tagBody = "";
+                    //tagBody = ""; [sstein, 10.10.2005]
+                    tagBody = new StringBuffer();
                     STATE = STATE_WAIT_FEATURE_TAG;
 
                     //System.out.println("end feature");
@@ -512,21 +525,30 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
                          			if (oldValue instanceof List)
                          			{
                          				//already a list there - just stuff another thing in!
-                         				((List)oldValue).add( GMLinput.getColumnValue(index, tagBody,lastStartTag_atts) );
+                         				//-- [sstein, 10.10.2005]
+                         				//((List)oldValue).add( GMLinput.getColumnValue(index, tagBody,lastStartTag_atts) );
+                         				((List)oldValue).add(
+                         						GMLinput.getColumnValue(index, tagBody.toString(),lastStartTag_atts)
+                         						);
                          			}
                          			else
                          			{
                          				//no list currently there - make a list and replace
                          				List l = new ArrayList();
                          				l.add(oldValue);
-                         				l.add(GMLinput.getColumnValue(index, tagBody,lastStartTag_atts)); // new value
+                         				//[sstein, 10.10.2005]
+                         				//l.add(GMLinput.getColumnValue(index, tagBody,lastStartTag_atts)); // new value
+                         				l.add(GMLinput.getColumnValue(index,
+                         						tagBody.toString(),lastStartTag_atts)); // new value
                          				currentFeature.setAttribute(GMLinput.columnName(index), l );
                          			}
                          	}
                         	else  // handle normally
                         	{	
 	                            currentFeature.setAttribute(GMLinput.columnName(index),
-	                                GMLinput.getColumnValue(index, tagBody,lastStartTag_atts));
+	                                //[sstein, 10.10.2005]
+	                                //GMLinput.getColumnValue(index, tagBody,lastStartTag_atts));
+	                                GMLinput.getColumnValue(index, tagBody.toString(),lastStartTag_atts));
                         	}
                         }
                     } catch (Exception e) {
@@ -535,20 +557,21 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
                         e.printStackTrace();
                     }
 
-                    tagBody = "";
+                    //tagBody = ""; [sstein, 10.10.2005]
+                    tagBody = new StringBuffer();
                 }
             } else if (STATE == STATE_WAIT_FEATURE_TAG) {
                 if (qName.compareToIgnoreCase(GMLinput.collectionTag) == 0) {
                     STATE = STATE_INIT; //finish
 
                     //System.out.println("DONE!");
-                    tagBody = "";
-
+                    //tagBody = ""; [sstein, 10.10.2005]
+                    tagBody = new StringBuffer();
                     return;
                 }
             } else if (STATE == STATE_WAIT_COLLECTION_TAG) {
-                tagBody = "";
-
+                //tagBody = ""; [sstein, 10.10.2005]
+            	tagBody = new StringBuffer();
                 return; //still look for start collection tag
             }
         } catch (Exception e) {
@@ -715,7 +738,8 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
      */
     public void startDocument() {
         //System.out.println("Start document");
-        tagBody = "";
+        //tagBody = ""; [sstein, 10.10.2005]
+        tagBody = new StringBuffer();
         STATE = STATE_WAIT_COLLECTION_TAG;
     }
 
@@ -733,7 +757,8 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
         Attributes atts) throws SAXException {
         try {
             //System.out.println("Start element: " + qName);
-            tagBody = "";
+            //tagBody = ""; [sstein, 10.10.2005]
+            tagBody = new StringBuffer();
             lastStartTag_uri = uri;
             lastStartTag_name = name;
             lastStartTag_qName = qName;
