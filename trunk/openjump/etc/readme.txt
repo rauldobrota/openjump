@@ -17,6 +17,9 @@ Contents
 ----------
 OpenJUMP is distributed under the GPL license. A description of this license
 can be found in the "gpl.txt" file on the same location than this readme file.
+OpenJUMP uses the BATIK libraries to write svg format. The BATIK libraries are
+used under the terms of the APACHE license, which can be found in the "apache.txt" 
+file.
 
 
 2. Installation instructions
