@@ -317,21 +317,16 @@ public class ScaleStylePanel extends JPanel implements StylePanel {
     private Double getLargestScale() {
     	//[sstein 01.10.2005] 
     	// change to be able to work with real scale values
-    	double realScale = largestScaleTextField.getDouble();
-    	double internalScale = realScale*this.scaleFactor;    	
-
         return largestScaleTextField.getText().trim().length() > 0 ? new Double(
-                internalScale)
+            largestScaleTextField.getDouble()*this.scaleFactor)
                 : null;
     }
 
     private Double getSmallestScale() {
     	//[sstein 01.10.2005] 
     	// change to be able to work with real scale values
-    	double realScale = smallestScaleTextField.getDouble();
-    	double internalScale = realScale*this.scaleFactor;    	
         return smallestScaleTextField.getText().trim().length() > 0 ? new Double(
-                internalScale)
+            smallestScaleTextField.getDouble() * this.scaleFactor)
                 : null;
     }
 
