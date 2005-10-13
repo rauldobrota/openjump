@@ -289,7 +289,8 @@ public class BasicStylePanel extends JPanel {
         return StringUtil.replaceAll(pattern.trim(), " ", ",");
     }
 
-    void jbInit() throws Exception {
+    //UT made it protected for testing
+    protected void jbInit() throws Exception {
 	    lineWidthSlider.setPreferredSize(SLIDER_DIMENSION);
 	    lineWidthSlider.setPaintLabels(true);
 	    lineWidthSlider.setValue(1);
