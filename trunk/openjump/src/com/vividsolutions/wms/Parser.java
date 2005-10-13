@@ -110,7 +110,7 @@ public class Parser {
 // I need a new variable for BoundingBox.
 // It must be a list because in the OGC document
 // stands that Layers may have zero or more <BoundingBox> [uwe dalluege]
-    BoundingBox boundingBox = null;
+//    BoundingBox boundingBox = null;
     ArrayList boundingBoxList = new ArrayList ( );
     
     NodeList nl = layerNode.getChildNodes();
@@ -124,8 +124,6 @@ public class Parser {
             name = ((CharacterData)n.getFirstChild()).getData();
           } else if( n.getNodeName().equals( "Title" ) ) {
             title = ((CharacterData)n.getFirstChild()).getData();
-            boundingBox = boundingBoxFromNode( n );
-            boundingBoxList.add ( boundingBox );
             
           } else if( n.getNodeName().equals( "SRS" ) ) {
             String srsStr = ((CharacterData)n.getFirstChild()).getData();      
@@ -143,18 +141,20 @@ public class Parser {
               }
             }
           } else if( n.getNodeName().equals( "LatLonBoundingBox" ) ) {
-            bbox = boundingBoxFromNode( n );
+              bbox = boundingBoxFromNode( n );
+              boundingBoxList.add ( bbox );
             
 // Check for BoundingBox [uwe dalluege]
           } else if( n.getNodeName( ).equals( "BoundingBox" ) ) {
-            boundingBox = boundingBoxFromNode( n );
-            boundingBoxList.add ( boundingBox );
+              bbox = boundingBoxFromNode( n );
+              boundingBoxList.add ( bbox );
 
           } else if( n.getNodeName().equals( "Layer" ) ) {
             subLayers.add( wmsLayerFromNode( n ) );
           }
         }
       } catch( Exception e ) {
+          e.printStackTrace();
         LOG.error( "Exception caught in wmsLayerFromNode(): " + e.toString() );
       }
     }
@@ -172,14 +172,16 @@ public class Parser {
    */
   public BoundingBox boundingBoxFromNode( Node n ) throws Exception {
     try {
-      String srs;
+      String srs = "";
       NamedNodeMap nm = n.getAttributes();
+
       if( n.getNodeName().equals( "LatLonBoundingBox" ) ) {
         srs = "LatLon";
       } else if( n.getNodeName().equals( "BoundingBox" ) ) {
         srs = nm.getNamedItem( "SRS" ).getNodeValue();
       } else {
-        throw new Exception( I18N.get("Parser.not-a-latlon-boundingbox-element") );
+          // don't bother...
+//        throw new Exception( I18N.get("com.vividsolutions.wms.Parser.not-a-latlon-boundingbox-element") );
       }
       
       // could not parse when values equal "inf"
@@ -190,33 +192,40 @@ public class Parser {
 		
       // change "inf" values with +/-"Infinity"
       double minx;
-      if (nm.getNamedItem("minx").getNodeValue().equals("inf"))
-			minx = Double.parseDouble("-Infinity");
-      else
+      if (nm.getNamedItem("minx").getNodeValue().equals("inf")){
+			minx = Double.NEGATIVE_INFINITY;
+      } else {
 			minx = Double.parseDouble(nm.getNamedItem("minx").getNodeValue()); 
-		
-		double miny;
-		if (nm.getNamedItem("miny").getNodeValue().equals("inf"))
-			miny = Double.parseDouble("-Infinity");
-		else
+      }
+      
+      double miny;
+      if (nm.getNamedItem("miny").getNodeValue().equals("inf")){
+			miny = Double.NEGATIVE_INFINITY;
+      } else {
 			miny = Double.parseDouble(nm.getNamedItem("miny").getNodeValue()); 
+      }
+      double maxx;
 		
-		double maxx;
-		if (nm.getNamedItem("maxx").getNodeValue().equals("inf"))
-			maxx = Double.parseDouble("+Infinity");
-		else
+      if (nm.getNamedItem("maxx").getNodeValue().equals("inf")) {
+			maxx = Double.POSITIVE_INFINITY;
+      } else {
 			maxx = Double.parseDouble(nm.getNamedItem("maxx").getNodeValue());
-		
-		double maxy;
-		if (nm.getNamedItem("maxy").getNodeValue().equals("inf"))
-			maxy = Double.parseDouble("+Infinity");
-		else
-			maxy = Double.parseDouble(nm.getNamedItem("maxy").getNodeValue()); 
+      }
+      
+      double maxy;
+      if (nm.getNamedItem("maxy").getNodeValue().equals("inf")) {
+			maxy = Double.POSITIVE_INFINITY;
+      } else {
+			maxy = Double.parseDouble(nm.getNamedItem("maxy").getNodeValue());
+      }
+      
       return new BoundingBox( srs, minx, miny, maxx, maxy );
+      
     } catch( Exception e ) {
       // possible NullPointerException from getNamedItem returning a null
       // also possible NumberFormatException
-      throw new Exception( I18N.get("Parser.invalid-bounding-box-element-node")+": " + e.toString() );
+        e.printStackTrace();
+      throw new Exception( I18N.get("com.vividsolutions.wms.Parser.invalid-bounding-box-element-node")+": " + e.toString() );
     }    
   }
   private Capabilities parseCapabilities_1_0_0( WMService service, InputStream inStream ) throws IOException {
@@ -242,8 +251,8 @@ public class Parser {
         // possible NullPointerException if there is no firstChild()
         // also possible miscast causing an Exception
       	
-// [uwe dalluege]
-					throw new IOException( "Maybe wrong Capabilities Version! " );
+          // 	[uwe dalluege]
+          throw new IOException( "Maybe wrong Capabilities Version! " );
       }
       
       // get the supported file formats
