@@ -229,7 +229,8 @@ public class RenderingStylePanel extends BasicStylePanel implements StylePanel {
         vertexSlider.setValue(layer.getVertexStyle().getSize());
     }
 
-    void jbInit() throws Exception {
+    //UT made protected
+    protected void jbInit() throws Exception {
         if (vertexSlider == null) {
             //Get here during superclass initialization. [Jon Aquino]
             super.jbInit();
