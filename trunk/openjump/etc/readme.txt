@@ -103,6 +103,7 @@ Original development team of JUMP was:
 
 OpenJUMP regular (and past) contributors are (non exaustive list!):
 - Jonathan Aquino, 
+- Steve Tanner,
 - Landon Blake, 
 - Erwan Bocher, 
 - Basile Chandesris,
@@ -112,13 +113,17 @@ OpenJUMP regular (and past) contributors are (non exaustive list!):
 - Ezequias Rodrigues da Rocha
 - Stefan Steiniger,
 - Ugo Taddei, 
-- Steve Tanner, 
+- Joe Desbonet,
+and
+-  Larry Becker and Integrated Systems Analysts, Inc.
+   for providing their Jump ISA tools code
+
 
 
 Translation contributors are:
 - French: Basile Chandesris, Erwan Bocher, Steve Tanner
 - Spanish: Steve Tanner
-- German: Florian Rengers
+- German: Florian Rengers, Stefan Steiniger
 - Portuguese (brazilian): Ezequias Rodrigues da Rocha
 
 
