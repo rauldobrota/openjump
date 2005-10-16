@@ -14,7 +14,14 @@ import org.openjump.core.ui.plugin.edit.ReplicateSelectedItemsPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectAllLayerItemsPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectItemsByCircleFromSelectedLayersPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectItemsByFenceFromSelectedLayersPlugIn;
+import org.openjump.core.ui.plugin.edittoolbox.ConstrainedMoveVertexPlugIn;
+import org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedArcPlugIn;
+import org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedCirclePlugIn;
+import org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedLineStringPlugIn;
+import org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedPolygonPlugIn;
+import org.openjump.core.ui.plugin.edittoolbox.RotateSelectedItemPlugIn;
 import org.openjump.core.ui.plugin.file.SaveImageAsSVGPlugIn;
+import org.openjump.core.ui.plugin.layer.ToggleVisiblityPlugIn;
 import org.openjump.core.ui.plugin.queries.SimpleQueryPlugIn;
 import org.openjump.core.ui.plugin.view.ShowScalePlugIn;
 import org.openjump.core.ui.plugin.view.ZoomToScalePlugIn;
@@ -79,12 +86,14 @@ public class OpenJumpConfiguration{
 		/***********************
 		 *  menu LAYER
 		 **********************/
-
+//		ToggleVisiblityPlugIn myToggleVisPlugIn = new ToggleVisiblityPlugIn();
+//		myToggleVisPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
 		/***********************
 		 *  menu TOOLS
 		 **********************/
-		//SimpleQueryPlugIn mySimpleQueryPlugIn = new SimpleQueryPlugIn();
-		//mySimpleQueryPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		SimpleQueryPlugIn mySimpleQueryPlugIn = new SimpleQueryPlugIn();
+		mySimpleQueryPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
 		/***********************
 		 *  menu WINDOW
@@ -98,7 +107,27 @@ public class OpenJumpConfiguration{
 		 *  Right click menus
 		 **********************/
 
+		/***********************
+		 *  EDITing toolbox
+		 **********************/
+/*
+		DrawConstrainedPolygonPlugIn myConstrainedPolygonPlugIn = new DrawConstrainedPolygonPlugIn();
+		myConstrainedPolygonPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 
+		DrawConstrainedLineStringPlugIn myConstrainedLSPlugIn = new DrawConstrainedLineStringPlugIn();
+		myConstrainedLSPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
+		DrawConstrainedCirclePlugIn myConstrainedCPlugIn = new DrawConstrainedCirclePlugIn();
+		myConstrainedCPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		DrawConstrainedArcPlugIn myConstrainedArcPlugIn = new DrawConstrainedArcPlugIn();
+		myConstrainedArcPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+
+		ConstrainedMoveVertexPlugIn myCMVPlugIn = new ConstrainedMoveVertexPlugIn();
+		myCMVPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		RotateSelectedItemPlugIn myRotateSIPlugIn = new RotateSelectedItemPlugIn();
+		myRotateSIPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+*/		
 	}
 }
