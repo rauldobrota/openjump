@@ -47,16 +47,24 @@ import javax.swing.filechooser.FileFilter;
 
 import org.openjump.io.SIDLayer;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
 import com.vividsolutions.jump.workbench.model.UndoableCommand;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
+import com.vividsolutions.jump.workbench.ui.MenuNames;
 import com.vividsolutions.wms.MapLayer;
 
 //modeled after the AddWMSQueryPlugIn
 public class AddSIDLayerPlugIn extends AbstractPlugIn
 {
+	final static String sAddMrSIDLayer = I18N.get("org.openjump.core.ui.plugin.layer.AddSIDLayerPlugIn.Add-MrSID-Layer");
+	final static String sErrorSeeOutputWindow =I18N.get("org.openjump.core.ui.plugin.layer.AddSIDLayerPlugIn.Error-See-Output-Window");
+	final static String sNotInstalled=I18N.get("org.openjump.core.ui.plugin.layer.AddSIDLayerPlugIn.not-installed");
+	final static String sOpenMrSIDFile=I18N.get("org.openjump.core.ui.plugin.layer.AddSIDLayerPlugIn.open-MrSID-file");
+	final static String sFiles=I18N.get("org.openjump.core.ui.plugin.layer.AddSIDLayerPlugIn.files");
+	
     public static String WORKING_DIR;
     public static String ETC_PATH;
     public static String TMP_PATH;
@@ -67,7 +75,7 @@ public class AddSIDLayerPlugIn extends AbstractPlugIn
     public void initialize(PlugInContext context) throws Exception
     {
         context.getFeatureInstaller().addMainMenuItem(this,
-        new String[] { "Layer"}, "Add MrSID Layer", false, null, null);
+        new String[] {MenuNames.LAYER}, sAddMrSIDLayer, false, null, null);
         File empty = new File("");
         String sep = File.separator;
         WORKING_DIR = empty.getAbsoluteFile().getParent() + sep;
@@ -97,26 +105,26 @@ public class AddSIDLayerPlugIn extends AbstractPlugIn
             
             if (!new File(MRSIDDECODE).exists())
             {
-                context.getWorkbenchFrame().warnUser("Error: see output window");
-                context.getWorkbenchFrame().getOutputFrame().addText(MRSIDDECODE + " not installed.");
+                context.getWorkbenchFrame().warnUser(sErrorSeeOutputWindow);
+                context.getWorkbenchFrame().getOutputFrame().addText(MRSIDDECODE + " " + sNotInstalled);
                 return false;
             }
             
             if (!new File(MRSIDINFO).exists())
             {
-                context.getWorkbenchFrame().warnUser("Error: see output window");
-                context.getWorkbenchFrame().getOutputFrame().addText(MRSIDINFO + " not installed.");
+                context.getWorkbenchFrame().warnUser(sErrorSeeOutputWindow);
+                context.getWorkbenchFrame().getOutputFrame().addText(MRSIDINFO + " " + sNotInstalled);
                 return false;
             }
             
             JFileChooser fileChooser = new JFileChooser();
             fileChooser = GUIUtil.createJFileChooserWithExistenceChecking();
-            fileChooser.setDialogTitle("Open MrSID file");
+            fileChooser.setDialogTitle(sOpenMrSIDFile);
             fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
             fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             fileChooser.setMultiSelectionEnabled(true);
             GUIUtil.removeChoosableFileFilters(fileChooser);
-            FileFilter fileFilter = GUIUtil.createFileFilter("MrSID Files", new String[]{"sid"});
+            FileFilter fileFilter = GUIUtil.createFileFilter("MrSID " + sFiles, new String[]{"sid"});
             fileChooser.addChoosableFileFilter(fileFilter);
             fileChooser.setFileFilter(fileFilter);
             
@@ -158,7 +166,7 @@ public class AddSIDLayerPlugIn extends AbstractPlugIn
         
         catch (Exception e)
         {
-            context.getWorkbenchFrame().warnUser("Error: see output window");
+            context.getWorkbenchFrame().warnUser(sErrorSeeOutputWindow);
             context.getWorkbenchFrame().getOutputFrame().addText("AddSIDLayerPlugIn Exception:" + e.toString());
             return false;
         }

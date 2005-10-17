@@ -59,6 +59,7 @@ import com.sun.image.codec.jpeg.JPEGDecodeParam;
 import com.sun.image.codec.jpeg.JPEGImageDecoder;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.util.Assert;
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.util.Blackboard;
 import com.vividsolutions.jump.workbench.model.LayerManager;
 import com.vividsolutions.jump.workbench.model.WMSLayer;
@@ -68,6 +69,11 @@ import com.vividsolutions.jump.workbench.ui.Viewport;
 
 public class SIDLayer extends WMSLayer
 {
+	final static String sLayer = I18N.get("org.openjump.io.SIDLayer.Layer");
+	final static String couldNotGetSIDinfoFor = I18N.get("org.openjump.io.SIDLayer.Could-not-get-SID-info-for");
+	final static String sLevel = I18N.get("org.openjump.io.SIDLayer.level");
+	final static String sOf = I18N.get("org.openjump.io.SIDLayer.of");
+	
     private List imageFilenames = new ArrayList();
     private List deletedSIDs = new ArrayList();
     private int sidPixelWidth = 0;
@@ -92,9 +98,10 @@ public class SIDLayer extends WMSLayer
 
     public SIDLayer(PlugInContext context, List layerNames) throws IOException
     {  //this code copied from WMSLayer and AbstractLayerable constructors
+    		
         callingContext = context;
         LayerManager layerManager = context.getLayerManager();
-        String name = "MrSID Layer";
+        String name = "MrSID " + sLayer;
         Assert.isTrue(name != null);
         Assert.isTrue(layerManager != null);
         setLayerManager(layerManager);
@@ -136,7 +143,7 @@ public class SIDLayer extends WMSLayer
             if (readInfo(sidFilename) != 0)
             {
                 deletedSIDs.add(currObj);
-                callingContext.getWorkbenchFrame().getOutputFrame().addText("Could not get SID info for " + sidFilename);               
+                callingContext.getWorkbenchFrame().getOutputFrame().addText(couldNotGetSIDinfoFor + " " + sidFilename);               
             }
             else
             {
@@ -182,7 +189,7 @@ public class SIDLayer extends WMSLayer
                 if (sidLevel < 0) sidLevel = 0;
                 if (sidLevel > maxLevel) sidLevel = maxLevel;
                 double lvlres = sid_xres * Math.pow(2, sidLevel);
-                panel.getContext().setStatusMessage("MrSID level " + sidLevel + " of " + maxLevel);
+                panel.getContext().setStatusMessage("MrSID " + sLevel + " " + sidLevel + " " + sOf + " " + maxLevel);
                 
                 //calculate the number of pixels at this level
                 int lvl = 0;

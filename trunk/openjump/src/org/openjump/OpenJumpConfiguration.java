@@ -12,6 +12,7 @@ package org.openjump;
 
 import org.openjump.core.ui.plugin.edit.ReplicateSelectedItemsPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectAllLayerItemsPlugIn;
+import org.openjump.core.ui.plugin.edit.SelectByTypePlugIn;
 import org.openjump.core.ui.plugin.edit.SelectItemsByCircleFromSelectedLayersPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectItemsByFenceFromSelectedLayersPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.ConstrainedMoveVertexPlugIn;
@@ -21,8 +22,13 @@ import org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedLineStringPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedPolygonPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.RotateSelectedItemPlugIn;
 import org.openjump.core.ui.plugin.file.SaveImageAsSVGPlugIn;
+import org.openjump.core.ui.plugin.layer.AddSIDLayerPlugIn;
 import org.openjump.core.ui.plugin.layer.ToggleVisiblityPlugIn;
 import org.openjump.core.ui.plugin.queries.SimpleQueryPlugIn;
+import org.openjump.core.ui.plugin.tools.ConvexHullPlugIn;
+import org.openjump.core.ui.plugin.tools.DeleteEmptyGeometriesPlugIn;
+import org.openjump.core.ui.plugin.view.MapToolTipPlugIn;
+import org.openjump.core.ui.plugin.view.ShowFullPathPlugIn;
 import org.openjump.core.ui.plugin.view.ShowScalePlugIn;
 import org.openjump.core.ui.plugin.view.ZoomToScalePlugIn;
 import org.openjump.core.ui.plugin.wms.ZoomToWMSPlugIn;
@@ -70,6 +76,9 @@ public class OpenJumpConfiguration{
 		ReplicateSelectedItemsPlugIn replicatePlugIn = new ReplicateSelectedItemsPlugIn();
 		replicatePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
+		SelectByTypePlugIn mySelectByGeomTypePlugIn = new SelectByTypePlugIn();
+		mySelectByGeomTypePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
 		/***********************
 		 *  menu VIEW
 		 **********************/
@@ -83,17 +92,32 @@ public class OpenJumpConfiguration{
 		ShowScalePlugIn myShowScalePlugIn = new ShowScalePlugIn();
 		myShowScalePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
+		MapToolTipPlugIn myMapTipPlugIn= new MapToolTipPlugIn();
+		myMapTipPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		ShowFullPathPlugIn myFullPathPlugin = new ShowFullPathPlugIn();
+		myFullPathPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
 		/***********************
 		 *  menu LAYER
 		 **********************/
-//		ToggleVisiblityPlugIn myToggleVisPlugIn = new ToggleVisiblityPlugIn();
-//		myToggleVisPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		ToggleVisiblityPlugIn myToggleVisPlugIn = new ToggleVisiblityPlugIn();
+		myToggleVisPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		AddSIDLayerPlugIn myMrSIDPlugIn= new AddSIDLayerPlugIn();
+		myMrSIDPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
 		/***********************
 		 *  menu TOOLS
 		 **********************/
 		SimpleQueryPlugIn mySimpleQueryPlugIn = new SimpleQueryPlugIn();
 		mySimpleQueryPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		DeleteEmptyGeometriesPlugIn myDelGeomPlugin= new DeleteEmptyGeometriesPlugIn(); 
+		myDelGeomPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		ConvexHullPlugIn myConvHullPlugIn = new ConvexHullPlugIn();
+		myConvHullPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
 		/***********************
 		 *  menu WINDOW
@@ -110,7 +134,7 @@ public class OpenJumpConfiguration{
 		/***********************
 		 *  EDITing toolbox
 		 **********************/
-/*
+
 		DrawConstrainedPolygonPlugIn myConstrainedPolygonPlugIn = new DrawConstrainedPolygonPlugIn();
 		myConstrainedPolygonPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 
@@ -128,6 +152,6 @@ public class OpenJumpConfiguration{
 		
 		RotateSelectedItemPlugIn myRotateSIPlugIn = new RotateSelectedItemPlugIn();
 		myRotateSIPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
-*/		
+		
 	}
 }
