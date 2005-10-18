@@ -202,14 +202,21 @@ public class LayerTableModel extends ColumnBasedTableModel {
     }
 
     private void setAttributesOf(Feature feature, Feature attributes) {
+//      [UT] 25.08.2005 the old clone is available here but not used! so use it!
         Feature oldClone = (Feature) feature.clone();
         for (int i = 0; i < feature.getSchema().getAttributeCount(); i++) {
             feature.setAttribute(i, attributes.getAttribute(i));
         }
-        layer.getLayerManager().fireFeaturesChanged(
+        // remove this to include method with reference to old feature
+        /*layer.getLayerManager().fireFeaturesChanged(
             Arrays.asList(new Feature[] { feature }),
             FeatureEventType.ATTRIBUTES_MODIFIED,
-            layer);
+            layer);*/
+        
+        layer.getLayerManager().fireFeaturesAttChanged(
+                Arrays.asList(new Feature[] { feature }),
+                FeatureEventType.ATTRIBUTES_MODIFIED,
+                layer, Arrays.asList(new Feature[] { oldClone }));
     }
 
     public Layer getLayer() {
