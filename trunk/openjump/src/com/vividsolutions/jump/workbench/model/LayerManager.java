@@ -720,4 +720,13 @@ public class LayerManager {
 		return coordinateSystem;
 	}
 
+	//[UT] 25.08.2005 added
+    public void fireFeaturesAttChanged(final Collection features, 
+                                       final FeatureEventType type, 
+                                       final Layer layer, 
+                                       final Collection oldFeatureClones) {
+	   Assert.isTrue(type != FeatureEventType.GEOMETRY_MODIFIED);
+	   fireFeaturesChanged(features, type, layer, oldFeatureClones);
+
+    }
 }
