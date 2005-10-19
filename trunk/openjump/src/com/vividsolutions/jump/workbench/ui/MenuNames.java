@@ -48,6 +48,8 @@ public interface MenuNames {
 	public static String TOOLS_WARP = I18N.get("ui.MenuNames.TOOLS.WARP");
 	public static String TOOLS_ANALYSIS = I18N.get("ui.MenuNames.TOOLS.ANALYSIS");
 	public static String TOOLS_QA = I18N.get("ui.MenuNames.TOOLS.QA");
+	public static String TOOLS_JOIN = I18N.get("ui.MenuNames.TOOLS.JOIN");
 	public static String WINDOW = I18N.get("ui.MenuNames.WINDOW");
 	public static String HELP = I18N.get("ui.MenuNames.HELP");
+	public static String PLUGINS = I18N.get("ui.MenuNames.PLUGINS");
 }
