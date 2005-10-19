@@ -67,13 +67,12 @@ public class ConvexHullPlugIn extends AbstractPlugIn {
     private MultiInputDialog dialog;
     private double blendTolerance = 0.1;
     private boolean exceptionThrown = false;
-    final static String sJoin = I18N.get("org.openjump.core.ui.plugin.tools.ConvexHullPlugIn.Join");
     final static String sConvexHull = I18N.get("org.openjump.core.ui.plugin.tools.ConvexHullPlugIn.Convex-Hull");
 
     public void initialize(PlugInContext context) throws Exception
     {     
         workbenchContext = context.getWorkbenchContext();
-        context.getFeatureInstaller().addMainMenuItem(this, new String[] {MenuNames.TOOLS, sJoin }, getName(), false, null, this.createEnableCheck(workbenchContext));
+        context.getFeatureInstaller().addMainMenuItem(this, new String[] {MenuNames.TOOLS, MenuNames.TOOLS_JOIN }, getName(), false, null, this.createEnableCheck(workbenchContext));
 
 //        workbenchContext = context.getWorkbenchContext();
 //        FeatureInstaller featureInstaller = new FeatureInstaller(workbenchContext);

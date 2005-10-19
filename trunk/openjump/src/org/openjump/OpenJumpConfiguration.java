@@ -10,6 +10,8 @@
  */
 package org.openjump;
 
+import javax.swing.JPopupMenu;
+
 import org.openjump.core.ui.plugin.edit.ReplicateSelectedItemsPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectAllLayerItemsPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectByTypePlugIn;
@@ -21,12 +23,20 @@ import org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedCirclePlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedLineStringPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedPolygonPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.RotateSelectedItemPlugIn;
+import org.openjump.core.ui.plugin.edittoolbox.SelectOneItemPlugIn;
 import org.openjump.core.ui.plugin.file.SaveImageAsSVGPlugIn;
 import org.openjump.core.ui.plugin.layer.AddSIDLayerPlugIn;
 import org.openjump.core.ui.plugin.layer.ToggleVisiblityPlugIn;
+import org.openjump.core.ui.plugin.mousemenu.EditSelectedSidePlugIn;
+import org.openjump.core.ui.plugin.mousemenu.MoveAlongAnglePlugIn;
+import org.openjump.core.ui.plugin.mousemenu.RotatePlugIn;
 import org.openjump.core.ui.plugin.queries.SimpleQueryPlugIn;
+import org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn;
 import org.openjump.core.ui.plugin.tools.ConvexHullPlugIn;
 import org.openjump.core.ui.plugin.tools.DeleteEmptyGeometriesPlugIn;
+import org.openjump.core.ui.plugin.tools.JoinWithArcPlugIn;
+import org.openjump.core.ui.plugin.tools.MeasureM_FPlugIn;
+import org.openjump.core.ui.plugin.tools.ReducePointsISAPlugIn;
 import org.openjump.core.ui.plugin.view.MapToolTipPlugIn;
 import org.openjump.core.ui.plugin.view.ShowFullPathPlugIn;
 import org.openjump.core.ui.plugin.view.ShowScalePlugIn;
@@ -35,6 +45,8 @@ import org.openjump.core.ui.plugin.wms.ZoomToWMSPlugIn;
 
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
+import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
+
 
 /**
  * @description:
@@ -109,15 +121,31 @@ public class OpenJumpConfiguration{
 		
 		/***********************
 		 *  menu TOOLS
-		 **********************/
+		 **********************/	
+		/**** QUERY ****/
 		SimpleQueryPlugIn mySimpleQueryPlugIn = new SimpleQueryPlugIn();
 		mySimpleQueryPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
 		DeleteEmptyGeometriesPlugIn myDelGeomPlugin= new DeleteEmptyGeometriesPlugIn(); 
 		myDelGeomPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
-		
+		/**** JOIN ****/
 		ConvexHullPlugIn myConvHullPlugIn = new ConvexHullPlugIn();
 		myConvHullPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		JoinWithArcPlugIn myJoinWithArcPlugIn= new JoinWithArcPlugIn();
+		myJoinWithArcPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		BlendLineStringsPlugIn myLSBlender= new BlendLineStringsPlugIn();
+		myLSBlender.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		/**** GENERALIZATION ****/
+		ReducePointsISAPlugIn mySimplifyISA = new ReducePointsISAPlugIn();
+		mySimplifyISA.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		/**** tools main ****/
+		MeasureM_FPlugIn myFeetPlugIn = new MeasureM_FPlugIn();
+		myFeetPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+
 		
 		/***********************
 		 *  menu WINDOW
@@ -129,8 +157,19 @@ public class OpenJumpConfiguration{
 
 		/***********************
 		 *  Right click menus
-		 **********************/
+		 **********************/		
+		JPopupMenu popupMenu = LayerViewPanel.popupMenu();
+		popupMenu.addSeparator();        
 
+		MoveAlongAnglePlugIn myMoveAlongAnglePlugin = new MoveAlongAnglePlugIn();
+		myMoveAlongAnglePlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		RotatePlugIn myRotatePlugin = new RotatePlugIn();
+		myRotatePlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		EditSelectedSidePlugIn myEditSidePlugin = new EditSelectedSidePlugIn();
+		myEditSidePlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+			
 		/***********************
 		 *  EDITing toolbox
 		 **********************/
@@ -153,5 +192,7 @@ public class OpenJumpConfiguration{
 		RotateSelectedItemPlugIn myRotateSIPlugIn = new RotateSelectedItemPlugIn();
 		myRotateSIPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
+		SelectOneItemPlugIn mySelectOnePlugin= new SelectOneItemPlugIn();
+		mySelectOnePlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 	}
 }
