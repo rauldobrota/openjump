@@ -44,6 +44,7 @@ import com.vividsolutions.jump.workbench.plugin.EnableCheck;
 import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
+import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.Viewport;
 import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 
@@ -75,7 +76,9 @@ public class ZoomNextPlugIn extends AbstractPlugIn {
         return new MultiEnableCheck().add(checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck())
                                      .add(new EnableCheck() {
                 public String check(JComponent component) {
-                    return (!workbenchContext.getLayerViewPanel().getViewport()
+                    LayerViewPanel layerViewPanel = workbenchContext.getLayerViewPanel();
+                    return ( layerViewPanel == null || //[UT] 20.10.2005 not quite the error mesg
+                                    !layerViewPanel.getViewport()
                                              .getZoomHistory().hasNext())
                     ? I18N.get("ui.zoom.ZoomNextPlugIn.already-at-end") : null;
                 }
