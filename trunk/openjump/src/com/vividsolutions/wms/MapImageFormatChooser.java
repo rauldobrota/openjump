@@ -68,7 +68,7 @@ public class MapImageFormatChooser {
   public MapImageFormatChooser(String wmsVersion) {
     this.transparencyRequired = false;
     this.useLossy = false;
-    if( WMService.WMS_1_1_1.equals( wmsVersion ) ){
+    if( WMService.WMS_1_1_1.equals( wmsVersion ) || WMService.WMS_1_1_0.equals( wmsVersion )){
         imageFormats = IMAGE_FORMATS[1];
     }
   }
@@ -131,16 +131,19 @@ public class MapImageFormatChooser {
         }
         String[] order = new String[3];
         if( transparencyRequired ) {
-          order[0] = imageFormats[1];
-          order[1] = imageFormats[0];
-          order[2] = imageFormats[2];
+          order[0] = imageFormats[1]; //png
+          order[1] = imageFormats[0]; //gif
+          order[2] = imageFormats[2]; //jpg
+          
         } else if( useLossy ) {
-          order[0] = imageFormats[2];
-          order[1] = imageFormats[1];
+
+          order[0] = imageFormats[2]; //jpg
+          order[1] = imageFormats[1]; //png
           order[2] = imageFormats[0];
         } else {
-          order[0] = imageFormats[1];
-          order[1] = imageFormats[2];
+            
+          order[0] = imageFormats[1]; //png
+          order[1] = imageFormats[2]; //jpg
           order[2] = imageFormats[0];
         }
         Arrays.sort( formats );

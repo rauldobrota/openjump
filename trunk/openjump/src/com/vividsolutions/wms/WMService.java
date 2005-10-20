@@ -49,7 +49,11 @@ public class WMService {
     
     public static final String WMS_1_0_0 = "1.0.0";
 
+    public static final String WMS_1_1_0 = "1.1.0";
+    
     public static final String WMS_1_1_1 = "1.1.1";
+    
+    
   private String serverUrl;
   private String wmsVersion = WMS_1_0_0;
   private Capabilities cap;
@@ -79,9 +83,12 @@ public class WMService {
 	public void initialize() throws IOException {
 //    [UT]
 	    String req = "request=capabilities&WMTVER=1.0";
-	    if( WMS_1_1_1.equals(wmsVersion) ){
+	    if( WMS_1_1_0.equals( wmsVersion) ){
+	    	req = "SERVICE=WMS&VERSION=1.1.0&REQUEST=GetCapabilities";
+	    } else if ( WMS_1_1_1.equals( wmsVersion) ){
 	    	req = "SERVICE=WMS&VERSION=1.1.1&REQUEST=GetCapabilities";
 	    }
+	    
 	    String requestUrlString = this.serverUrl + req;
 	    URL requestUrl = new URL( requestUrlString );
 	    InputStream inStream = requestUrl.openStream();

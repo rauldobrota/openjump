@@ -84,7 +84,8 @@ public class Parser {
    */
   
   public Capabilities parseCapabilities( WMService service, InputStream inStream ) throws IOException {
-      if ( WMService.WMS_1_1_1.equals( service.getVersion()) ){
+      if ( WMService.WMS_1_1_1.equals( service.getVersion() ) 
+                      || WMService.WMS_1_1_0.equals( service.getVersion() ) ){
           return parseCapabilities_1_1_1(service, inStream);
       }
 
