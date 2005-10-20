@@ -49,6 +49,7 @@ import com.vividsolutions.jump.workbench.model.LayerManagerProxy;
 import com.vividsolutions.jump.workbench.ui.LayerNamePanel;
 import com.vividsolutions.jump.workbench.ui.LayerNamePanelProxy;
 import com.vividsolutions.jump.workbench.ui.LayerViewFrame;
+import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanelProxy;
 import com.vividsolutions.jump.workbench.ui.SelectionManager;
 import com.vividsolutions.jump.workbench.ui.SelectionManagerProxy;
@@ -461,7 +462,9 @@ public class EnableCheckFactory {
     public EnableCheck createFenceMustBeDrawnCheck() {
         return new EnableCheck() {
             public String check(JComponent component) {
-                return (null == workbenchContext.getLayerViewPanel().getFence())
+                LayerViewPanel layerViewPanel = workbenchContext.getLayerViewPanel();  
+                return ( layerViewPanel == null || //[UT] 20.10.2005 not quite the error mesg
+                                null == layerViewPanel.getFence())
                     ? "A fence must be drawn"
                     : null;
             }
