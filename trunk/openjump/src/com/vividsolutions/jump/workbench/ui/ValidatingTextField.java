@@ -41,9 +41,6 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
-/*
- * [sstein: 12.10.2005: changed #getDouble()  
- */
 
 /**
  * Prevents the user from entering invalid data.
@@ -220,16 +217,7 @@ public class ValidatingTextField extends JTextField {
     }
 
     public double getDouble() {
-    	String txt = getText().trim();
-    	//[sstein: 12.10.2005] changed to avoid parsing error
-    	//  i am not sure if it is a good solution to set the 
-    	//  output to "0" if the string is empty.
-    	if (txt.length() > 0){ 
-    		return Double.parseDouble(txt);
-    	}
-    	else{
-    		return 0;
-    	}
+        return Double.parseDouble(getText().trim());
     }
 
     public int getInteger() {
