@@ -30,6 +30,7 @@ import org.openjump.core.ui.plugin.layer.ToggleVisiblityPlugIn;
 import org.openjump.core.ui.plugin.mousemenu.EditSelectedSidePlugIn;
 import org.openjump.core.ui.plugin.mousemenu.MoveAlongAnglePlugIn;
 import org.openjump.core.ui.plugin.mousemenu.RotatePlugIn;
+import org.openjump.core.ui.plugin.mousemenu.SaveDatasetsPlugIn;
 import org.openjump.core.ui.plugin.queries.SimpleQueryPlugIn;
 import org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn;
 import org.openjump.core.ui.plugin.tools.ConvexHullPlugIn;
@@ -169,7 +170,10 @@ public class OpenJumpConfiguration{
 		
 		EditSelectedSidePlugIn myEditSidePlugin = new EditSelectedSidePlugIn();
 		myEditSidePlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
-			
+		
+		SaveDatasetsPlugIn mySaveDataSetPlugIn = new SaveDatasetsPlugIn();
+		mySaveDataSetPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
 		/***********************
 		 *  EDITing toolbox
 		 **********************/
