@@ -222,11 +222,15 @@ public class ZoomBar extends JPanel {
     }
 
     private void installViewListeners() {
+        
         //Use hash code to uniquely identify this zoom bar (there may be other
         //zoom bars) [Jon Aquino]
         String VIEW_LISTENERS_INSTALLED_KEY =
             Integer.toHexString(hashCode()) + " - VIEW LISTENERS INSTALLED";
         if (viewBlackboard().get(VIEW_LISTENERS_INSTALLED_KEY) != null) {
+            return;
+        }
+        if ( layerViewPanel() == null ){
             return;
         }
         layerViewPanel().getViewport().addListener(new ViewportListener() {
@@ -256,6 +260,7 @@ public class ZoomBar extends JPanel {
     }
 
     private void installModelListeners() {
+
         //Use hash code to uniquely identify this zoom bar (there may be other
         //zoom bars) [Jon Aquino]
         String MODEL_LISTENERS_INSTALLED_KEY =
@@ -263,6 +268,10 @@ public class ZoomBar extends JPanel {
         if (viewBlackboard().get(MODEL_LISTENERS_INSTALLED_KEY) != null) {
             return;
         }
+        if ( layerViewPanel() == null ){
+            return;
+        }
+
         layerViewPanel().getLayerManager().addLayerListener(new LayerListener() {
             public void categoryChanged(CategoryEvent e) {}
             public void featuresChanged(FeatureEvent e) {
@@ -297,7 +306,8 @@ public class ZoomBar extends JPanel {
     });
 
     public void updateComponents() throws NoninvertibleTransformException {
-        if (layerViewPanel() == dummyLayerViewPanel) {
+        LayerViewPanel layerViewPanel = layerViewPanel();
+        if (layerViewPanel == dummyLayerViewPanel || layerViewPanel == null) {
             setComponentsEnabled(false);
             return;
         }
@@ -306,7 +316,7 @@ public class ZoomBar extends JPanel {
         //I'm currently hiding the label on the right, to save real estate. [Jon Aquino]
         slider.setValue(
             toSliderValue(
-                viewBlackboard().get(SCALE_KEY, layerViewPanel().getViewport().getScale())));
+                viewBlackboard().get(SCALE_KEY, layerViewPanel.getViewport().getScale())));
         updateLabel();
         updateSliderLabels();
     }
@@ -593,7 +603,7 @@ public class ZoomBar extends JPanel {
     private static final String MAX_EXTENT_KEY = ZoomBar.class.getName() + " - MAX EXTENT";
 
     private Blackboard viewBlackboard() {
-        return layerViewPanel().getBlackboard();
+        return layerViewPanel() != null ? layerViewPanel().getBlackboard() : new Blackboard();
     }
     private Blackboard modelBlackboard() {
         return layerViewPanel().getLayerManager().getBlackboard();
@@ -608,7 +618,9 @@ public class ZoomBar extends JPanel {
 
 		public void handleThrowable(Throwable t) {
 		}
+		
     });
+
     private LayerViewPanel layerViewPanel() {
         if (!(frame.getActiveInternalFrame() instanceof LayerViewPanelProxy)) {
             return dummyLayerViewPanel;
