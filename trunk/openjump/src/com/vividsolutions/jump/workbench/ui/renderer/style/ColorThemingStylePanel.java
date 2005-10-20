@@ -818,8 +818,8 @@ public class ColorThemingStylePanel extends JPanel implements StylePanel {
             if (attributeNameComboBox.getItemCount() == 0) {
                 return;
             }
-
-            if (attributeNameComboBox.getSelectedItem().equals(lastAttributeName)) {
+            Object selectedItem = attributeNameComboBox.getSelectedItem();
+            if ( selectedItem != null && selectedItem.equals( lastAttributeName ) ) {
                 //Don't want to clear the table if the attribute hasn't changed. [Jon Aquino]
                 return;
             }
