@@ -38,14 +38,19 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import javax.swing.JComponent;
+import javax.swing.JInternalFrame;
 
 import com.vividsolutions.jts.util.Assert;
 import com.vividsolutions.jump.util.StringUtil;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.model.Layer;
+import com.vividsolutions.jump.workbench.model.LayerManager;
 import com.vividsolutions.jump.workbench.model.LayerManagerProxy;
+import com.vividsolutions.jump.workbench.ui.LayerNamePanel;
 import com.vividsolutions.jump.workbench.ui.LayerNamePanelProxy;
+import com.vividsolutions.jump.workbench.ui.LayerViewFrame;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanelProxy;
+import com.vividsolutions.jump.workbench.ui.SelectionManager;
 import com.vividsolutions.jump.workbench.ui.SelectionManagerProxy;
 import com.vividsolutions.jump.workbench.ui.TaskFrame;
 import com.vividsolutions.jump.workbench.ui.TaskFrameProxy;
@@ -260,7 +265,9 @@ public class EnableCheckFactory {
         final Class layerableClass) {
         return new EnableCheck() {
             public String check(JComponent component) {
+                LayerNamePanel layerNamePanel = workbenchContext.getLayerNamePanel();
                 return (
+                                layerNamePanel == null || 
                     n
                         > (workbenchContext.getLayerNamePanel())
                             .selectedNodes(layerableClass)
@@ -288,7 +295,10 @@ public class EnableCheckFactory {
     public EnableCheck createAtLeastNLayersMustExistCheck(final int n) {
         return new EnableCheck() {
             public String check(JComponent component) {
-                return (n > workbenchContext.getLayerManager().size())
+                LayerManager layerManager = workbenchContext.getLayerManager();
+                return (
+                                layerManager == null ||
+                                n > layerManager.size())
                     ? ("At least " + n + " layer" + StringUtil.s(n) + " must exist")
                     : null;
             }
@@ -348,15 +358,13 @@ public class EnableCheckFactory {
     public EnableCheck createAtLeastNItemsMustBeSelectedCheck(final int n) {
         return new EnableCheck() {
             public String check(JComponent component) {
+                JInternalFrame iFrame = workbenchContext.getWorkbench()
+                	.getFrame().getActiveInternalFrame();
                 return (
-                    n
-                        > ((SelectionManagerProxy) workbenchContext
-                            .getWorkbench()
-                            .getFrame()
-                            .getActiveInternalFrame())
-                            .getSelectionManager()
-                            .getSelectedItems()
-                            .size())
+                                iFrame == null 
+                                || 
+                    n > ((SelectionManagerProxy) iFrame)
+                        .getSelectionManager().getSelectedItems().size())
                     ? ("At least " + n + " item" + StringUtil.s(n) + " must be selected")
                     : null;
             }
