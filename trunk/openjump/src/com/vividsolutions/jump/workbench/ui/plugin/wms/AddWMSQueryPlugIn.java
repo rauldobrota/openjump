@@ -52,7 +52,7 @@ import java.util.List;
 
 public class AddWMSQueryPlugIn extends AbstractPlugIn {
     private String cachedURL = "http://demo.deegree.org:8080/deegree/wms";
-
+    private String lastWMSVersion = WMService.WMS_1_1_1;
     public AddWMSQueryPlugIn() {
     }
 
@@ -72,8 +72,9 @@ public class AddWMSQueryPlugIn extends AbstractPlugIn {
 
         WizardDialog d = new WizardDialog(context.getWorkbenchFrame(),
         		I18N.get("ui.plugin.wms.AddWMSQueryPlugIn.connect-to-web-map-server"), context.getErrorHandler());
+        
         d.init(new WizardPanel[] {
-                new URLWizardPanel(cachedURL), new MapLayerWizardPanel(),
+                new URLWizardPanel(cachedURL, lastWMSVersion), new MapLayerWizardPanel(),
                 new SRSWizardPanel(), new OneSRSWizardPanel()
             });
 
@@ -104,7 +105,10 @@ public class AddWMSQueryPlugIn extends AbstractPlugIn {
                 }
             }, context);
         cachedURL = (String) d.getData(URLWizardPanel.URL_KEY);
+        lastWMSVersion = (String) d.getData( URLWizardPanel.VERSION_KEY );
 
+        
+        
         return true;
     }
 }
