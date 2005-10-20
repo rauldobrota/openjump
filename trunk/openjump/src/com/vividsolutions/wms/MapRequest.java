@@ -264,8 +264,10 @@ public class MapRequest {
   public URL getURL() throws MalformedURLException {
       StringBuffer urlBuf = new StringBuffer();
       String ver = "REQUEST=map&WMTVER=1.0";
-      if ( WMService.WMS_1_1_1.equals( version )){
-          ver = "REQUEST=GetMap&VERSION=1.1.1";
+      if ( WMService.WMS_1_1_0.equals( version )){
+          ver = "REQUEST=GetMap&SERVICE=WMS&VERSION=1.1.0";
+      } else if ( WMService.WMS_1_1_1.equals( version ) ){
+          ver = "REQUEST=GetMap&SERVICE=WMS&VERSION=1.1.1";
       }
       urlBuf.append( service.getServerUrl() + ver + "&WIDTH=" + imgWidth + "&HEIGHT=" + imgHeight );
       urlBuf.append( "&LAYERS=" + listToString( layerList ) );
@@ -282,6 +284,9 @@ public class MapRequest {
           urlBuf.append( "&SRS=" + bbox.getSRS() );
         }
       }
+      // [UT] some style info is *required*, so add this to be spec conform
+      urlBuf.append( "&STYLES=" );
+      
       
       LOG.info(urlBuf.toString());
       
