@@ -174,7 +174,7 @@ public class FeatureInstaller {
      */
     public void addLayerViewMenuItem(PlugIn executable, String[] menuPath,
             String menuItemName) {
-        addMainMenuItem(executable, menuPath, menuItemName, false, null,
+    	addMainMenuItemWithJava14Fix(executable, menuPath, menuItemName, false, null,
                 checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck());
     }
 
@@ -184,7 +184,7 @@ public class FeatureInstaller {
      */
     public void addLayerNameViewMenuItem(PlugIn executable, String[] menuPath,
             String menuItemName) {
-        addMainMenuItem(
+    	    addMainMenuItemWithJava14Fix(
                 executable,
                 menuPath,
                 menuItemName,

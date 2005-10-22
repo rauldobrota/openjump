@@ -62,7 +62,7 @@ public class ShowScalePlugIn extends AbstractPlugIn {
 	
 	public void initialize(PlugInContext context) throws Exception {
 
-	    context.getFeatureInstaller().addMainMenuItem(this,
+	    context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this,
 		        new String[]
 				{MenuNames.VIEW},
 				I18N.get("org.openjump.core.ui.plugin.view.ShowScalePlugIn.show-scale")+"{pos:14}", 

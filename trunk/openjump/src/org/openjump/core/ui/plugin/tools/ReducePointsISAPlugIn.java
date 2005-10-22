@@ -88,7 +88,7 @@ public class ReducePointsISAPlugIn extends AbstractPlugIn {
             this.createEnableCheck(workbenchContext));
         */
     	
-        context.getFeatureInstaller().addMainMenuItem(
+        context.getFeatureInstaller().addMainMenuItemWithJava14Fix(
         		this, 
 				new String[] {MenuNames.TOOLS, MenuNames.TOOLS_GENERALIZATION }, 
 				sSimplifyISA, 

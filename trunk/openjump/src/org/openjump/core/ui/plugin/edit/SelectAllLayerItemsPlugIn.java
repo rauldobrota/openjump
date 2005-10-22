@@ -72,7 +72,7 @@ public class SelectAllLayerItemsPlugIn extends AbstractPlugIn{
 					null,
                     createEnableCheck(context.getWorkbenchContext()));
 		    
-		    context.getFeatureInstaller().addMainMenuItem(this,
+		    context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this,
 		        new String[]
 				{MenuNames.EDIT},
 				I18N.get("org.openjump.core.ui.plugin.edit.SelectAllLayerItemsPlugIn.select-layer-items")+"{pos:8}", 

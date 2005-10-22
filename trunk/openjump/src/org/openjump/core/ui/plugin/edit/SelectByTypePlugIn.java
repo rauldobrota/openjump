@@ -87,7 +87,7 @@ public class SelectByTypePlugIn extends AbstractPlugIn
     public void initialize(PlugInContext context) throws Exception
     {     
         workbenchContext = context.getWorkbenchContext();
-        context.getFeatureInstaller().addMainMenuItem(this, 
+        context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this, 
         		new String[] { MenuNames.EDIT }, 
 				getName() + "..." +"{pos:8}", 
 				false, 

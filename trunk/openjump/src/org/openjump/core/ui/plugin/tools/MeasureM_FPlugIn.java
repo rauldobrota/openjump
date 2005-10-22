@@ -55,7 +55,7 @@ public class MeasureM_FPlugIn extends AbstractPlugIn
     {    
     	//
         //context.getWorkbenchContext().getWorkbench().getFrame().getToolBar().addPlugIn(getIcon(), this, new MultiEnableCheck(), context.getWorkbenchContext());
-        context.getFeatureInstaller().addMainMenuItem(
+        context.getFeatureInstaller().addMainMenuItemWithJava14Fix(
         		this, 
 				new String[] {MenuNames.TOOLS }, 
 				sMeasureInFeets, 

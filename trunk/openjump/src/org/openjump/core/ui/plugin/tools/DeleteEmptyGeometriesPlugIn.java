@@ -72,7 +72,7 @@ public class DeleteEmptyGeometriesPlugIn extends AbstractPlugIn
     public void initialize(PlugInContext context) throws Exception
     {     
         workbenchContext = context.getWorkbenchContext();
-        context.getFeatureInstaller().addMainMenuItem(
+        context.getFeatureInstaller().addMainMenuItemWithJava14Fix(
         		this, 
 				new String[] { MenuNames.TOOLS, MenuNames.TOOLS_QA }, 
 				sDeleteEmptyGeometries, 

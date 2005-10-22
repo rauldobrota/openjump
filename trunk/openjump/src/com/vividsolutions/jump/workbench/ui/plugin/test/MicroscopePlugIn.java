@@ -53,7 +53,7 @@ public class MicroscopePlugIn extends AbstractPlugIn {
             new EnableCheckFactory(context.getWorkbenchContext());
         context
             .getFeatureInstaller()
-            .addMainMenuItem(
+			.addMainMenuItemWithJava14Fix(
                 this,
                     new String[] { "Tools", "Test" },
                     getName(),

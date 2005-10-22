@@ -48,7 +48,7 @@ public class ProgressReportingPlugIn extends ThreadedBasePlugIn {
     }
 
     public void initialize(PlugInContext context) throws Exception {
-        context.getFeatureInstaller().addMainMenuItem(this,
+        context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this,
             new String[] { "Tools", "Test" }, getName(), false, null, null);
     }
 

@@ -77,7 +77,7 @@ public class BlendLineStringsPlugIn extends AbstractPlugIn {
     public void initialize(PlugInContext context) throws Exception
     {     
         workbenchContext = context.getWorkbenchContext();
-        context.getFeatureInstaller().addMainMenuItem(this, new String[] { MenuNames.TOOLS, MenuNames.TOOLS_JOIN }, getName(), false, null, this.createEnableCheck(workbenchContext));
+        context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this, new String[] { MenuNames.TOOLS, MenuNames.TOOLS_JOIN }, getName(), false, null, this.createEnableCheck(workbenchContext));
 
 //        FeatureInstaller featureInstaller = new FeatureInstaller(workbenchContext);
 //        JPopupMenu popupMenu = workbenchContext.getLayerViewPanel().popupMenu();
