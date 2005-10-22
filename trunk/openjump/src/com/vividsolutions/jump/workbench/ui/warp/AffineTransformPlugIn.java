@@ -59,7 +59,7 @@ public class AffineTransformPlugIn extends AbstractPlugIn {
     }
 
     public void initialize(PlugInContext context) throws Exception {
-        context.getFeatureInstaller().addMainMenuItem(this,
+        context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this,
             new String[] { MenuNames.TOOLS, MenuNames.TOOLS_WARP }, getName(), false, null,
             new MultiEnableCheck().add(context.getCheckFactory()
                                               .createWindowWithLayerViewPanelMustBeActiveCheck())

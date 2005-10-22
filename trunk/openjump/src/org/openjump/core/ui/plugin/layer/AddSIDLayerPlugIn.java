@@ -74,7 +74,7 @@ public class AddSIDLayerPlugIn extends AbstractPlugIn
 
     public void initialize(PlugInContext context) throws Exception
     {
-        context.getFeatureInstaller().addMainMenuItem(this,
+        context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this,
         new String[] {MenuNames.LAYER}, sAddMrSIDLayer +"{pos:3}", false, null, null);
         File empty = new File("");
         String sep = File.separator;

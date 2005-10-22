@@ -65,7 +65,7 @@ public class ZoomToWMSPlugIn extends AbstractPlugIn {
 
         context.getFeatureInstaller()
         //			.addMainMenuItemWithJava14Fix ( this, new String [ ] { "View" },
-            .addMainMenuItem( this, new String[] { MenuNames.VIEW },
+			.addMainMenuItemWithJava14Fix( this, new String[] { MenuNames.VIEW },
                 I18N.get( "org.openjump.core.ui.plugin.wms.ZoomToWMSPlugIn.zoom-to-wms-layer" )
                     + "{pos:8}", false, null, enableCheck ); //enableCheck );
         // Add PlugIn to WMSPopupMenu

@@ -25,7 +25,7 @@ public class SimpleQueryPlugIn extends AbstractPlugIn {
 	
     public void initialize(PlugInContext context) throws Exception {
 
-		    context.getFeatureInstaller().addMainMenuItem(this,
+		    context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this,
 		        new String[]
 	            {MenuNames.TOOLS, 
 		 	    I18N.get("org.openjump.core.ui.plugin.queries.SimpleQuery.menu")},
