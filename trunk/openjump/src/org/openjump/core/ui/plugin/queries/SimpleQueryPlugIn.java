@@ -4,7 +4,7 @@ import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
 
-import org.openjump.core.ui.plugin.queries.SimpleQueryDialog;
+import org.openjump.core.ui.plugin.queries.QueryDialog;
 import com.vividsolutions.jump.I18N;
 
 /**
