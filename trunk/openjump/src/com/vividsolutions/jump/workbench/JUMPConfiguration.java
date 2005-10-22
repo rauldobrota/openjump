@@ -548,10 +548,10 @@ public class JUMPConfiguration implements Setup {
         featureInstaller.addMainMenuItemWithJava14Fix(cutSelectedItemsPlugIn, new String[] {MenuNames.EDIT},
                 cutSelectedItemsPlugIn.getName(), false, null, cutSelectedItemsPlugIn
                         .createEnableCheck(workbenchContext));
-        featureInstaller.addMainMenuItemWithJava14Fix(copySelectedItemsPlugIn, new String[] {MenuNames.EDIT},
+        featureInstaller.addMainMenuItem(copySelectedItemsPlugIn, new String[] {MenuNames.EDIT},
                 copySelectedItemsPlugIn.getNameWithMnemonic(), false, null,
                 CopySelectedItemsPlugIn.createEnableCheck(workbenchContext));
-        featureInstaller.addMainMenuItemWithJava14Fix(pasteItemsPlugIn, new String[] {MenuNames.EDIT},
+        featureInstaller.addMainMenuItem(pasteItemsPlugIn, new String[] {MenuNames.EDIT},
                 pasteItemsPlugIn.getNameWithMnemonic(), false, null, PasteItemsPlugIn
                         .createEnableCheck(workbenchContext));
         featureInstaller.addMainMenuItemWithJava14Fix(copyImagePlugIn, new String[]{MenuNames.EDIT},
@@ -656,13 +656,13 @@ public class JUMPConfiguration implements Setup {
                 addNewCategoryPlugIn.getName(), false, null, addNewCategoryPlugIn
                         .createEnableCheck(workbenchContext));
         featureInstaller.addMenuSeparator(MenuNames.LAYER); // ===================
-        featureInstaller.addMainMenuItemWithJava14Fix(cutSelectedLayersPlugIn, new String[]{MenuNames.LAYER},
+        featureInstaller.addMainMenuItem(cutSelectedLayersPlugIn, new String[]{MenuNames.LAYER},
                 cutSelectedLayersPlugIn.getNameWithMnemonic(), false, null,
                 cutSelectedLayersPlugIn.createEnableCheck(workbenchContext));
-        featureInstaller.addMainMenuItemWithJava14Fix(copySelectedLayersPlugIn, new String[] {MenuNames.LAYER},
+        featureInstaller.addMainMenuItem(copySelectedLayersPlugIn, new String[] {MenuNames.LAYER},
                 copySelectedLayersPlugIn.getNameWithMnemonic(), false, null,
                 copySelectedLayersPlugIn.createEnableCheck(workbenchContext));
-        featureInstaller.addMainMenuItemWithJava14Fix(pasteLayersPlugIn, new String[] {MenuNames.LAYER},
+        featureInstaller.addMainMenuItem(pasteLayersPlugIn, new String[] {MenuNames.LAYER},
                 pasteLayersPlugIn.getNameWithMnemonic(), false, null,
                 pasteLayersPlugIn.createEnableCheck(workbenchContext));
         featureInstaller.addMenuSeparator(MenuNames.LAYER); // ===================
