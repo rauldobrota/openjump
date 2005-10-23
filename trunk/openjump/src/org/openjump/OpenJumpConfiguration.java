@@ -105,18 +105,20 @@ public class OpenJumpConfiguration{
 		ShowScalePlugIn myShowScalePlugIn = new ShowScalePlugIn();
 		myShowScalePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
-		MapToolTipPlugIn myMapTipPlugIn= new MapToolTipPlugIn();
-		myMapTipPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		//-- this plugin causes an error on mouse move and schema editing
+		//MapToolTipPlugIn myMapTipPlugIn= new MapToolTipPlugIn();
+		//myMapTipPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
-		/* 
-		 * //--this plugin causes problems with the postgis plugin [sstein]
-		ShowFullPathPlugIn myFullPathPlugin = new ShowFullPathPlugIn();
-		myFullPathPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
-		*/
+		 
+		//--this plugin causes problems with the postgis plugin [sstein]
+		//ShowFullPathPlugIn myFullPathPlugin = new ShowFullPathPlugIn();
+		//myFullPathPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
 		
 		/***********************
 		 *  menu LAYER
 		 **********************/
+		
 		ToggleVisiblityPlugIn myToggleVisPlugIn = new ToggleVisiblityPlugIn();
 		myToggleVisPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
@@ -174,6 +176,7 @@ public class OpenJumpConfiguration{
 		EditSelectedSidePlugIn myEditSidePlugin = new EditSelectedSidePlugIn();
 		myEditSidePlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
+		//--this plugin causes problems with the postgis plugin [sstein]
 		SaveDatasetsPlugIn mySaveDataSetPlugIn = new SaveDatasetsPlugIn();
 		mySaveDataSetPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
