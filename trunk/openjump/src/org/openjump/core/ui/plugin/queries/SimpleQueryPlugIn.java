@@ -36,7 +36,7 @@ public class SimpleQueryPlugIn extends AbstractPlugIn {
         if (queryDialog==null) {
             queryDialog = new QueryDialog(context);
         }
-        //queryDialog.initUI();
+        else {queryDialog.setVisible(true);}
         return false;
     }
     
