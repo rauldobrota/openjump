@@ -108,8 +108,11 @@ public class OpenJumpConfiguration{
 		MapToolTipPlugIn myMapTipPlugIn= new MapToolTipPlugIn();
 		myMapTipPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
+		/* 
+		 * //--this plugin causes problems with the postgis plugin [sstein]
 		ShowFullPathPlugIn myFullPathPlugin = new ShowFullPathPlugIn();
 		myFullPathPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		*/
 		
 		/***********************
 		 *  menu LAYER
