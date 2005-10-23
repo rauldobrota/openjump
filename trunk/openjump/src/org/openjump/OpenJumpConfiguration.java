@@ -111,8 +111,8 @@ public class OpenJumpConfiguration{
 		
 		 
 		//--this plugin causes problems with the postgis plugin [sstein]
-		//ShowFullPathPlugIn myFullPathPlugin = new ShowFullPathPlugIn();
-		//myFullPathPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		ShowFullPathPlugIn myFullPathPlugin = new ShowFullPathPlugIn();
+		myFullPathPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
 		
 		/***********************

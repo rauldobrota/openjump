@@ -38,25 +38,65 @@ package org.openjump.core.ui.plugin.view;
 
 import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
+import java.awt.geom.NoninvertibleTransformException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 
 import com.vividsolutions.jump.I18N;
+import com.vividsolutions.jump.io.datasource.DataSource;
 import com.vividsolutions.jump.io.datasource.DataSourceQuery;
+import com.vividsolutions.jump.util.Blackboard;
+import com.vividsolutions.jump.workbench.model.CategoryEvent;
+import com.vividsolutions.jump.workbench.model.FeatureEvent;
+import com.vividsolutions.jump.workbench.model.FeatureEventType;
 import com.vividsolutions.jump.workbench.model.Layer;
+import com.vividsolutions.jump.workbench.model.LayerEvent;
+import com.vividsolutions.jump.workbench.model.LayerEventType;
+import com.vividsolutions.jump.workbench.model.LayerListener;
+import com.vividsolutions.jump.workbench.model.LayerManager;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
+import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.LayerNamePanelListener;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanelListener;
 import com.vividsolutions.jump.workbench.ui.TaskFrame;
+import com.vividsolutions.jump.workbench.ui.WorkbenchFrame;
 
 public class ShowFullPathPlugIn extends AbstractPlugIn
 {
     PlugInContext gContext;
 	final static String sErrorSeeOutputWindow =I18N.get("org.openjump.core.ui.plugin.view.ShowFullPathPlugIn.Error-See-Output-Window");
 	final static String sNumberSelected = I18N.get("org.openjump.core.ui.plugin.view.ShowFullPathPlugIn.NumberSelected");
+	
+	//-- added by sstein for test reasons
+//	private LayerListener myLayerListener = new LayerListener() {
+//        public void categoryChanged(CategoryEvent e) {}
+//        public void featuresChanged(FeatureEvent e)  {}        
+//		public void layerChanged(LayerEvent e) {
+//        if (e.getType() == LayerEventType.ADDED || e.getType() == LayerEventType.REMOVED) {
+//            Collection layerCollection = (Collection) gContext.getWorkbenchContext().getLayerNamePanel().getLayerManager().getLayers();
+//            for (Iterator i = layerCollection.iterator(); i.hasNext();)
+//            {
+//                Layer layer = (Layer) i.next();
+//                if (layer.hasReadableDataSource())
+//                {
+//                    DataSourceQuery dsq = layer.getDataSourceQuery();
+//                    try{
+//                    	String fname = dsq.getDataSource().getProperties().get("File").toString();                   	
+//                    	layer.setDescription(fname);
+//                    }
+//                    catch(Exception e){
+//                    	System.out.println("seems to be a database dataset" + e);
+//                    }                }
+//            	}   
+//        	}
+//		}
+//	};
 	
     private LayerNamePanelListener layerNamePanelListener =
     new LayerNamePanelListener()
@@ -69,9 +109,16 @@ public class ShowFullPathPlugIn extends AbstractPlugIn
                 Layer layer = (Layer) i.next();
                 if (layer.hasReadableDataSource())
                 {
-                    DataSourceQuery dsq = layer.getDataSourceQuery();
-                    String fname = dsq.getDataSource().getProperties().get("File").toString();
-                    layer.setDescription(fname);
+                	DataSourceQuery dsq = layer.getDataSourceQuery();			
+	                try{
+	                    	Map props = dsq.getDataSource().getProperties();
+	                    	String fname = dsq.getDataSource().getProperties().get("File").toString();  
+	                    	
+	                    	layer.setDescription(fname);
+	                }
+	                catch(Exception e){
+	                    	System.out.println("ShowFullPathPlugIn: seems to be a database dataset?: " + layer.getDataSourceQuery().getDataSource().getClass() + "  " + e);
+	                }                
                 }
             }            
         }
@@ -96,35 +143,72 @@ public class ShowFullPathPlugIn extends AbstractPlugIn
             
         }
     };
-            
+      
     public void initialize(PlugInContext context) throws Exception
     {
-        gContext = context;                
+    	gContext = context;
+//    	/***	added by sstein ***********************/
+//	    //
+//        // Whenever anything happens on an internal frame we want to do this.
+//        //
+//	    GUIUtil.addInternalFrameListener(
+//	            context.getWorkbenchFrame().getDesktopPane(),
+//	            GUIUtil.toInternalFrameListener(new ActionListener() {
+//	        public void actionPerformed(ActionEvent e) {
+//	            installListenersOnCurrentPanel();
+//	        }
+//	    }));
+	    /**** original *********************************/
         context.getWorkbenchFrame().getDesktopPane().addContainerListener(
-        new ContainerListener()
-        {
-            public void componentAdded(ContainerEvent e)
-            {                              
-                Component child = e.getChild();
-                if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
+                new ContainerListener()
                 {
-                    ((TaskFrame)child).getLayerNamePanel().addListener(layerNamePanelListener);
-                    ((TaskFrame)child).getLayerViewPanel().addListener(layerViewPanelListener);                    
-            	}
-            }
-            
-            public void componentRemoved(ContainerEvent e)
-            {
-                Component child = e.getChild();
-                if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
-                {
-                    ((TaskFrame)child).getLayerNamePanel().removeListener(layerNamePanelListener);
-                    ((TaskFrame)child).getLayerViewPanel().removeListener(layerViewPanelListener);
-            	}
-            }
-        });
+                    public void componentAdded(ContainerEvent e)
+                    {                              
+                        Component child = e.getChild();
+                        if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
+                        {
+                            ((TaskFrame)child).getLayerNamePanel().addListener(layerNamePanelListener); //causes conflict [sstein]
+                            ((TaskFrame)child).getLayerViewPanel().addListener(layerViewPanelListener);                      
+                    	}
+                    }
+                    
+                    public void componentRemoved(ContainerEvent e)
+                    {
+                        Component child = e.getChild();
+                        if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
+                        {
+                            ((TaskFrame)child).getLayerNamePanel().removeListener(layerNamePanelListener); //causes conflict [sstein]
+                            ((TaskFrame)child).getLayerViewPanel().removeListener(layerViewPanelListener);
+                    	}
+                    }
+                });   	
+        
     }
     
+//    //-- method by sstein adapted from Zoombar
+//    private void installListenersOnCurrentPanel(){
+//    	 System.out.println("try to install listener");
+//        String LAYER_PATH_LISTENERS_INSTALLED_KEY =
+//            Integer.toHexString(hashCode()) + " - LAYER PATH LISTENERS INSTALLED";
+//        if (viewBlackboard().get(LAYER_PATH_LISTENERS_INSTALLED_KEY) != null) {
+//            return;
+//        }
+//
+//    	if(gContext.getLayerViewPanel() == null){
+//    		return;
+//    	}
+//        //[sstein]        
+//        LayerManager lm = gContext.getLayerManager();
+//        lm.addLayerListener(this.myLayerListener);
+//        System.out.println("listener installed");
+//        viewBlackboard().put(LAYER_PATH_LISTENERS_INSTALLED_KEY, new Object());
+//    }
+//    
+//    //-- method by sstein adapted from Zoombar    
+//    private Blackboard viewBlackboard() {
+//        return gContext.getLayerViewPanel() != null ? gContext.getLayerViewPanel().getBlackboard() : new Blackboard();
+//    }
+//    
     public boolean execute(PlugInContext context) throws Exception
     {
         try
