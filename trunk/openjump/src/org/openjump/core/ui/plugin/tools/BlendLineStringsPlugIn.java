@@ -70,6 +70,8 @@ public class BlendLineStringsPlugIn extends AbstractPlugIn {
     private final static String sTheBlendTolerance = I18N.get("org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn.The-blend-tolerance");
     private final static String sNew = I18N.get("org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn.New");
     private final static String TOLERANCE = I18N.get("org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn.Tolerance");
+    private final static String sName = I18N.get("org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn.Blend-LineStrings");
+    
     private MultiInputDialog dialog;
     private double blendTolerance = 0.1;
     private boolean exceptionThrown = false;
@@ -77,7 +79,7 @@ public class BlendLineStringsPlugIn extends AbstractPlugIn {
     public void initialize(PlugInContext context) throws Exception
     {     
         workbenchContext = context.getWorkbenchContext();
-        context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this, new String[] { MenuNames.TOOLS, MenuNames.TOOLS_JOIN }, getName(), false, null, this.createEnableCheck(workbenchContext));
+        context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this, new String[] { MenuNames.TOOLS, MenuNames.TOOLS_JOIN }, sName, false, null, this.createEnableCheck(workbenchContext));
 
 //        FeatureInstaller featureInstaller = new FeatureInstaller(workbenchContext);
 //        JPopupMenu popupMenu = workbenchContext.getLayerViewPanel().popupMenu();
