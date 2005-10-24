@@ -38,34 +38,21 @@ package org.openjump.core.ui.plugin.view;
 
 import java.awt.Component;
 import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
-import java.awt.geom.NoninvertibleTransformException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
 import com.vividsolutions.jump.I18N;
-import com.vividsolutions.jump.io.datasource.DataSource;
 import com.vividsolutions.jump.io.datasource.DataSourceQuery;
-import com.vividsolutions.jump.util.Blackboard;
-import com.vividsolutions.jump.workbench.model.CategoryEvent;
-import com.vividsolutions.jump.workbench.model.FeatureEvent;
-import com.vividsolutions.jump.workbench.model.FeatureEventType;
 import com.vividsolutions.jump.workbench.model.Layer;
-import com.vividsolutions.jump.workbench.model.LayerEvent;
-import com.vividsolutions.jump.workbench.model.LayerEventType;
-import com.vividsolutions.jump.workbench.model.LayerListener;
-import com.vividsolutions.jump.workbench.model.LayerManager;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
-import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.LayerNamePanelListener;
+import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanelListener;
 import com.vividsolutions.jump.workbench.ui.TaskFrame;
-import com.vividsolutions.jump.workbench.ui.WorkbenchFrame;
 
 public class ShowFullPathPlugIn extends AbstractPlugIn
 {
@@ -129,8 +116,11 @@ public class ShowFullPathPlugIn extends AbstractPlugIn
     {
         public void selectionChanged()
         {
-            int numSel = gContext.getWorkbenchContext().getLayerViewPanel().getSelectionManager().getFeatureSelection().getSelectedItems().size();
-            gContext.getWorkbenchFrame().setTimeMessage(sNumberSelected + " " + numSel);
+        	LayerViewPanel lvp=gContext.getWorkbenchContext().getLayerViewPanel();
+        	if (lvp != null){
+            	int numSel = gContext.getWorkbenchContext().getLayerViewPanel().getSelectionManager().getFeatureSelection().getSelectedItems().size();        
+            	gContext.getWorkbenchFrame().setTimeMessage(sNumberSelected + " " + numSel);
+        	}
         }
         
         public void cursorPositionChanged(String x, String y)
@@ -168,7 +158,10 @@ public class ShowFullPathPlugIn extends AbstractPlugIn
                         if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
                         {
                             ((TaskFrame)child).getLayerNamePanel().addListener(layerNamePanelListener); //causes conflict [sstein]
-                            ((TaskFrame)child).getLayerViewPanel().addListener(layerViewPanelListener);                      
+                            LayerViewPanel lvp = ((TaskFrame)child).getLayerViewPanel();
+                            if (lvp != null){                            	
+								lvp.addListener(layerViewPanelListener);
+                            }
                     	}
                     }
                     
@@ -178,7 +171,10 @@ public class ShowFullPathPlugIn extends AbstractPlugIn
                         if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
                         {
                             ((TaskFrame)child).getLayerNamePanel().removeListener(layerNamePanelListener); //causes conflict [sstein]
+                            LayerViewPanel lvp = ((TaskFrame)child).getLayerViewPanel();
+                            if (lvp != null){
                             ((TaskFrame)child).getLayerViewPanel().removeListener(layerViewPanelListener);
+                            }
                     	}
                     }
                 });   	

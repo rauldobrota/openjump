@@ -102,15 +102,18 @@ public class MapToolTipPlugIn extends AbstractPlugIn
     {
         public void mouseMoved(MouseEvent e)
         {
-            ToolTipWriter toolTipWriter = new ToolTipWriter(gContext.getWorkbenchContext().getLayerViewPanel());
-            toolTipWriter.setEnabled(gContext.getWorkbenchContext().getLayerViewPanel().getToolTipWriter().isEnabled());
-            String fid = toolTipWriter.write("{FID}", e.getPoint());
+        	LayerViewPanel lvp=gContext.getWorkbenchContext().getLayerViewPanel();
+        	if (lvp != null){
+        		ToolTipWriter toolTipWriter = new ToolTipWriter(gContext.getWorkbenchContext().getLayerViewPanel());
+        		toolTipWriter.setEnabled(gContext.getWorkbenchContext().getLayerViewPanel().getToolTipWriter().isEnabled());
+        		String fid = toolTipWriter.write("{FID}", e.getPoint());
 //            String toolTipText = toolTipWriter.write("feat_desc: {feat_desc}, dist_u_d: {dist_u_d}, facil_id {facil_id}", e.getPoint());
-            if (fid != null)
-            {
-                String toolTipText = getData(Integer.parseInt(fid), e.getPoint());
-                gContext.getWorkbenchContext().getLayerViewPanel().setToolTipText(toolTipText);
-            }
+        		if (fid != null)
+        		{
+        			String toolTipText = getData(Integer.parseInt(fid), e.getPoint());
+        			gContext.getWorkbenchContext().getLayerViewPanel().setToolTipText(toolTipText);
+        		}
+        	}
         }
     };
                
@@ -122,19 +125,25 @@ public class MapToolTipPlugIn extends AbstractPlugIn
         {
             public void componentAdded(ContainerEvent e)
             {                              
-                Component child = e.getChild();
-                if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
-                {
-                    ((TaskFrame)child).getLayerViewPanel().addMouseMotionListener(mouseMotionAdapter);
+            	LayerViewPanel lvp=gContext.getWorkbenchContext().getLayerViewPanel();
+            	if (lvp != null){
+            		Component child = e.getChild();
+            		if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
+            		{
+            			((TaskFrame)child).getLayerViewPanel().addMouseMotionListener(mouseMotionAdapter);
+            		}
             	}
             }
             
             public void componentRemoved(ContainerEvent e)
             {
-                Component child = e.getChild();
-                if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
-                {
-                    ((TaskFrame)child).getLayerViewPanel().removeMouseMotionListener(mouseMotionAdapter);
+            	LayerViewPanel lvp=gContext.getWorkbenchContext().getLayerViewPanel();
+            	if (lvp != null){
+	                Component child = e.getChild();
+	                if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
+	                {
+	                    ((TaskFrame)child).getLayerViewPanel().removeMouseMotionListener(mouseMotionAdapter);
+	            	}
             	}
             }
         });

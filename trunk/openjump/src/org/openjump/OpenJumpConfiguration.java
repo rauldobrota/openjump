@@ -104,13 +104,14 @@ public class OpenJumpConfiguration{
 		
 		ShowScalePlugIn myShowScalePlugIn = new ShowScalePlugIn();
 		myShowScalePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
-		
-		//-- this plugin causes an error on mouse move and schema editing
-		//MapToolTipPlugIn myMapTipPlugIn= new MapToolTipPlugIn();
-		//myMapTipPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
-		
-		 
-		//--this plugin causes problems with the postgis plugin [sstein]
+				
+		MapToolTipPlugIn myMapTipPlugIn= new MapToolTipPlugIn();
+		myMapTipPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+				 
+		//--this caused problems with the postgis plugin [sstein]
+		//  TODO: the problem has been solved (using try/catch) but still class has to be
+		//        changed using LayerListener LayerEventType.ADDED event instead of 
+		//		  layerSelectionChanged() from LayerNamePanelListener
 		ShowFullPathPlugIn myFullPathPlugin = new ShowFullPathPlugIn();
 		myFullPathPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
