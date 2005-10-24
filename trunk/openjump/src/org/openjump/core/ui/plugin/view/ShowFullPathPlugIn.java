@@ -47,8 +47,10 @@ import java.util.Map;
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.io.datasource.DataSourceQuery;
 import com.vividsolutions.jump.workbench.model.Layer;
+import com.vividsolutions.jump.workbench.model.LayerManager;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
+import com.vividsolutions.jump.workbench.ui.LayerNamePanel;
 import com.vividsolutions.jump.workbench.ui.LayerNamePanelListener;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanelListener;
@@ -90,24 +92,30 @@ public class ShowFullPathPlugIn extends AbstractPlugIn
     {
         public void layerSelectionChanged()
         {
-            Collection layerCollection = (Collection) gContext.getWorkbenchContext().getLayerNamePanel().getLayerManager().getLayers();
-            for (Iterator i = layerCollection.iterator(); i.hasNext();)
-            {
-                Layer layer = (Layer) i.next();
-                if (layer.hasReadableDataSource())
-                {
-                	DataSourceQuery dsq = layer.getDataSourceQuery();			
-	                try{
-	                    	Map props = dsq.getDataSource().getProperties();
-	                    	String fname = dsq.getDataSource().getProperties().get("File").toString();  
-	                    	
-	                    	layer.setDescription(fname);
-	                }
-	                catch(Exception e){
-	                    	System.out.println("ShowFullPathPlugIn: seems to be a database dataset?: " + layer.getDataSourceQuery().getDataSource().getClass() + "  " + e);
-	                }                
-                }
-            }            
+        	LayerNamePanel lnp = gContext.getWorkbenchContext().getLayerNamePanel();
+        	if(lnp !=null){
+        		LayerManager lm = lnp.getLayerManager();
+        		if (lm != null){
+		            Collection layerCollection = (Collection) gContext.getWorkbenchContext().getLayerNamePanel().getLayerManager().getLayers();
+		            for (Iterator i = layerCollection.iterator(); i.hasNext();)
+		            {
+		                Layer layer = (Layer) i.next();
+		                if (layer.hasReadableDataSource())
+		                {
+		                	DataSourceQuery dsq = layer.getDataSourceQuery();			
+			                try{
+			                    	Map props = dsq.getDataSource().getProperties();
+			                    	String fname = dsq.getDataSource().getProperties().get("File").toString();  
+			                    	
+			                    	layer.setDescription(fname);
+			                }
+			                catch(Exception e){
+			                    	System.out.println("ShowFullPathPlugIn: seems to be a database dataset?: " + layer.getDataSourceQuery().getDataSource().getClass() + "  " + e);
+			                }                
+		                }
+		            }
+        		}
+        	}
         }
     };
    
@@ -157,7 +165,10 @@ public class ShowFullPathPlugIn extends AbstractPlugIn
                         Component child = e.getChild();
                         if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
                         {
-                            ((TaskFrame)child).getLayerNamePanel().addListener(layerNamePanelListener); //causes conflict [sstein]
+                        	LayerNamePanel lnp =((TaskFrame)child).getLayerNamePanel();                        	
+                        	if(lnp != null){ //can we use LayerListener instead??
+                        		((TaskFrame)child).getLayerNamePanel().addListener(layerNamePanelListener); 
+                        	}
                             LayerViewPanel lvp = ((TaskFrame)child).getLayerViewPanel();
                             if (lvp != null){                            	
 								lvp.addListener(layerViewPanelListener);
@@ -170,7 +181,10 @@ public class ShowFullPathPlugIn extends AbstractPlugIn
                         Component child = e.getChild();
                         if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
                         {
-                            ((TaskFrame)child).getLayerNamePanel().removeListener(layerNamePanelListener); //causes conflict [sstein]
+                        	LayerNamePanel lnp =((TaskFrame)child).getLayerNamePanel();                        	
+                        	if(lnp != null){
+                        		((TaskFrame)child).getLayerNamePanel().removeListener(layerNamePanelListener); 
+                        	}
                             LayerViewPanel lvp = ((TaskFrame)child).getLayerViewPanel();
                             if (lvp != null){
                             ((TaskFrame)child).getLayerViewPanel().removeListener(layerViewPanelListener);
