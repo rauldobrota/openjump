@@ -164,6 +164,9 @@ public class SkinOptionsPanel extends JPanel implements OptionsPanel {
     private void updateWindow(Window w) {
         SwingUtilities.updateComponentTreeUI(w);
 
+//      [UT] 2005-10-26 bug fix for editing toolbox resize problem found by uwe dalluege  
+        w.pack ( ); 
+        
         Window[] children = w.getOwnedWindows();
 
         for (int i = 0; i < children.length; i++)
