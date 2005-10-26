@@ -110,7 +110,9 @@ public class ShowFullPathPlugIn extends AbstractPlugIn
 			                    	layer.setDescription(fname);
 			                }
 			                catch(Exception e){
-			                    	System.out.println("ShowFullPathPlugIn: seems to be a database dataset?: " + layer.getDataSourceQuery().getDataSource().getClass() + "  " + e);
+			                    	//System.out.println("ShowFullPathPlugIn: seems to be a database dataset?: " + layer.getDataSourceQuery().getDataSource().getClass() + "  " + e);			                		
+			                		layer.setDescription("database");
+			                		//exc eaten
 			                }                
 		                }
 		            }
