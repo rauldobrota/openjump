@@ -486,6 +486,7 @@ public class JUMPConfiguration implements Setup {
 
     private void configureMainMenus(final WorkbenchContext workbenchContext,
             final EnableCheckFactory checkFactory,
+		//-- FILE
             FeatureInstaller featureInstaller) throws Exception {
         featureInstaller.addMainMenuItemWithJava14Fix(loadDatasetFromFilePlugIn, new String[] {MenuNames.FILE},
                 loadDatasetFromFilePlugIn.getName() + "...", false, null, AbstractLoadDatasetPlugIn
@@ -522,7 +523,8 @@ public class JUMPConfiguration implements Setup {
                 saveImageAsPlugIn.getName() + "...", 
 				false,
 				null, 
-				SaveImageAsPlugIn.createEnableCheck(workbenchContext));          
+				SaveImageAsPlugIn.createEnableCheck(workbenchContext));      
+		//-- EDIT
         featureInstaller.addMainMenuItemWithJava14Fix(undoPlugIn, new String[] {MenuNames.EDIT}, undoPlugIn
                 .getName(), false, GUIUtil.toSmallIcon(undoPlugIn.getIcon()),
                 undoPlugIn.createEnableCheck(workbenchContext));
@@ -565,6 +567,7 @@ public class JUMPConfiguration implements Setup {
         featureInstaller.addMainMenuItemWithJava14Fix(optionsPlugIn, new String[] {MenuNames.EDIT}, optionsPlugIn
                 .getName()
                 + "...", false, null, null);
+		//-- VIEW        
         editingPlugIn.createMainMenuItem(new String[] { MenuNames.VIEW}, GUIUtil
                 .toSmallIcon(EditingPlugIn.ICON), workbenchContext);
         featureInstaller.addMenuSeparator(MenuNames.VIEW); // ===================
@@ -643,11 +646,7 @@ public class JUMPConfiguration implements Setup {
                 MapToolTipsPlugIn.createEnableCheck(workbenchContext));
         zoomBarPlugIn.createMainMenuItem(new String[] { MenuNames.VIEW}, null,
                 workbenchContext);
-        featureInstaller.addMainMenuItemWithJava14Fix(outputWindowPlugIn, new String[] {MenuNames.VIEW},
-                outputWindowPlugIn.getName(), false, GUIUtil
-                        .toSmallIcon(outputWindowPlugIn.getIcon()), null);
-        featureInstaller.addMainMenuItemWithJava14Fix(generateLogPlugIn, new String[] {MenuNames.VIEW},
-                generateLogPlugIn.getName() + "...", false, null, null);
+        //-- LAYER
         featureInstaller.addLayerViewMenuItem(addNewLayerPlugIn, MenuNames.LAYER,
                 addNewLayerPlugIn.getName());
         featureInstaller.addLayerViewMenuItem(addWMSQueryPlugIn, MenuNames.LAYER,
@@ -673,6 +672,19 @@ public class JUMPConfiguration implements Setup {
         		new String[] {MenuNames.LAYER}, removeSelectedCategoriesPlugIn.getName(), false, null,
                 removeSelectedCategoriesPlugIn
                         .createEnableCheck(workbenchContext));
+        //-- WINDOW
+        /*
+        featureInstaller.addMainMenuItemWithJava14Fix(optionsPlugIn, new String[] {MenuNames.WINDOW}, optionsPlugIn
+                .getName()
+                + "...", false, null, null);
+        */
+        featureInstaller.addMainMenuItemWithJava14Fix(outputWindowPlugIn, new String[] {MenuNames.WINDOW},
+                outputWindowPlugIn.getName(), false, GUIUtil
+                        .toSmallIcon(outputWindowPlugIn.getIcon()), null);        
+        featureInstaller.addMainMenuItemWithJava14Fix(generateLogPlugIn, new String[] {MenuNames.WINDOW},
+                generateLogPlugIn.getName() + "...", false, null, null);        
+        featureInstaller.addMenuSeparator(MenuNames.WINDOW); // ===================
+        
         featureInstaller.addMainMenuItemWithJava14Fix(cloneWindowPlugIn, new String[] {MenuNames.WINDOW},
                 cloneWindowPlugIn.getName(), false, null, new EnableCheck() {
 
@@ -682,7 +694,9 @@ public class JUMPConfiguration implements Setup {
                                 : null;
                     }
                 });
+      
         featureInstaller.addMenuSeparator(MenuNames.WINDOW); // ===================
+        //-- TOOLS
         new BoundaryMatchDataPlugIn().initialize(new PlugInContext(
                 workbenchContext, null, null, null, null));
         new WarpingPlugIn().initialize(new PlugInContext(workbenchContext,
@@ -693,6 +707,7 @@ public class JUMPConfiguration implements Setup {
                 workbenchContext, null, null, null, null));
         new RandomArrowsPlugIn().initialize(new PlugInContext(workbenchContext,
                 null, null, null, null));
+        //-- TOOLS - Analysis
         featureInstaller
         		.addMainMenuItemWithJava14Fix(
                         overlayPlugIn,

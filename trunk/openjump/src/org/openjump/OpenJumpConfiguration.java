@@ -10,6 +10,7 @@
  */
 package org.openjump;
 
+import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
 import org.openjump.core.ui.plugin.edit.ReplicateSelectedItemsPlugIn;
@@ -47,6 +48,8 @@ import org.openjump.core.ui.plugin.wms.ZoomToWMSPlugIn;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
+import com.vividsolutions.jump.workbench.ui.MenuNames;
+import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 
 
 /**
@@ -128,7 +131,8 @@ public class OpenJumpConfiguration{
 		
 		/***********************
 		 *  menu TOOLS
-		 **********************/	
+		 **********************/
+		
 		/**** QUERY ****/
 		SimpleQueryPlugIn mySimpleQueryPlugIn = new SimpleQueryPlugIn();
 		mySimpleQueryPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
@@ -150,6 +154,15 @@ public class OpenJumpConfiguration{
 		mySimplifyISA.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
 		/**** tools main ****/
+		
+		//-- [sstein] do this to avoid that the programming menu is created after 
+		//   MeasureM_FPlugIn is added to the tools menu
+		PlugInContext pc = new PlugInContext(workbenchContext, null, null, null, null);
+		FeatureInstaller fi = pc.getFeatureInstaller();
+		JMenu menuTools = fi.menuBarMenu(MenuNames.TOOLS);
+		fi.createMenusIfNecessary(menuTools, new String[]{MenuNames.TOOLS_PROGRAMMING});
+		//---
+
 		MeasureM_FPlugIn myFeetPlugIn = new MeasureM_FPlugIn();
 		myFeetPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 

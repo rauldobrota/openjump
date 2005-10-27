@@ -756,12 +756,31 @@ public class WorkbenchFrame extends JFrame implements LayerViewPanelContext,
 		// the Window
 		//menu has exactly one "regular" menu item (newWindowMenuItem). [Jon
 		// Aquino]
-		if (windowMenu.getItemCount() > 0
-				&& windowMenu.getItem(0) != null
-				&& windowMenu.getItem(0).getText().equals(
-						AbstractPlugIn.createName(CloneWindowPlugIn.class))) {
-			JMenuItem newWindowMenuItem = windowMenu.getItem(0);
-			windowMenu.removeAll();
+		int addedMenuItems = 3; //[sstein: new menus: options + log + separator]
+		int allItems = windowMenu.getItemCount();
+		String t = windowMenu.getItem(addedMenuItems).getText();
+		String name = AbstractPlugIn.createName(CloneWindowPlugIn.class);
+		boolean isWindowCloneClass = t.equals(name);				
+		if (windowMenu.getItemCount() > addedMenuItems
+				&& windowMenu.getItem(addedMenuItems) != null
+				&& isWindowCloneClass) {
+			JMenuItem newWindowMenuItem = windowMenu.getItem(addedMenuItems);
+			//windowMenu.removeAll();
+			int loopsdone = 0;
+			for(int itemIdx = addedMenuItems; itemIdx < allItems; itemIdx ++){
+				//-- subtract since number of window-menu-items shrinks				
+				try{
+					//String tt = windowMenu.getItem(itemIdx-loopsdone).getText();
+					//-- [sstein:] an exception for the line above is thrown if the item is a separator
+					//             then, getText seems not to work 
+					windowMenu.remove(itemIdx-loopsdone);
+					loopsdone = loopsdone+1;
+				}
+				catch(Exception exc){
+					//eat -- should be thrown caused by a separator
+					System.out.println("WorkbenchFrame: exception in windowMenu_Selected() ");
+				}				
+			}
 			windowMenu.add(newWindowMenuItem);
 			windowMenu.addSeparator();
 		} else {
@@ -777,7 +796,7 @@ public class WorkbenchFrame extends JFrame implements LayerViewPanelContext,
 			associate(menuItem, frames[i]);
 			windowMenu.add(menuItem);
 		}
-		if (windowMenu.getItemCount() == 0) {
+		if (windowMenu.getItemCount() == addedMenuItems) {
 			//For ezLink [Jon Aquino]
 			windowMenu.add(new JMenuItem("("+I18N.get("ui.WorkbenchFrame.no-windows")+")"));
 		}

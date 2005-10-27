@@ -15,7 +15,7 @@ import com.vividsolutions.jump.workbench.ui.toolbox.ToolboxDialog;
 import com.vividsolutions.jump.workbench.ui.toolbox.ToolboxPlugIn;
 public class BeanShellPlugIn extends ToolboxPlugIn {
 	public void initialize(PlugInContext context) throws Exception {
-		createMainMenuItem(new String[]{MenuNames.VIEW}, null, context
+		createMainMenuItem(new String[]{MenuNames.TOOLS, MenuNames.TOOLS_PROGRAMMING}, null, context
 				.getWorkbenchContext());
 	}
 

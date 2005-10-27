@@ -41,7 +41,6 @@ import javax.swing.ImageIcon;
 
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
-import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
 
@@ -53,7 +52,7 @@ public class MeasureM_FPlugIn extends AbstractPlugIn
 	
     public void initialize(PlugInContext context) throws Exception
     {    
-    	//
+        
         //context.getWorkbenchContext().getWorkbench().getFrame().getToolBar().addPlugIn(getIcon(), this, new MultiEnableCheck(), context.getWorkbenchContext());
         context.getFeatureInstaller().addMainMenuItemWithJava14Fix(
         		this, 
