@@ -45,7 +45,10 @@ import org.openjump.core.ui.plugin.view.helpclassescale.InstallShowScalePlugIn;
 import org.openjump.core.ui.plugin.view.helpclassescale.ShowScaleRenderer;
 
 import com.vividsolutions.jump.I18N;
+import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
+import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
+import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
 
@@ -68,11 +71,17 @@ public class ShowScalePlugIn extends AbstractPlugIn {
 				I18N.get("org.openjump.core.ui.plugin.view.ShowScalePlugIn.show-scale")+"{pos:14}", 
 				false, 
 				null, 
-				null);
+				createEnableCheck(context.getWorkbenchContext()));
 	    InstallShowScalePlugIn myISSP = new InstallShowScalePlugIn();
 	    myISSP.initialize(context);
 	}
 	
+    public static MultiEnableCheck createEnableCheck(WorkbenchContext workbenchContext) {
+        EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
+        
+        return new MultiEnableCheck()
+                        .add(checkFactory.createAtLeastNLayersMustExistCheck(1));
+    }
     public boolean execute(PlugInContext context) throws Exception {
 	    InstallShowScalePlugIn myInstallScalePlugIn = new InstallShowScalePlugIn();
         reportNothingToUndoYet(context);

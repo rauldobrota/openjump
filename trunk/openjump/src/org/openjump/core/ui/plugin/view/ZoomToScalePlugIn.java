@@ -79,15 +79,14 @@ public class ZoomToScalePlugIn extends AbstractPlugIn{
 	        I18N.get("org.openjump.core.ui.plugin.view.ZoomToScalePlugIn.zoom-to-scale")+"{pos:9}", 
 			false, 
 			null, 
-			null);
+			createEnableCheck(context.getWorkbenchContext()));
     }
     
     public static MultiEnableCheck createEnableCheck(WorkbenchContext workbenchContext) {
         EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
         
-        return new MultiEnableCheck()
-                        .add(checkFactory.createTaskWindowMustBeActiveCheck());
-        
+        return new MultiEnableCheck()                        
+                        .add(checkFactory.createAtLeastNLayersMustExistCheck(1));
     }
     
     
