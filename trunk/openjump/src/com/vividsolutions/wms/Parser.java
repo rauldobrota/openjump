@@ -298,6 +298,7 @@ public class Parser {
       } catch (Exception e) {
         // possible NullPointerException if there is no firstChild()
         // also possible miscast causing an Exception
+          e.printStackTrace();
       }
       
       // get the supported file formats			// UT was "WMT_MS_Capabilities/Capability/Request/Map/Format"
