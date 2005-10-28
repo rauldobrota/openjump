@@ -71,20 +71,21 @@ public class SkinOptionsPanel extends JPanel implements OptionsPanel {
     private JPanel fillerPanel = new JPanel();
     private JLabel label = new JLabel();
     private Blackboard blackboard;
-    private Window window;
+    //[UT] is not used, commented out
+//    private Window window;
     private boolean modified;
 
     public SkinOptionsPanel(Blackboard blackboard, Window window) {
-        this.window = window;
+//        this.window = window;
         this.blackboard = blackboard;
-
         try {
-            jbInit();
             comboBox.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         modified = true;
                     }
                 });
+            jbInit();
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -105,11 +106,10 @@ public class SkinOptionsPanel extends JPanel implements OptionsPanel {
             new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
                 GridBagConstraints.CENTER, GridBagConstraints.NONE,
                 new Insets(10, 10, 10, 4), 0, 0));
+        
     }
 
     public void init() {
-        modified = false;
-
         DefaultComboBoxModel model = new DefaultComboBoxModel();
 
         for (Iterator i = ((Collection) blackboard.get(SKINS_KEY)).iterator();
@@ -121,13 +121,14 @@ public class SkinOptionsPanel extends JPanel implements OptionsPanel {
         comboBox.setModel(model);
         comboBox.setSelectedItem(blackboard.get(CURRENT_SKIN_KEY,
                 comboBox.getModel().getElementAt(0)));
+        modified = false;
     }
 
     public void okPressed() {
         if (!modified) {
             return;
         }
-
+        
         blackboard.put(CURRENT_SKIN_KEY, comboBox.getSelectedItem());
 
         try {
