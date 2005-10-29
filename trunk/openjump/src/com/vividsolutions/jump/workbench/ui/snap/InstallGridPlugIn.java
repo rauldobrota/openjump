@@ -57,7 +57,10 @@ public class InstallGridPlugIn extends InstallRendererPlugIn {
         super.initialize(context);
         OptionsDialog.instance(context.getWorkbenchContext().getWorkbench()).addTab(
             I18N.get("ui.snap.InstallGridPlugIn.snap-grid"),
-            new SnapOptionsPanel(context.getWorkbenchContext().getWorkbench().getBlackboard()));        
+            new SnapOptionsPanel(context.getWorkbenchContext().getWorkbench().getBlackboard()));   
+        //[sstein: 29.10.2005] added the following lines to get sure that "snap-tab" will be on top
+        int noTabs = OptionsDialog.instance(context.getWorkbenchContext().getWorkbench()).getTabbedPane().getTabCount();
+        OptionsDialog.instance(context.getWorkbenchContext().getWorkbench()).getTabbedPane().setSelectedIndex(noTabs-1);
     }
 
 }

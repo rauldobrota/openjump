@@ -172,4 +172,10 @@ public class OptionsDialog extends JDialog {
         return okCancelPanel.wasOKPressed();
     }
 
+	/**
+	 * @return Returns the tabbedPane.
+	 */
+	public JTabbedPane getTabbedPane() {
+		return tabbedPane;
+	}
 }
