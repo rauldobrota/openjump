@@ -37,6 +37,7 @@ import org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn;
 import org.openjump.core.ui.plugin.tools.ConvexHullPlugIn;
 import org.openjump.core.ui.plugin.tools.DeleteEmptyGeometriesPlugIn;
 import org.openjump.core.ui.plugin.tools.JoinWithArcPlugIn;
+import org.openjump.core.ui.plugin.tools.LineSimplifyJTS15AlgorithmPlugIn;
 import org.openjump.core.ui.plugin.tools.MeasureM_FPlugIn;
 import org.openjump.core.ui.plugin.tools.ReducePointsISAPlugIn;
 import org.openjump.core.ui.plugin.view.MapToolTipPlugIn;
@@ -152,6 +153,9 @@ public class OpenJumpConfiguration{
 		/**** GENERALIZATION ****/
 		ReducePointsISAPlugIn mySimplifyISA = new ReducePointsISAPlugIn();
 		mySimplifyISA.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		LineSimplifyJTS15AlgorithmPlugIn jtsSimplifier = new LineSimplifyJTS15AlgorithmPlugIn();
+		jtsSimplifier.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
 		/**** tools main ****/
 		
