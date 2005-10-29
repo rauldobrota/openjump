@@ -30,6 +30,7 @@ public class LoadDatasetFromFilePlugIn extends AbstractLoadDatasetPlugIn {
                 .createJFileChooserWithExistenceChecking();
         fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
         fileChooser.setMultiSelectionEnabled(true);
+        fileChooser.rescanCurrentDirectory(); //[sstein: 29.10.2005 line added]
         return loadSaveDatasetFileMixin.showDialog(fileChooser,
                 LoadFileDataSourceQueryChooser.class, context);
     }
