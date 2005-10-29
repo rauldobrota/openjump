@@ -64,6 +64,7 @@ import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
 public class JoinWithArcPlugIn extends AbstractPlugIn {
     private WorkbenchContext workbenchContext;
     
+    private final static String sJoinWithArc = I18N.get("org.openjump.core.ui.plugin.tools.JoinWithArcPlugIn.Join-With-Arc");
     private final static String sNew = I18N.get("org.openjump.core.ui.plugin.tools.JoinWithArcPlugIn.New");
     private final static String sTheArcRadius = I18N.get("org.openjump.core.ui.plugin.tools.JoinWithArcPlugIn.The-arc-radius");
     private final static String sBetween= I18N.get("org.openjump.core.ui.plugin.tools.JoinWithArcPlugIn.Between");
@@ -79,6 +80,10 @@ public class JoinWithArcPlugIn extends AbstractPlugIn {
     {     
         workbenchContext = context.getWorkbenchContext();
         context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this, new String[] { MenuNames.TOOLS, MenuNames.TOOLS_JOIN }, getName(), false, null, this.createEnableCheck(workbenchContext));
+    }
+    
+    public String getName() {
+        return sJoinWithArc;
     }
     
     public boolean execute(final PlugInContext context) throws Exception

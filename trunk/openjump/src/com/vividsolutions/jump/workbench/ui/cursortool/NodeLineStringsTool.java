@@ -14,6 +14,7 @@ import javax.swing.Icon;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.util.Block;
 import com.vividsolutions.jump.util.CollectionUtil;
@@ -46,6 +47,12 @@ public class NodeLineStringsTool extends AbstractClickSelectedLineStringsTool {
 		}
 	}
 
+    private final static String sNoIntersectionsHere = I18N.get("com.vividsolutions.jump.workbench.ui.cursortool.NodeLineStringsTool.No-intersections-here");
+    
+    public String getName() {
+        return I18N.get("com.vividsolutions.jump.workbench.ui.cursortool.NodeLineStringsTool.Node-LineStrings");
+    }
+    
 	protected void gestureFinished(Collection nearbyLineStringFeatures)
 			throws NoninvertibleTransformException {
 		Intersection intersection = closest(getModelClickPoint(),
@@ -66,7 +73,7 @@ public class NodeLineStringsTool extends AbstractClickSelectedLineStringsTool {
 							}
 						}));
 		if (intersection == null) {
-			getWorkbench().getFrame().warnUser("No intersections here");
+			getWorkbench().getFrame().warnUser(sNoIntersectionsHere);
 			return;
 		}
 		if (!intersection.layerA.isEditable()) {

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.geom.NoninvertibleTransformException;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 
 import javax.swing.Icon;
 
@@ -12,14 +11,18 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.util.CollectionUtil;
-import com.vividsolutions.jump.util.StringUtil;
 import com.vividsolutions.jump.workbench.model.Layer;
 import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 
 public class SplitLineStringTool extends AbstractClickSelectedLineStringsTool {
 
+    public String getName() {
+        return I18N.get("com.vividsolutions.jump.workbench.ui.cursortool.SplitLineStringTool.Split-LinesStrings");
+    }
+    
 	protected void gestureFinished(Collection nearbyLineStringFeatures)
 			throws NoninvertibleTransformException {
 		Feature closestFeature = closest(nearbyLineStringFeatures,

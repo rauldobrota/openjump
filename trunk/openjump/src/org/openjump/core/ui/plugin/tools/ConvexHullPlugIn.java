@@ -83,6 +83,10 @@ public class ConvexHullPlugIn extends AbstractPlugIn {
 //            this.createEnableCheck(workbenchContext));
     }
     
+    public String getName() {
+        return sConvexHull;
+    }
+
     public boolean execute(final PlugInContext context) throws Exception
     {
         reportNothingToUndoYet(context);
