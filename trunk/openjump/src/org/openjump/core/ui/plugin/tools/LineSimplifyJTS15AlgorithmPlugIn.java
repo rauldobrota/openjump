@@ -183,11 +183,11 @@ public class LineSimplifyJTS15AlgorithmPlugIn extends AbstractPlugIn implements 
 	       	if (this.geomType > 0){
 		   	    //-- update geometry --------
 		   	    if (this.geomType == 1){	//linestring
-		   	    	resultgeom = DouglasPeuckerSimplifier.simplify(line, maxDisp);
+		   	    	resultgeom = DouglasPeuckerSimplifier.simplify(line, Math.abs(maxDisp));
 		   	    }
 		   	    else if (this.geomType == 2){ //polygon
 		   	    	//poly = (Polygon)geom.clone();
-		   	    	resultgeom = TopologyPreservingSimplifier.simplify(poly, maxDisp);
+		   	    	resultgeom = TopologyPreservingSimplifier.simplify(poly, Math.abs(maxDisp));
 		   	    }	   	     
 			    String mytext = sItem + ": " + count + " / " + noItems + " : " + sSimplificationFinalized;
 			    //context.getWorkbenchFrame().setStatusMessage(mytext);
