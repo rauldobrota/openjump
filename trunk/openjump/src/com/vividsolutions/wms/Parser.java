@@ -42,6 +42,7 @@ package com.vividsolutions.wms;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.LinkedList;
 // For the ArrayList [uwe dalluege]
 import java.util.*;
@@ -283,11 +284,15 @@ public class Parser {
       Document doc;
       
       try {
-        DOMParser parser = new DOMParser();
-        parser.setFeature( "http://xml.org/sax/features/validation", false );
-        parser.parse( new InputSource( inStream ) );
-        doc = parser.getDocument();
-//XMLTools.printNode( doc, "" );
+          DOMParser parser = new DOMParser();
+          parser.setFeature( "http://xml.org/sax/features/validation", false );
+          //was throwing java.io.UTFDataFormatException: Invalid byte 2 of 3-byte UTF-8 sequence.
+//          parser.parse( new InputSource( inStream ) );
+          
+          InputStreamReader ireader = new InputStreamReader( inStream );
+          
+          parser.parse( new InputSource( ireader ) );
+          doc = parser.getDocument();
       } catch( SAXException saxe ) {
         throw new IOException( saxe.toString() );
       }
