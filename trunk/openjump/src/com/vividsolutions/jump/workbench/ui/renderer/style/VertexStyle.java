@@ -35,10 +35,9 @@ package com.vividsolutions.jump.workbench.ui.renderer.style;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.RectangularShape;
-
-import javax.swing.Icon;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.util.Assert;
@@ -49,12 +48,21 @@ import com.vividsolutions.jump.workbench.ui.Viewport;
 
 
 public abstract class VertexStyle implements Style {
-    protected RectangularShape shape;
+    //UT
+    //protected RectangularShape shape;
+    protected Shape shape;
+    
     protected int size = 4;
     private Color fillColor;
     private boolean enabled = false;
+    
+    //UT
+    private Color strokeColor;
 
-    protected VertexStyle(RectangularShape shape) {
+    protected VertexStyle(){}
+    
+    //UT made RectangularShape shape a Shape 
+    protected VertexStyle(Shape shape) {
         this.shape = shape;
     }
 
@@ -76,8 +84,11 @@ public abstract class VertexStyle implements Style {
 
     public void initialize(Layer layer) {
         //Set the vertices' fill color to the layer's line color
-        fillColor = GUIUtil.alphaColor(layer.getBasicStyle().getLineColor(),
+        fillColor = GUIUtil.alphaColor(layer.getBasicStyle().getFillColor(),
                 layer.getBasicStyle().getAlpha());
+        strokeColor = GUIUtil.alphaColor(layer.getBasicStyle().getLineColor(),
+            layer.getBasicStyle().getAlpha());
+
     }
 
     public void paint(Feature f, Graphics2D g, Viewport viewport)
@@ -102,11 +113,21 @@ public abstract class VertexStyle implements Style {
     }
 
     private void setFrame(Point2D p) {
-        shape.setFrame(p.getX() - (getSize() / 2d),
+        //UT
+        /*shape.setFrame(p.getX() - (getSize() / 2d),
+            p.getY() - (getSize() / 2d), getSize(), getSize());*/
+        ((RectangularShape)shape).setFrame(p.getX() - (getSize() / 2d),
             p.getY() - (getSize() / 2d), getSize(), getSize());
     }
 
     protected void render(Graphics2D g) {
+        //UT was
+//        g.fill(shape);
+        
+        // deeJUMP
+        g.setColor(strokeColor);
+   	 	g.draw(shape);
+   	 	g.setColor(fillColor);
         g.fill(shape);
     }
 
