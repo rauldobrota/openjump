@@ -78,10 +78,10 @@ public class URLWizardPanel extends JPanel implements WizardPanel {
     
     public URLWizardPanel(String initialURL, String wmsVersion) {
         try {
+            this.wmsVersion = wmsVersion;
             jbInit();
             urlTextField.setFont(new JLabel().getFont());
             urlTextField.setText(initialURL);
-            this.wmsVersion = wmsVersion;
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -239,7 +239,7 @@ public class URLWizardPanel extends JPanel implements WizardPanel {
             p.add(buttons[i]);
             //click the last one
             if ( versions[i].equals( wmsVersion ) ){
-                group.setSelected( buttons[ buttons.length - 1 ].getModel(), true);                        
+                buttons[i].setSelected( true );
             }
         }
         
