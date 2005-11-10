@@ -223,17 +223,7 @@ public class ShowFullPathPlugIn extends AbstractPlugIn
 //    
     public boolean execute(PlugInContext context) throws Exception
     {
-        try
-        {
-            return true;
-        }
-        catch (Exception e)
-        {
-            context.getWorkbenchFrame().warnUser(sErrorSeeOutputWindow);
-            context.getWorkbenchFrame().getOutputFrame().createNewDocument();
-            context.getWorkbenchFrame().getOutputFrame().addText("ShowFullPathPlugIn Exception:" + e.toString());
-            return false;
-        }
+        return true;
     }
     
 }
