@@ -68,7 +68,8 @@ public class ZoomToScalePlugIn extends AbstractPlugIn{
     int scale = 0;
     double oldHorizontalScale = 0; // is calculated for panel-width (not heigth!!)
     double modelWidth = 0;
-    double panelWidth = 0; 
+    double panelWidth = 0;
+    String text =I18N.get("org.openjump.core.ui.plugin.view.ZoomToScalePlugIn.set-new-scale-to-zoom") + ":  1 : ";
 
     public void initialize(PlugInContext context) throws Exception {
     	
@@ -130,12 +131,11 @@ public class ZoomToScalePlugIn extends AbstractPlugIn{
         //dialog.addLabel("actual scale in horizontal direction: " + (int)this.oldHorizontalScale);
         dialog.addLabel(I18N.get("org.openjump.core.ui.plugin.view.ZoomToScalePlugIn.actual-scale-in-horizontal-direction") + " 1 : " +(int)this.oldHorizontalScale);
 	    //dialog.addLabel("set new scale to zoom:");
-	    String text =I18N.get("org.openjump.core.ui.plugin.view.ZoomToScalePlugIn.set-new-scale-to-zoom") + ":  1 : ";
 	    dialog.addIntegerField(text, 25000, 7,text);	    
 	  }
 
 	private void getDialogValues(MultiInputDialog dialog) {
-	    this.scale = dialog.getInteger(T1);    	    
+	    this.scale = dialog.getInteger(text);    	    
 	  }
     
 }
