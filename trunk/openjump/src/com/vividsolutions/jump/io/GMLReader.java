@@ -988,7 +988,7 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
                     coord.x = Double.parseDouble(numb);
                 } else if (dim == 1) {
                     coord.y = Double.parseDouble(numb);
-                } else if (dim == 3) {
+                } else if (dim == 2) { //[UT] 17.11.2005 was dim == 3, changed to dim == 2
                     coord.z = Double.parseDouble(numb);
                 }
 
