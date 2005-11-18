@@ -27,7 +27,8 @@
  */
 /*****************************************************
  * created:  		19.05.2005
- * last modified:  	21.05.2005 (copy only one item in new layer)					
+ * last modified:  	21.05.2005 (copy only one item in new layer)
+ * 					18.11.2005 do deep copy (clone)					
  * 
  * @author sstein
  * 
@@ -165,7 +166,7 @@ public class ReplicateSelectedItemsPlugIn extends AbstractPlugIn implements Thre
 	    		i++;
 	    		fi = (Feature)iter.next();
 	    	    if(fschema.equals(fi.getSchema())){ 
-					actualLayerFeatures.add(fi);
+					actualLayerFeatures.add((Feature)fi.clone());
 	    		}
 	    	    else{
 	    	    	context.getWorkbenchFrame().setStatusMessage(
@@ -175,7 +176,7 @@ public class ReplicateSelectedItemsPlugIn extends AbstractPlugIn implements Thre
 	    	    		hasBeenCalled = true;
 	    	    	}
 	    	    	if (this.copyAsGeometry == true){
-	    	    		Geometry geom = fi.getGeometry();
+	    	    		Geometry geom = (Geometry)fi.getGeometry().clone();
 	    	    		Feature newFeature = FeatureUtil.toFeature(geom, fschema);
 	    	    		actualLayerFeatures.add(newFeature);
 	    	    	}
@@ -187,14 +188,14 @@ public class ReplicateSelectedItemsPlugIn extends AbstractPlugIn implements Thre
 	    	Iterator iter = features.iterator();
 	    	Feature f = (Feature)iter.next();
     	    FeatureCollection myCollA = new FeatureDataset(f.getSchema());
-    	    myCollA.add(f);
+    	    myCollA.add((Feature)f.clone()); //copy first Item
 	    	Feature fi = null;
 	    	int i=1;
 	    	while (iter.hasNext()){
 	    		i++;
 	    		fi = (Feature)iter.next();
 	    	    if(f.getSchema().equals(fi.getSchema())){ 
-					myCollA.add(fi);
+					myCollA.add((Feature)fi.clone());
 	    		}
 	    	    else{
 	    	    	context.getWorkbenchFrame().setStatusMessage(
@@ -204,7 +205,7 @@ public class ReplicateSelectedItemsPlugIn extends AbstractPlugIn implements Thre
 	    	    		hasBeenCalled = true;
 	    	    	}
 	    	    	if (this.copyAsGeometry == true){
-	    	    		Geometry geom = fi.getGeometry();
+	    	    		Geometry geom = (Geometry)fi.getGeometry().clone();
 	    	    		Feature newFeature = FeatureUtil.toFeature(geom, f.getSchema());
 	    	    		myCollA.add(newFeature);
 	    	    	}	    	    	
