@@ -25,6 +25,7 @@ import org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedLineStringPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedPolygonPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.RotateSelectedItemPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.SelectOneItemPlugIn;
+import org.openjump.core.ui.plugin.edittoolbox.DrawCircleWithGivenRadiusPlugIn;
 import org.openjump.core.ui.plugin.file.SaveImageAsSVGPlugIn;
 import org.openjump.core.ui.plugin.layer.AddSIDLayerPlugIn;
 import org.openjump.core.ui.plugin.layer.ToggleVisiblityPlugIn;
@@ -35,6 +36,7 @@ import org.openjump.core.ui.plugin.mousemenu.SaveDatasetsPlugIn;
 import org.openjump.core.ui.plugin.queries.SimpleQueryPlugIn;
 import org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn;
 import org.openjump.core.ui.plugin.tools.ConvexHullPlugIn;
+import org.openjump.core.ui.plugin.tools.CreateCircleWithGivenRadiusPlugIn;
 import org.openjump.core.ui.plugin.tools.DeleteEmptyGeometriesPlugIn;
 import org.openjump.core.ui.plugin.tools.JoinWithArcPlugIn;
 import org.openjump.core.ui.plugin.tools.LineSimplifyJTS15AlgorithmPlugIn;
@@ -134,6 +136,11 @@ public class OpenJumpConfiguration{
 		 *  menu TOOLS
 		 **********************/
 		
+		/**** GENERATE ****/
+		//-- [sstein] test : not commited 
+		//CreateCircleWithGivenRadiusPlugIn myCircleRadiusPlugin = new CreateCircleWithGivenRadiusPlugIn();
+		//myCircleRadiusPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
 		/**** QUERY ****/
 		SimpleQueryPlugIn mySimpleQueryPlugIn = new SimpleQueryPlugIn();
 		mySimpleQueryPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
@@ -222,5 +229,9 @@ public class OpenJumpConfiguration{
 		
 		SelectOneItemPlugIn mySelectOnePlugin= new SelectOneItemPlugIn();
 		mySelectOnePlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		DrawCircleWithGivenRadiusPlugIn drawCirclePlugin = new DrawCircleWithGivenRadiusPlugIn();
+		drawCirclePlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+			
 	}
 }
