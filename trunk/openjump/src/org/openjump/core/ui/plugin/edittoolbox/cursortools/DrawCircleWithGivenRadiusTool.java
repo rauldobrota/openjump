@@ -76,6 +76,7 @@ import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanelContext;
 import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
 import com.vividsolutions.jump.workbench.ui.WorkbenchFrame;
+import com.vividsolutions.jump.workbench.ui.cursortool.AbstractCursorTool;
 import com.vividsolutions.jump.workbench.ui.cursortool.CursorTool;
 import com.vividsolutions.jump.workbench.ui.cursortool.DragTool;
 import com.vividsolutions.jump.workbench.ui.cursortool.MultiClickTool;
@@ -97,6 +98,7 @@ public class DrawCircleWithGivenRadiusTool extends NClickTool{
     private double radius= 50.0; //in m
     private Point mp = null;
     private int points = 8;
+    private double tolerance = 0.1;
     private int deactivateCount=0;	
 	//private String T1 = "Circle Radius";
 	private String T1 = I18N.get("org.openjump.core.ui.plugin.edittoolbox.cursortools.DrawCircleWithGivenRadiusTool.Cirlce-Radius") + ":";
@@ -105,7 +107,10 @@ public class DrawCircleWithGivenRadiusTool extends NClickTool{
 	//private String name = "Draw circle with given radius and center.";
 	private String name = I18N.get("org.openjump.core.ui.plugin.edittoolbox.cursortools.DrawCircleWithGivenRadiusTool.Draw-circle-with-given-radius-and-center");
 	//private String sidebarstring = "Draws a circle by specifiying the radius, the number of segments per circle quarter and the center position by mouse click";
-	private String sidebarstring = I18N.get("org.openjump.core.ui.plugin.edittoolbox.cursortools.DrawCircleWithGivenRadiusTool.Draws-a-circle-by-specifiying-the-radius-the-number-of-segments-per-circle-quarter-and-the-centre-position-by-mouse-click");
+	//private String sidebarstring = I18N.get("org.openjump.core.ui.plugin.edittoolbox.cursortools.DrawCircleWithGivenRadiusTool.Draws-a-circle-by-specifiying-the-radius-the-number-of-segments-per-circle-quarter-and-the-centre-position-by-mouse-click");
+	private String sidebarstring = I18N.get("org.openjump.core.ui.plugin.edittoolbox.cursortools.DrawCircleWithGivenRadiusTool.Draws-a-circle-by-specifiying-the-radius-and-the-circle-accuracy-and-the-centre-position-by-mouse-click");
+	private String sAccuracy = I18N.get("org.openjump.core.ui.plugin.edittoolbox.cursortools.DrawCircleWithGivenRadiusTool.Circle-Accuracy");
+	private String sReset = I18N.get("org.openjump.core.ui.plugin.edittoolbox.cursortools.DrawCircleWithGivenRadiusTool.too-small-tolerance-reset-to-300-segments");
 	    
 	private DrawCircleWithGivenRadiusTool(FeatureDrawingUtil featureDrawingUtil) {
 		super(1);
@@ -135,7 +140,22 @@ public class DrawCircleWithGivenRadiusTool extends NClickTool{
         
     	Point p = new GeometryFactory().createPoint(this.getModelDestination());
     	this.mp = p;
-    	Geometry circle = BufferOp.bufferOp(p,this.radius,this.points);
+    	//-- calculate number of points per quarter
+    	double tmp = Math.acos((this.radius-this.tolerance)/this.radius);
+    	if (tmp != 0){
+    		int pts = (int)Math.floor((Math.PI/tmp)/4.0);
+    		if(pts < 3){
+    			pts = 3;
+    		}
+    		if(pts > 300){
+    			pts = 300;
+    			AbstractCursorTool.workbenchFrame(this.getPanel()).warnUser(sReset);
+    		}
+    		this.points=pts;
+    	}    	 
+    	//-------------------
+    													//points-1 = segments
+    	Geometry circle = BufferOp.bufferOp(p,this.radius,this.points-1);
     	this.checkCircle(circle);
     	
     	if (circle instanceof Polygon){ 
@@ -233,7 +253,7 @@ public class DrawCircleWithGivenRadiusTool extends NClickTool{
 	 * @param middlePoint coordinates of the circle
 	 */
     private void calcuateCircle(Coordinate middlePoint, LayerViewPanel panel){
-        //--calcualte circle;
+        //--calculate circle;
     	Point p = new GeometryFactory().createPoint(middlePoint);
     	this.mp = p;
     	Geometry buffer = p.buffer(this.radius);   	
@@ -245,7 +265,7 @@ public class DrawCircleWithGivenRadiusTool extends NClickTool{
     		this.selectedFeaturesShape = panel.getJava2DConverter().toShape(gc);
     	}
     	catch(NoninvertibleTransformException e){
-    		System.out.println("SelectItemsByCircleTool:Exception " + e);
+    		System.out.println("DrawCircleWithGivenRadiusTool:Exception " + e);
     	}
     }
  
@@ -265,12 +285,13 @@ public class DrawCircleWithGivenRadiusTool extends NClickTool{
 	  {    	
 	    dialog.setSideBarDescription(this.sidebarstring);
 	    dialog.addDoubleField(T1,this.radius,7,T1); 
-	    dialog.addIntegerField(T2,this.points, 8,T2);
+	    dialog.addDoubleField(this.sAccuracy,this.tolerance, 7,this.sAccuracy);
 	  }
 
 	private void getDialogValues(MultiInputDialog dialog) {
 	    this.radius = dialog.getDouble(T1);
-	    this.points = dialog.getInteger(T2); 
+	    this.tolerance = dialog.getDouble(this.sAccuracy); 
+	    System.out.println("blub");
 	  }
 	
     //----------- from drag tool ------------//
