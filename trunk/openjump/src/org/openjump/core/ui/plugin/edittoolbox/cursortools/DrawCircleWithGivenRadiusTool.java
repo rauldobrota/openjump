@@ -291,7 +291,6 @@ public class DrawCircleWithGivenRadiusTool extends NClickTool{
 	private void getDialogValues(MultiInputDialog dialog) {
 	    this.radius = dialog.getDouble(T1);
 	    this.tolerance = dialog.getDouble(this.sAccuracy); 
-	    System.out.println("blub");
 	  }
 	
     //----------- from drag tool ------------//
