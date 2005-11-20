@@ -93,7 +93,6 @@ public class DrawCircleWithGivenRadiusTool extends NClickTool{
     private FeatureDrawingUtil featureDrawingUtil;    
     private Shape selectedFeaturesShape;
     private GeometryFactory geometryFactory = new GeometryFactory();
-    private List verticesToSnap = null;
     private boolean valuesWereSet = false;
     private double radius= 50.0; //in m
     private Point mp = null;
