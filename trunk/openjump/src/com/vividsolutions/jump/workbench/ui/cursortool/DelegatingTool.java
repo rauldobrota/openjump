@@ -28,6 +28,8 @@
  *
  * (250)385-6040
  * www.vividsolutions.com
+ *
+ * modified by ISA
  */
 
 package com.vividsolutions.jump.workbench.ui.cursortool;
@@ -62,9 +64,9 @@ public abstract class DelegatingTool implements CursorTool {
             return;
         }
 
-        if (active) {
-            this.delegate.deactivate();
-        }
+//        if (active) {
+//            this.delegate.deactivate();
+//        }
 
         this.delegate = delegate;
 

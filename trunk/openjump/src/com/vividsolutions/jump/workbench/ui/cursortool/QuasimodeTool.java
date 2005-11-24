@@ -28,6 +28,8 @@
  *
  * (250)385-6040
  * www.vividsolutions.com
+ *
+ * modified by ISA
  */
 package com.vividsolutions.jump.workbench.ui.cursortool;
 
@@ -57,6 +59,9 @@ import javax.swing.SwingUtilities;
  */
 public class QuasimodeTool extends DelegatingTool {
 
+    private boolean altKeyDown = false;
+    private boolean mouseDown = false;
+    
     //Sometimes when I try to use the Alt quasimode, the cursor becomes the default
     //cursor (arrow) and stays that way. This seems to have been fixed in JDK 1.4,
     //in which the default cursor stays only for a split second. [Jon Aquino]
@@ -99,19 +104,27 @@ public class QuasimodeTool extends DelegatingTool {
         }
 
         private void keyStateChanged(KeyEvent e) {
+            altKeyDown = e.isAltDown();
             setTool(e);
         }
     };
 
     private void setTool(KeyEvent e) {
-        cursor = getTool(e).getCursor();
-        panel.setCursor(cursor);
-        currentKeyEvent = e;
-        if (getDelegate().isGestureInProgress()
-            && getDelegate() != getTool(e)
-            && getDelegate() != getDefaultTool()) {
-            setDelegate(getDefaultTool());
+        if (!mouseDown)
+        {
+            cursor = getTool(e).getCursor();
+            panel.setCursor(cursor);
+            currentKeyEvent = e;
+            setDelegate(getTool(e));
         }
+        
+//        if the following code is used then the tool gets set during the mouse pressed event
+//        if (getDelegate().isGestureInProgress()
+//            && getDelegate() != getTool(e)
+//            && getDelegate() != getDefaultTool()) 
+//        {
+//            setDelegate(getDefaultTool());
+//        }
     }
 
     private KeyEvent currentKeyEvent = null;
@@ -149,14 +162,23 @@ public class QuasimodeTool extends DelegatingTool {
     }
 
     public void mousePressed(MouseEvent e) {
-        setDelegate(currentKeyEvent != null ? getTool(currentKeyEvent) : getDefaultTool());
+//        setDelegate(currentKeyEvent != null ? getTool(currentKeyEvent) : getDefaultTool());
         super.mousePressed(e);
+        mouseDown = true;
+    }
+
+    public void mouseReleased(MouseEvent e) {
+        super.mouseReleased(e);
+        mouseDown = false;
     }
 
     public void deactivate() {
-        super.deactivate();
-        if (frame != null) {
-            frame.removeEasyKeyListener(keyListener);
+        if (!altKeyDown)
+        {
+            super.deactivate();
+            if (frame != null) {
+                frame.removeEasyKeyListener(keyListener);
+            }
         }
     }
 
