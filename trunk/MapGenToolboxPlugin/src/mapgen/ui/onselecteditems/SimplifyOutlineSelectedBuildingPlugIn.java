@@ -1,8 +1,8 @@
 
 /*****************************************************
  * created:  		07.06.2005
- * last modified:  	
- * 
+ * last modified:  	21.11.2005
+ * 					24.11.2005 feature cloning added
  * @author sstein
  * 
  * description:
@@ -12,10 +12,15 @@
 package mapgen.ui.onselecteditems;
 
 
-import ch.unizh.geo.agents.goals.BuildingGoals;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
 import mapgen.algorithms.polygons.BuildingOutlineSimplify;
 import mapgen.constraints.buildings.BuildingLocalWidth;
 import mapgen.constraints.buildings.BuildingShortestEdge;
+import ch.unizh.geo.agents.goals.BuildingGoals;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
@@ -28,23 +33,17 @@ import com.vividsolutions.jump.feature.FeatureDatasetFactory;
 import com.vividsolutions.jump.feature.FeatureSchema;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
+import com.vividsolutions.jump.workbench.model.Layer;
+import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.ThreadedPlugIn;
-import com.vividsolutions.jump.workbench.ui.EditTransaction;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
-import com.vividsolutions.jump.workbench.ui.zoom.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import com.vividsolutions.jump.workbench.model.Layer;
-import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
-import java.util.Collection;
+import com.vividsolutions.jump.workbench.ui.zoom.ZoomToSelectedItemsPlugIn;
 
 /**
  * @description:
@@ -157,7 +156,9 @@ public class SimplifyOutlineSelectedBuildingPlugIn extends AbstractPlugIn implem
 	    //--get single object in selection to analyse
       	for (Iterator iter = features.iterator(); iter.hasNext();) {
       		count++;
-      		Feature f = (Feature)iter.next();
+      		Feature ft = (Feature)iter.next();
+      		//[sstein - 23.11.2005] line added to avoid that original features get changed
+      		Feature f= (Feature)ft.clone(); 
       		System.out.println("========== Item featureID: " + f.getID() + " ==========");      		
       		
       		//-- set schema by using the first selected item
@@ -257,12 +258,22 @@ public class SimplifyOutlineSelectedBuildingPlugIn extends AbstractPlugIn implem
 			           	        tosolve = false;
 			           	        context.getWorkbenchFrame().warnUser("stopped at step: " + j);
 			           	    }
+			           	    //--eventually check also if all edges are too short (this.hasAllEdgesTooShort)
 			           	    if(bosimplify.isAlreadySimple() == true){
 			           	        tosolve = false;
 			           	    }		
-			           	    //-- stop if only one not solveable conflicts appears 
-			           	    //   to avoid unnecessary loop till end   
+			           	    //-- stop if only one not solveable conflict appears 
+			           	    //   to avoid unnecessary loop till end
+			           	    //   but try one more time
 			           	    if(problems && (conflicts.measure.getConflicList().size() == 1 )){
+			           	    	//-- the last try
+			           	    	bosimplify = new BuildingOutlineSimplify(poly,
+	        							conflicts.measure.getConflicList());
+			           	    	poly = bosimplify.getOutPolygon();
+			           	    	conflicts = new BuildingShortestEdge(poly, 
+				           			    goals.getShortestEdgeReal(), goals.getShortestEdgeFlexibility());
+			           	    	j++;
+			           	    	//--
 			           	        tosolve = false;
 			           	        context.getWorkbenchFrame().warnUser("stopped at step: " + j);
 			           	    }
