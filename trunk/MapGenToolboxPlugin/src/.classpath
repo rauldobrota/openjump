@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="/MapGenLib/snakesalgos.jar"/>
 	<classpathentry kind="lib" path="C:/programme/Jump/jump113RC6.jar"/>
 	<classpathentry kind="lib" path="C:/programme/jumpi18/jump-i18n-1.1.2-rc1.jar"/>
+	<classpathentry kind="lib" path="/MapGenLib/bdgoutlinesimplify.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
