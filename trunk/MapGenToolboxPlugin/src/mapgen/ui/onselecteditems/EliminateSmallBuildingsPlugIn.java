@@ -187,7 +187,7 @@ public class EliminateSmallBuildingsPlugIn extends AbstractPlugIn implements Thr
 	           	PolygonMinimalArea pma = new PolygonMinimalArea(poly,goals.getMinAreaReal(),goals.getMinAreaFlexibility());
 	           	//---
 	            if(pma.isfullfilled() == false){	           		
-		           	context.getWorkbenchFrame().setStatusMessage("to small bldg id: " + f.getID());
+		           	context.getWorkbenchFrame().setStatusMessage("to small bldg id: " + ft.getID());
 		           	eliminated++;
 	            }
 	           	else{//if area is larger as necessary or within tolerance 

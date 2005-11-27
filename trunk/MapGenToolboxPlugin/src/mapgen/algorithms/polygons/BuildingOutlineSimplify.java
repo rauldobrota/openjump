@@ -3,7 +3,8 @@
  * last modified: 	21.07.2005 : handle for conftype=1 and edgePos = 2 change of last point
  * 					23.11.2005 : outPoly=inPoly(clone) for second constructor to avoid errors if not calculating anything 
  * 								 confType 6 and PolyRingIndex introduced, clone of inPoly    
- * 
+ * 					26.11.2005 : different improvements
+ * 			
  * author:			sstein
  * 
  * description:
@@ -20,10 +21,9 @@ import java.util.Iterator;
 
 import mapgen.geomutilities.LineIntersection;
 import mapgen.geomutilities.ModifyPolygonPoints;
+import mapgen.geomutilities.TangentAngleFunction;
 import mapgen.measures.supportclasses.ShortEdgeConflict;
 import mapgen.measures.supportclasses.ShortEdgeConflictList;
-
-import ch.unizh.geo.geomutilities.TangentAngleFunction;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
@@ -112,17 +112,6 @@ public class BuildingOutlineSimplify {
 	        //-- get smallest conflict        
 	        ShortEdgeConflict sec = unsolvedConflicts.getStrongestConflict();	        
 	        int index = unsolvedConflicts.getShortestEdgeConflictListIndex();
-	        /***************************
-	         *  detect edge configuration
-	         *  	confType = 1 : stair shape 
-	         * 		confType = 2 : u-turn shape
-	         *		confType = 3 : perpendicular shape
-	         * 		confType = 4 : semi acute angle (spitzer winkel?)  
-	         * 		confType = 5 : stair shape but with flat angle middle part
-	         * 		confType = 6 : a straight element (start or end point have curvature ~0)
-	         * 		confType = 7 : other type : angle to far away from 0°, 90°, 180°
-	         * 					   this might be necessary for round buildings	  
-	         ***************************/
 	        int confType = 0;
 	        //-- detect edge configuration using the TWF
 	        int edgePos = 0;	
@@ -221,7 +210,18 @@ public class BuildingOutlineSimplify {
 						}
 					}					
 	        	idx=idx+1;
-			}//end check of adjacent problem edges	        
+			}//end check of adjacent problem edges
+	        /***************************
+	         *  detect edge configuration
+	         *  	confType = 1 : stair shape 
+	         * 		confType = 2 : u-turn shape
+	         *		confType = 3 : perpendicular shape
+	         * 		confType = 4 : semi acute angle (spitzer winkel?)  
+	         * 		confType = 5 : stair shape but with flat angle middle part
+	         * 		confType = 6 : a straight element (start or end point have curvature ~0)
+	         * 		confType = 7 : other type : angle to far away from 0°, 90°, 180°
+	         * 					   this might be necessary for round buildings	  
+	         ***************************/	        
 			//----------------------
 			//  set edge config type
 			//----------------------
@@ -243,7 +243,7 @@ public class BuildingOutlineSimplify {
         	}
         	//-- set at the end since the rest uses excluding "else if()"
         	double curv=curvValues[sec.edgeStartPtIdx];
-        	if((confType == 1 ) && (Math.abs(curvValues[sec.edgeStartPtIdx]) < Math.PI/4)){
+        	if((confType == 1 ) && (Math.abs(curvValues[sec.edgeStartPtIdx]) < (70*Math.PI/180))){
         		confType = 5; // flat stair 
         	}
         	if((Math.abs(curvValues[sec.edgeStartPtIdx]) < this.flexInRad) ||
@@ -344,7 +344,12 @@ public class BuildingOutlineSimplify {
             this.setRingCoordinate(idxE.getNext(),ls0,x2,y2);
             //-- delete points
             newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxE.i);
-            newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxS.i);
+            if (idxE.i != ls0.getNumPoints()-1){
+            	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxS.i);
+            }
+            else{//since point E has been deleted, the index of last point has changed 
+            	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxS.i-1);
+            }
         	this.couldNotSolve = false;
     	}
     	else if ((confType==1) && (neighbourConflict!=-1)){
@@ -419,7 +424,7 @@ public class BuildingOutlineSimplify {
 	        				// later in a second loop        				
 	        			}
 	        			catch(Exception e){
-	        				System.out.println("BuildingOutlineSimplify.deleteEdge: cant calc intersection for confType=3 edgePos= 2");
+	        				System.out.println("BuildingOutlineSimplify.deleteEdge: cant calc intersection for confType=1");
 	        			}      				
 	    				this.couldNotSolve = false;
     				}
@@ -434,7 +439,12 @@ public class BuildingOutlineSimplify {
     					//-- lines are nearly parallel: delete the edge: hopefully the rest is 
     					//   solved in a later iteration using confType=7 
         				newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxE.i);
-        				newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxS.i);
+        	            if (idxE.i != ls0.getNumPoints()-1){
+        	            	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxS.i);
+        	            }
+        	            else{//since point E has been deleted, the index of last point has changed 
+        	            	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxS.i-1);
+        	            }
     					this.couldNotSolve = false;
     				}
     				else if(Math.abs(kappa-0) < this.flexInRad){
@@ -472,7 +482,12 @@ public class BuildingOutlineSimplify {
         		            this.setRingCoordinate(idxE.getNext(),ls0,x2,y2);
         		            //-- delete points
         		            newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxE.i);
-        		            newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxS.i);
+        		            if (idxE.i != ls0.getNumPoints()-1){
+        		            	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxS.i);
+        		            }
+        		            else{//since point E has been deleted, the index of last point has changed 
+        		            	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxS.i-1);
+        		            }
         		        	this.couldNotSolve = false;
         				}    					
     				}
@@ -499,10 +514,9 @@ public class BuildingOutlineSimplify {
     				LineIntersection lint = LineIntersection.intersectionPoint(coord0, coord1, coord2, coord3);
     				Coordinate intersection = lint.getCoordinate();
     				//-- assign coordinates to first point = idx1
-    				coord1.x = intersection.x;
-    				coord1.y = intersection.y;
+    				this.setRingCoordinate(idxS.i,ls0,intersection.x,intersection.y);
     				//-- and delete second point   				
-    				newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idx2);
+    				newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxE.i);
     			}
     			catch(Exception e){
     				System.out.println("BuildingOutlineSimplify.deleteEdge: cant calc intersection for confType=3 edgePos= 2");
@@ -550,12 +564,22 @@ public class BuildingOutlineSimplify {
 			//--	d1: previous edge, d2: subsequent edge
     		double d1 = 0; double d2 = 0;
    			d1 = distances[idxS.getPrevious()];
-			d2 = distances[idxE.i];
+   			if (idxE.i != ls0.getNumPoints()-1){
+   				d2 = distances[idxE.i];
+   			}
+   			else{
+   				d2 = distances[0];
+   			}
     		double edgediff = Math.abs(d1-d2); 
     		if(edgediff < lengthTreshold){ 
 			    	//-- attention: delete point with higher index first
 			    	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxE.i);		    	
-			    	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxS.i);
+		            if (idxE.i != ls0.getNumPoints()-1){
+		            	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxS.i);
+		            }
+		            else{//since point E has been deleted, the index of last point has changed 
+		            	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxS.i-1);
+		            }
 			    	this.couldNotSolve = false;
 	    	}
     		// half u-turn : previous side is longer   		
@@ -570,18 +594,23 @@ public class BuildingOutlineSimplify {
 	    				LineIntersection lint = LineIntersection.intersectionPoint(coord0, coord1, coord2, coord3);
 	    				Coordinate intersection = lint.getCoordinate();
 	    				//-- assign coordinates to first point = idx1
-	    				coord1.x = intersection.x;
-	    				coord1.y = intersection.y;
+	    				this.setRingCoordinate(idxS.i,ls0,intersection.x,intersection.y);
 	    			}
 	    			catch(Exception e){
 	    				System.out.println("BuildingOutlineSimplify.deleteEdge: cant calc intersection for confType=2b edgePos= 2");
 	    			}    				    			
 			    	//-- attention: delete point with higher index first
-			    	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxE.getNext());		    	
-			    	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxE.i);
+			    	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxE.getNext());
+			    	//-- is the following point elimination necessary?
+		            if (idxE.getNext() != ls0.getNumPoints()-1){
+		            	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxE.i);
+		            }
+		            else{//since point E has been deleted, the index of last point has changed 
+		            	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxE.i-1);
+		            }			    	
 			    	this.couldNotSolve = false;
     		}
-    		else if(d2 > d1){
+    		else if(d2 > d1){//second side is longer   	
     			Coordinate coord0=null; Coordinate coord1=null;
     			Coordinate coord2=null; Coordinate coord3=null;
 	    			//-- calc intersection point 
@@ -594,15 +623,24 @@ public class BuildingOutlineSimplify {
     				LineIntersection lint = LineIntersection.intersectionPoint(coord0, coord1, coord2, coord3);
     				Coordinate intersection = lint.getCoordinate();
     				//-- assign coordinates to first point = idx1
-    				coord1.x = intersection.x;
-    				coord1.y = intersection.y;
+    				this.setRingCoordinate(idxS.i,ls0,intersection.x,intersection.y);
     			}
     			catch(Exception e){
     				System.out.println("BuildingOutlineSimplify.deleteEdge: cant calc intersection for confType=2c");
-    			}    				    			
+    			}    			
 		    	//-- attention: delete point with higher index first
-		    	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxE.i);		    	
-		    	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxS.i);
+		    	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxE.i);
+		    	/*[sstein 27.11.2005] the following could be  commented out since it is not 
+		    	 * necessary for inner(concav) u-turns
+		    	 * the still existing point S.getPrevious() will be deleted later by confType 6
+		    	 * */
+	            if (idxE.i != ls0.getNumPoints()-1){
+	            	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxS.getPrevious());
+	            }
+	            else{//since point last point has been deleted, the index of last point has changed 
+	            	newP = ModifyPolygonPoints.deletePoint(newP,sec.edgeRingIdx, idxS.getPrevious()-1);
+	            }
+	            
 		    	this.couldNotSolve = false;	    				    		
     		}
     		else{// distances[idx2] < = > distances[idx1-1]

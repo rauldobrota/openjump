@@ -159,7 +159,7 @@ public class SimplifyOutlineSelectedBuildingPlugIn extends AbstractPlugIn implem
       		Feature ft = (Feature)iter.next();
       		//[sstein - 23.11.2005] line added to avoid that original features get changed
       		Feature f= (Feature)ft.clone(); 
-      		System.out.println("========== Item featureID: " + f.getID() + " ==========");      		
+      		System.out.println("========== Item featureID: " + ft.getID() + " ==========");      		
       		
       		//-- set schema by using the first selected item
       		//check if attribute name exists
