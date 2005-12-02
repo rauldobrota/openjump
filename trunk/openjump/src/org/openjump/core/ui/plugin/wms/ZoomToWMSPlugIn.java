@@ -17,7 +17,7 @@
  * 22297 Hamburg Germany Tel.: +49 40 42875 - 5335 oder 5353 oder 5313 Fax: +49 40 42875 - 5409
  * E-Mail: uwe.dalluege@rzcn.haw-hamburg.de Url: http://www.haw-hamburg.de/geomatik
  * 
- * Last change: 14.09.2005
+ * Last change: 29.11.2005
  */
 package org.openjump.core.ui.plugin.wms;
 
@@ -38,7 +38,8 @@ import com.vividsolutions.jump.workbench.ui.MenuNames;
 import com.vividsolutions.jump.workbench.ui.plugin.*;
 import com.vividsolutions.jump.util.*;
 
-public class ZoomToWMSPlugIn extends AbstractPlugIn {
+public class ZoomToWMSPlugIn extends AbstractPlugIn 
+{
     PlugInContext context;
 
     Object[][] values = null;
@@ -123,7 +124,7 @@ public class ZoomToWMSPlugIn extends AbstractPlugIn {
         for (int i = 0; i < anzSelectedWMSLayer; i++) {
             selectedWMSLayerNames[i] = wmsLayer[i].getName();
         }
-        // ------------------------------ ZoomToWMSPLugIn getSelectedWMSLayerNames ( )
+// ------------------------------ ZoomToWMSPLugIn getSelectedWMSLayerNames ( )
         return selectedWMSLayerNames;
     } // End getSelectedWMSLayerNames ( )
     
@@ -256,13 +257,17 @@ public class ZoomToWMSPlugIn extends AbstractPlugIn {
         return boundingBoxesForSRS;
     } // End getBoundingBoxesForSRS ( )
 
-    JComboBox makeComboBox( Hashtable boundingBoxesForSRS ) {
+    JComboBox makeComboBox( Hashtable boundingBoxesForSRS ) 
+    {
         JComboBox comboBox = new JComboBox();
-        if ( boundingBoxesForSRS.size() > 0 ) {
+        if ( boundingBoxesForSRS.size() > 0 ) 
+        {
             Object[] keys = boundingBoxesForSRS.keySet().toArray();
             Arrays.sort( keys );
             comboBox = new JComboBox( keys );
-        } else {
+        } 
+        else 
+        {
             comboBox
                 .addItem( I18N
                     .get( "org.openjump.core.ui.plugin.wms.ZoomToWMSPlugIn.no-bounding-boxes-available" ) );
@@ -356,17 +361,29 @@ public class ZoomToWMSPlugIn extends AbstractPlugIn {
 
         TableColumn tc0 = tcm.getColumn( 0 );
         TableColumn tc1 = tcm.getColumn( 1 );
+        TableColumn tc2 = tcm.getColumn( 2 );
+        
+        TableColumn tc3 = tcm.getColumn( 3 );
+        TableColumn tc4 = tcm.getColumn( 4 );
+        TableColumn tc5 = tcm.getColumn( 5 );
+        TableColumn tc6 = tcm.getColumn( 6 );
 
         tc0.setMinWidth( 160 );
-        tc1.setMinWidth( 160 );
+        tc1.setMinWidth( 120 );
+        tc2.setMinWidth( 70 );
+        
+        tc3.setMinWidth( 90 ); 
+        tc4.setMinWidth( 90 );
+        tc5.setMinWidth( 90 );
+        tc6.setMinWidth( 90 );
 
         th.setResizingAllowed( true );
         infoTable.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
 
-        //		infoTable.setPreferredSize ( new java.awt.Dimension ( 700, 300 ) );
+        //infoTable.setPreferredSize ( new java.awt.Dimension ( 700, 300 ) );
 
         this.infoTableSc = new JScrollPane( infoTable );
-        infoTableSc.setPreferredSize( new java.awt.Dimension( 710, 300 ) );
+        infoTableSc.setPreferredSize ( new java.awt.Dimension( 735, 300 ) );
 
         JOptionPane.showMessageDialog( context.getWorkbenchFrame(), infoTableSc, "InfoTable",
             JOptionPane.INFORMATION_MESSAGE );
@@ -602,7 +619,7 @@ public class ZoomToWMSPlugIn extends AbstractPlugIn {
 
         double cutDouble( double value, int afterComma ) {
             double mulQuot = Math.pow( 10.d, afterComma );
-            int tmp = (int) ( value * mulQuot );
+            long tmp = (long) ( value * mulQuot );
             return tmp
                 / mulQuot;
         }
@@ -628,7 +645,7 @@ public class ZoomToWMSPlugIn extends AbstractPlugIn {
             title = mapLayer.getTitle();
             if ( title == null )
                 title = unknown;
-
+/* I think this is not usefull [u.d., 05.11.29]
             BoundingBox latLonBB = mapLayer.getLatLonBoundingBox();
 
             if ( latLonBB == null ) {
@@ -639,6 +656,7 @@ public class ZoomToWMSPlugIn extends AbstractPlugIn {
                 maxY = 400.;
             } else {
                 srs = "epsg:4326";
+System.out.println ( "ZoomToWMS srs: " + srs + "  latLonBBMinX: " + latLonBB.getMinX() );
                 minX = cutDouble( latLonBB.getMinX(), 1 );
                 minY = cutDouble( latLonBB.getMinY(), 1 );
                 maxX = cutDouble( latLonBB.getMaxX(), 1 );
@@ -646,7 +664,8 @@ public class ZoomToWMSPlugIn extends AbstractPlugIn {
             }
 
             mapLayerRows.add( new MapLayerAttributes( title, name, srs, minX, minY, maxX, maxY ) );
-
+*/
+            
             ArrayList boundingBoxList = mapLayer.getAllBoundingBoxList();
 
             for (int i = 0; i < boundingBoxList.size(); i++) {
@@ -660,10 +679,17 @@ public class ZoomToWMSPlugIn extends AbstractPlugIn {
                     maxY = 400.;
                 } else {
                     srs = bb.getSRS().toLowerCase();
-                    minX = cutDouble( bb.getMinX(), 1 );
-                    minY = cutDouble( bb.getMinY(), 1 );
-                    maxX = cutDouble( bb.getMaxX(), 1 );
-                    maxY = cutDouble( bb.getMaxY(), 1 );
+                    /* not so good? [u.d., 05.11.29]
+                    minX = cutDouble( bb.getMinX(), 2 );
+                    minY = cutDouble( bb.getMinY(), 2 );
+                    maxX = cutDouble( bb.getMaxX(), 2 );
+                    maxY = cutDouble( bb.getMaxY(), 2 );
+                    */
+                    // better?
+                    minX = bb.getMinX();
+                    minY = bb.getMinY();
+                    maxX = bb.getMaxX();
+                    maxY = bb.getMaxY();
                 }
 
                 mapLayerRows
@@ -783,7 +809,7 @@ public class ZoomToWMSPlugIn extends AbstractPlugIn {
     class MASort extends MouseAdapter { // Mausadapter für Spaltensortierung
 
         public void mousePressed( MouseEvent me ) {
-            if ( me.getButton() == MouseEvent.BUTTON1 ) {
+            if ( me.getButton() == MouseEvent.BUTTON3 ) {
                 int viewColumn = tcm.getColumnIndexAtX( me.getX() );
                 int column = infoTable.convertColumnIndexToModel( viewColumn );
 
