@@ -40,8 +40,6 @@ package org.openjump.core.ui.plugin.edittoolbox.cursortools;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.geom.NoninvertibleTransformException;
