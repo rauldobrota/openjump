@@ -24,6 +24,7 @@ import org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedCirclePlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedLineStringPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedPolygonPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.RotateSelectedItemPlugIn;
+import org.openjump.core.ui.plugin.edittoolbox.ScaleSelectedItemsPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.SelectOneItemPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.DrawCircleWithGivenRadiusPlugIn;
 import org.openjump.core.ui.plugin.file.SaveImageAsSVGPlugIn;
@@ -51,7 +52,9 @@ import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
+import com.vividsolutions.jump.workbench.ui.cursortool.editing.EditingPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
+import com.vividsolutions.jump.workbench.ui.toolbox.ToolboxDialog;
 
 
 /**
@@ -95,7 +98,7 @@ public class OpenJumpConfiguration{
 		replicatePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
 		SelectByTypePlugIn mySelectByGeomTypePlugIn = new SelectByTypePlugIn();
-		mySelectByGeomTypePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		mySelectByGeomTypePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));		
 		
 		/***********************
 		 *  menu VIEW
@@ -228,6 +231,11 @@ public class OpenJumpConfiguration{
 		
 		DrawCircleWithGivenRadiusPlugIn drawCirclePlugin = new DrawCircleWithGivenRadiusPlugIn();
 		drawCirclePlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
-			
+		
+		//--  now initialized in #EditingPlugIn.java to fill toolbox
+		/*
+		ScaleSelectedItemsPlugIn myScaleItemsPlugin = new ScaleSelectedItemsPlugIn();
+		myScaleItemsPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		*/
 	}
 }

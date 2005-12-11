@@ -194,6 +194,13 @@ public class GeoUtils extends java.lang.Object
         return newcoords; //should never get here
     }
     
+    public static double getDistance(Coordinate p1, Coordinate p2){        
+        double dx = p2.x - p1.x;
+        double dy = p2.y - p1.y;
+        double s = Math.sqrt(dx*dx + dy*dy);        
+        return s;
+    }
+    
     public double getDistance(Coordinate pt, Coordinate p0, Coordinate p1)
     {   //will return the distance from pt to the line segment p0-p1
         double X0, Y0, X1, Y1, Xv, Yv, Xr, Yr, Xp0r, Yp0r, Xp1r, Yp1r;

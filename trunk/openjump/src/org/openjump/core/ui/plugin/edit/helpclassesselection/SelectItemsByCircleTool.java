@@ -275,7 +275,7 @@ public class SelectItemsByCircleTool extends DragTool {
     /**
      * called on mouse click<p>
      * selects all the items from the selected layer 
-     * wich are not(!) disjount with circle 
+     * wich are not(!) disjoint with circle 
      */
     private void selectItems(Geometry circle){
 		int count = 0;

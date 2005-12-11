@@ -31,6 +31,13 @@
  */
 package com.vividsolutions.jump.workbench.ui.cursortool.editing;
 
+import java.awt.BorderLayout;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+
+import org.openjump.core.ui.plugin.edittoolbox.cursortools.ScaleSelectedItemsTool;
+
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
@@ -46,11 +53,6 @@ import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 import com.vividsolutions.jump.workbench.ui.plugin.OptionsPlugIn;
 import com.vividsolutions.jump.workbench.ui.toolbox.ToolboxDialog;
 import com.vividsolutions.jump.workbench.ui.toolbox.ToolboxPlugIn;
-
-import java.awt.BorderLayout;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 
 public class EditingPlugIn extends ToolboxPlugIn {
     
@@ -95,6 +97,8 @@ public class EditingPlugIn extends ToolboxPlugIn {
 		toolbox.add(new InsertVertexTool(checkFactory));
 		toolbox.add(new DeleteVertexTool(checkFactory));
 		toolbox.add(new MoveVertexTool(checkFactory));
+		//-- [sstein: 11.12.2006] added here to fill toolbox 
+        toolbox.add(new ScaleSelectedItemsTool(checkFactory));
 
 		toolbox.addToolBar();
 		toolbox.add(new SnapVerticesTool(checkFactory));
