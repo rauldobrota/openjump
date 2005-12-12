@@ -40,6 +40,7 @@ package org.openjump.core.ui.plugin.edittoolbox.cursortools;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.geom.NoninvertibleTransformException;
@@ -116,9 +117,9 @@ public class ScaleSelectedItemsTool extends DragTool {
         allowSnapping();
     }
 
-    protected void gestureFinished() throws java.lang.Exception {
-	    	//System.out.println("gesture finished");    	
-	    	if (this.startScaling == true){
+    protected void gestureFinished() throws java.lang.Exception { 	
+    	//System.out.println("gesture finished");    	
+    	if (this.startScaling == true){
 	        reportNothingToUndoYet();
 	        ArrayList transactions = new ArrayList();
 	        for (Iterator i = getPanel().getSelectionManager().getLayersWithSelectedItems().iterator();
@@ -290,6 +291,12 @@ public class ScaleSelectedItemsTool extends DragTool {
 		        double dyMouse=Math.abs(this.center.y- this.mousePos.y);
 		        this.xscale = dxMouse / this.originalBBox.getEnvelopeInternal().getWidth();
 		        this.yscale = dyMouse / this.originalBBox.getEnvelopeInternal().getHeight();
+		        //-- attention: key must be pressed before mouse button is pressed
+		        //   otherwise it wont be recognized
+		        if (e.isShiftDown()){
+		        	//System.out.println("key pressed");
+		        	this.yscale=this.xscale;
+		        }
 		        getPanel().getContext().setStatusMessage(sScaleFactor+ " x: " + df2.format(xscale) + "  " + sScaleFactor + " y: " + df2.format(yscale));
 		        /*
 		        //-- reset shape of selectedFeatureShape = bbox
@@ -328,16 +335,22 @@ public class ScaleSelectedItemsTool extends DragTool {
         		//-- this does not work
         		//this.createCursor(IconLoader.icon("MoveVertexCursor.gif").getImage());
         		//if (this.style == 1){
-	        		this.setStroke(new BasicStroke(4));
+	        		this.setStroke(new BasicStroke(2));
+        			//Graphics2D g =(Graphics2D)getPanel().getGraphics();
+        			//g.setColor(Color.BLUE);
+        			//g.setStroke(new BasicStroke(1));
 	                this.setColor(Color.BLUE);
 			        //this.outlineItemsShape = getPanel().getJava2DConverter().toShape(this.originalBBox);  //not necessary
-			        this.style = 2;
+			        //this.style = 2;
 			        this.somethingChanged = true;
         		//}
         	}        	
         	else{
-        		if (this.style == 2){
+        		if ((this.style == 2) /*|| (this.isShapeOnScreen()== true)*/){
 	                this.setStroke(this.originalStroke);
+        			//Graphics2D g =(Graphics2D)getPanel().getGraphics();
+        			//g.setStroke(this.originalStroke);
+        			//g.setColor(Color.RED);
 	        		this.setColor(Color.RED);
 			        //this.outlineItemsShape = getPanel().getJava2DConverter().toShape(this.originalBBox); //not necessary
 			        this.style = 1;
@@ -345,7 +358,9 @@ public class ScaleSelectedItemsTool extends DragTool {
         		}
         	}
         	if(somethingChanged == true){
-    			this.redrawShape();
+        		//this.clearShape();
+        		//this.drawShapeXOR(this.getShape(),(Graphics2D)this.getPanel().getGraphics());        		
+    			this.redrawShape();   // create only flickering 			
     			somethingChanged = false;
     		}
     	}
@@ -428,7 +443,11 @@ public class ScaleSelectedItemsTool extends DragTool {
     protected Shape getShape(){
     	return this.outlineItemsShape;
 		//return this.selectionBBoxShape; 		
-    }  
+    }
+    
+    public void deactivate(MouseEvent e){
+    	this.cleanup((Graphics2D)getPanel().getGraphics());
+    }
     
     protected void setMousePos(Coordinate destination) {
         this.mousePos = snap(destination);

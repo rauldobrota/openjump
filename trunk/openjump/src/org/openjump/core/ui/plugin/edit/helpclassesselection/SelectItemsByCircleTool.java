@@ -91,7 +91,7 @@ public class SelectItemsByCircleTool extends DragTool {
     /******************  events ********************************/
     protected void gestureFinished() throws java.lang.Exception {
         reportNothingToUndoYet();
-        System.out.println("gesture finnished!");               
+        //System.out.println("gesture finnished!");               
     }
    
     public Cursor getCursor() {
@@ -176,7 +176,7 @@ public class SelectItemsByCircleTool extends DragTool {
                 //System.out.println(myButton.getClass());
            }
            
-                          	
+           fireGestureFinished();      	
         } 
         catch (Throwable t) {
             getPanel().getContext().handleThrowable(t);
