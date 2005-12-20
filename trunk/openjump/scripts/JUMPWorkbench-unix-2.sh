@@ -94,7 +94,7 @@ then
     MACSTUFF="-Xdock:name=JUMP -Dapple.laf.useScreenMenuBar=true \
           -Dapple.awt.showGrowBox=true" 
 
-    for jarfile in $LIB/*.jar $JUMP_PLUGIN_DIR/*.jar
+    for jarfile in $LIB/*.jar $LIB/batik/*.jar $JUMP_PLUGIN_DIR/*.jar
       do
       CLASSPATH=$jarfile:$CLASSPATH;
       if [ $VERBOSE ]
@@ -130,7 +130,7 @@ then
 
     LIB=$JUMPHOME/lib
 
-    for jarfile in $LIB/*.jar $JUMP_PLUGIN_DIR/*.jar
+    for jarfile in $LIB/*.jar $LIB/batik/*.jar $JUMP_PLUGIN_DIR/*.jar
       do
       CLASSPATH=$jarfile:$CLASSPATH;
       echo adding $jarfile to CLASSPATH
@@ -158,7 +158,7 @@ else # Some other OS / let's pretend it's fairly standard Unix type system
 
     LIB=$JUMPHOME/lib
 
-    for jarfile in $LIB/*.jar $JUMP_PLUGIN_DIR/*.jar
+    for jarfile in $LIB/*.jar $LIB/batik/*.jar $JUMP_PLUGIN_DIR/*.jar
       do
       CLASSPATH=$jarfile:$CLASSPATH;
       echo adding $jarfile to CLASSPATH

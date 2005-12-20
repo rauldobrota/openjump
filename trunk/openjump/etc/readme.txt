@@ -33,7 +33,6 @@ c:/OpenJUMP/bin
 c:/OpenJUMP/language
 c:/OpenJUMP/lib
 
-
 3. Running OpenJUMP
 -------------------
 Run the startup scripts contained in the /bin folder:
@@ -41,6 +40,14 @@ Run the startup scripts contained in the /bin folder:
 - For Linux/Unix, launch OpenJUMP-unix.sh
 - For Mac, launch OpenJUMP-mac.sh
 
+further notes
+. can be found on our wiki: www.openjump.org
+. to Unix/Linux users: 
+  a) use chmod +x to make the *.sh script executable 
+  b) change carriage returns (line-end-markers) from DOS to UNIX
+  c) users of looks extension: should place all the jar files 
+  	 from looks-extension directly into /lib/ext instead of a subdirectory
+  	 
 Startup options
 -----------------
 Several startup options are available, either for the Java Virtual Machine, or for the
