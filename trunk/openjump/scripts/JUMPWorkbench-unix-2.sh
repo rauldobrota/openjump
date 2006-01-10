@@ -57,6 +57,10 @@
 #    This script is based on earlier scripts contributed to the
 # JUMP discussion list by Raj Singh (Mac OS X) and Cameron Shorter
 # (Linux), and perhaps others...
+# Original version: Djun M. Kim
+# Last modifs by S. Tanner, 2006 January 10th:
+# - added $LIB/batik/*.jar
+# - replaced -Xmx512M by -Xmx256M (safer, not everyone has 1 Go of memory onboard...)
 
 
 
@@ -110,7 +114,7 @@ then
       echo $CLASSPATH | tr ':' '\n';
     fi
 
-    $JAVA -cp $CLASSPATH $MACSTUFF -Xmx512M -Dorg.xml.sax.driver=$SAXDRIVER \
+    $JAVA -cp $CLASSPATH $MACSTUFF -Xmx256M -Dorg.xml.sax.driver=$SAXDRIVER \
       $MAIN -properties $PROPS -plug-in-directory $JUMP_PLUGIN_DIR
     
     exit 0;
@@ -143,7 +147,7 @@ then
       echo $CLASSPATH | tr ':' '\n';
     fi
     
-    $JAVA -cp $CLASSPATH -Xmx512M -Dorg.xml.sax.driver=$SAXDRIVER $MAIN \
+    $JAVA -cp $CLASSPATH -Xmx256M -Dorg.xml.sax.driver=$SAXDRIVER $MAIN \
       -properties $PROPS \
       -plug-in-directory $JUMP_PLUGIN_DIR
     
@@ -171,7 +175,7 @@ else # Some other OS / let's pretend it's fairly standard Unix type system
       echo $CLASSPATH | tr ':' '\n';
     fi
     
-    $JAVA -cp $CLASSPATH -Xmx512M -Dorg.xml.sax.driver=$SAXDRIVER $MAIN \
+    $JAVA -cp $CLASSPATH -Xmx256M -Dorg.xml.sax.driver=$SAXDRIVER $MAIN \
       -properties $PROPS \
       -plug-in-directory $JUMP_PLUGIN_DIR
     
