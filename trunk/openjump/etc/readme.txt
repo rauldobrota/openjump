@@ -35,17 +35,16 @@ c:/OpenJUMP/lib
 3. Running OpenJUMP
 -------------------
 Run the startup scripts contained in the /bin folder:
-- For windows, double-click on "OpenJUMP.bat"
-- For Linux/Unix, launch OpenJUMP-unix.sh
-- For Mac, launch OpenJUMP-mac.sh
-- an alternative script for unix exists: OpenJUMP-unix2.sh
+- For windows, double-click on "JUMPWorkbench.bat"
+- For Linux/Unix, launch JUMPWorkbench-unix.sh
+- For Mac, launch JUMPWorkbench-mac.sh
+- an improved script for unix exists: JUMPWorkbench-unix2.sh
 
 further notes
 . can be found on our wiki: www.openjump.org
 . to Unix/Linux users: 
   a) use chmod +x to make the *.sh script executable 
-  b) change carriage returns (line-end-markers) from DOS to UNIX
-  c) users of looks extension: should place all the jar files 
+  b) users of looks extension: should place all the jar files 
   	 from looks-extension directly into /lib/ext instead of a subdirectory
   	 
 Startup options
