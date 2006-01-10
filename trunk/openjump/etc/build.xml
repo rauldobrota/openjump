@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!--  ======================================================================= 
-      JUMP build file. Based on the HttpUnit build file.                                                    
+      OpenJUMP build file. Based on the HttpUnit build file.                                                    
 
-      JUMP Release Procedure:
+      OpenJUMP Release Procedure:
        - Update PDF documents (especially version history)
        - Update CVS sandbox
        - Commit CVS sandbox
