@@ -1,7 +1,7 @@
 OpenJUMP readme file
 --------------------
-Version 1.2.0
-September 1st, 2005
+Version 0.99
+January 10th, 2006
 
 Contents
 --------
@@ -30,7 +30,6 @@ To install, decompress the archive in your hard drive, for example into c:/OpenJ
 You will see the following folder structure:
 c:/OpenJUMP/
 c:/OpenJUMP/bin
-c:/OpenJUMP/language
 c:/OpenJUMP/lib
 
 3. Running OpenJUMP
@@ -39,6 +38,7 @@ Run the startup scripts contained in the /bin folder:
 - For windows, double-click on "OpenJUMP.bat"
 - For Linux/Unix, launch OpenJUMP-unix.sh
 - For Mac, launch OpenJUMP-mac.sh
+- an alternative script for unix exists: OpenJUMP-unix2.sh
 
 further notes
 . can be found on our wiki: www.openjump.org
@@ -82,8 +82,8 @@ OpenJUMP command lines
 ----------
 General questions regarding OpenJUMP can be found in:
 - www.jump-project.org  the original JUMP site
-- jump-pilot.sourceforge.net the developper site
-- www.openjump.org the specific OpenJUMp website (under construction)
+- www.openjump.org the OpenJUMp website
+- jump-pilot.sourceforge.net the old OpenJUMP developper site
 
 
 5. OpenJUMP history
