@@ -9,7 +9,7 @@
  *   the class is used to work with indexes from vertices
  *   of a closed polygon.
  *****************************************************/
-package mapgen.algorithms.polygons;
+package mapgen.algorithms;
 
 /**
  * @author sstein
