@@ -1,8 +1,9 @@
-
 /*****************************************************
  * created:  		07.06.2005
  * last modified:  	21.11.2005
  * 					24.11.2005 feature cloning added
+ *					01.12.2005 pre deleting points in line 										
+ * 
  * @author sstein
  * 
  * description:
@@ -12,15 +13,11 @@
 package mapgen.ui.onselecteditems;
 
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
-import mapgen.algorithms.polygons.BuildingOutlineSimplify;
-import mapgen.constraints.buildings.BuildingLocalWidth;
-import mapgen.constraints.buildings.BuildingShortestEdge;
 import ch.unizh.geo.agents.goals.BuildingGoals;
+import mapgen.algorithms.polygons.BuildingDeletePointsInLine;
+import mapgen.algorithms.polygons.BuildingOutlineSimplify;
+import mapgen.constraints.buildings.BuildingPointInLine;
+import mapgen.constraints.buildings.BuildingShortestEdge;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
@@ -33,8 +30,6 @@ import com.vividsolutions.jump.feature.FeatureDatasetFactory;
 import com.vividsolutions.jump.feature.FeatureSchema;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
-import com.vividsolutions.jump.workbench.model.Layer;
-import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
@@ -43,7 +38,14 @@ import com.vividsolutions.jump.workbench.plugin.ThreadedPlugIn;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
-import com.vividsolutions.jump.workbench.ui.zoom.ZoomToSelectedItemsPlugIn;
+import com.vividsolutions.jump.workbench.ui.zoom.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import com.vividsolutions.jump.workbench.model.Layer;
+import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
+import java.util.Collection;
 
 /**
  * @description:
@@ -137,6 +139,7 @@ public class SimplifyOutlineSelectedBuildingPlugIn extends AbstractPlugIn implem
 	private FeatureCollection simplify(PlugInContext context, int scale, 
 	                          boolean solveIterative, TaskMonitor monitor) throws Exception{
 	    
+       	double flexInRad = 10.0*Math.PI/180;
 	    System.gc(); //flush garbage collector
 	    // --------------------------	    
 	    //-- get selected items
@@ -149,8 +152,9 @@ public class SimplifyOutlineSelectedBuildingPlugIn extends AbstractPlugIn implem
 	    
 	    int count=0; int noItems = features.size(); Geometry resultgeom = null;	    
 	    //FeatureDataset problematicFeatures = null;
-	    FeatureDataset resultFeatures = null;
+	    FeatureDataset resultFeatures = null;	    
 	    ArrayList problematicEdges = new ArrayList();
+	    ArrayList errorBdgs = new ArrayList();
        	//List resultList = new ArrayList();
        	FeatureSchema fs = new FeatureSchema();
 	    //--get single object in selection to analyse
@@ -193,122 +197,148 @@ public class SimplifyOutlineSelectedBuildingPlugIn extends AbstractPlugIn implem
 	       	Polygon poly = null;       	
 	       	if ( geom instanceof Polygon){
 	       		poly = (Polygon) geom; //= erste Geometrie
-	    	    // --------------------------
-	       		
+	    	    // --------------------------	       		
 	           	List conflictListA = new ArrayList();
 	           	List conflictListB = new ArrayList();
 	           	List conflictListD = new ArrayList();
-	           	
-	           	//---- detect conflicts
+	    	    // ---- init goals
 	           	BuildingGoals goals = new BuildingGoals(scale);
-	           	BuildingLocalWidth plw = new BuildingLocalWidth(poly, 
-	           	        	goals.getMinWidthReal(),goals.getMinWidthFlexibility());
+	           	//---- detect point in line conflicts and delete these points
+	           	//	   they may occure since a union operation of row houses could 
+	           	//     be done previously
+	           	//     it is also necessary to help stairs: ConfType=1 with neighbourConflict = 2
+	           	try{
+		           	BuildingPointInLine bpil = new BuildingPointInLine(poly, goals.getPositionAccuracy(),flexInRad);
+		           	if (bpil.isfullfilled() == false){
+		           	    BuildingDeletePointsInLine dpil = new BuildingDeletePointsInLine(poly,bpil.measure.getConflicList());  
+		           	    poly = dpil.getOutPolygon();
+		           	}	
+	           	}
+	           	catch(Exception e){
+	           	    errorBdgs.add((Geometry)f.getGeometry().clone());
+	           	    System.out.println("xxxxxxxxxxxxxxxxxxxxxxx");
+	           	    System.out.println("Exception: Bdg delete points in line");
+	           	    System.out.println(e);
+	           	    System.out.println("xxxxxxxxxxxxxxxxxxxxxxx");		           	    		           	    
+	           	}
+	           	//---- detect short edge conflicts
+	           	//BuildingLocalWidth plw = new BuildingLocalWidth(poly, 
+	           	//        	goals.getMinWidthReal(),goals.getMinWidthFlexibility());
 	           	BuildingShortestEdge conflicts = new BuildingShortestEdge(poly, 
 	           			goals.getShortestEdgeReal(), goals.getShortestEdgeFlexibility());
 	           	//---
 	           	if(conflicts.measure.hasConflicts() == true){
 		           	context.getWorkbenchFrame().setStatusMessage("conflicts detected! : " + conflicts.measure.getNrOfToShortEdges());           	
-		           	conflictListA.addAll(plw.measure.getDispVecPointEdgeLStringList());
-		           	conflictListB.addAll(plw.measure.getDispVecPointPointLStringList());
+		           	//conflictListA.addAll(plw.measure.getDispVecPointEdgeLStringList());
+		           	//conflictListB.addAll(plw.measure.getDispVecPointPointLStringList());
 		           	conflictListD.addAll(conflicts.measure.getLineStringList());
 		           	//--- solve conflicts ---
-		           	//-----------
-		           	// no iteration
-		           	//-----------
-		           	if (solveIterative == false){
-		           	    BuildingOutlineSimplify bosimplify = new BuildingOutlineSimplify(poly,
-		           	        							conflicts.measure.getConflicList());		           		
-		           	    //resultList.add(bosimplify.getOutPolygon());
-		           	    fnew.setGeometry(bosimplify.getOutPolygon());
-		           	    
-			           	conflicts = new BuildingShortestEdge(bosimplify.getOutPolygon(), 
-			           			goals.getShortestEdgeReal(), goals.getShortestEdgeFlexibility());
-		           	    if ((conflicts.measure.hasConflicts() == true) ||
-		           	    		(bosimplify.isAlreadySimple() == true)){
-		           	    	fnew.setAttribute(this.newAttributString, "not solved");
-		           	    	problematicEdges.addAll(conflicts.measure.getLineStringList());
-		           	    }
-		           	    else{
-		           	    	fnew.setAttribute(this.newAttributString, "simplified");
-		           	    }
-		           	    /**
-		           	    transaction.setGeometry(count-1,bosimplify.getOutPolygon());
-		           	    **/
-		           	}
-		           	else{
-		           	 //====================================   
-		           	 // if solution should be done iterative
-		           	 //====================================
-
-		           	    BuildingOutlineSimplify bosimplify = null;		           		
-		           	    int j = 0;
-		           	    boolean tosolve = conflicts.measure.hasConflicts();
-		           	    while(tosolve == true){
-			           	    bosimplify = new BuildingOutlineSimplify(poly,
-	        							conflicts.measure.getConflicList());
-			           	    poly = bosimplify.getOutPolygon();
-			           	    boolean problems = bosimplify.isProblemsEncountered();
-			           	    conflicts = new BuildingShortestEdge(poly, 
-				           			    goals.getShortestEdgeReal(), goals.getShortestEdgeFlexibility()); 
-			           	    tosolve = conflicts.measure.hasConflicts();
-			           	    //--notbremse:
-			           	    j = j + 1;
-			           	    //-- stop at max iterations 
-			           	    if(j == this.iterMax){
-			           	        tosolve = false;
-			           	        context.getWorkbenchFrame().warnUser("stopped at step: " + j);
+		           	try{
+			           	//-----------
+			           	// no iteration
+			           	//-----------
+			           	if (solveIterative == false){
+			           	    BuildingOutlineSimplify bosimplify = new BuildingOutlineSimplify(poly,
+			           	        							conflicts.measure.getConflicList(),conflicts.getGoalValue());		           		
+			           	    //resultList.add(bosimplify.getOutPolygon());
+			           	    fnew.setGeometry(bosimplify.getOutPolygon());
+			           	    
+				           	conflicts = new BuildingShortestEdge(bosimplify.getOutPolygon(), 
+				           			goals.getShortestEdgeReal(), goals.getShortestEdgeFlexibility());
+			           	    if ((conflicts.measure.hasConflicts() == true) ||
+			           	    		(bosimplify.isAlreadySimple() == true)){
+			           	    	fnew.setAttribute(this.newAttributString, "not solved");
+			           	    	problematicEdges.addAll(conflicts.measure.getLineStringList());
 			           	    }
-			           	    //--eventually check also if all edges are too short (this.hasAllEdgesTooShort)
-			           	    if(bosimplify.isAlreadySimple() == true){
-			           	        tosolve = false;
-			           	    }		
-			           	    //-- stop if only one not solveable conflict appears 
-			           	    //   to avoid unnecessary loop till end
-			           	    //   but try one more time
-			           	    if(problems && (conflicts.measure.getConflicList().size() == 1 )){
-			           	    	//-- the last try
-			           	    	bosimplify = new BuildingOutlineSimplify(poly,
-	        							conflicts.measure.getConflicList());
-			           	    	poly = bosimplify.getOutPolygon();
-			           	    	conflicts = new BuildingShortestEdge(poly, 
-				           			    goals.getShortestEdgeReal(), goals.getShortestEdgeFlexibility());
-			           	    	j++;
-			           	    	//--
-			           	        tosolve = false;
-			           	        context.getWorkbenchFrame().warnUser("stopped at step: " + j);
+			           	    else{
+			           	    	fnew.setAttribute(this.newAttributString, "simplified");
 			           	    }
-			           	    if (tosolve == false){
-				           	    //--objects which still have problems
-			           	    	if(conflicts.measure.hasConflicts()== true){
-			           	    		fnew.setAttribute(this.newAttributString, "not solved");
-			           	    		/*
-				           	    	Feature fnew = (Feature)f.clone();
+			           	    /**
+			           	    transaction.setGeometry(count-1,bosimplify.getOutPolygon());
+			           	    **/
+			           	}
+			           	else{
+			           	 //====================================   
+			           	 // if solution should be done iterative
+			           	 //====================================
+	
+			           	    BuildingOutlineSimplify bosimplify = null;		           		
+			           	    int j = 0;
+			           	    boolean tosolve = conflicts.measure.hasConflicts();
+			           	    while(tosolve == true){
+				           	    bosimplify = new BuildingOutlineSimplify(poly,
+		        							conflicts.measure.getConflicList(), conflicts.getGoalValue());
+				           	    poly = bosimplify.getOutPolygon();
+				           	    boolean problems = bosimplify.isProblemsEncountered();
+				           	    conflicts = new BuildingShortestEdge(poly, 
+					           			    goals.getShortestEdgeReal(), goals.getShortestEdgeFlexibility()); 
+				           	    tosolve = conflicts.measure.hasConflicts();
+				           	    //--notbremse:
+				           	    j = j + 1;
+				           	    //-- stop at max iterations 
+				           	    if(j == this.iterMax){
+				           	        tosolve = false;
+				           	        context.getWorkbenchFrame().warnUser("stopped at step: " + j);
+				           	    }
+				           	    //--eventually check also if all edges are too short (this.hasAllEdgesTooShort)
+				           	    if(bosimplify.isAlreadySimple() == true){
+				           	        tosolve = false;
+				           	    }		
+				           	    //-- stop if only one not solveable conflict appears 
+				           	    //   to avoid unnecessary loop till end
+				           	    //   but try one more time
+				           	    if(problems && (conflicts.measure.getConflicList().size() == 1 )){
+				           	    	//-- the last try
+				           	    	bosimplify = new BuildingOutlineSimplify(poly,
+		        							conflicts.measure.getConflicList(), conflicts.getGoalValue());
+				           	    	poly = bosimplify.getOutPolygon();
+				           	    	conflicts = new BuildingShortestEdge(poly, 
+					           			    goals.getShortestEdgeReal(), goals.getShortestEdgeFlexibility());
+				           	    	j++;
+				           	    	//--
+				           	        tosolve = false;
+				           	        context.getWorkbenchFrame().warnUser("stopped at step: " + j);
+				           	    }
+				           	    if (tosolve == false){
+					           	    //--objects which still have problems
+				           	    	if(conflicts.measure.hasConflicts()== true){
+				           	    		fnew.setAttribute(this.newAttributString, "not solved");
+				           	    		/*
+					           	    	Feature fnew = (Feature)f.clone();
+					           	    	fnew.setGeometry(bosimplify.getOutPolygon());
+					           	    	problematicFeatures.add(fnew);
+					           	    	*/
+					           	    	problematicEdges.addAll(conflicts.measure.getLineStringList());
+				           	    	}//--objects with solved problems
+				           	    	else{
+				           	    		fnew.setAttribute(this.newAttributString, "simplified");
+				           	    	}
+				           	    	//--store geometry
 				           	    	fnew.setGeometry(bosimplify.getOutPolygon());
-				           	    	problematicFeatures.add(fnew);
-				           	    	*/
-				           	    	problematicEdges.addAll(conflicts.measure.getLineStringList());
-			           	    	}//--objects with solved problems
-			           	    	else{
-			           	    		fnew.setAttribute(this.newAttributString, "simplified");
-			           	    	}
-			           	    	//--store geometry
-			           	    	fnew.setGeometry(bosimplify.getOutPolygon());
-			           	    }
-			           	    //-- visualisation
-			           	    /*
-			               	List stepList = new ArrayList();
-			           	    stepList.add(0,bosimplify.getOutPolygon());
-				    	    FeatureCollection myCollD = FeatureDatasetFactory.createFromGeometry(stepList);
-				    	    if (myCollD.size() > 0){
-				    		    context.addLayer(StandardCategoryNames.WORKING, "stepList", myCollD);
-				    		    }	    	  
-				    	    */
-		           	    }//end while
-		           	    /**
-		           	    resultList.add(bosimplify.getOutPolygon());
-		           	    transaction.setGeometry(count-1,bosimplify.getOutPolygon());
-		           	    **/
-		           	} //--end iterative solution
+				           	    }
+				           	    //-- visualisation
+				           	    /*
+				               	List stepList = new ArrayList();
+				           	    stepList.add(0,bosimplify.getOutPolygon());
+					    	    FeatureCollection myCollD = FeatureDatasetFactory.createFromGeometry(stepList);
+					    	    if (myCollD.size() > 0){
+					    		    context.addLayer(StandardCategoryNames.WORKING, "stepList", myCollD);
+					    		    }	    	  
+					    	    */
+			           	    }//end while
+			           	    /**
+			           	    resultList.add(bosimplify.getOutPolygon());
+			           	    transaction.setGeometry(count-1,bosimplify.getOutPolygon());
+			           	    **/
+			           	} //--end iterative solution
+		           	}
+		           	catch(Exception e){
+		           	    errorBdgs.add((Geometry)f.getGeometry().clone());
+		           	    System.out.println("xxxxxxxxxxxxxxxxxxxxxxx");
+		           	    System.out.println("Exception:");
+		           	    System.out.println(e);
+		           	    System.out.println("xxxxxxxxxxxxxxxxxxxxxxx");		           	    		           	    
+		           	}
 		           	// ===== visulisation =====
 		           	/**
 		    	    FeatureCollection myCollA = FeatureDatasetFactory.createFromGeometry(conflictListA);
@@ -341,8 +371,8 @@ public class SimplifyOutlineSelectedBuildingPlugIn extends AbstractPlugIn implem
            	    fnew.setAttribute(this.newAttributString, "no polygon");
 	       	}
        	    resultFeatures.add(fnew);
-		    String mytext = "item: " + count + " / " + noItems + " : simplification finalized";
-		    monitor.report(mytext);	       	
+		    String mytext = "item: " + count + " / " + noItems + " : simplification finalized";		    
+		    monitor.report(mytext);
       	}//  end loop for selection
       	/**
        	transaction.commit();
@@ -351,6 +381,12 @@ public class SimplifyOutlineSelectedBuildingPlugIn extends AbstractPlugIn implem
 		    FeatureCollection myCollE = FeatureDatasetFactory.createFromGeometry(problematicEdges);
 		    context.addLayer(StandardCategoryNames.WORKING, "problematic edges", myCollE);
 		    }
+	    if (errorBdgs.size() > 0){
+    	    FeatureCollection myCollE = FeatureDatasetFactory.createFromGeometry(errorBdgs);
+    	    if (myCollE.size() > 0){
+    		    context.addLayer(StandardCategoryNames.WORKING, "Exception Bdg", myCollE);
+    		    }
+	    }
 	    //context.addLayer(StandardCategoryNames.WORKING, "simplified buildings", resultFeatures);	    
         return resultFeatures;        
 	}
