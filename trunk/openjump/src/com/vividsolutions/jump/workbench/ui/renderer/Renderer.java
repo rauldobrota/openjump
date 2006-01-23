@@ -26,4 +26,10 @@ public interface Renderer {
     public static interface Factory {
         public Renderer create();
     }    
+    
+    //[sstein: 20.01.2006] from Ole for RenderingManager changes
+    // for not hardwired renderers and to including pirol image layers 
+    public static interface ContentDependendFactory {
+        public Renderer create(Object contentID);
+    } 
 }

@@ -36,6 +36,7 @@ import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +107,10 @@ public class RenderingManager {
 
 	private boolean paintingEnabled = true;
 
+	//[sstein: 20.01.2006]	added for Ole
+	protected static HashMap layerableClassToRendererFactoryMap = new HashMap();
+
+	  
 	public RenderingManager(final LayerViewPanel panel) {
 		this.panel = panel;
 		repaintTimer.setCoalesce(true);
@@ -221,6 +226,27 @@ public class RenderingManager {
 		panel.superRepaint();
 	}
 
+	//[sstein: 20.01.2006]
+	// Start: added by Ole
+	// everything is static to make it useable before a LayerManager instance
+	// (containing a RenderingManager) is created
+	// which is the case, at the time the PlugIns are initialized and to have one map
+	// for all RenderingManager
+	public static Renderer.ContentDependendFactory getRenderFactoryForLayerable(Class clss){
+	    if (layerableClassToRendererFactoryMap.containsKey(clss)){
+	        return (Renderer.ContentDependendFactory)layerableClassToRendererFactoryMap.get(clss); 
+	        }
+	    return null;
+	  }	
+	public static void putRendererForLayerable(Class clss,
+	  							Renderer.ContentDependendFactory rendererFactory) {
+		if (!layerableClassToRendererFactoryMap.containsKey(clss)) {
+			layerableClassToRendererFactoryMap.put(clss, rendererFactory);
+		}
+	}
+	// End: added by Ole*
+
+	
 	//this method is called by method render();
 	protected Renderer createRenderer(Object contentID) {
 		if (contentID instanceof Layer) {
@@ -231,11 +257,13 @@ public class RenderingManager {
 			//[sstein] old
 			//return new LayerRenderer((Layer) contentID, panel);
 		}
-
 		if (contentID instanceof WMSLayer) {
 			return new WMSLayerRenderer((WMSLayer) contentID, panel);
 		}
-
+	    //[sstein: 20.01.2006] Start: added by Ole
+	    if(RenderingManager.getRenderFactoryForLayerable(contentID.getClass())!=null){
+	          return RenderingManager.getRenderFactoryForLayerable(contentID.getClass()).create(contentID); }
+        //End: added by Ole*
 		if (contentIDToLowRendererFactoryMap.containsKey(contentID)) {
 			return ((Renderer.Factory) contentIDToLowRendererFactoryMap
 					.get(contentID)).create();
