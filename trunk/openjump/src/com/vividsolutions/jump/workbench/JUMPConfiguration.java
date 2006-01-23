@@ -271,6 +271,12 @@ public class JUMPConfiguration implements Setup {
 
     private void configureCategoryPopupMenu(WorkbenchContext workbenchContext,
             FeatureInstaller featureInstaller) {
+    	//[sstein 20.01.2006] added again after user request
+        featureInstaller.addPopupMenuItem(workbenchContext.getWorkbench()
+                .getFrame().getCategoryPopupMenu(), loadDatasetPlugIn,
+                loadDatasetPlugIn.getName() + "...", false, null,
+                LoadDatasetPlugIn.createEnableCheck(workbenchContext));
+        //--
         featureInstaller.addPopupMenuItem(workbenchContext.getWorkbench()
                 .getFrame().getCategoryPopupMenu(), loadDatasetFromFilePlugIn,
                 loadDatasetFromFilePlugIn.getName() + "...", false, null,
