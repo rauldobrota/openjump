@@ -1,7 +1,7 @@
 OpenJUMP readme file
 --------------------
-Version 0.99
-January 10th, 2006
+Version 1.00
+January 24th, 2006
 
 Contents
 --------
@@ -24,13 +24,13 @@ file or on www.apache.org.
 
 2. Installation instructions
 ----------------------------
-OpenJUMP comes usually under the form of a compressed archive, either zip format
-for windows, or gzip for linux.
+The platform-independent version of OpenJUMP comes under the form of a compressed archive.
 To install, decompress the archive in your hard drive, for example into c:/OpenJUMP
 You will see the following folder structure:
 c:/OpenJUMP/
 c:/OpenJUMP/bin
 c:/OpenJUMP/lib
+
 
 3. Running OpenJUMP
 -------------------
@@ -40,20 +40,17 @@ Run the startup scripts contained in the /bin folder:
 - For Mac, launch JUMPWorkbench-mac.sh
 - an improved script for unix exists: JUMPWorkbench-unix2.sh
 
-further notes
-. can be found on our wiki: www.openjump.org
-. to Unix/Linux users: 
-  a) use chmod +x to make the *.sh script executable 
-  b) users of looks extension: should place all the jar files 
-  	 from looks-extension directly into /lib/ext instead of a subdirectory
-  	 
+Further notes can be found on our wiki: www.openjump.org
+
+Users of looks extension should place all the jar files from looks-extension 
+directly into /lib/ext.
+
+
 Startup options
 -----------------
 Several startup options are available, either for the Java Virtual Machine, or for the
-OpenJUMP core. To change them, edit the startup scripts
-accordingly: 
-- For windows users, edit the line beginning by "start javaw".
-- For Linux/Unix/Mac users, edit the line beginning by "java".
+OpenJUMP core. To change them, edit the startup script
+accordingly, editing the line beginning by "start javaw".
 
 Java VM options (a complete list can be found in the Java VM documentation)
 -Xms defines the allocated memory for the virtual machine at startup. Example: -Xms256M
@@ -81,7 +78,7 @@ OpenJUMP command lines
 ----------
 General questions regarding OpenJUMP can be found in:
 - www.jump-project.org  the original JUMP site
-- www.openjump.org the OpenJUMp website
+- www.openjump.org the OpenJump website
 - jump-pilot.sourceforge.net the old OpenJUMP developper site
 
 
@@ -109,21 +106,20 @@ Original development team of JUMP was:
 
 OpenJUMP regular (and past) contributors are (non exaustive list!):
 - Jonathan Aquino, 
-- Steve Tanner,
-- Landon Blake, 
-- Erwan Bocher, 
+- Landon Blake (Sunburned Surveyor),
+- Erwan Bocher,
 - Basile Chandesris,
+- Joe Desbonet,
 - Michael Michaud,
 - Axel Orth,
 - Ole Rahn,
 - Ezequias Rodrigues da Rocha
 - Stefan Steiniger,
 - Ugo Taddei, 
-- Joe Desbonet,
+- Steve Tanner,
 and
--  Larry Becker and Integrated Systems Analysts, Inc.
-   for providing their Jump ISA tools code
-
+- Larry Becker and Integrated Systems Analysts, Inc.
+  for providing their Jump ISA tools code.
 
 
 Translation contributors are:
