@@ -28,7 +28,7 @@
  */
 /*****************************************************
  * created:  		11.12.2005
- * last modified:  	
+ * last modified:  	28.01.2006 cursor change on mouse over corner
  * 
  * author: sstein
  * 
@@ -40,6 +40,7 @@ package org.openjump.core.ui.plugin.edittoolbox.cursortools;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
@@ -70,6 +71,7 @@ import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.ui.EditTransaction;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.cursortool.DragTool;
+import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 import com.vividsolutions.jump.workbench.ui.snap.SnapManager;
 
 public class ScaleSelectedItemsTool extends DragTool {
@@ -97,6 +99,8 @@ public class ScaleSelectedItemsTool extends DragTool {
     private BasicStroke originalStroke = null;
     boolean somethingChanged = false;
     int style = 1;
+	Cursor cursor2 = createCursor(IconLoader.icon("MoveVertexCursor.gif").getImage());
+	Cursor cursor1 = null;
     
     public ScaleSelectedItemsTool(EnableCheckFactory checkFactory) {
         
@@ -114,7 +118,8 @@ public class ScaleSelectedItemsTool extends DragTool {
                 0);        
         setStroke(this.originalStroke);
         this.style=1;
-        allowSnapping();
+        allowSnapping();    	
+        this.cursor1 = this.getCursor();
     }
 
     protected void gestureFinished() throws java.lang.Exception { 	
@@ -261,7 +266,7 @@ public class ScaleSelectedItemsTool extends DragTool {
 	    		//   boundary delivers the next lower dimension (OGC Simple Features spec)
 	    		LineString lsBBox = (LineString)this.originalBBox.getBoundary();
 	    		this.outlineItems = this.originalItemsAsLines.union(lsBBox); //clone    		
-	    		//-- test use this if drawing the bounding box only (=> change therfore #getShape() as well)
+	    		//-- test: use this if drawing the bounding box only (=> change therfore #getShape() as well)
 	    		//this.selectionBBoxShape = getPanel().getJava2DConverter().toShape(this.originalBBox);
 	    		this.outlineItemsShape = getPanel().getJava2DConverter().toShape(this.outlineItems);
 	            //-- set centroid on first press
@@ -314,7 +319,7 @@ public class ScaleSelectedItemsTool extends DragTool {
 	        }
     	}
     }
-    /*
+    /* //overwrite method
     public Cursor getCursor() {
         return Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
     }
@@ -333,34 +338,23 @@ public class ScaleSelectedItemsTool extends DragTool {
     		Point mousep = new GeometryFactory().createPoint(this.mousePos);
         	if (buffergeom.contains(mousep)){
         		//-- this does not work
-        		//this.createCursor(IconLoader.icon("MoveVertexCursor.gif").getImage());
-        		//if (this.style == 1){
-	        		this.setStroke(new BasicStroke(2));
-        			//Graphics2D g =(Graphics2D)getPanel().getGraphics();
-        			//g.setColor(Color.BLUE);
-        			//g.setStroke(new BasicStroke(1));
-	                this.setColor(Color.BLUE);
-			        //this.outlineItemsShape = getPanel().getJava2DConverter().toShape(this.originalBBox);  //not necessary
-			        //this.style = 2;
+        		if (this.style == 1){        		
+	        		//this.setStroke(new BasicStroke(2));
+	                this.getPanel().setCursor(this.cursor2);
+			        this.style = 2;
 			        this.somethingChanged = true;
-        		//}
+        		}
         	}        	
         	else{
         		if ((this.style == 2) /*|| (this.isShapeOnScreen()== true)*/){
-	                this.setStroke(this.originalStroke);
-        			//Graphics2D g =(Graphics2D)getPanel().getGraphics();
-        			//g.setStroke(this.originalStroke);
-        			//g.setColor(Color.RED);
-	        		this.setColor(Color.RED);
-			        //this.outlineItemsShape = getPanel().getJava2DConverter().toShape(this.originalBBox); //not necessary
+	                //this.setStroke(this.originalStroke);
+	                this.getPanel().setCursor(this.cursor1);	                
 			        this.style = 1;
 			        this.somethingChanged = true;			        
         		}
         	}
         	if(somethingChanged == true){
-        		//this.clearShape();
-        		//this.drawShapeXOR(this.getShape(),(Graphics2D)this.getPanel().getGraphics());        		
-    			this.redrawShape();   // create only flickering 			
+    			this.redrawShape(); 	
     			somethingChanged = false;
     		}
     	}

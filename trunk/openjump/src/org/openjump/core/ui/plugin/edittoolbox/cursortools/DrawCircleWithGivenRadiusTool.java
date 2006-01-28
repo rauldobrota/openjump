@@ -28,10 +28,10 @@
 /*****************************************************
  * created:  		by Vivid Solutions
  * last modified:  	22.05.2005 by sstein
+ * 					28.01.2006 new MultiInputDialog without cancel button
  * 
  * description:
- *  - defines the mouse behaviour (shows a circle on mouse endpoint)
- *  - makes the item selection for the circle
+ *  draws a circle for a given radius (showing the circle on mouse endpoint) 
  * 
  *****************************************************/
 package org.openjump.core.ui.plugin.edittoolbox.cursortools;
@@ -53,6 +53,8 @@ import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+
+import org.openjump.core.ui.MultiInputDialogWithoutCancel;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -272,7 +274,7 @@ public class DrawCircleWithGivenRadiusTool extends NClickTool{
 	public boolean makeDialogThings(LayerViewPanel panel) throws Exception{
 		LayerViewPanelContext context = (LayerViewPanelContext)panel.getContext();
 		WorkbenchFrame fr = (WorkbenchFrame)(context);
-	    MultiInputDialog dialog = new MultiInputDialog(fr, getName(), true);
+	    MultiInputDialogWithoutCancel dialog = new MultiInputDialogWithoutCancel(fr, getName(), true);
 	        setDialogValues(dialog);
 	        GUIUtil.centreOnWindow(dialog);
 	        dialog.setVisible(true);
@@ -281,14 +283,14 @@ public class DrawCircleWithGivenRadiusTool extends NClickTool{
 	        return true;	
 	}
 	
-    private void setDialogValues(MultiInputDialog dialog)
+    private void setDialogValues(MultiInputDialogWithoutCancel dialog)
 	  {    	
 	    dialog.setSideBarDescription(this.sidebarstring);
 	    dialog.addDoubleField(T1,this.radius,7,T1); 
 	    dialog.addDoubleField(this.sAccuracy,this.tolerance, 7,this.sAccuracy);
 	  }
 
-	private void getDialogValues(MultiInputDialog dialog) {
+	private void getDialogValues(MultiInputDialogWithoutCancel dialog) {
 	    this.radius = dialog.getDouble(T1);
 	    this.tolerance = dialog.getDouble(this.sAccuracy); 
 	  }
