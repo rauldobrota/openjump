@@ -48,6 +48,7 @@ import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 
 
 public class MeasureTool extends MultiClickTool {
+	
     public MeasureTool() {
         allowSnapping();
     }
@@ -84,22 +85,28 @@ public class MeasureTool extends MultiClickTool {
 
     private void display(List coordinates, LayerViewPanel panel)
         throws NoninvertibleTransformException {
-        display(distance(coordinates), panel);
+        display(distances(coordinates), panel);
     }
 
-    private void display(double distance, LayerViewPanel panel) {
-        panel.getContext().setStatusMessage(I18N.get("ui.cursortool.MeasureTool.distance")+": " +
-            panel.format(distance));
+    private void display(double[] distances, LayerViewPanel panel) {
+    	String mesg = I18N.get("ui.cursortool.MeasureTool.distance") + ": ";
+        panel.getContext().setStatusMessage( mesg + panel.format(distances[0])
+        		+ " (" + panel.format( distances[1] ) + ")");
     }
 
-    private double distance(List coordinates) {
-        double distance = 0;
+    private double[] distances(List coordinates) {
+    	double distance = 0;
+    	double lastSegmentLength = 0;
 
         for (int i = 1; i < coordinates.size(); i++) {
             distance += ((Coordinate) coordinates.get(i - 1)).distance((Coordinate) coordinates.get(
                     i));
+            if ( i == coordinates.size() - 1 ){
+            	lastSegmentLength = ((Coordinate) coordinates.get(i - 1)).distance((Coordinate) coordinates.get(
+                        i)); 
+            }
         }
 
-        return distance;
+        return new double[]{distance,lastSegmentLength};
     }
 }
