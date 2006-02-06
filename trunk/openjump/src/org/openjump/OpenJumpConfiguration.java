@@ -42,6 +42,7 @@ import org.openjump.core.ui.plugin.tools.JoinWithArcPlugIn;
 import org.openjump.core.ui.plugin.tools.LineSimplifyJTS15AlgorithmPlugIn;
 import org.openjump.core.ui.plugin.tools.MeasureM_FPlugIn;
 import org.openjump.core.ui.plugin.tools.ReducePointsISAPlugIn;
+import org.openjump.core.ui.plugin.view.InstallKeyPanPlugIn;
 import org.openjump.core.ui.plugin.view.MapToolTipPlugIn;
 import org.openjump.core.ui.plugin.view.ShowFullPathPlugIn;
 import org.openjump.core.ui.plugin.view.ShowScalePlugIn;
@@ -237,5 +238,9 @@ public class OpenJumpConfiguration{
 		ScaleSelectedItemsPlugIn myScaleItemsPlugin = new ScaleSelectedItemsPlugIn();
 		myScaleItemsPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		*/
+		
+		// takes care of keyboard navigation
+		new InstallKeyPanPlugIn().initialize( new PlugInContext(workbenchContext, null, null, null, null) );
+		
 	}
 }
