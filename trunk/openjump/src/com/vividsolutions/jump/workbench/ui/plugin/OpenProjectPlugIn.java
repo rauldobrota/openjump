@@ -97,7 +97,7 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
 
     public void run(TaskMonitor monitor, PlugInContext context)
             throws Exception {
-        loadLayers(sourceTask.getLayerManager(), newTask.getLayerManager(),
+        loadLayers(sourceTask, newTask.getLayerManager(),
                 CoordinateSystemRegistry.instance(context.getWorkbenchContext()
                         .getBlackboard()), monitor);
     }
@@ -115,10 +115,11 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
             // Probably to reverse the order of the layerables. See comments.
             // Probably also to set the LayerManager coordinate system.
             // [Jon Aquino 2005-03-16]
-            initializeDataSources(sourceTask, workbenchFrame.getContext());
             newTask = new Task();
+            newTask.setProjectFile(file);            
+            sourceTask.setProjectFile(file);            
+            initializeDataSources(sourceTask, workbenchFrame.getContext());
             newTask.setName(GUIUtil.nameWithoutExtension(file));
-            newTask.setProjectFile(file);
             workbenchFrame.addTaskFrame(newTask);
         } finally {
             reader.close();
@@ -126,19 +127,25 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
     }
 
     private void initializeDataSources(Task task, WorkbenchContext context) {
+        
         for (Iterator i = task.getLayerManager().getLayers().iterator(); i
                 .hasNext();) {
             Layer layer = (Layer) i.next();
+
             if (layer.getDataSourceQuery().getDataSource() instanceof WorkbenchContextReference) {
-                ((WorkbenchContextReference) layer.getDataSourceQuery()
+                
+                ((WorkbenchContextReference)layer.getDataSourceQuery()
                         .getDataSource()).setWorkbenchContext(context);
             }
         }
     }
 
-    private void loadLayers(LayerManager sourceLayerManager,
+    private void loadLayers( Task sourceTask,
             LayerManager newLayerManager, CoordinateSystemRegistry registry,
             TaskMonitor monitor) throws Exception {
+        
+        LayerManager sourceLayerManager = sourceTask.getLayerManager();
+        
         for (Iterator i = sourceLayerManager.getCategories().iterator(); i
                 .hasNext();) {
             Category sourceLayerCategory = (Category) i.next();
@@ -162,7 +169,7 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
 
                 if (layerable instanceof Layer) {
                     Layer layer = (Layer) layerable;
-                    load(layer, registry, monitor);
+                    load( sourceTask.getProjectFile(), layer, registry, monitor);
                 }
 
                 newLayerManager.addLayerable(sourceLayerCategory.getName(),
@@ -171,10 +178,22 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
         }
     }
 
-    public static void load(Layer layer, CoordinateSystemRegistry registry, TaskMonitor monitor) throws Exception {
+    public static void load( File parentFile, Layer layer, CoordinateSystemRegistry registry, TaskMonitor monitor) throws Exception {
+        
+        DataSource dataSource = layer.getDataSourceQuery().getDataSource();
+        
+        String filename = (String) dataSource.getProperties().get(DataSource.FILE_KEY);
+        
+        //this is to keep backwards compatibility
+        File f = new File( filename );
+        if ( !f.isAbsolute() ) {
+            filename = parentFile.getParentFile() + File.separator + filename;
+            dataSource.getProperties().put( DataSource.FILE_KEY, 
+                     filename );
+        }
+        
         layer.setFeatureCollection(executeQuery(layer
-                .getDataSourceQuery().getQuery(), layer
-                .getDataSourceQuery().getDataSource(), registry,
+                .getDataSourceQuery().getQuery(), dataSource, registry,
                 monitor));
         layer.setFeatureCollectionModified(false);
     }
@@ -190,4 +209,5 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
             connection.close();
         }
     }
+    
 }
