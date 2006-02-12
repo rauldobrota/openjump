@@ -34,6 +34,7 @@
 package org.openjump.core.ui.plugin.edittoolbox.tab;
 
 import java.awt.event.MouseEvent;
+import java.awt.geom.NoninvertibleTransformException;
 import java.util.List;
 
 import org.openjump.core.geomutils.GeoUtils;
@@ -52,6 +53,9 @@ public class ConstraintManager {
     public static final String ANGLE_SIZE_KEY = "ANGLE_CONSTRAINT";
     public static final String RELATIVE_ANGLE_KEY = "RELATIVE_ANGLE_CONSTRAINT";
     public static final String ABSOLUTE_ANGLE_KEY = "ABSOLUTE_ANGLE_CONSTRAINT";
+    public static final String CONSTRAIN_RECTANGLE_RATIO_ENABLED_KEY = "CONSTRAIN_RECTANGLE_RATIO - ENABLED";
+    public static final String RATIO_WIDTH_KEY = "RATIO_WIDTH_CONSTRAINT";
+    public static final String RATIO_HEIGHT_KEY = "RATIO_HEIGHT_CONSTRAINT";
     protected LayerViewPanel panel;
     WorkbenchContext workbenchContext;
 
@@ -64,10 +68,10 @@ public class ConstraintManager {
     {
         if (coordinates == null) return targetPt;
         this.panel = panel;
-        int numPts = coordinates.size();        
+        int numPts = coordinates.size();    
         boolean shiftConstrain = (e.isShiftDown() && (numPts > 1));
         boolean ctrlConstrain = (e.isControlDown() && (numPts > 1));
-        Coordinate retPt = (Coordinate)targetPt.clone();
+        Coordinate retPt = (Coordinate)targetPt.clone();        
 
         if ((PersistentBlackboardPlugIn.get(workbenchContext).get(CONSTRAIN_LENGTH_ENABLED_KEY, false)) && (numPts >= 1))
         {
@@ -111,7 +115,7 @@ public class ConstraintManager {
                     Coordinate endPt = (Coordinate)coordinates.get(numPts - 1);
                     double length = endPt.distance(retPt);
                     Coordinate newPt = constructVector(startPt, endPt, length);
-                    retPt = new GeoUtils().rotPt(newPt, endPt, theta);
+                    retPt = GeoUtils.rotPt(newPt, endPt, theta);
                 }
             }
             
@@ -122,7 +126,7 @@ public class ConstraintManager {
                     Coordinate startPt = (Coordinate)coordinates.get(numPts - 1);
                     Coordinate endPt = (Coordinate)startPt.clone();
                     endPt.x += startPt.distance(retPt);
-                    retPt = new GeoUtils().rotPt(endPt, startPt, theta);
+                    retPt = GeoUtils.rotPt(endPt, startPt, theta);
                 }
             }
         }
@@ -138,7 +142,7 @@ public class ConstraintManager {
                 Coordinate p2 = (Coordinate) retPt.clone();
                 Coordinate p3 = (Coordinate)coordinates.get(0);
                 Coordinate p4 = constrainIncrementalAngle(startPt, endPt, retPt, incrementalAngleConstraint);
-                Coordinate intxPt = new GeoUtils().getIntersection(p1, p2, p3, p4);
+                Coordinate intxPt = GeoUtils.getIntersection(p1, p2, p3, p4);
                 if (intxPt.z == 0) //z <> 0 means that the lines are parallel
                     retPt = new Coordinate(intxPt.x, intxPt.y);
             }
@@ -155,7 +159,7 @@ public class ConstraintManager {
         double theta =  360 / angleConstraint;
         for (int i = 0; i < angleConstraint - 1; i++)
         {
-            newPt = new GeoUtils().rotPt(newPt, endPt, theta);
+            newPt = GeoUtils.rotPt(newPt, endPt, theta);
             double newDist = targetPt.distance(newPt);
             if (newDist < currDist)
             {
@@ -166,6 +170,28 @@ public class ConstraintManager {
         return retPt;
     }
     
+     public Coordinate constrainRectangleToRatio(LayerViewPanel panel, List coordinates, Coordinate targetPt, MouseEvent e) throws NoninvertibleTransformException
+	 {
+        if (coordinates == null) return targetPt;
+        this.panel = panel;
+        boolean shiftConstrain = ((PersistentBlackboardPlugIn.get(workbenchContext).get(CONSTRAIN_RECTANGLE_RATIO_ENABLED_KEY, false)) && (e.isShiftDown()));
+
+        double ratioWidth = PersistentBlackboardPlugIn.get(workbenchContext).get(RATIO_WIDTH_KEY, 1.0);
+     	double ratioHeight = PersistentBlackboardPlugIn.get(workbenchContext).get(RATIO_HEIGHT_KEY, 1.0);
+     	double ratio = ratioWidth/ratioHeight;
+     	
+        if ((coordinates.size() >= 1) && (shiftConstrain))
+     	{
+     		Coordinate firstCoordinate = (Coordinate) coordinates.get(0);
+     		double yLength = Math.abs((firstCoordinate.x - targetPt.x)) / ratio;
+     		if (targetPt.y > firstCoordinate.y)    		
+     			return new Coordinate(targetPt.x, firstCoordinate.y + yLength);
+     		else
+     			return new Coordinate(targetPt.x, firstCoordinate.y - yLength);
+     	}
+     	return targetPt;
+	 }
+     
     private Coordinate constructVector(Coordinate startPt, Coordinate endPt, double dist)
     //this routine will use startPt & endPt to determine the slope of the new vector
     //it will calculate a new vector from endPt with the slope and dist
