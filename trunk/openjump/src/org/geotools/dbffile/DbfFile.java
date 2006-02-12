@@ -1,21 +1,16 @@
-/*
- * CVS header information:
- *  $RCSfile$
- *  $Revision$
- *  $Date$
- *  $Source$
- */
-
 package org.geotools.dbffile;
 
 import com.vividsolutions.jump.io.EndianDataInputStream;
 
 import java.io.*;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Vector;
 
 
@@ -28,8 +23,6 @@ import java.util.Vector;
  *<hr>
  * @author <a href="mailto:ian@geog.leeds.ac.uk">Ian Turton</a> Centre for
  * Computaional Geography, University of Leeds, LS2 9JT, 1998.
- * 
- * @version $Revision$
  *
  */
 public class DbfFile implements DbfConsts {
@@ -49,7 +42,8 @@ public class DbfFile implements DbfConsts {
     public DbfFieldDef[] fielddef;
     public static final SimpleDateFormat DATE_PARSER = new SimpleDateFormat("yyyyMMdd") {
         {
-            setLenient(false);
+            // DZ
+            setLenient(true);
         }
     };
 
@@ -263,7 +257,7 @@ public class DbfFile implements DbfConsts {
           // The number field should be trimed from the start AND the end.
           // Added .trim() to 'String numb = rec.substring(start, end)' instead. [Kevin Neufeld]
           // while ((start < end) && (rec.charAt(start) == ' '))
-          //    start++;
+          // 	start++;
           
           String numb = rec.substring(start, end).trim();
           if (isInteger) { //its an int
@@ -727,13 +721,35 @@ public class DbfFile implements DbfConsts {
         if (s.trim().length() == 0) {
             return null;
         }
+
         if (s.equals("00000000")) {
             //Not sure if Jan 1, 0001 is the most appropriate value.
             //Year 0000 gives me a ParseException. [Jon Aquino]
             return DATE_PARSER.parse("00010101");
         }
-        return DATE_PARSER.parse(s);
+        try{
+            return lastFormat.parse(s);
+        }catch(ParseException pe){
+            // ignore
+        }
+        
+        String[] patterns = new String[]{"yyyyMMdd", "yy/mm/dd"};
+        
+        for(int i=0;i<patterns.length;i++){
+            DateFormat df = new SimpleDateFormat(patterns[i]);
+            df.setLenient(true);
+            try{
+                Date d = df.parse(s);
+                lastFormat = df;
+                return d;
+            }catch(ParseException pe){
+                // ignore
+            }
+        }
+        
+        return null;
     }
+    private DateFormat lastFormat = DATE_PARSER;
 
     public static void main(String[] args) throws Exception {
         System.out.println(new SimpleDateFormat("yyyymmdd") {
@@ -743,4 +759,3 @@ public class DbfFile implements DbfConsts {
         }.parse("00010101"));
     }
 }
-
