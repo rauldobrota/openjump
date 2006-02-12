@@ -85,7 +85,7 @@ public class InfoFrame
                 layerManager = new LayerManager();
             }
         });
-        attributeTab = new AttributeTab(model, workbenchContext, taskFrame, this);
+        attributeTab = new AttributeTab(model, workbenchContext, taskFrame, this, false);
         addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameOpened(InternalFrameEvent e) {
                 attributeTab.getToolBar().updateEnabledState();

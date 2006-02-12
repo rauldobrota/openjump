@@ -14,7 +14,7 @@ import com.vividsolutions.jump.workbench.model.LayerManagerProxy;
 public class OneLayerAttributeTab extends AttributeTab {
     public OneLayerAttributeTab(WorkbenchContext context, TaskFrame taskFrame,
         LayerManagerProxy layerManagerProxy) {
-        super(new InfoModel(), context, taskFrame, layerManagerProxy);
+        super(new InfoModel(), context, taskFrame, layerManagerProxy, true);
         context.getLayerManager().addLayerListener(new LayerListener() {
                 public void featuresChanged(FeatureEvent e) {
                     if (getLayerTableModel() == null) {

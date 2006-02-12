@@ -42,6 +42,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -197,9 +198,18 @@ public class AttributeTablePanel extends JPanel {
 
     private WorkbenchContext workbenchContext;
 
-    public AttributeTablePanel(final LayerTableModel model,
+    public AttributeTablePanel(final LayerTableModel model, boolean addScrollPane,
             final WorkbenchContext workbenchContext) {
         this();
+        if (addScrollPane) {
+            remove(table);
+            remove(table.getTableHeader());
+            JScrollPane scrollPane = new JScrollPane();
+            scrollPane.getViewport().add(table);
+            this.add(scrollPane, new GridBagConstraints(0, 2, 1, 1, 1, 1,
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+                            0, 0, 0, 0), 0, 0));
+        }
         updateGrid(model.getLayer());
         model.getLayer().getLayerManager().addLayerListener(
                 new LayerListener() {
@@ -308,9 +318,9 @@ public class AttributeTablePanel extends JPanel {
 
     private AttributeTablePanel() {
         try {
-            jbInit();
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        jbInit();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -322,7 +332,7 @@ public class AttributeTablePanel extends JPanel {
         return getModel().getColumnName(0).equals(table.getColumnName(column));
     }
 
-    private void updateLabel() {
+    private void updateLabel() {//[sstein] change for translation
     	if (getModel().getRowCount() == 1) {
     		 layerNameRenderer.getLabel().setText(
                     getModel().getLayer().getName() + " ("

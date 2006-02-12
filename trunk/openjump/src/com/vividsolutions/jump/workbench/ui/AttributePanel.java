@@ -67,7 +67,6 @@ public class AttributePanel
     private GridBagLayout gridBagLayout1 = new GridBagLayout();
     private HashMap layerToTablePanelMap = new HashMap();
     private InfoModel model;
-    private JPanel fillerPanel = new JPanel();
     private WorkbenchContext workbenchContext;
     private ZoomToSelectedItemsPlugIn zoomToSelectedItemsPlugIn =
         new ZoomToSelectedItemsPlugIn();
@@ -99,6 +98,7 @@ public class AttributePanel
     };
     private TaskFrame taskFrame;
     private LayerManagerProxy layerManagerProxy;
+    private boolean addScrollPanesToChildren;
     /**
      * @param layerManagerProxy Can't simply get LayerManager from TaskFrame
      * because when that frame closes, it sets its LayerManager to null.
@@ -107,7 +107,9 @@ public class AttributePanel
         InfoModel model,
         WorkbenchContext workbenchContext,
         TaskFrame taskFrame,
-        LayerManagerProxy layerManagerProxy) {
+        LayerManagerProxy layerManagerProxy,
+        boolean addScrollPanesToChildren) {
+        this.addScrollPanesToChildren = addScrollPanesToChildren;
         selectionManager = new SelectionManager(null, layerManagerProxy);
         selectionManager.setPanelUpdatesEnabled(false);
         this.taskFrame = taskFrame;
@@ -150,10 +152,9 @@ public class AttributePanel
     private void addTablePanel(final LayerTableModel layerTableModel) {
         Assert.isTrue(!layerToTablePanelMap.containsKey(layerTableModel.getLayer()));
         final AttributeTablePanel tablePanel =
-            new AttributeTablePanel(layerTableModel, workbenchContext);
+            new AttributeTablePanel(layerTableModel, addScrollPanesToChildren, workbenchContext);
         tablePanel.addListener(this);
         layerToTablePanelMap.put(layerTableModel.getLayer(), tablePanel);
-        remove(fillerPanel);
         add(
             tablePanel,
             new GridBagConstraints(
@@ -162,23 +163,9 @@ public class AttributePanel
                 1,
                 1,
                 1.0,
-                0.0,
-                GridBagConstraints.CENTER,
-                GridBagConstraints.BOTH,
-                new Insets(0, 0, 0, 0),
-                0,
-                0));
-        add(
-            fillerPanel,
-            new GridBagConstraints(
-                0,
-                getComponentCount(),
-                1,
-                1,
-                0.0,
                 1.0,
                 GridBagConstraints.CENTER,
-                GridBagConstraints.VERTICAL,
+                GridBagConstraints.BOTH,
                 new Insets(0, 0, 0, 0),
                 0,
                 0));

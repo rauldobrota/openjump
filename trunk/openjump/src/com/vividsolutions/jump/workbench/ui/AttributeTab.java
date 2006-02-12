@@ -123,7 +123,7 @@ public class AttributeTab extends JPanel implements LayerNamePanel {
         final InfoModel model,
         final WorkbenchContext workbenchContext,
         final TaskFrame taskFrame,
-        LayerManagerProxy layerManagerProxy) {
+        LayerManagerProxy layerManagerProxy, boolean addScrollPanesToChildren) {
         this.layerManagerProxy = layerManagerProxy;
         this.model = model;
         this.taskFrame = taskFrame;
@@ -136,7 +136,7 @@ public class AttributeTab extends JPanel implements LayerNamePanel {
             }
         }));
         panel =
-            new AttributePanel(model, workbenchContext, taskFrame, layerManagerProxy) {
+            new AttributePanel(model, workbenchContext, taskFrame, layerManagerProxy, addScrollPanesToChildren) {
             public void layerAdded(LayerTableModel layerTableModel) {
                 super.layerAdded(layerTableModel);
 
@@ -213,6 +213,11 @@ public class AttributeTab extends JPanel implements LayerNamePanel {
         }
 
         initScrollPane();
+        if (addScrollPanesToChildren) {
+            remove(scrollPane);
+            add(panel, BorderLayout.CENTER);
+            
+        }        
         installToolBarButtons(workbenchContext, taskFrame);                  
         toolBar.updateEnabledState();
     }
