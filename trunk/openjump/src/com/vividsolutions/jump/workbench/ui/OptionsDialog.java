@@ -51,6 +51,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import com.vividsolutions.jts.util.Assert;
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.util.Blackboard;
 import com.vividsolutions.jump.workbench.JUMPWorkbench;
 
@@ -60,6 +61,8 @@ public class OptionsDialog extends JDialog {
     private OKCancelPanel okCancelPanel = new OKCancelPanel();
     private JTabbedPane tabbedPane = new JTabbedPane();
 
+    private static String sOptions=I18N.get("com.vividsolutions.jump.workbench.ui.plugin.OptionsPlugIn");
+	
     private OptionsDialog(Frame frame, String title, boolean modal) {
         super(frame, title, modal);
         try {
@@ -105,7 +108,7 @@ public class OptionsDialog extends JDialog {
         if (blackboard.get(OptionsDialog.class +" - INSTANCE") == null) {
             return (OptionsDialog) blackboard.get(
                         OptionsDialog.class +" - INSTANCE",
-                        new OptionsDialog(frame, "Options", true));    
+                        new OptionsDialog(frame, sOptions, true));    
         }
         return (OptionsDialog) blackboard.get(OptionsDialog.class +" - INSTANCE");        
     }
@@ -163,7 +166,7 @@ public class OptionsDialog extends JDialog {
         getContentPane().add(strut, BorderLayout.NORTH);
         panel1.setLayout(borderLayout1);        
         this.setModal(true);
-        this.setTitle("Options");
+        this.setTitle(sOptions);
         getContentPane().add(panel1);
         panel1.add(tabbedPane, BorderLayout.CENTER);
         this.getContentPane().add(okCancelPanel, BorderLayout.SOUTH);
