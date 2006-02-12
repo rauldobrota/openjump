@@ -41,6 +41,7 @@ import org.openjump.core.ui.plugin.tools.DeleteEmptyGeometriesPlugIn;
 import org.openjump.core.ui.plugin.tools.JoinWithArcPlugIn;
 import org.openjump.core.ui.plugin.tools.LineSimplifyJTS15AlgorithmPlugIn;
 import org.openjump.core.ui.plugin.tools.MeasureM_FPlugIn;
+import org.openjump.core.ui.plugin.tools.ProjectionPlugIn;
 import org.openjump.core.ui.plugin.tools.ReducePointsISAPlugIn;
 import org.openjump.core.ui.plugin.view.InstallKeyPanPlugIn;
 import org.openjump.core.ui.plugin.view.MapToolTipPlugIn;
@@ -220,7 +221,7 @@ public class OpenJumpConfiguration{
 		
 		DrawConstrainedArcPlugIn myConstrainedArcPlugIn = new DrawConstrainedArcPlugIn();
 		myConstrainedArcPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
-
+				
 		ConstrainedMoveVertexPlugIn myCMVPlugIn = new ConstrainedMoveVertexPlugIn();
 		myCMVPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
@@ -239,8 +240,21 @@ public class OpenJumpConfiguration{
 		myScaleItemsPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		*/
 		
+		/***********************
+		 *  others
+		 **********************/
+		
 		// takes care of keyboard navigation
 		new InstallKeyPanPlugIn().initialize( new PlugInContext(workbenchContext, null, null, null, null) );
 		
+		
+		/***********************
+		 *  testing
+		 **********************/
+		/*
+		ProjectionPlugIn projectionPlugin = new ProjectionPlugIn();
+		projectionPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		*/
+
 	}
 }
