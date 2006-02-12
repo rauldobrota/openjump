@@ -56,8 +56,6 @@ import com.vividsolutions.jump.workbench.ui.zoom.ZoomTool;
 public class DrawConstrainedPolygonPlugIn extends AbstractPlugIn
 {
     private boolean polygonButtonAdded = false;
-    private static String BOX_CHECKED_KEY = DrawConstrainedPolygonPlugIn.class.getName() +
-        " - BOX CHECKED";
     
     final static String constraints = I18N.get("org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedPolygonPlugIn.Constraints");
     final static String errorSeeOutputWindow =I18N.get("org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedPolygonPlugIn.Error-See-Output-Window");
@@ -112,8 +110,6 @@ public class DrawConstrainedPolygonPlugIn extends AbstractPlugIn
     {
     	if (!polygonButtonAdded)
     	{
-//    		OptionsDialog.instance(context.getWorkbenchContext().getWorkbench()).addTab("Constraints",
-//    				new ConstraintsOptionsPanel(context.getWorkbenchContext()));
     		final ToolboxDialog toolbox = ((EditingPlugIn) context.getWorkbenchContext().getBlackboard().get(EditingPlugIn.KEY)).getToolbox(context.getWorkbenchContext());
     		toolbox.addToolBar();
     		QuasimodeTool quasimodeTool = new QuasimodeTool(DrawConstrainedPolygonTool.create(toolbox.getContext()));

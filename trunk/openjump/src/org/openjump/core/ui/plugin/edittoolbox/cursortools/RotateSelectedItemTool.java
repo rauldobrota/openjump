@@ -33,7 +33,6 @@
 
 package org.openjump.core.ui.plugin.edittoolbox.cursortools;
 
-import java.awt.BasicStroke;
 import java.awt.Cursor;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
@@ -44,7 +43,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -60,6 +58,7 @@ import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.workbench.model.Layer;
 import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.ui.EditTransaction;
+import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.cursortool.DragTool;
 
 public class RotateSelectedItemTool extends DragTool {
@@ -70,27 +69,26 @@ public class RotateSelectedItemTool extends DragTool {
 
     private EnableCheckFactory checkFactory;
     private Shape selectedFeatureShape;
-    private GeometryFactory geometryFactory = new GeometryFactory();
-    private List verticesToSnap = null;
     private Coordinate centerCoord;
     protected boolean clockwise = true;
     private double fullAngle = 0.0;
+    private boolean shiftDown = false;
+    private Cursor rotateCursor = createCursor(new ImageIcon(getClass().getResource("RotateSelCursor.gif")).getImage());;
+    private Cursor crosshairCursor = createCursor(new ImageIcon(getClass().getResource("CrossHairCursor.gif")).getImage());
     
     public RotateSelectedItemTool(EnableCheckFactory checkFactory) {
         this.checkFactory = checkFactory;
-        setStroke(
-            new BasicStroke(
-                1,
-                BasicStroke.CAP_BUTT,
-                BasicStroke.JOIN_BEVEL,
-                0,
-                new float[] { 3, 3 },
-                0));
-        allowSnapping();
+    }
+
+    public void activate(LayerViewPanel layerViewPanel) 
+    {
+    	centerCoord = null;
+    	super.activate(layerViewPanel);
     }
 
     protected void gestureFinished() throws java.lang.Exception {
         reportNothingToUndoYet();
+		if (!check(checkFactory.createAtLeastNItemsMustBeSelectedCheck(1))) return;
         ArrayList transactions = new ArrayList();
         for (Iterator i = getPanel().getSelectionManager().getLayersWithSelectedItems().iterator();
             i.hasNext();
@@ -129,30 +127,52 @@ public class RotateSelectedItemTool extends DragTool {
     }
     
     public Cursor getCursor() {
-        return createCursor(new ImageIcon(getClass().getResource("RotateSelCursor.gif")).getImage());
+    	if (shiftDown)
+    		return crosshairCursor;
+    	else
+    		return rotateCursor;
     }
 
     public Icon getIcon() {
         return new ImageIcon(getClass().getResource("RotateSel.gif"));
     }
-
-    public String getName() {
+    
+    public void mouseMoved(MouseEvent e)
+    {
+    	if (e.isShiftDown())
+    	{
+    		shiftDown = true;
+    		getPanel().setCursor(crosshairCursor);
+    	}
+    	else
+    	{
+    		shiftDown = false;
+    		getPanel().setCursor(rotateCursor);
+    	}
+    	super.mouseMoved(e);
+    }
+    
+        public String getName() {
         return rotateSelectedItem;
     }
     
     public void mousePressed(MouseEvent e) {
         try {
-            if (!check(checkFactory.createExactlyNFeaturesMustBeSelectedCheck(1))) {
-                return;
-            }
-
             if (!check(checkFactory.createSelectedItemsLayersMustBeEditableCheck())) {
                 return;
             }
 
-            verticesToSnap = null;
-            selectedFeatureShape = createSelectedItemsShape();
-            super.mousePressed(e);
+            if (e.isShiftDown())
+            {
+            	centerCoord = getPanel().getViewport().toModelCoordinate(e.getPoint());
+            }
+            else
+            {
+        		if (!check(checkFactory.createAtLeastNItemsMustBeSelectedCheck(1))) return;
+
+            	selectedFeatureShape = createSelectedItemsShape();
+            	super.mousePressed(e);
+            }
         } catch (Throwable t) {
             getPanel().getContext().handleThrowable(t);
         }
@@ -161,7 +181,18 @@ public class RotateSelectedItemTool extends DragTool {
     private Shape createSelectedItemsShape() throws NoninvertibleTransformException {
         Collection selectedGeos = (getPanel().getSelectionManager().getSelectedItems());
         Geometry geo = ((Geometry) selectedGeos.iterator().next());
-        centerCoord = geo.getCentroid().getCoordinate(); 
+        Geometry[] allGeoms = new Geometry[selectedGeos.size()];
+        int i = 0;
+        for (Iterator j = selectedGeos.iterator(); j.hasNext();)
+        	allGeoms[i++] = (Geometry)j.next();
+        
+        GeometryFactory geoFac = new GeometryFactory();
+        geo = geoFac.createGeometryCollection(allGeoms);
+        
+        if (centerCoord == null)
+        {
+        	centerCoord = geo.getCentroid().getCoordinate(); 
+        }
         return getPanel().getJava2DConverter().toShape(geo);
     }
 
@@ -179,7 +210,7 @@ public class RotateSelectedItemTool extends DragTool {
         Coordinate initialCoord = getPanel().getViewport().toModelCoordinate(initialPt);
         Coordinate currCoord = getPanel().getViewport().toModelCoordinate(currPt);
         
-        boolean toRight = (new GeoUtils().pointToRight(currCoord, centerCoord, initialCoord));      
+        boolean toRight = (GeoUtils.pointToRight(currCoord, centerCoord, initialCoord));      
         boolean cwQuad = ((fullAngle >= 0.0) &&(fullAngle <= 90.0) && clockwise);
         boolean ccwQuad = ((fullAngle < 0.0) &&(fullAngle >= -90.0) && !clockwise);
         

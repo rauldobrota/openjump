@@ -74,7 +74,6 @@ public class JoinWithArcPlugIn extends AbstractPlugIn {
     private final static String RADIUS = I18N.get("org.openjump.core.ui.plugin.tools.JoinWithArcPlugIn.Radius");
     private MultiInputDialog dialog;
     private double arcRadius = 50.0;
-    private boolean exceptionThrown = false;
 
     public void initialize(PlugInContext context) throws Exception
     {     
@@ -166,22 +165,12 @@ public class JoinWithArcPlugIn extends AbstractPlugIn {
     public MultiEnableCheck createEnableCheck(final WorkbenchContext workbenchContext) {
         EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
         return new MultiEnableCheck()
+            .add(checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck())
             .add(checkFactory.createOnlyOneLayerMayHaveSelectedFeaturesCheck())
             .add(createBetweenNAndMFeaturesMustBeSelectedCheck(1, 2))
-            .add(checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck())
-            .add(checkFactory.createAtLeastNFeaturesMustHaveSelectedItemsCheck(1))
-            .add(new EnableCheck() {
-            public String check(JComponent component) {
-                Collection featuresWithSelectedItems =
-                    workbenchContext
-                        .getLayerViewPanel()
-                        .getSelectionManager()
-                        .getFeaturesWithSelectedItems();
-                return null;
-            }
-        });
+            .add(checkFactory.createAtLeastNFeaturesMustHaveSelectedItemsCheck(1));
     }
-    
+
     private EnableCheck createBetweenNAndMFeaturesMustBeSelectedCheck(final int n, final int m) {
         return new EnableCheck() {
             public String check(JComponent component) {
@@ -215,16 +204,12 @@ public class JoinWithArcPlugIn extends AbstractPlugIn {
     
      private LineString MakeRoundCorner(Coordinate A, Coordinate B, Coordinate C, Coordinate D, double r, boolean arcOnly)
     {
-        boolean toLeft = true;
-        boolean makeRoundCorner = true;
-        boolean AB_Swapped = true;
-        boolean CD_Swapped = true;
         MathVector Gv = new MathVector();
         MathVector Hv;
         MathVector Fv;
         Coordinate E = Intersect(A, B, C, D);	//vector solution
         
-        if (E != null)
+        if (E != null) //non-parallel lines
         {
             MathVector Ev = new MathVector(E);
             
@@ -235,10 +220,6 @@ public class JoinWithArcPlugIn extends AbstractPlugIn {
                 A = B;
                 B = temp;
             }
-            else
-            {
-                AB_Swapped = false;
-            }
             
             if (E.distance(D) > E.distance(C)) //find longest distance from intersection
             {   //these equations assume B and D are closest to the intersection
@@ -247,15 +228,9 @@ public class JoinWithArcPlugIn extends AbstractPlugIn {
                 C = D;
                 D = temp;
             }
-            else
-            {
-                CD_Swapped = false;
-            }
             
             MathVector Av = new MathVector(A);
-            MathVector Bv = new MathVector(B);
             MathVector Cv = new MathVector(C);
-            MathVector Dv = new MathVector(D);
             double alpha = Av.vectorBetween(Ev).angleRad(Cv.vectorBetween(Ev)) / 2.0; //we only need the half angle
             double h1 = Math.abs(r / Math.sin(alpha));  //from definition of sine solved for h
             
@@ -284,10 +259,6 @@ public class JoinWithArcPlugIn extends AbstractPlugIn {
                 if (!arcOnly) coordinates.add(A);
                 return new GeometryFactory().createLineString(coordinates.toCoordinateArray());
             }
-        }
-        else //parallel lines
-        {
-            
         }
        return null;
     }
@@ -383,72 +354,5 @@ public class JoinWithArcPlugIn extends AbstractPlugIn {
          filletCoordinates.add(lineString.getCoordinates(), false, false);
          filletCoordinates.add(filletCoordinates.getCoordinate(0));
          return new GeometryFactory().createLinearRing(filletCoordinates.toCoordinateArray());
-     }
-     
-//{---------------------------------------------------------------------------}
-//{ Find the perpendicular distance between Point R and the Line from P0 to P1}
-//{ Based on the affine parametric equation of a line: P(t) = P0 + tV			}
-//{ First find the value of t such that R - P(t) is perpendicular to V where V}
-//{ is the vector P1 - P0.  Given that the dot product of two vectors is zero }
-//{ when they are perpendicular:	  ( * is read as dot )						}
-//{		(R-P(t)) * V = 0					  substituting P0 + tV for P(t) gives	}
-//{		(R - P0 - tV) * V = 0		  collecting term gives:				}
-//{		{R-P0) * V = tV * V			  solving for t gives:					}
-//{				t = ((R-P0) * V) / (V * V)		If t is in the interval 0 to 1 then	  }
-//{ the intersection point is between P0 and P1, otherwise use the distance	}
-//{ formula.	Plugging in the value of t to the original equation gives the	}
-//{ vector from the line to R and we need only take the magnitude of it to	}
-//{ find the distance.														}
-//{---------------------------------------------------------------------------}
-//procedure GetDistance(R, P0, P1: Coord; var Distance: extended; var Which: integer; var CoordOut: coord);
-//var								{Which = 0 (P0), 1 (P0-P1), 2 (P1)}
-//	X0, Y0, X1, Y1, Xv, Yv, Xr, Yr, Xp0r, Yp0r, Xp1r, Yp1r: extended;
-//	Xp, Yp: extended;
-//	t, VdotV, DistP0toR, DistP1toR: extended;	
-//begin
-//	X0 := P0.h; Y0 := P0.v;
-//	X1 := P1.h; Y1 := P1.v;
-//	Xr := R.h; Yr := R.v;
-//	Xv := X1 - X0;													{V := VectorBetween(P0, P1)}
-//	Yv := Y1 - Y0;
-//	VdotV := Xv * Xv + Yv * Yv;							{Dot(V, V)}
-//	Xp0r := Xr - X0;
-//	Yp0r := Yr - Y0;
-//	DistP0toR := SQRT(Xp0r * Xp0r + Yp0r * Yp0r );
-//	Which := 0;
-//	if VdotV = 0.0 then {degenerate line}
-//	begin
-//		Distance := DistP0toR;							{Dist(P0, R)}
-//		exit;
-//	end;
-//	t := (Xp0r * Xv + Yp0r * Yv) / VdotV;		{Dot( VectorBetween(P0, R), V) / VdotV}
-//	if ((t >= 0.0) and (t <= 1.0)) then { P(t) is between P0 and P1 }
-//	begin
-//		Xp := (X0 + t * Xv) - Xr; {VectorBetween(R, VectorAdd(P0, VectorTimesScalar(V, t)))}
-//		Yp := (Y0 + t * Yv) - Yr;
-//		Distance := SQRT(Xp*Xp + Yp*Yp);	{Mag(VectorBetween(R, Pt ))}
-//		Which := 1;
-//		CoordOut.h := R.h + Xp;
-//		CoordOut.v := R.v + Yp;
-//	end
-//	else								{ P(t) is outside the interval P0 to P1 }
-//	begin
-//		Xp1r := Xr - X1;
-//		Yp1r := Yr - Y1;
-//		DistP1toR := SQRT(Xp1r*Xp1r + Yp1r*Yp1r );
-//		if DistP1toR < DistP0toR then {Min( Dist(P0, R), Dist(P1, R) );}
-//		begin
-//			Distance := DistP1toR;
-//			Which := 2;
-//			CoordOut := P1;
-//		end
-//		else
-//		begin
-//			Distance := DistP0toR;
-//			Which := 0;
-//			CoordOut := P0;
-//		end;
-//	end;
-//end;
-     
+     }     
 }

@@ -49,7 +49,6 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureCollection;
-import com.vividsolutions.jump.feature.FeatureSchema;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.model.Layer;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
@@ -57,7 +56,6 @@ import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.AbstractSelection;
-import com.vividsolutions.jump.workbench.ui.LayerNamePanel;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
 import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
@@ -65,8 +63,6 @@ import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
 public class SelectByTypePlugIn extends AbstractPlugIn
 {
     private WorkbenchContext workbenchContext;
-    private MultiInputDialog dialog;
-    private boolean exceptionThrown = false;
     private boolean selectEmpty = false;
     private boolean selectPoint = false;
     private boolean selectMultiPoint = false;
@@ -97,7 +93,6 @@ public class SelectByTypePlugIn extends AbstractPlugIn
     
     public boolean execute(final PlugInContext context) throws Exception
     {
-//        final ArrayList transactions = new ArrayList();
         reportNothingToUndoYet(context);
         MultiInputDialog dialog = new MultiInputDialog(
         context.getWorkbenchFrame(), getName(), true);
@@ -107,7 +102,6 @@ public class SelectByTypePlugIn extends AbstractPlugIn
         if (! dialog.wasOKPressed()) {return false;}
         
         getDialogValues(dialog);
-        LayerNamePanel layerNamePanel = context.getWorkbenchContext().getLayerNamePanel();
         LayerViewPanel layerViewPanel = context.getWorkbenchContext().getLayerViewPanel();
         ArrayList selectedFeatures = new ArrayList();
         
@@ -127,13 +121,11 @@ public class SelectByTypePlugIn extends AbstractPlugIn
             if (layer.isVisible())
             {
                 FeatureCollection featureCollection = layer.getFeatureCollectionWrapper();
-                FeatureSchema schema = featureCollection.getFeatureSchema();
                 for (Iterator i = featureCollection.iterator(); i.hasNext();)
                 {
                     Feature feature = (Feature) i.next();
                     if (selectFeature(feature))
                     {
-//                        layer.getFeatureCollectionWrapper().remove(feature);
                         selectedFeatures.add(feature);
                     }
                 }
@@ -147,15 +139,16 @@ public class SelectByTypePlugIn extends AbstractPlugIn
     private boolean selectFeature(Feature feature)
     {
         Geometry geo = feature.getGeometry();
-        if (geo.isEmpty() && selectEmpty) return true;
-        if ((feature.getGeometry() instanceof Point) && selectPoint) return true;
-        if ((feature.getGeometry() instanceof MultiPoint) && selectMultiPoint) return true;
-        if ((feature.getGeometry() instanceof LineString) && selectLineString) return true;
-        if ((feature.getGeometry() instanceof LinearRing) && selectLinearRing) return true;
-        if ((feature.getGeometry() instanceof MultiLineString) && selectMultiLineString) return true;
-        if ((feature.getGeometry() instanceof Polygon) && selectPolygon) return true;
-        if ((feature.getGeometry() instanceof MultiPolygon) && selectMultiPolygon) return true;
-        if ((feature.getGeometry() instanceof GeometryCollection) && selectGeometryCollection) return true;
+        
+		if (selectPoint && (geo instanceof Point)) return true;
+		else if (selectMultiPoint && (geo instanceof MultiPoint)) return true;
+		else if (selectLineString && (geo instanceof LineString)) return true;
+		else if (selectLinearRing && (geo instanceof LinearRing)) return true;
+		else if (selectMultiLineString && (geo instanceof MultiLineString)) return true;
+		else if (selectPolygon && (geo instanceof Polygon)) return true;
+		else if (selectMultiPolygon && (geo instanceof MultiPolygon)) return true;
+		else if (selectGeometryCollection && (geo instanceof GeometryCollection)) return true;
+		else if (selectEmpty && geo.isEmpty()) return true;        
         return false;
     }
     
@@ -188,28 +181,9 @@ public class SelectByTypePlugIn extends AbstractPlugIn
         selectedLayersOnly = dialog.getCheckBox(sOnSelectedLayersOnly).isSelected();
     }
     
-//    private EditTransaction createTransaction(Layer layer, final Coordinate displacement)
-//    {
-//        EditTransaction transaction =
-//        EditTransaction.createTransactionOnSelection(new EditTransaction.SelectionEditor()
-//        {
-//            public Geometry edit(Geometry geometryWithSelectedItems, Collection selectedItems)
-//            {
-//                for (Iterator j = selectedItems.iterator(); j.hasNext();)
-//                {
-//                    Geometry item = (Geometry) j.next();
-//                    //move(item, displacement);
-//                }
-//                return geometryWithSelectedItems;
-//            }
-//        }, workbenchContext.getLayerViewPanel(), workbenchContext.getLayerViewPanel().getContext(), getName(), layer, false,false);// isRollingBackInvalidEdits(), false);
-//        return transaction;
-//    }
-    
     public MultiEnableCheck createEnableCheck(final WorkbenchContext workbenchContext) 
     {
         EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
-        return new MultiEnableCheck().add(checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck())
-        		.add(checkFactory.createAtLeastNLayersMustExistCheck(1));
+        return new MultiEnableCheck().add(checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck());
     }    
 }

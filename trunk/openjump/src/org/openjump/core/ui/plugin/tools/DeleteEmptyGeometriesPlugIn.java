@@ -46,7 +46,6 @@ import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.AbstractSelection;
-import com.vividsolutions.jump.workbench.ui.LayerNamePanel;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
 import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
 
@@ -84,7 +83,6 @@ public class DeleteEmptyGeometriesPlugIn extends AbstractPlugIn
     public boolean execute(final PlugInContext context) throws Exception
     {
         reportNothingToUndoYet(context);
-        LayerNamePanel layerNamePanel = context.getWorkbenchContext().getLayerNamePanel();
         ArrayList featuresToDelete = new ArrayList();
         Collection layers = context.getLayerViewPanel().getSelectionManager().getLayersWithSelectedItems();
         

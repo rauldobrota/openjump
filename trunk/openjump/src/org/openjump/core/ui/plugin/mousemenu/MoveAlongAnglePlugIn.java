@@ -38,9 +38,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateFilter;
 import com.vividsolutions.jts.geom.Geometry;
@@ -49,7 +47,6 @@ import com.vividsolutions.jump.geom.CoordUtil;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.model.Layer;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
-import com.vividsolutions.jump.workbench.plugin.EnableCheck;
 import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
@@ -64,6 +61,7 @@ public class MoveAlongAnglePlugIn extends AbstractPlugIn {
 	private final static String sMoveSelectedFeaturesAlongAngle =I18N.get("org.openjump.core.ui.plugin.mousemenu.MoveAlongAnglePlugIn.Move-Selected-Features-Along-Angle");
 	private final static String sTheDistanceInMapUnitsToMove=I18N.get("org.openjump.core.ui.plugin.mousemenu.MoveAlongAnglePlugIn.The-distance-in-map-units-to-move");
 	private final static String sTheAngleInDegreesToMove = I18N.get("org.openjump.core.ui.plugin.mousemenu.MoveAlongAnglePlugIn.The-angle-in-degrees-to-move");
+	private final static String sWillCovert = I18N.get("org.openjump.core.ui.plugin.mousemenu.MoveAlongAnglePlugIn.Will-convert-input-value-from-feet-to-meters");
 	
     private WorkbenchContext workbenchContext;
     private final static String ANGLE = I18N.get("org.openjump.core.ui.plugin.mousemenu.MoveAlongAnglePlugIn.Move-Angle");
@@ -72,7 +70,9 @@ public class MoveAlongAnglePlugIn extends AbstractPlugIn {
     private MultiInputDialog dialog;
     private double moveAngle = 0.0;
     private double moveDistance = 1.0;
-    private boolean exceptionThrown = false;
+
+    private final static String CONVERTTOMETERS = I18N.get("org.openjump.core.ui.plugin.mousemenu.MoveAlongAnglePlugIn.Convert-Feet-to-Meters");
+    private double conversionFactor = 1.0;
 
     public void initialize(PlugInContext context) throws Exception
     {     
@@ -91,14 +91,13 @@ public class MoveAlongAnglePlugIn extends AbstractPlugIn {
         MultiInputDialog dialog = new MultiInputDialog(
             context.getWorkbenchFrame(), getName(), true);
         setDialogValues(dialog, context);
-        //GUIUtil.centreOnWindow(dialog);
         dialog.setVisible(true);
         if (! dialog.wasOKPressed()) { return false; }
         getDialogValues(dialog);
         
         double angle = Deg2Rad * moveAngle;
-        double x = Math.cos(angle)*moveDistance;
-        double y = Math.sin(angle)*moveDistance;
+        double x = Math.cos(angle) * moveDistance * conversionFactor;
+        double y = Math.sin(angle) * moveDistance * conversionFactor;
         Coordinate displacement = new Coordinate(x,y);   
         workbenchContext = context.getWorkbenchContext();
         for (Iterator i = workbenchContext.getLayerViewPanel().getSelectionManager().getLayersWithSelectedItems().iterator();
@@ -117,9 +116,14 @@ public class MoveAlongAnglePlugIn extends AbstractPlugIn {
         dialog.setSideBarDescription(sMoveSelectedFeaturesAlongAngle);
         dialog.addDoubleField(DISTANCE, moveDistance, 6, sTheDistanceInMapUnitsToMove);
         dialog.addDoubleField(ANGLE, moveAngle, 6, sTheAngleInDegreesToMove);
+        dialog.addCheckBox(CONVERTTOMETERS, (!(conversionFactor == 1.0)), sWillCovert);
       }
 
       private void getDialogValues(MultiInputDialog dialog) {
+        if(dialog.getCheckBox(CONVERTTOMETERS).isSelected())
+        	conversionFactor =  0.3048;
+        else
+        	conversionFactor = 1.0;
         moveDistance = dialog.getDouble(DISTANCE);
         moveAngle = dialog.getDouble(ANGLE);
       }
@@ -152,25 +156,7 @@ public class MoveAlongAnglePlugIn extends AbstractPlugIn {
         return new MultiEnableCheck()
             .add(checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck())
             .add(checkFactory.createAtLeastNFeaturesMustHaveSelectedItemsCheck(1))
-            .add(checkFactory.createSelectedItemsLayersMustBeEditableCheck())
-            .add(new EnableCheck() {
-            public String check(JComponent component) {
-                Collection featuresWithSelectedItems =
-                    workbenchContext
-                        .getLayerViewPanel()
-                        .getSelectionManager()
-                        .getFeaturesWithSelectedItems();
-                //for (Iterator i = featuresWithSelectedItems.iterator(); i.hasNext();) {
-                //    Feature feature = (Feature) i.next();
-                //    if (!(feature.getGeometry() instanceof GeometryCollection)) {
-                //        return "Selected feature"
-                //           + StringUtil.s(featuresWithSelectedItems.size())
-                //            + " must be geometry collection"
-                //            + StringUtil.s(featuresWithSelectedItems.size());
-                //    }
-                //}
-                return null;
-            }
-        });
+            .add(checkFactory.createSelectedItemsLayersMustBeEditableCheck());
+
     }
 }

@@ -78,6 +78,7 @@ public class MapToolTipPlugIn extends AbstractPlugIn
         public int side;
         public double length;
         public double angle;
+        public double area;
         public void set(GeoData geoData)
         {
             this.type = geoData.type;
@@ -85,6 +86,7 @@ public class MapToolTipPlugIn extends AbstractPlugIn
             this.side = geoData.side;
             this.length = geoData.length;
             this.angle = geoData.angle;
+            this.area = geoData.area;
         }
     }
     
@@ -96,24 +98,23 @@ public class MapToolTipPlugIn extends AbstractPlugIn
 	final static String sAngle =I18N.get("org.openjump.core.ui.plugin.edittoolbox.cursortools.angle");
 	final static String sDegrees =I18N.get("org.openjump.core.ui.plugin.edittoolbox.cursortools.degrees");
 	final static String sNoData =I18N.get("org.openjump.core.ui.plugin.view.MapToolTipPlugIn.No-Data");
+	final static String sArea =I18N.get("org.openjump.core.ui.plugin.edittoolbox.cursortools.area");
 	
     private MouseMotionAdapter mouseMotionAdapter =
     new MouseMotionAdapter()
     {
         public void mouseMoved(MouseEvent e)
         {
-        	LayerViewPanel lvp=gContext.getWorkbenchContext().getLayerViewPanel();
-        	if (lvp != null){
-        		ToolTipWriter toolTipWriter = new ToolTipWriter(gContext.getWorkbenchContext().getLayerViewPanel());
-        		toolTipWriter.setEnabled(gContext.getWorkbenchContext().getLayerViewPanel().getToolTipWriter().isEnabled());
-        		String fid = toolTipWriter.write("{FID}", e.getPoint());
-//            String toolTipText = toolTipWriter.write("feat_desc: {feat_desc}, dist_u_d: {dist_u_d}, facil_id {facil_id}", e.getPoint());
-        		if (fid != null)
-        		{
-        			String toolTipText = getData(Integer.parseInt(fid), e.getPoint());
-        			gContext.getWorkbenchContext().getLayerViewPanel().setToolTipText(toolTipText);
-        		}
-        	}
+        	if (gContext.getWorkbenchContext().getLayerViewPanel() == null) { return; } //[Jon Aquino 2005-08-04]
+            ToolTipWriter toolTipWriter = new ToolTipWriter(gContext.getWorkbenchContext().getLayerViewPanel());
+            toolTipWriter.setEnabled(gContext.getWorkbenchContext().getLayerViewPanel().getToolTipWriter().isEnabled());
+            String fid = toolTipWriter.write("{FID}", e.getPoint());
+
+            if (fid != null)
+            {
+                String toolTipText = getData(Integer.parseInt(fid), e.getPoint());
+                gContext.getWorkbenchContext().getLayerViewPanel().setToolTipText(toolTipText);
+            }
         }
     };
                
@@ -125,25 +126,19 @@ public class MapToolTipPlugIn extends AbstractPlugIn
         {
             public void componentAdded(ContainerEvent e)
             {                              
-            	LayerViewPanel lvp=gContext.getWorkbenchContext().getLayerViewPanel();
-            	if (lvp != null){
-            		Component child = e.getChild();
-            		if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
-            		{
-            			((TaskFrame)child).getLayerViewPanel().addMouseMotionListener(mouseMotionAdapter);
-            		}
+                Component child = e.getChild();
+                if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
+                {
+                    ((TaskFrame)child).getLayerViewPanel().addMouseMotionListener(mouseMotionAdapter);
             	}
             }
             
             public void componentRemoved(ContainerEvent e)
             {
-            	LayerViewPanel lvp=gContext.getWorkbenchContext().getLayerViewPanel();
-            	if (lvp != null){
-	                Component child = e.getChild();
-	                if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
-	                {
-	                    ((TaskFrame)child).getLayerViewPanel().removeMouseMotionListener(mouseMotionAdapter);
-	            	}
+                Component child = e.getChild();
+                if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
+                {
+                    ((TaskFrame)child).getLayerViewPanel().removeMouseMotionListener(mouseMotionAdapter);
             	}
             }
         });
@@ -151,7 +146,17 @@ public class MapToolTipPlugIn extends AbstractPlugIn
     
     public boolean execute(PlugInContext context) throws Exception
     {
-        return true;
+        try
+        {
+            return true;
+        }
+        catch (Exception e)
+        {
+            context.getWorkbenchFrame().warnUser(sErrorSeeOutputWindow);
+            context.getWorkbenchFrame().getOutputFrame().createNewDocument();
+            context.getWorkbenchFrame().getOutputFrame().addText("MapToolTipPlugIn Exception:" + e.toString());
+            return false;
+        }
     }
     
     private String getData(int fID, Point2D mouseLocation)
@@ -159,6 +164,7 @@ public class MapToolTipPlugIn extends AbstractPlugIn
         int maxLinesOfData = 10;
         String dataText = "<html>";
         LayerViewPanel panel = gContext.getWorkbenchContext().getLayerViewPanel();
+        if (panel == null) {return "";}
         LayerManager layerManager = panel.getLayerManager();
         List layerList = layerManager.getVisibleLayers(false);
         for (Iterator i = layerList.iterator(); i.hasNext();)
@@ -217,7 +223,11 @@ public class MapToolTipPlugIn extends AbstractPlugIn
         GeoData geoData = getClosest(geo, mousePt);
         DecimalFormat df2 = new DecimalFormat("##0.0#");
         DecimalFormat df3 = new DecimalFormat("###,###,##0.0##");
-        String geoText = geoData.type + ": " + sSide + ": " + geoData.side + ", " + sLength + ": " + df3.format(geoData.length) + ", " + sAngle +": " + df2.format(geoData.angle) + " " + sDegrees;
+        String geoText = "";
+        if (geoData.area > 0)
+        	geoText = geoData.type + ": " + sSide + ": " + geoData.side + ", " + sLength + ": " + df3.format(geoData.length) + ", " + sAngle + ": " + df2.format(geoData.angle) + " " + sDegrees + ", " + sArea + ": " + df2.format(geoData.area);
+    	else	
+    		geoText = geoData.type + ": " + sSide + ": " + geoData.side + ", " + sLength + ": " + df3.format(geoData.length) + ", " + sAngle +": " + df2.format(geoData.angle) + " " + sDegrees;
         if (geoData.type.equals("Point")) geoText = "Point";
      return geoText;
     }  
@@ -268,21 +278,21 @@ public class MapToolTipPlugIn extends AbstractPlugIn
                 p0 = coords.getCoordinate(0);
                 p1 = coords.getCoordinate(1);
                 length = p0.distance(p1);
-                angle = new GeoUtils().getBearing180(p0, p1);
-                distToClosestSide = new GeoUtils().getDistance(mousePt, p0, p1);
+                angle = GeoUtils.getBearing180(p0, p1);
+                distToClosestSide = GeoUtils.getDistance(mousePt, p0, p1);
             }
             
             for (int i = 1; i < maxIndex; i++)
             {
                 p0 = coords.getCoordinate(i);
                 p1 = coords.getCoordinate(i+1);
-                double distToSide = new GeoUtils().getDistance(mousePt, p0, p1);
+                double distToSide = GeoUtils.getDistance(mousePt, p0, p1);
                 
                 if (distToSide < distToClosestSide)
                 {
                     side = i + 1;
                     length = p0.distance(p1);
-                    angle = new GeoUtils().getBearing180(p0, p1);
+                    angle = GeoUtils.getBearing180(p0, p1);
                     distToClosestSide = distToSide;
                 }
             }
@@ -292,6 +302,7 @@ public class MapToolTipPlugIn extends AbstractPlugIn
             geoData.length = length;
             geoData.angle = angle;
             geoData.distance = distToClosestSide;
+            geoData.area = geo.getArea();
         }
         return geoData;
     }

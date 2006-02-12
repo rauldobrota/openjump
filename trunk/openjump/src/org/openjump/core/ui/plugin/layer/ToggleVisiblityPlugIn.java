@@ -50,7 +50,6 @@ import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
-import com.vividsolutions.jump.workbench.ui.LayerNamePanel;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 
 public class ToggleVisiblityPlugIn extends AbstractPlugIn
@@ -86,15 +85,11 @@ public class ToggleVisiblityPlugIn extends AbstractPlugIn
         try
         {
             context.getWorkbenchFrame().getOutputFrame().createNewDocument();
-            LayerNamePanel layerNamePanel = context.getWorkbenchContext().getLayerNamePanel();
-            //layerNamePanel.addListener(layerNamePanelListener);
-            
             Collection layerCollection = (Collection) context.getWorkbenchContext().getLayerNamePanel().selectedNodes(Layer.class);
             for (Iterator j = layerCollection.iterator(); j.hasNext();)
-         {
+            {
                 Layer layer = (Layer) j.next();
                 layer.setVisible(!layer.isVisible());
-                //context.getWorkbenchFrame().getOutputFrame().addText(layer.getName());
             }
             
             Collection sidLayerCollection = (Collection) context.getWorkbenchContext().getLayerNamePanel().selectedNodes(SIDLayer.class);
@@ -102,7 +97,6 @@ public class ToggleVisiblityPlugIn extends AbstractPlugIn
             {
                 SIDLayer layer = (SIDLayer) j.next();
                 layer.setVisible(!layer.isVisible()); 
-                //context.getWorkbenchFrame().getOutputFrame().addText(layer.getName());
             }
             return true;
         }

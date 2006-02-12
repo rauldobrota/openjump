@@ -32,15 +32,11 @@
  */
 
 package org.openjump.core.ui.plugin.tools;
-import java.util.ArrayList;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
-
-import javax.swing.JComponent;
-
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateFilter;
 import com.vividsolutions.jts.geom.CoordinateList;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -48,13 +44,10 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureDataset;
-import com.vividsolutions.jump.geom.CoordUtil;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
-import com.vividsolutions.jump.workbench.model.Layer;
 import com.vividsolutions.jump.workbench.model.LayerManager;
 import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
-import com.vividsolutions.jump.workbench.plugin.EnableCheck;
 import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
@@ -72,26 +65,16 @@ public class BlendLineStringsPlugIn extends AbstractPlugIn {
     private final static String TOLERANCE = I18N.get("org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn.Tolerance");
     private final static String sName = I18N.get("org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn.Blend-LineStrings");
     
-    private MultiInputDialog dialog;
     private double blendTolerance = 0.1;
-    private boolean exceptionThrown = false;
 
     public void initialize(PlugInContext context) throws Exception
     {     
         workbenchContext = context.getWorkbenchContext();
-        context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this, new String[] { MenuNames.TOOLS, MenuNames.TOOLS_JOIN }, sName, false, null, this.createEnableCheck(workbenchContext));
-
-//        FeatureInstaller featureInstaller = new FeatureInstaller(workbenchContext);
-//        JPopupMenu popupMenu = workbenchContext.getLayerViewPanel().popupMenu();
-//        featureInstaller.addPopupMenuItem(popupMenu,
-//            this, "Blend LineStrings",
-//            false, null,  
-//            this.createEnableCheck(workbenchContext));
+        context.getFeatureInstaller().addMainMenuItem(this, new String[] { "Tools", "Join" }, getName(), false, null, this.createEnableCheck(workbenchContext));
     }
     
     public boolean execute(final PlugInContext context) throws Exception
     {
-        final ArrayList transactions = new ArrayList();
         reportNothingToUndoYet(context);
         
         MultiInputDialog dialog = new MultiInputDialog(context.getWorkbenchFrame(), getName(), true);
@@ -217,43 +200,11 @@ public class BlendLineStringsPlugIn extends AbstractPlugIn {
         blendTolerance = dialog.getDouble(TOLERANCE);
       }
 
-    private EditTransaction createTransaction(Layer layer, final Coordinate displacement) {
-        EditTransaction transaction =
-            EditTransaction.createTransactionOnSelection(new EditTransaction.SelectionEditor() {
-            public Geometry edit(Geometry geometryWithSelectedItems, Collection selectedItems) {
-                for (Iterator j = selectedItems.iterator(); j.hasNext();) {
-                    Geometry item = (Geometry) j.next();
-                    move(item, displacement);
-                }
-                return geometryWithSelectedItems;
-            }
-        }, workbenchContext.getLayerViewPanel(), workbenchContext.getLayerViewPanel().getContext(), getName(), layer, false,false);// isRollingBackInvalidEdits(), false);
-        return transaction;
-    }
-
-    private void move(Geometry geometry, final Coordinate displacement) {
-        geometry.apply(new CoordinateFilter() {
-            public void filter(Coordinate coordinate) {
-                coordinate.setCoordinate(CoordUtil.add(coordinate, displacement));
-            }
-        });
-    }
-    
     public MultiEnableCheck createEnableCheck(final WorkbenchContext workbenchContext) {
         EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
         return new MultiEnableCheck()
-            .add(checkFactory.createOnlyOneLayerMayHaveSelectedFeaturesCheck())
             .add(checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck())
-            .add(checkFactory.createAtLeastNFeaturesMustHaveSelectedItemsCheck(2))
-            .add(new EnableCheck() {
-            public String check(JComponent component) {
-                Collection featuresWithSelectedItems =
-                    workbenchContext
-                        .getLayerViewPanel()
-                        .getSelectionManager()
-                        .getFeaturesWithSelectedItems();
-                return null;
-            }
-        });
+            .add(checkFactory.createOnlyOneLayerMayHaveSelectedFeaturesCheck())
+            .add(checkFactory.createAtLeastNFeaturesMustHaveSelectedItemsCheck(2));
     }    
 }

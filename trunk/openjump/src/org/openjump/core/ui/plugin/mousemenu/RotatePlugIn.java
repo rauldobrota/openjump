@@ -36,11 +36,8 @@ package org.openjump.core.ui.plugin.mousemenu;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateFilter;
 import com.vividsolutions.jts.geom.Envelope;
@@ -49,7 +46,6 @@ import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.model.Layer;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
-import com.vividsolutions.jump.workbench.plugin.EnableCheck;
 import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
@@ -71,13 +67,11 @@ public class RotatePlugIn extends AbstractPlugIn {
     private final static String ROTATEABOUT = I18N.get("org.openjump.core.ui.plugin.mousemenu.RotatePlugIn.Rotate-About");
     private final double Deg2Rad = 0.0174532925199432;	//pi/180
     private WorkbenchContext workbenchContext;
-    private MultiInputDialog dialog;
     private double rotateAngle = 45.0;
     private double radiansAngle = 0.0;
     private double cosAngle = 0.0;
     private double sinAngle = 0.0;
-    private Coordinate rotationPoint = new Coordinate(0.0,0.0);   
-    private boolean exceptionThrown = false;
+    private Coordinate rotationPoint = new Coordinate(0.0,0.0);
     private Collection methodNames = new ArrayList();
     private String methodNameToRun = METHOD_ABOUTCENTER;
 
@@ -110,9 +104,6 @@ public class RotatePlugIn extends AbstractPlugIn {
                             .getSelectionManager().getLayersWithSelectedItems();
         if (methodNameToRun.equals(METHOD_ABOUTCENTER)) {
             //rotationPoint = getRotationPoint(layers);
-            Collection selectedLayers = context.getLayerViewPanel().getSelectionManager().getLayersWithSelectedItems();
-//            RFLUtilities util = new Utilities();
-//            Envelope en = new Envelope() = util.getEnvelope(context.getLayerViewPanel().getSelectionManager().getSelectedItems());
             Envelope en = new Envelope();
             Collection geometries = context.getLayerViewPanel().getSelectionManager().getSelectedItems();
             for (Iterator j = geometries.iterator(); j.hasNext();)
@@ -127,7 +118,7 @@ public class RotatePlugIn extends AbstractPlugIn {
             rotationPoint = context.getLayerViewPanel().getViewport().toModelCoordinate(
                 context.getLayerViewPanel().getLastClickedPoint());
         }   
-	radiansAngle = Deg2Rad * rotateAngle;
+        radiansAngle = Deg2Rad * rotateAngle;
         cosAngle = Math.cos(radiansAngle);
         sinAngle = Math.sin(radiansAngle);
 
@@ -154,29 +145,7 @@ public class RotatePlugIn extends AbstractPlugIn {
         methodNameToRun = dialog.getText(ROTATEABOUT);
         rotateAngle = dialog.getDouble(ANGLE);
     }
-
-    private Coordinate getRotationPoint(Collection layers) {
-        Coordinate result = new Coordinate(0,0);
-        try {
-           
-           for (Iterator i = layers.iterator();
-                i.hasNext();
-                ) {
-                Layer layerWithSelectedItems = (Layer) i.next();
-                for (Iterator j = layers.iterator(); j.hasNext();) {
-                    Geometry item = (Geometry) j.next();
-                        result = item.getCentroid().getCoordinate();
-                }
-           }
-            return result;
-        }
-        catch (RuntimeException ex) {
-          // simply eat exceptions and report them by returning 0,0
-          exceptionThrown = true;
-        }
-            return result;
-    }
-      
+     
     private EditTransaction createTransaction(Layer layer) {
         EditTransaction transaction =
             EditTransaction.createTransactionOnSelection(new EditTransaction.SelectionEditor() {
@@ -208,25 +177,6 @@ public class RotatePlugIn extends AbstractPlugIn {
         return new MultiEnableCheck()
             .add(checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck())
             .add(checkFactory.createAtLeastNFeaturesMustHaveSelectedItemsCheck(1))
-            .add(checkFactory.createSelectedItemsLayersMustBeEditableCheck())
-            .add(new EnableCheck() {
-            public String check(JComponent component) {
-                Collection featuresWithSelectedItems =
-                    workbenchContext
-                        .getLayerViewPanel()
-                        .getSelectionManager()
-                        .getFeaturesWithSelectedItems();
-                //for (Iterator i = featuresWithSelectedItems.iterator(); i.hasNext();) {
-                //    Feature feature = (Feature) i.next();
-                //    if (!(feature.getGeometry() instanceof GeometryCollection)) {
-                //        return "Selected feature"
-                //           + StringUtil.s(featuresWithSelectedItems.size())
-                //            + " must be geometry collection"
-                //            + StringUtil.s(featuresWithSelectedItems.size());
-                //    }
-                //}
-                return null;
-            }
-        });
+            .add(checkFactory.createSelectedItemsLayersMustBeEditableCheck());
     }
 }

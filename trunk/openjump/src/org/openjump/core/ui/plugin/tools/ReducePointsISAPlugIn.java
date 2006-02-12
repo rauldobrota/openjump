@@ -70,9 +70,7 @@ public class ReducePointsISAPlugIn extends AbstractPlugIn {
 	
     private WorkbenchContext workbenchContext;
     private final static String TOLERANCE = I18N.get("org.openjump.core.ui.plugin.tools.ReducePointsISAPlugIn.Tolerance");;
-    private MultiInputDialog dialog;
     private double tolerance = 0.1;
-    private boolean exceptionThrown = false;
     PlugInContext gContext;
 
     public void initialize(PlugInContext context) throws Exception
@@ -155,10 +153,7 @@ public class ReducePointsISAPlugIn extends AbstractPlugIn {
         {
             public Geometry edit(Geometry geometryWithSelectedItems, Collection selectedItems) 
             {
-//                int startNumPts = geometryWithSelectedItems.getNumPoints();
                 Geometry geo =  reducePoints(geometryWithSelectedItems, tolerance);
-//                int endNumPts = geo.getNumPoints();
-//                context.getWorkbenchFrame().setStatusMessage("Points reduced from " + startNumPts + " " + endNumPts);
                 return geo;
             }
         }, workbenchContext.getLayerViewPanel(), workbenchContext.getLayerViewPanel().getContext(), getName(), layer, false,false);
@@ -195,15 +190,15 @@ public class ReducePointsISAPlugIn extends AbstractPlugIn {
     {  
        if (geometry instanceof LineString) //open poly
        {
-           return new GeoUtils().reducePoints(geometry, tolerance);
+           return GeoUtils.reducePoints(geometry, tolerance);
        }
        else if (geometry instanceof LinearRing) //closed poly (no holes)
        {
-           return new GeoUtils().reducePoints(geometry, tolerance);
+           return GeoUtils.reducePoints(geometry, tolerance);
        }
        else if (geometry instanceof Polygon) //poly with 0 or more holes
        {
-           return new GeoUtils().reducePoints(geometry, tolerance);
+           return GeoUtils.reducePoints(geometry, tolerance);
        }
        else if (geometry instanceof MultiLineString)
        {
@@ -215,7 +210,7 @@ public class ReducePointsISAPlugIn extends AbstractPlugIn {
            {
                for (int i = 0; i < mls.getNumGeometries(); i++)
                {
-                   lineStrings[i] = (LineString)new GeoUtils().reducePoints(mls.getGeometryN(i), tolerance);
+                   lineStrings[i] = (LineString)GeoUtils.reducePoints(mls.getGeometryN(i), tolerance);
                }
                return new MultiLineString(lineStrings, geoFac);
            }
@@ -233,10 +228,9 @@ public class ReducePointsISAPlugIn extends AbstractPlugIn {
            
            if (!mp.isEmpty())
            {
-               LineString[] lineStrings = new LineString[mp.getNumGeometries()];
                for (int i = 0; i < mp.getNumGeometries(); i++)
                {
-                   Polygon poly = (Polygon) new GeoUtils().reducePoints(mp.getGeometryN(i), tolerance);
+                   Polygon poly = (Polygon) GeoUtils.reducePoints(mp.getGeometryN(i), tolerance);
                    CoordinateSequence cs = dcsf.create(poly.getCoordinates());
                    polys[i] = new Polygon(new LinearRing(cs, geoFac), null, geoFac);
                }
@@ -254,12 +248,10 @@ public class ReducePointsISAPlugIn extends AbstractPlugIn {
     }
     
     public MultiEnableCheck createEnableCheck(final WorkbenchContext workbenchContext) {
-      
         EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
-
         return new MultiEnableCheck()
-                        .add(checkFactory.createAtLeastNItemsMustBeSelectedCheck(1))
-						.add(checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck())
-						.add(checkFactory.createSelectedItemsLayersMustBeEditableCheck());
+            .add(checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck())
+            .add(checkFactory.createAtLeastNFeaturesMustHaveSelectedItemsCheck(1))
+            .add(checkFactory.createSelectedItemsLayersMustBeEditableCheck());
     }
 }

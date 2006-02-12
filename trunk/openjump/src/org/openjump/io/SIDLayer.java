@@ -51,11 +51,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 
 import org.openjump.core.ui.plugin.layer.AddSIDLayerPlugIn;
 
 import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGDecodeParam;
 import com.sun.image.codec.jpeg.JPEGImageDecoder;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.util.Assert;
@@ -74,6 +74,7 @@ public class SIDLayer extends WMSLayer
 	final static String sLevel = I18N.get("org.openjump.io.SIDLayer.level");
 	final static String sOf = I18N.get("org.openjump.io.SIDLayer.of");
 	
+    private SID_Info_List sidInfoList;	
     private List imageFilenames = new ArrayList();
     private List deletedSIDs = new ArrayList();
     private int sidPixelWidth = 0;
@@ -86,7 +87,6 @@ public class SIDLayer extends WMSLayer
     private double sid_uly = 0; //realworld coords
     private String sid_colorspace;
     private int maxLevel = 0; 
-    private LayerViewPanel gpanel;
     private PlugInContext callingContext;
 
     /**
@@ -94,6 +94,7 @@ public class SIDLayer extends WMSLayer
      */
     public SIDLayer() 
     {
+    	sidInfoList = new SID_Info_List();
     }
 
     public SIDLayer(PlugInContext context, List layerNames) throws IOException
@@ -115,8 +116,9 @@ public class SIDLayer extends WMSLayer
             setName(layerManager.uniqueLayerName(name));
         } finally {
             layerManager.setFiringEvents(firingEvents);
-        }        
-        this.imageFilenames = new ArrayList(layerNames);
+        }
+        
+        sidInfoList = new SID_Info_List(layerNames);
     }
 
     private int round(double num)
@@ -125,7 +127,7 @@ public class SIDLayer extends WMSLayer
     }
      
     public Image createImage(LayerViewPanel panel) throws IOException
-    {
+    {        
         //view and panel refer to the workbench portion with which the user is interacting
         //raster refers to the visible portion of the SID file drawn onto the view panel
         //image refers to the created image onto which is drawn the raster extracted from the SID file
@@ -133,21 +135,25 @@ public class SIDLayer extends WMSLayer
         Graphics2D g = (Graphics2D)newImage.getGraphics();
         g.setColor(new Color(0,0,0,0)); //alpha channel = 0 for transparent background
         g.fillRect(0, 0, panel.getWidth(), panel.getHeight());       
-        gpanel = panel;
+        List imageFilenames = sidInfoList.getFileNames();
         
         for (Iterator i = imageFilenames.iterator(); i.hasNext();)
         {
             Object currObj = i.next();
             String sidFilename = (String) currObj;
-            
-            if (readInfo(sidFilename) != 0)
+            SID_Info sidInfo = sidInfoList.getInfo(sidFilename);
+            if (sidInfo == null)
             {
-                deletedSIDs.add(currObj);
-                callingContext.getWorkbenchFrame().getOutputFrame().addText(couldNotGetSIDinfoFor + " " + sidFilename);               
+                callingContext.getWorkbenchFrame().getOutputFrame().addText("Could not get SID info for " + sidFilename);               
             }
             else
             {
-                readWorldFile(sidFilename);
+                int sidPixelWidth = sidInfo.getPixelWidth();
+                int sidPixelHeight = sidInfo.getPixelHeight();
+                double sid_xres = sidInfo.getXRes();
+                double sid_ulx = sidInfo.getULX(); //realworld coords
+                double sid_uly = sidInfo.getULY(); //realworld coords
+
                 int image_x = 0; //x position of raster in final image in pixels
                 int image_y = 0; //y position of raster in final image in pixels
                 int image_w = panel.getWidth(); //width of raster in final image in pixels
@@ -177,7 +183,6 @@ public class SIDLayer extends WMSLayer
                 double rwRasterRight = Math.min(rwViewRight, rwSidFileRightEdge);
                 double rwRasterTop = Math.min(rwViewTop, rwSidFileTopEdge);
                 double rwRasterBot = Math.max(rwViewBot, rwSidFileBotEdge);
-                double rwRasterWidth = rwRasterRight - rwRasterLeft;
                 
                 //calculate the sid level which will return the number of pixels
                 //that is closest to the number of view pixels so that we can
@@ -281,7 +286,7 @@ public class SIDLayer extends WMSLayer
                         };
                         
                         Process p = Runtime.getRuntime().exec(runStr);
-                        int exitVal = p.waitFor();
+                        p.waitFor();
                         p.destroy();
                         
                     } catch (Throwable t)
@@ -293,7 +298,6 @@ public class SIDLayer extends WMSLayer
                     {
                         FileInputStream in = new FileInputStream(jpgFilename);
                         JPEGImageDecoder decoder = JPEGCodec.createJPEGDecoder(in);
-                        JPEGDecodeParam dp = decoder.getJPEGDecodeParam();
                         BufferedImage image = decoder.decodeAsBufferedImage();
                         in.close();
 
@@ -311,40 +315,50 @@ public class SIDLayer extends WMSLayer
             }
         }
         
-        for (Iterator j = deletedSIDs.iterator(); j.hasNext();)
-        {
-            imageFilenames.remove(j.next());
-        }
-        deletedSIDs.clear();
-        
         return newImage;
     }
     
-    protected int readWorldFile(String filename) throws IOException, FileNotFoundException
+    protected SID_Info readWorldFile(String filename) throws IOException, FileNotFoundException
     {
-//        String wfname = "xxx";//RFLnew Utilities().removeExtension(filename);        
         String wfname = (filename.indexOf('.') < 0) ? filename : filename.substring(0, filename.indexOf('.'));
         wfname = wfname + ".sdw";
         File file = new File(wfname);
         
-        if (!file.exists()) return 1;
-        if (!(file.isFile() && file.canRead())) return 1;
+        if (!file.exists()) return null;
+        if (!(file.isFile() && file.canRead())) return null;
         
         FileReader wf = new FileReader(wfname);
         BufferedReader in = new BufferedReader(wf);
-        sid_xres = Double.parseDouble(in.readLine());
-        sid_xrot = Double.parseDouble(in.readLine());
-        sid_yrot = Double.parseDouble(in.readLine());
-        sid_yres = Double.parseDouble(in.readLine());
-        sid_ulx = Double.parseDouble(in.readLine());
-        sid_uly = Double.parseDouble(in.readLine());
+        double sid_xres = Double.parseDouble(in.readLine());
+        double sid_xrot = Double.parseDouble(in.readLine());
+        double sid_yrot = Double.parseDouble(in.readLine());
+        double sid_yres = Double.parseDouble(in.readLine());
+        double sid_ulx = Double.parseDouble(in.readLine());
+        double sid_uly = Double.parseDouble(in.readLine());
+        SID_Info sidInfo = new SID_Info(filename,
+        							0,
+									0,
+        		                    sid_xres, 
+        		                    sid_xrot, 
+        		                    sid_yrot, 
+        		                    sid_yres, 
+        		                    sid_ulx, 
+        		                    sid_uly);
         in.close();
         wf.close();
-        return 0;
+        return sidInfo;
     }
     
-    protected int readInfo(String sidFilename) throws IOException
+    protected SID_Info readInfo(String sidFilename) //throws IOException
     {
+        int sidPixelWidth = 0;
+        int sidPixelHeight = 0;
+        double sid_xres = 1;
+        double sid_xrot = 0;
+        double sid_yrot = 0;
+        double sid_yres = 1;
+        double sid_ulx = 0; //realworld coords
+        double sid_uly = 0; //realworld coords
         maxLevel = 0;
         String infoFilename = AddSIDLayerPlugIn.TMP_PATH + "MrSIDinfo.txt";
         int numInfoItems = 0;
@@ -362,15 +376,15 @@ public class SIDLayer extends WMSLayer
             };
             
             Process p = Runtime.getRuntime().exec(runStr);
-            int exitVal = p.waitFor();
+            p.waitFor();
             p.destroy();
             
             File file = new File(infoFilename);
             
-            if (!((file.exists()) && (file.isFile()) && (file.canRead())))
-                return 1;  //this could happen if mrsidinfo.exe couldn't produce a file
+            if (!(file.exists() && file.isFile() && file.canRead()))
+                return null;  //this could happen if mrsidinfo.exe couldn't produce a file
             
-            //read the info
+        	//read the info
             FileReader fin = new FileReader(infoFilename);
             BufferedReader in = new BufferedReader(fin);
             String lineIn = in.readLine();
@@ -441,30 +455,171 @@ public class SIDLayer extends WMSLayer
             in.close();
             fin.close();
             
+            if (numInfoItems == 8)
+            	return new SID_Info(sidFilename,
+            			sidPixelWidth,
+						sidPixelHeight,
+						sid_xres, 
+						sid_xrot, 
+						sid_yrot, 
+						sid_yres, 
+						sid_ulx, 
+						sid_uly);
+            else
+            	return null;
+            
         } catch (Throwable t)
-        {
-            t.printStackTrace();
-            return 1;
-        }
-        
-        if (numInfoItems == 8)
-            return 0;
-        else
-            return 1;
+		{
+        	t.printStackTrace();
+        	return null;
+		}        
     }
     
-    public void addImageFilename(String imageFilename) {
-        imageFilenames.add(imageFilename);
+    public void addImageFilename(String imageFilename) 
+    {
+        sidInfoList.addInfo(imageFilename);
     }
 
-    public List getImageFilenames() {
-        return Collections.unmodifiableList(imageFilenames);
+    public List getImageFilenames() 
+    {
+    	return sidInfoList.getFileNames();
     }
     
     private Blackboard blackboard = new Blackboard();
     public Blackboard getBlackboard()
     {
         return blackboard;
-    }    
+    }   
+
+    private class SID_Info
+	{
+    	private String fileName;
+	    private int pixelWidth;
+	    private int pixelHeight;
+	    private double xres;
+	    private double xrot;
+	    private double yrot;
+	    private double yres;
+	    private double ulx; //realworld coords
+	    private double uly; //realworld coords
+    	
+    	SID_Info(String fileName,
+    		     int pixelWidth,
+				 int pixelHeight,
+				 double xres,
+				 double xrot,
+				 double yrot,
+				 double yres,
+				 double ulx,
+				 double uly)
+		{
+    		this.fileName = fileName;
+    		this.pixelWidth = pixelWidth;
+    		this.pixelHeight = pixelHeight;
+    		this.xres = xres;
+    		this.xrot = xrot;
+    		this.yrot = yrot;
+    		this.yres = yres;
+    		this.ulx = ulx;
+    		this.uly = uly;
+		}
+    	
+    	String getFileName()
+    	{
+    		return fileName;
+    	}
+
+    	int getPixelWidth()
+    	{
+    		return pixelWidth;
+    	}
+
+    	int getPixelHeight()
+    	{
+    		return pixelHeight;
+    	}
+
+    	double getXRes()
+    	{
+    		return xres;
+    	}
+
+    	double getXRot()
+    	{
+    		return xrot;
+    	}
+
+    	double getYRot()
+    	{
+    		return yrot;
+    	}
+
+    	double getYRes()
+    	{
+    		return yres;
+    	}
+
+    	double getULX()
+    	{
+    		return ulx;
+    	}
+
+    	double getULY()
+    	{
+    		return uly;
+    	}
+
+	}
+    
+    private class SID_Info_List
+	{
+    	private Vector infoList = new Vector(50, 10);
+    	
+    	SID_Info_List()
+		{
+    		
+		}
+    	
+    	SID_Info_List(List fileNames)
+		{
+            for (Iterator i = fileNames.iterator(); i.hasNext();)
+            {				
+            	String fileName = (String) i.next();
+                SID_Info sidInfo = readInfo(fileName);
+                if (sidInfo == null)
+                	callingContext.getWorkbenchFrame().getOutputFrame().addText("Could not get SID info for " + fileName);
+                else
+                	infoList.add(sidInfo);
+            }
+		}
+    	
+    	public void addInfo(String fileName)
+    	{
+            SID_Info sidInfo = readInfo(fileName);
+            if (sidInfo != null)
+            	infoList.add(sidInfo);
+    	}
+    	
+    	public SID_Info getInfo(String filename)
+		{
+            for (Iterator i = infoList.iterator(); i.hasNext();)
+            {
+            	SID_Info sidInfo = (SID_Info) i.next();
+            	if (sidInfo.getFileName().equals(filename))
+            		return sidInfo;
+            }
+            return null;
+		}
+        
+    	public List getFileNames()
+        {
+        	List imageFilenames = new ArrayList();
+            for (Iterator i = infoList.iterator(); i.hasNext();)
+            	imageFilenames.add(((SID_Info) i.next()).getFileName());
+        	
+        	return Collections.unmodifiableList(imageFilenames);
+        }
+	}
+
 }
 

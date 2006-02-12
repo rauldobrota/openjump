@@ -35,8 +35,6 @@ package org.openjump.core.ui.plugin.tools;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.swing.JComponent;
-
 import org.openjump.core.geomutils.GeoUtils;
 
 import com.vividsolutions.jts.geom.CoordinateList;
@@ -54,7 +52,6 @@ import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.model.LayerManager;
 import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
-import com.vividsolutions.jump.workbench.plugin.EnableCheck;
 import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
@@ -73,14 +70,6 @@ public class ConvexHullPlugIn extends AbstractPlugIn {
     {     
         workbenchContext = context.getWorkbenchContext();
         context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this, new String[] {MenuNames.TOOLS, MenuNames.TOOLS_JOIN }, getName(), false, null, this.createEnableCheck(workbenchContext));
-
-//        workbenchContext = context.getWorkbenchContext();
-//        FeatureInstaller featureInstaller = new FeatureInstaller(workbenchContext);
-//        JPopupMenu popupMenu = workbenchContext.getLayerViewPanel().popupMenu();
-//        featureInstaller.addPopupMenuItem(popupMenu,
-//            this, "Create Convex Hull",
-//            false, null,  
-//            this.createEnableCheck(workbenchContext));
     }
     
     public String getName() {
@@ -107,7 +96,7 @@ public class ConvexHullPlugIn extends AbstractPlugIn {
             coords.add( filter.getCoordinates() ,false);
          }
          
-        CoordinateList convexHullCoords = (new GeoUtils()).ConvexHullWrap( coords );
+        CoordinateList convexHullCoords = GeoUtils.ConvexHullWrap( coords );
         LineString convexHull = new GeometryFactory().createLineString(convexHullCoords.toCoordinateArray());
 
         Feature newFeature = new BasicFeature(featureSchema);
@@ -131,16 +120,6 @@ public class ConvexHullPlugIn extends AbstractPlugIn {
         EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
         return new MultiEnableCheck()
             .add(checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck())
-            .add(checkFactory.createAtLeastNFeaturesMustHaveSelectedItemsCheck(1))
-            .add(new EnableCheck() {
-            public String check(JComponent component) {
-                Collection featuresWithSelectedItems =
-                    workbenchContext
-                        .getLayerViewPanel()
-                        .getSelectionManager()
-                        .getFeaturesWithSelectedItems();
-                return null;
-            }
-        });
+            .add(checkFactory.createAtLeastNFeaturesMustHaveSelectedItemsCheck(1));
     }    
 }

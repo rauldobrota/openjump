@@ -39,18 +39,19 @@ package org.openjump.core.ui.plugin.layer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 import org.openjump.io.SIDLayer;
 
 import com.vividsolutions.jump.I18N;
+import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
 import com.vividsolutions.jump.workbench.model.UndoableCommand;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
+import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
+import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
@@ -70,12 +71,11 @@ public class AddSIDLayerPlugIn extends AbstractPlugIn
     public static String TMP_PATH;
     public static String MRSIDDECODE;
     public static String MRSIDINFO;
-    private String cachedFilename = "C:";
 
     public void initialize(PlugInContext context) throws Exception
     {
         context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this,
-        new String[] {MenuNames.LAYER}, sAddMrSIDLayer +"{pos:3}", false, null, null);
+        new String[] {MenuNames.LAYER}, sAddMrSIDLayer +"{pos:3}", false, null, this.createEnableCheck(context.getWorkbenchContext()));
         File empty = new File("");
         String sep = File.separator;
         WORKING_DIR = empty.getAbsoluteFile().getParent() + sep;
@@ -83,17 +83,6 @@ public class AddSIDLayerPlugIn extends AbstractPlugIn
         TMP_PATH = WORKING_DIR + "tmp" + sep;
         MRSIDDECODE = ETC_PATH + "mrsiddecode.exe";
         MRSIDINFO = ETC_PATH + "mrsidinfo.exe";
-    }
-    
-    private List toLayerNames(List mapLayers) 
-    {
-        ArrayList names = new ArrayList();
-        for (Iterator i = mapLayers.iterator(); i.hasNext();) 
-        {
-            MapLayer layer = (MapLayer) i.next();
-            names.add(layer.getName());
-        }
-        return names;
     }
     
     public boolean execute(final PlugInContext context) throws Exception
@@ -131,7 +120,6 @@ public class AddSIDLayerPlugIn extends AbstractPlugIn
             if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(context.getWorkbenchFrame()))
             {
                 List imageFilenames = new ArrayList();
-                File selectedFile = fileChooser.getSelectedFile();
                 File[] files = fileChooser.getSelectedFiles();
                 for(int i = 0; i < files.length; i++)
                 {
@@ -171,5 +159,11 @@ public class AddSIDLayerPlugIn extends AbstractPlugIn
             return false;
         }
     }
+    
+    public MultiEnableCheck createEnableCheck(final WorkbenchContext workbenchContext) {
+        EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
+        return new MultiEnableCheck()
+            .add(checkFactory.createTaskWindowMustBeActiveCheck());
+    }    
 }
 

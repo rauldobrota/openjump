@@ -40,7 +40,10 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import com.vividsolutions.jump.I18N;
+import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
+import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
+import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
 
@@ -59,8 +62,8 @@ public class MeasureM_FPlugIn extends AbstractPlugIn
 				new String[] {MenuNames.TOOLS }, 
 				sMeasureInFeets, 
 				false, 
-				null, 
-				null);
+				null,
+				createEnableCheck(context.getWorkbenchContext()));
         measureTool = new MeasureM_FTool();
    }
     
@@ -84,5 +87,11 @@ public class MeasureM_FPlugIn extends AbstractPlugIn
     {
         return new ImageIcon(getClass().getResource("RulerM_F.gif"));
     }  
+    
+    public MultiEnableCheck createEnableCheck(final WorkbenchContext workbenchContext) {
+        EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
+        return new MultiEnableCheck()
+            .add(checkFactory.createTaskWindowMustBeActiveCheck());
+    }
 }
 

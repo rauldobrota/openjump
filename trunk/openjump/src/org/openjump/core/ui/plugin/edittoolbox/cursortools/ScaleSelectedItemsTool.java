@@ -452,7 +452,7 @@ public class ScaleSelectedItemsTool extends DragTool {
    	double maxDist=0, dist = 0;
    	Coordinate[] coords = box.getCoordinates();
    	for(int i=0; i < coords.length; i++){
-   		dist = GeoUtils.getDistance(coords[i], point);   			
+   		dist = GeoUtils.distance(coords[i], point);   			
    		if (dist > maxDist){
    			maxDist = dist;
    			farestp = (Coordinate)coords[i].clone();
