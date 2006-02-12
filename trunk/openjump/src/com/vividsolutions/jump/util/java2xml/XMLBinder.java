@@ -45,6 +45,7 @@ import org.jdom.input.SAXBuilder;
 import java.awt.Color;
 import java.awt.Font;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -163,6 +164,7 @@ public class XMLBinder {
                     return object.toString();
                 }
             });
+            //not fixed in original jump
         classToCustomConverterMap.put(Long.class,
                 new CustomConverter() {
                     public Object toJava(String value) {
@@ -203,6 +205,16 @@ public class XMLBinder {
                     return object.toString();
                 }
             });
+        classToCustomConverterMap.put(File.class,
+                new CustomConverter() {
+                    public Object toJava(String value) {
+                        return new File(value);
+                    }
+
+                    public String toXML(Object object) {
+                        return object.toString();
+                    }
+                });
     }
 
     private String specFilename(Class c) {

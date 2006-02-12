@@ -31,18 +31,17 @@
  */
 package com.vividsolutions.jump.workbench.datasource;
 
+import java.io.File;
+import java.util.Collection;
+
+import javax.swing.JFileChooser;
+
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.coordsys.CoordinateSystemSupport;
 import com.vividsolutions.jump.util.Blackboard;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
-
-import java.io.File;
-
-import java.util.Collection;
-
-import javax.swing.JFileChooser;
 
 /**
  * UI for picking a file-based dataset to load.
