@@ -49,13 +49,52 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.util.UniqueCoordinateArrayFilter;
 
-public class GeoUtils extends java.lang.Object
+public class GeoUtils
 {
+	public static final int emptyBit = 0;
+	public static final int pointBit = 1;
+	public static final int lineBit = 2;
+	public static final int polyBit = 3;
+	
     public GeoUtils()
     {
     }
     
-    public Coordinate rotPt(Coordinate inpt, Coordinate rpt, double theta)
+    public static double mag(Coordinate q)
+    {
+    	return Math.sqrt(q.x * q.x + q.y * q.y );
+    }
+
+    public static double distance(Coordinate p1, Coordinate p2)
+    {
+        double dx = p2.x - p1.x;
+        double dy = p2.y - p1.y;
+        return Math.sqrt((dx*dx)+(dy*dy));
+    }
+
+    public static Coordinate unitVec(Coordinate q)
+    {
+		double m = mag(q);
+		if (m == 0) m = 1;
+		return new Coordinate(q.x / m, q.y / m);
+    }
+
+    public static Coordinate vectorAdd(Coordinate q, Coordinate r)
+    {   //return the Coordinate by vector adding r to q
+         return new Coordinate(q.x + r.x, q.y + r.y);
+    }
+    
+    public static Coordinate vectorBetween(Coordinate q, Coordinate r)
+    {   //return the Coordinate by vector subtracting q from r
+         return new Coordinate(r.x - q.x, r.y - q.y);
+    }
+
+    public static Coordinate vectorTimesScalar(Coordinate q, double m)
+    {   //return the Coordinate by vector subracting r from q
+         return new Coordinate(q.x * m, q.y * m);
+    }
+    
+    public static Coordinate rotPt(Coordinate inpt, Coordinate rpt, double theta)
     {   //rotate inpt about rpt by theta degrees (+ clockwise)
         double tr = Math.toRadians(theta);
         double ct = Math.cos(tr);
@@ -67,7 +106,7 @@ public class GeoUtils extends java.lang.Object
         return new Coordinate(xout, yout);
     }
    
-    public boolean pointToRight(Coordinate pt, Coordinate p1, Coordinate p2)
+    public static boolean pointToRight(Coordinate pt, Coordinate p1, Coordinate p2)
     {   //true if pt is to the right of the line from p1 to p2
         double a = p2.x - p1.x;
         double b = p2.y - p1.y;
@@ -76,14 +115,26 @@ public class GeoUtils extends java.lang.Object
         return (fpt < 0.0);
     }
     
-    public double distance(Coordinate p1, Coordinate p2)
+    public static Coordinate perpendicularVector(Coordinate v1, Coordinate v2, double dist, boolean toLeft) 
     {
-        double dx = p2.x - p1.x;
-        double dy = p2.y - p1.y;
-        return Math.sqrt((dx*dx)+(dy*dy));
-    }
+    	//return perpendicular Coordinate vector from v1 of dist specified to left of v1-v2}
+    	Coordinate v3 = vectorBetween(v2,v1);
+    	Coordinate v4 = new Coordinate();     	
+    	if (toLeft)
+    	{
+    		v4.x = -v3.y;
+    		v4.y = v3.x;
+    	}
+    	else
+    	{
+    		v4.x = v3.y;
+    		v4.y = -v3.x;
+    	}
+       	return vectorAdd(v1, vectorTimesScalar( unitVec(v4), dist));
+     }
     
-    public double getBearing180(Coordinate startPt, Coordinate endPt)
+     
+    public static double getBearing180(Coordinate startPt, Coordinate endPt)
     {   //return Bearing in degrees (-180 to +180) from startPt to endPt
         Coordinate r = new Coordinate(endPt.x - startPt.x, endPt.y - startPt.y);
         double rMag = Math.sqrt(r.x * r.x + r.y * r.y );
@@ -102,7 +153,7 @@ public class GeoUtils extends java.lang.Object
         }
     }
     
-    public double getBearing360(Coordinate startPt, Coordinate endPt)
+    public static double getBearing360(Coordinate startPt, Coordinate endPt)
     {  //return Bearing in degrees (0 - 360) from startPt to endPt
         double bearing = getBearing180(startPt, endPt);
         if (bearing < 0)
@@ -112,9 +163,9 @@ public class GeoUtils extends java.lang.Object
         return bearing;
     }
     
-    public double theta(Coordinate p1, Coordinate p2)
-    { //this function returns the order of the angle from p1 to p2
-        //special use in reducePoints
+    public static double theta(Coordinate p1, Coordinate p2)
+    {   //this function returns the order of the angle from p1 to p2
+        //special use in ConvexHullWrap
         double dx = p2.x - p1.x;
         double dy = p2.y - p1.y;
         double ax = Math.abs(dx);
@@ -132,7 +183,7 @@ public class GeoUtils extends java.lang.Object
         return (t * 90.0);
     }
     
-    public CoordinateList ConvexHullWrap( CoordinateList coords )
+    public static CoordinateList ConvexHullWrap( CoordinateList coords )
     {
         //The convex hull is the linestring made by the points on the outside of a cloud of points.
         //Thmin = 0, e package wrapping algorithm - see  Algorithms by Sedgewick
@@ -194,15 +245,13 @@ public class GeoUtils extends java.lang.Object
         return newcoords; //should never get here
     }
     
-    public static double getDistance(Coordinate p1, Coordinate p2){        
-        double dx = p2.x - p1.x;
-        double dy = p2.y - p1.y;
-        double s = Math.sqrt(dx*dx + dy*dy);        
-        return s;
+    public static double getDistance(Coordinate pt, Coordinate p0, Coordinate p1)
+    {   //will return the distance from pt to the line segment p0-p1
+    	return pt.distance(getClosestPointOnSegment(pt, p0, p1));
     }
     
-    public double getDistance(Coordinate pt, Coordinate p0, Coordinate p1)
-    {   //will return the distance from pt to the line segment p0-p1
+    public static Coordinate getClosestPointOnSegment(Coordinate pt, Coordinate p0, Coordinate p1)
+    {   //will return the coordinate on the line segment p0-p1 which is closest to pt
         double X0, Y0, X1, Y1, Xv, Yv, Xr, Yr, Xp0r, Yp0r, Xp1r, Yp1r;
         double Xp, Yp;
         double t, VdotV, DistP0toR, DistP1toR;
@@ -217,12 +266,10 @@ public class GeoUtils extends java.lang.Object
         Xp0r = Xr - X0;
         Yp0r = Yr - Y0;
         DistP0toR = Math.sqrt(Xp0r * Xp0r + Yp0r * Yp0r);
-        int which = 0;
-        double distance = DistP0toR;
         
-        if (VdotV == 0.0) //degenerate line
+        if (VdotV == 0.0) //degenerate line (p0, p1 the same)
         {
-            return distance; //Dist(P0, R)
+            return p0; //Dist(P0, R)
         };
         
         t = (Xp0r * Xv + Yp0r * Yv) / VdotV; //Dot(VectorBetween(P0, R), V) / VdotV
@@ -231,8 +278,6 @@ public class GeoUtils extends java.lang.Object
         {
             Xp = (X0 + t * Xv) - Xr; //VectorBetween(R, VectorAdd(P0, VectorTimesScalar(V, t)))}
             Yp = (Y0 + t * Yv) - Yr;
-            distance = Math.sqrt(Xp*Xp + Yp*Yp); //Mag(VectorBetween(R, Pt ))}
-            which = 1;
             coordOut.x = pt.x + Xp;
             coordOut.y = pt.y + Yp;
         }
@@ -243,26 +288,23 @@ public class GeoUtils extends java.lang.Object
             DistP1toR = Math.sqrt(Xp1r*Xp1r + Yp1r*Yp1r);
             if (DistP1toR < DistP0toR) // Min( Dist(P0, R), Dist(P1, R) ))
             {
-                distance = DistP1toR;
-                which = 2;
                 coordOut = p1;
             }
             else
             {
-                distance = DistP0toR;
-                which = 0;
                 coordOut = p0;
             };
         }
-        return distance;
+        return coordOut;
     }
     
-    public Coordinate getClosestPoint(Coordinate pt, Coordinate p0, Coordinate p1)
+    public static Coordinate getClosestPointOnLine(Coordinate pt, Coordinate p0, Coordinate p1)
     {   //returns the nearest point from pt to the infinite line defined by p0-p1
         MathVector vpt = new MathVector(pt);
         MathVector vp0 = new MathVector(p0);
         MathVector vp1 = new MathVector(p1);
         MathVector v = vp0.vectorBetween(vp1);
+
         double vdotv = v.dot(v);
         if (vdotv == 0.0) //degenerate line (ie: P0 = P1)
         {
@@ -277,7 +319,7 @@ public class GeoUtils extends java.lang.Object
         }
     }
     
-    public Coordinate along(double d, Coordinate q, Coordinate r)
+    public static Coordinate along(double d, Coordinate q, Coordinate r)
     {   //return the point at distance d along vector from q to r
         double ux, uy, m;
         Coordinate n = (Coordinate)r.clone();
@@ -290,11 +332,11 @@ public class GeoUtils extends java.lang.Object
             uy = d * uy / m;
             n.x = q.x + ux;
             n.y = q.y + uy;
-        };
+        }
         return n;
     }
   
-    public Geometry reducePoints(Geometry geo, double tolerance)
+    public static Geometry reducePoints(Geometry geo, double tolerance)
     { //uses Douglas-Peucker algorithm
         CoordinateList coords = new CoordinateList();
         UniqueCoordinateArrayFilter filter = new UniqueCoordinateArrayFilter();
@@ -328,7 +370,7 @@ public class GeoUtils extends java.lang.Object
                     {
                         j--;
                         Coordinate pt = coords.getCoordinate(j);
-                        Coordinate cp = getClosestPoint(pt, anchor, floater);
+                        Coordinate cp = getClosestPointOnLine(pt, anchor, floater);
                         double d = pt.distance(cp);
                         
                         if (d > dmax)
@@ -370,7 +412,7 @@ public class GeoUtils extends java.lang.Object
         }
     }
     
-    public boolean clockwise(Geometry geo)
+    public static boolean clockwise(Geometry geo)
     {
         if ((geo instanceof Polygon) || (geo instanceof LinearRing))
         {   //calculates the area; neg means clockwise
@@ -397,7 +439,7 @@ public class GeoUtils extends java.lang.Object
         }
     }
     
-    public Coordinate getIntersection(Coordinate p1, Coordinate p2, Coordinate p3, Coordinate p4)  //find intersection of two lines
+    public static Coordinate getIntersection(Coordinate p1, Coordinate p2, Coordinate p3, Coordinate p4)  //find intersection of two lines
     {
         Coordinate e = new Coordinate(0,0,0);
         Coordinate v = new Coordinate(0,0);
@@ -429,7 +471,7 @@ public class GeoUtils extends java.lang.Object
         return e;
     }   
     
-    public Coordinate getCenter(Coordinate p1, Coordinate p2, Coordinate p3)
+    public static Coordinate getCenter(Coordinate p1, Coordinate p2, Coordinate p3)
     {
         double x = p1.x + ((p1.x - p2.x) / 2.0);
         double y = p1.y + ((p1.y - p2.y) / 2.0);
@@ -449,17 +491,17 @@ public class GeoUtils extends java.lang.Object
             return center;
     }
     
-    public BitSet setBit(BitSet bitSet, Geometry geometry)
+    public static BitSet setBit(BitSet bitSet, Geometry geometry)
     {
         BitSet newBitSet = (BitSet) bitSet.clone();
-        if      (geometry.isEmpty())                  newBitSet.set(0);
-        else if (geometry instanceof Point)           newBitSet.set(1);
-        else if (geometry instanceof MultiPoint)      newBitSet.set(1);
-        else if (geometry instanceof LineString)      newBitSet.set(2);
-        else if (geometry instanceof LinearRing)      newBitSet.set(2);
-        else if (geometry instanceof MultiLineString) newBitSet.set(2);
-        else if (geometry instanceof Polygon)         newBitSet.set(3);
-        else if (geometry instanceof MultiPolygon)    newBitSet.set(3);
+        if      (geometry.isEmpty())                  newBitSet.set(emptyBit);
+        else if (geometry instanceof Point)           newBitSet.set(pointBit);
+        else if (geometry instanceof MultiPoint)      newBitSet.set(pointBit);
+        else if (geometry instanceof LineString)      newBitSet.set(lineBit);
+        else if (geometry instanceof LinearRing)      newBitSet.set(lineBit);
+        else if (geometry instanceof MultiLineString) newBitSet.set(lineBit);
+        else if (geometry instanceof Polygon)         newBitSet.set(polyBit);
+        else if (geometry instanceof MultiPolygon)    newBitSet.set(polyBit);
         else if (geometry instanceof GeometryCollection)
         {
             GeometryCollection geometryCollection = (GeometryCollection) geometry;

@@ -46,7 +46,6 @@ public class Arc extends java.lang.Object
     protected double radius = 0.0;
     protected double angle = 0.0;
     protected double arcTolerance = 0.1;
-    protected GeoUtils gu = new GeoUtils();
     
     public Arc(Coordinate center, Coordinate start, double angle)
     {
@@ -101,7 +100,7 @@ public class Arc extends java.lang.Object
         
         for (int i = 1; i < n; i++) //add all but the last one
         {
-            Coordinate p2 = gu.rotPt(pt, center, ai*i);
+            Coordinate p2 = GeoUtils.rotPt(pt, center, ai*i);
             coordinates.add(new Coordinate(p2));
         }
         
@@ -111,7 +110,7 @@ public class Arc extends java.lang.Object
         }
         else
         {
-            coordinates.add(new Coordinate(gu.rotPt(pt, center, angle))); //add the last point
+            coordinates.add(new Coordinate(GeoUtils.rotPt(pt, center, angle))); //add the last point
         }
         return coordinates;
     }
