@@ -53,6 +53,7 @@ import com.vividsolutions.jump.workbench.datasource.SaveDatasetAsPlugIn;
 import com.vividsolutions.jump.workbench.datasource.SaveDatasetAsFilePlugIn;
 import com.vividsolutions.jump.workbench.plugin.*;
 import com.vividsolutions.jump.workbench.ui.*;
+import com.vividsolutions.jump.workbench.ui.renderer.style.*;
 import com.vividsolutions.jump.workbench.ui.cursortool.*;
 import com.vividsolutions.jump.workbench.ui.cursortool.editing.EditingPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.*;
@@ -825,6 +826,16 @@ public class JUMPConfiguration implements Setup {
 
     private void configureStyles(WorkbenchContext workbenchContext) {
         WorkbenchFrame frame = workbenchContext.getWorkbench().getFrame();
+        frame
+                .addChoosableStyleClass(VertexIndexLineSegmentStyle.VertexIndex.class);
+        frame
+                .addChoosableStyleClass(MetricsLineStringSegmentStyle.LengthAngle.class);
+        frame
+                .addChoosableStyleClass(ArrowLineStringSegmentStyle.Open.class);
+        frame
+                .addChoosableStyleClass(ArrowLineStringSegmentStyle.Solid.class);
+        frame
+                .addChoosableStyleClass(ArrowLineStringSegmentStyle.NarrowSolid.class);
         frame
                 .addChoosableStyleClass(ArrowLineStringEndpointStyle.FeathersStart.class);
         frame
