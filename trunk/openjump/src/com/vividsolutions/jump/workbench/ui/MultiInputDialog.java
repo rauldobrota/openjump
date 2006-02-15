@@ -32,22 +32,11 @@
 package com.vividsolutions.jump.workbench.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Vector;
-import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.util.*;
+import javax.swing.*;
 import com.vividsolutions.jts.util.Assert;
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.util.CollectionMap;
@@ -125,6 +114,8 @@ public class MultiInputDialog extends JDialog {
     GridBagLayout gridBagLayout2 = new GridBagLayout();
     JPanel outerMainPanel = new JPanel();
     private HashMap fieldNameToComponentMap = new HashMap();
+    private Map buttonGroupMap = new HashMap();
+
     private JComponent getComponent(String fieldName) {
         return (JComponent) fieldNameToComponentMap.get(fieldName);
     }
@@ -133,6 +124,9 @@ public class MultiInputDialog extends JDialog {
     }
     public JCheckBox getCheckBox(String fieldName) {
         return (JCheckBox) getComponent(fieldName);
+    }
+    public JRadioButton getRadioButton(String fieldName) {
+        return (JRadioButton) getComponent(fieldName);
     }
     public JComponent getLabel(String fieldName) {
         return (JComponent) fieldNameToLabelMap.get(fieldName);
@@ -183,21 +177,35 @@ public class MultiInputDialog extends JDialog {
         GUIUtil.centreOnWindow(MultiInputDialog.this);
         super.setVisible(visible);
     }
+
+    /**
+     * Gets the string value of a control
+     * @param fieldName control to read
+     * @return the string value of the control
+     * @return null if the control is not in a valid state (e.g. not selected)
+     */
     public String getText(String fieldName) {
         if (fieldNameToComponentMap.get(fieldName) instanceof JTextField) {
             return ((JTextField) fieldNameToComponentMap.get(fieldName)).getText();
         }
         if (fieldNameToComponentMap.get(fieldName) instanceof JComboBox) {
-            return ((JComboBox) fieldNameToComponentMap.get(fieldName))
-                .getSelectedItem()
-                .toString();
+          Object selObj = ((JComboBox) fieldNameToComponentMap.get(fieldName)).getSelectedItem();
+          if (selObj == null) return null;
+          return selObj.toString();
         }
         Assert.shouldNeverReachHere(fieldName);
         return null;
     }
+
+    /**
+     * Returns selected state for checkboxes, radio buttons.
+     *
+     * @param fieldName the name of the control to test
+     * @return the selected state of the control
+     */
     public boolean getBoolean(String fieldName) {
-        JCheckBox checkbox = (JCheckBox) fieldNameToComponentMap.get(fieldName);
-        return checkbox.isSelected();
+        AbstractButton button = (AbstractButton) fieldNameToComponentMap.get(fieldName);
+        return button.isSelected();
     }
     public double getDouble(String fieldName) {
         return Double.parseDouble(getText(fieldName).trim());
@@ -391,6 +399,29 @@ public class MultiInputDialog extends JDialog {
         addRow(fieldName, new JLabel(""), checkBox, null, toolTipText);
         return checkBox;
     }
+
+    public JRadioButton addRadioButton(
+        String fieldName,
+        String buttonGroupName,
+        boolean initialValue,
+        String toolTipText) {
+      JRadioButton radioButton = new JRadioButton(fieldName, initialValue);
+      addRow(fieldName, new JLabel(""), radioButton, null, toolTipText);
+
+      // add to button group, if specified (and create one if it doesn't exist)
+      if (buttonGroupName != null) {
+        ButtonGroup group = (ButtonGroup) buttonGroupMap.get(buttonGroupName);
+        if (group == null) {
+          group = new ButtonGroup();
+          buttonGroupMap.put(buttonGroupName, group);
+        }
+        group.add(radioButton);
+      }
+
+      return radioButton;
+    }
+
+
     public void setSideBarImage(Icon icon) {
         //Add imageLabel only if #setSideBarImage is called. Otherwise the margin
         //above the description will be too tall. [Jon Aquino]
@@ -627,6 +658,7 @@ public class MultiInputDialog extends JDialog {
         String toolTipText) {
         if (toolTipText != null) {
             label.setToolTipText(toolTipText);
+            component.setToolTipText(toolTipText);
         }
         fieldNameToLabelMap.put(fieldName, label);
         fieldNameToComponentMap.put(fieldName, component);
@@ -638,6 +670,7 @@ public class MultiInputDialog extends JDialog {
         int labelX;
         int labelWidth;
         if (component instanceof JCheckBox
+            || component instanceof JRadioButton
             || component instanceof JLabel
             || component instanceof JPanel) {
             componentX = 1;
