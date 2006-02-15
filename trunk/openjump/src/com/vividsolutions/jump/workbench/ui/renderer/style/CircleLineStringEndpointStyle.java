@@ -40,6 +40,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.workbench.ui.Viewport;
 import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 
@@ -66,13 +67,13 @@ public abstract class CircleLineStringEndpointStyle extends LineStringEndpointSt
 
     public static class Start extends CircleLineStringEndpointStyle {
         public Start() {
-            super("Start-Circle", true, "CircleStart.gif");
+            super(I18N.get("ui.renderer.style.CircleLineStringEndpointStyle.Start-Circle"), true, "CircleStart.gif");
         }
     }
 
     public static class End extends CircleLineStringEndpointStyle {
         public End() {
-            super("End-Circle", false, "CircleEnd.gif");
+            super(I18N.get("ui.renderer.style.CircleLineStringEndpointStyle.End-Circle"), false, "CircleEnd.gif");
         }
     }
 }

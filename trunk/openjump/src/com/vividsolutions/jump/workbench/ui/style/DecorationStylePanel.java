@@ -34,9 +34,7 @@ package com.vividsolutions.jump.workbench.ui.style;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
@@ -158,6 +156,8 @@ public class DecorationStylePanel extends JPanel implements StylePanel {
             }
         }
 
+        Collections.sort(availableItems);
+        Collections.sort(inUseItems);
         addRemovePanel.getLeftList().getModel().setItems(availableItems);
         addRemovePanel.getRightList().getModel().setItems(inUseItems);
     }
