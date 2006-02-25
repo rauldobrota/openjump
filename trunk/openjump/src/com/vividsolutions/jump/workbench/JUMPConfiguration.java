@@ -726,7 +726,7 @@ public static String MENU_ANALYSIS = MenuNames.TOOLS_ANALYSIS;
 public static String[] MENU_TOOLS_ANALYSIS = new String[] { MENU_TOOLS, MENU_ANALYSIS};
 
 // these must be defined as instance vars for initialization to be performed
-private SpatialQueryPlugIn spatialQueryPlugIn = new SpatialQueryPlugIn();
+//private SpatialQueryPlugIn spatialQueryPlugIn = new SpatialQueryPlugIn();
 //private AttributeQueryPlugIn attrQueryPlugIn = new AttributeQueryPlugIn();
 private UnionPlugIn unionPlugIn = new UnionPlugIn();
 private GeometryFunctionPlugIn geometryFunctionPlugIn = new GeometryFunctionPlugIn();
