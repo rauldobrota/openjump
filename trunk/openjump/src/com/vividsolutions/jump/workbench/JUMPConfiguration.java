@@ -31,52 +31,34 @@
  */
 package com.vividsolutions.jump.workbench;
 
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.lang.reflect.Field;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
-import javax.swing.JPopupMenu;
-import javax.swing.JToggleButton;
-
+import com.vividsolutions.jts.util.*;
 import org.openjump.OpenJumpConfiguration;
-
-import com.vividsolutions.jts.util.Assert;
 import com.vividsolutions.jump.I18N;
-import com.vividsolutions.jump.workbench.datasource.AbstractLoadDatasetPlugIn;
-import com.vividsolutions.jump.workbench.datasource.AbstractSaveDatasetAsPlugIn;
-import com.vividsolutions.jump.workbench.datasource.InstallStandardDataSourceQueryChoosersPlugIn;
-import com.vividsolutions.jump.workbench.datasource.LoadDatasetFromFilePlugIn;
+
+import com.vividsolutions.jump.workbench.datasource.*;
 import com.vividsolutions.jump.workbench.datasource.LoadDatasetPlugIn;
 import com.vividsolutions.jump.workbench.datasource.SaveDatasetAsPlugIn;
 import com.vividsolutions.jump.workbench.datasource.SaveDatasetAsFilePlugIn;
 import com.vividsolutions.jump.workbench.plugin.*;
 import com.vividsolutions.jump.workbench.ui.*;
-import com.vividsolutions.jump.workbench.ui.renderer.style.*;
 import com.vividsolutions.jump.workbench.ui.cursortool.*;
-import com.vividsolutions.jump.workbench.ui.cursortool.editing.EditingPlugIn;
+import com.vividsolutions.jump.workbench.ui.cursortool.editing.*;
 import com.vividsolutions.jump.workbench.ui.plugin.*;
 import com.vividsolutions.jump.workbench.ui.plugin.analysis.*;
 import com.vividsolutions.jump.workbench.ui.plugin.clipboard.*;
-import com.vividsolutions.jump.workbench.ui.plugin.generate.BoundaryMatchDataPlugIn;
-import com.vividsolutions.jump.workbench.ui.plugin.scalebar.InstallScaleBarPlugIn;
-import com.vividsolutions.jump.workbench.ui.plugin.scalebar.ScaleBarPlugIn;
-import com.vividsolutions.jump.workbench.ui.plugin.scalebar.ScaleBarRenderer;
+import com.vividsolutions.jump.workbench.ui.plugin.scalebar.*;
 import com.vividsolutions.jump.workbench.ui.plugin.skin.InstallSkinsPlugIn;
-import com.vividsolutions.jump.workbench.ui.plugin.test.RandomArrowsPlugIn;
-import com.vividsolutions.jump.workbench.ui.plugin.test.RandomTrianglesPlugIn;
-import com.vividsolutions.jump.workbench.ui.plugin.wms.AddWMSQueryPlugIn;
-import com.vividsolutions.jump.workbench.ui.plugin.wms.EditWMSQueryPlugIn;
-import com.vividsolutions.jump.workbench.ui.renderer.style.ArrowLineStringEndpointStyle;
-import com.vividsolutions.jump.workbench.ui.renderer.style.CircleLineStringEndpointStyle;
-import com.vividsolutions.jump.workbench.ui.snap.InstallGridPlugIn;
-import com.vividsolutions.jump.workbench.ui.snap.SnapToVerticesPolicy;
-import com.vividsolutions.jump.workbench.ui.style.ChangeStylesPlugIn;
-import com.vividsolutions.jump.workbench.ui.task.TaskMonitorManager;
-import com.vividsolutions.jump.workbench.ui.warp.AffineTransformPlugIn;
-import com.vividsolutions.jump.workbench.ui.warp.WarpingPlugIn;
+import com.vividsolutions.jump.workbench.ui.plugin.test.*;
+import com.vividsolutions.jump.workbench.ui.plugin.wms.*;
+import com.vividsolutions.jump.workbench.ui.renderer.style.*;
+import com.vividsolutions.jump.workbench.ui.snap.*;
+import com.vividsolutions.jump.workbench.ui.style.*;
+import com.vividsolutions.jump.workbench.ui.task.*;
+import com.vividsolutions.jump.workbench.ui.warp.*;
 import com.vividsolutions.jump.workbench.ui.zoom.*;
+import java.awt.event.*;
+import java.lang.reflect.*;
+import javax.swing.*;
 
 /**
  * Initializes the Workbench with various menus and cursor tools. Accesses the
@@ -84,8 +66,12 @@ import com.vividsolutions.jump.workbench.ui.zoom.*;
  */
 public class JUMPConfiguration implements Setup {
 
+	/**
+	 * Built-in plugins must be defined as instance variables, since
+	 * they are located for iniatialization via reflection on this class
+	 */
     private InstallScaleBarPlugIn installScaleBarPlugIn = new InstallScaleBarPlugIn();
-    
+
     private InstallGridPlugIn installGridPlugIn = new InstallGridPlugIn();
 
     private PersistentBlackboardPlugIn persistentBlackboardPlugIn = new PersistentBlackboardPlugIn();
@@ -140,11 +126,9 @@ public class JUMPConfiguration implements Setup {
 
     private EditablePlugIn editablePlugIn = new EditablePlugIn(editingPlugIn);
 
-    private FeatureStatisticsPlugIn featureStatisticsPlugIn = new FeatureStatisticsPlugIn();
 
     private BeanShellPlugIn beanShellPlugIn = new BeanShellPlugIn();
 
-    private LayerStatisticsPlugIn layerStatisticsPlugIn = new LayerStatisticsPlugIn();
 
     private LoadDatasetPlugIn loadDatasetPlugIn = new LoadDatasetPlugIn();
     private LoadDatasetFromFilePlugIn loadDatasetFromFilePlugIn = new LoadDatasetFromFilePlugIn();
@@ -158,13 +142,6 @@ public class JUMPConfiguration implements Setup {
 
     private OpenProjectPlugIn openProjectPlugIn = new OpenProjectPlugIn();
 
-    private OverlayPlugIn overlayPlugIn = new OverlayPlugIn();
-
-    private UnionPlugIn unionPlugIn = new UnionPlugIn();
-
-    private GeometryFunctionPlugIn geometryFunctionPlugIn = new GeometryFunctionPlugIn();
-
-    private BufferPlugIn bufferPlugIn = new BufferPlugIn();
 
     private PasteItemsPlugIn pasteItemsPlugIn = new PasteItemsPlugIn();
 
@@ -195,9 +172,7 @@ public class JUMPConfiguration implements Setup {
 
     private RedoPlugIn redoPlugIn = new RedoPlugIn();
 
-    private ValidateSelectedLayersPlugIn validateSelectedLayersPlugIn = new ValidateSelectedLayersPlugIn();
 
-    private CalculateAreasAndLengthsPlugIn calculateAreasAndLengthsPlugIn = new CalculateAreasAndLengthsPlugIn();
 
     private ViewAttributesPlugIn viewAttributesPlugIn = new ViewAttributesPlugIn();
 
@@ -238,6 +213,8 @@ public class JUMPConfiguration implements Setup {
     
     public void setup(WorkbenchContext workbenchContext) throws Exception {
         configureStyles(workbenchContext);
+        configureDatastores(workbenchContext);
+
         workbenchContext.getWorkbench().getBlackboard().put(
                 SnapToVerticesPolicy.ENABLED_KEY, true);
 
@@ -653,32 +630,10 @@ public class JUMPConfiguration implements Setup {
                 MapToolTipsPlugIn.createEnableCheck(workbenchContext));
         zoomBarPlugIn.createMainMenuItem(new String[] { MenuNames.VIEW}, null,
                 workbenchContext);
-        //-- LAYER
-        featureInstaller.addLayerViewMenuItem(addNewLayerPlugIn, MenuNames.LAYER,
-                addNewLayerPlugIn.getName());
-        featureInstaller.addLayerViewMenuItem(addWMSQueryPlugIn, MenuNames.LAYER,
-                addWMSQueryPlugIn.getName());
-        featureInstaller.addMainMenuItemWithJava14Fix(addNewCategoryPlugIn, new String[] {MenuNames.LAYER},
-                addNewCategoryPlugIn.getName(), false, null, addNewCategoryPlugIn
-                        .createEnableCheck(workbenchContext));
-        featureInstaller.addMenuSeparator(MenuNames.LAYER); // ===================
-        featureInstaller.addMainMenuItem(cutSelectedLayersPlugIn, new String[]{MenuNames.LAYER},
-                cutSelectedLayersPlugIn.getNameWithMnemonic(), false, null,
-                cutSelectedLayersPlugIn.createEnableCheck(workbenchContext));
-        featureInstaller.addMainMenuItem(copySelectedLayersPlugIn, new String[] {MenuNames.LAYER},
-                copySelectedLayersPlugIn.getNameWithMnemonic(), false, null,
-                copySelectedLayersPlugIn.createEnableCheck(workbenchContext));
-        featureInstaller.addMainMenuItem(pasteLayersPlugIn, new String[] {MenuNames.LAYER},
-                pasteLayersPlugIn.getNameWithMnemonic(), false, null,
-                pasteLayersPlugIn.createEnableCheck(workbenchContext));
-        featureInstaller.addMenuSeparator(MenuNames.LAYER); // ===================
-        featureInstaller.addMainMenuItemWithJava14Fix(removeSelectedLayersPlugIn, new String[] {MenuNames.LAYER},
-                removeSelectedLayersPlugIn.getName(), false,null,
-                removeSelectedLayersPlugIn.createEnableCheck(workbenchContext));
-        featureInstaller.addMainMenuItemWithJava14Fix(removeSelectedCategoriesPlugIn,
-        		new String[] {MenuNames.LAYER}, removeSelectedCategoriesPlugIn.getName(), false, null,
-                removeSelectedCategoriesPlugIn
-                        .createEnableCheck(workbenchContext));
+        //-- LAYER       
+        //-- [sstein: 23.02.2006 new in VividJump]
+        configLayer(workbenchContext, checkFactory, featureInstaller);
+        
         //-- WINDOW
         /*
         featureInstaller.addMainMenuItemWithJava14Fix(optionsPlugIn, new String[] {MenuNames.WINDOW}, optionsPlugIn
@@ -703,126 +658,309 @@ public class JUMPConfiguration implements Setup {
                 });
       
         featureInstaller.addMenuSeparator(MenuNames.WINDOW); // ===================
+
         //-- TOOLS
-        new BoundaryMatchDataPlugIn().initialize(new PlugInContext(
-                workbenchContext, null, null, null, null));
-        new WarpingPlugIn().initialize(new PlugInContext(workbenchContext,
-                null, null, null, null));
-        new AffineTransformPlugIn().initialize(new PlugInContext(
-                workbenchContext, null, null, null, null));
-        new RandomTrianglesPlugIn().initialize(new PlugInContext(
-                workbenchContext, null, null, null, null));
-        new RandomArrowsPlugIn().initialize(new PlugInContext(workbenchContext,
-                null, null, null, null));
-        //-- TOOLS - Analysis
-        featureInstaller
-        		.addMainMenuItemWithJava14Fix(
-                        overlayPlugIn,
-                        new String[] {  MenuNames.TOOLS, MenuNames.TOOLS_ANALYSIS},
-                        overlayPlugIn.getName() + "...",
-                        false,
-                        null,
-                        new MultiEnableCheck()
-                                .add(
-                                        checkFactory
-                                                .createWindowWithLayerNamePanelMustBeActiveCheck())
-                                .add(
-                                        checkFactory
-                                                .createAtLeastNLayersMustExistCheck(2)));
-        featureInstaller
-        		.addMainMenuItemWithJava14Fix(
-                        unionPlugIn,
-                        new String[] {MenuNames.TOOLS, MenuNames.TOOLS_ANALYSIS},
-                        unionPlugIn.getName() + "...",
-                        false,
-                        null,
-                        new MultiEnableCheck()
-                                .add(
-                                        checkFactory
-                                                .createWindowWithLayerNamePanelMustBeActiveCheck())
-                                .add(
-                                        checkFactory
-                                                .createAtLeastNLayersMustExistCheck(1)));
-        featureInstaller
-        		.addMainMenuItemWithJava14Fix(
-                        geometryFunctionPlugIn,
-                        new String[] { MenuNames.TOOLS, MenuNames.TOOLS_ANALYSIS},
-                        geometryFunctionPlugIn.getName() + "...",
-                        false,
-                        null,
-                        new MultiEnableCheck()
-                                .add(
-                                        checkFactory
-                                                .createWindowWithLayerNamePanelMustBeActiveCheck())
-                                .add(
-                                        checkFactory
-                                                .createAtLeastNLayersMustExistCheck(2)));
-        featureInstaller
-        		.addMainMenuItemWithJava14Fix(
-                        bufferPlugIn,
-                        new String[] {MenuNames.TOOLS, MenuNames.TOOLS_ANALYSIS},
-                        bufferPlugIn.getName() + "...",
-                        false,
-                        null,
-                        new MultiEnableCheck()
-                                .add(
-                                        checkFactory
-                                                .createWindowWithLayerNamePanelMustBeActiveCheck())
-                                .add(
-                                        checkFactory
-                                                .createAtLeastNLayersMustExistCheck(1)));
-        featureInstaller
-        		.addMainMenuItemWithJava14Fix(
-                        validateSelectedLayersPlugIn,
-                        new String[] { MenuNames.TOOLS, MenuNames.TOOLS_QA},
-                        validateSelectedLayersPlugIn.getName() + "...",
-                        false,
-                        null,
-                        new MultiEnableCheck()
-                                .add(
-                                        checkFactory
-                                                .createWindowWithLayerNamePanelMustBeActiveCheck())
-                                .add(
-                                        checkFactory
-                                                .createAtLeastNLayersMustBeSelectedCheck(1)));
-        featureInstaller
-        		.addMainMenuItemWithJava14Fix(
-                        layerStatisticsPlugIn,
-                        new String[] { MenuNames.TOOLS, MenuNames.TOOLS_ANALYSIS},
-                        layerStatisticsPlugIn.getName(),
-                        false,
-                        null,
-                        new MultiEnableCheck()
-                                .add(
-                                        checkFactory
-                                                .createWindowWithLayerNamePanelMustBeActiveCheck())
-                                .add(
-                                        checkFactory
-                                                .createAtLeastNLayersMustBeSelectedCheck(1)));
-        featureInstaller
-        		.addMainMenuItemWithJava14Fix(
-                        featureStatisticsPlugIn,
-                        new String[] { MenuNames.TOOLS, MenuNames.TOOLS_QA},
-                        featureStatisticsPlugIn.getName(),
-                        false,
-                        null,
-                        new MultiEnableCheck()
-                                .add(
-                                        checkFactory
-                                                .createWindowWithLayerNamePanelMustBeActiveCheck())
-                                .add(
-                                        checkFactory
-                                                .createAtLeastNLayersMustBeSelectedCheck(1)));
-        featureInstaller.addMainMenuItemWithJava14Fix(calculateAreasAndLengthsPlugIn,
-                new String[] { MenuNames.TOOLS, MenuNames.TOOLS_ANALYSIS},
-                calculateAreasAndLengthsPlugIn.getName() + "...", false, null,
-                calculateAreasAndLengthsPlugIn
-                        .createEnableCheck(workbenchContext));
+        //-- [sstein: 23.02.2006 new in VividJump]
+        configToolsAnalysis(workbenchContext, checkFactory, featureInstaller);
+        configToolsEdit(workbenchContext, checkFactory, featureInstaller);
+        configToolsQA(workbenchContext, checkFactory, featureInstaller);        
+
         featureInstaller.addMainMenuItemWithJava14Fix(shortcutKeysPlugIn, new String[]{MenuNames.HELP},
                 shortcutKeysPlugIn.getName() + "...", false, null, null);
         new FeatureInstaller(workbenchContext).addMainMenuItemWithJava14Fix(
                 new AboutPlugIn(), new String[]{MenuNames.HELP}, I18N.get("JUMPConfiguration.about"), false, null, null);
     }
+
+    //==== [sstein: 23.02.2006] ====== 
+    // this is a new method in VividJump (December 2005) to initialize 
+    // plugins working on layers
+    //================================
+    public static String MENU_LAYER = MenuNames.LAYER;
+    	/*
+        private AddDatastoreLayerPlugIn addDatastoreLayerPlugIn = new AddDatastoreLayerPlugIn();
+        private RunDatastoreQueryPlugIn runDatastoreQueryPlugIn = new RunDatastoreQueryPlugIn();
+        private InstallDatastoreLayerRendererHintsPlugIn installDatastoreLayerRendererHintsPlugIn = new InstallDatastoreLayerRendererHintsPlugIn();
+        */
+    private void configLayer(final WorkbenchContext workbenchContext,
+    		final EnableCheckFactory checkFactory,
+			FeatureInstaller featureInstaller) throws Exception {
+    	
+    	featureInstaller.addLayerViewMenuItem(addNewLayerPlugIn, MENU_LAYER,
+    			addNewLayerPlugIn.getName());
+    	/*
+    	 featureInstaller.addLayerViewMenuItem(addDatastoreLayerPlugIn, MENU_LAYER,
+    	 addDatastoreLayerPlugIn.getName() + "...");
+    	 featureInstaller.addLayerViewMenuItem(runDatastoreQueryPlugIn, MENU_LAYER,
+    	 runDatastoreQueryPlugIn.getName() + "...");
+    	 */
+    	featureInstaller.addLayerViewMenuItem(addWMSQueryPlugIn, MENU_LAYER,
+    			addWMSQueryPlugIn.getName() + "...");
+    	featureInstaller.addMainMenuItem(addNewCategoryPlugIn, MENU_LAYER,
+    			addNewCategoryPlugIn.getName(), null, addNewCategoryPlugIn
+				.createEnableCheck(workbenchContext));
+    	featureInstaller.addMenuSeparator(MenuNames.LAYER); // ===================
+    	featureInstaller.addMainMenuItem(cutSelectedLayersPlugIn, MENU_LAYER,
+    			cutSelectedLayersPlugIn.getNameWithMnemonic(), null,
+				cutSelectedLayersPlugIn.createEnableCheck(workbenchContext));
+    	featureInstaller.addMainMenuItem(copySelectedLayersPlugIn, MENU_LAYER,
+    			copySelectedLayersPlugIn.getNameWithMnemonic(), null,
+				copySelectedLayersPlugIn.createEnableCheck(workbenchContext));
+    	featureInstaller.addMainMenuItem(pasteLayersPlugIn, MENU_LAYER,
+    			pasteLayersPlugIn.getNameWithMnemonic(), null,
+				pasteLayersPlugIn.createEnableCheck(workbenchContext));
+    	featureInstaller.addMenuSeparator(MenuNames.LAYER); // ===================
+    	featureInstaller.addMainMenuItem(removeSelectedLayersPlugIn, MENU_LAYER,
+    			removeSelectedLayersPlugIn.getName(), null,
+				removeSelectedLayersPlugIn.createEnableCheck(workbenchContext));
+    	featureInstaller.addMainMenuItem(removeSelectedCategoriesPlugIn,
+    			MENU_LAYER, removeSelectedCategoriesPlugIn.getName(), null,
+				removeSelectedCategoriesPlugIn
+				.createEnableCheck(workbenchContext));
+    }    	
+   
+
+// MD - following is proposed new pattern for defining built-in menus
+
+public static String MENU_TOOLS = MenuNames.TOOLS;
+public static String MENU_ANALYSIS = MenuNames.TOOLS_ANALYSIS;
+public static String[] MENU_TOOLS_ANALYSIS = new String[] { MENU_TOOLS, MENU_ANALYSIS};
+
+// these must be defined as instance vars for initialization to be performed
+private SpatialQueryPlugIn spatialQueryPlugIn = new SpatialQueryPlugIn();
+//private AttributeQueryPlugIn attrQueryPlugIn = new AttributeQueryPlugIn();
+private UnionPlugIn unionPlugIn = new UnionPlugIn();
+private GeometryFunctionPlugIn geometryFunctionPlugIn = new GeometryFunctionPlugIn();
+private OverlayPlugIn overlayPlugIn = new OverlayPlugIn();
+//private ConvexHullPlugIn convexHullPI = new ConvexHullPlugIn();
+private BufferPlugIn bufferPlugIn = new BufferPlugIn();
+private CalculateAreasAndLengthsPlugIn calculateAreasAndLengthsPlugIn = new CalculateAreasAndLengthsPlugIn();
+
+private void configToolsAnalysis(final WorkbenchContext workbenchContext,
+		final EnableCheckFactory checkFactory,
+		FeatureInstaller featureInstaller) throws Exception {
+	/*
+	featureInstaller
+	.addMainMenuItem(
+			spatialQueryPlugIn,
+			MENU_TOOLS_ANALYSIS,
+			spatialQueryPlugIn.getName() + "...",
+			false,
+			null,
+			new MultiEnableCheck()
+			.add(
+					checkFactory
+					.createWindowWithLayerNamePanelMustBeActiveCheck())
+					.add(
+							checkFactory
+							.createAtLeastNLayersMustExistCheck(2)));
+	*/
+	//TODO: implement
+	//featureInstaller
+	//        .addMainMenuItem(
+	//                attrQueryPlugIn,
+	//                MENU_TOOLS_ANALYSIS,
+	//                attrQueryPlugIn.getName() + "...",
+	//                false,
+	//                null,
+	//                new MultiEnableCheck()
+	//                        .add(
+	//                                checkFactory
+	//                                        .createWindowWithLayerNamePanelMustBeActiveCheck())
+	//                        .add(
+	//                                checkFactory
+	//                                        .createAtLeastNLayersMustExistCheck(1)));
+	
+	featureInstaller
+	.addMainMenuItem(
+			geometryFunctionPlugIn,
+			MENU_TOOLS_ANALYSIS,
+			geometryFunctionPlugIn.getName() + "...",
+			false,
+			null,
+			new MultiEnableCheck()
+			.add(
+					checkFactory
+					.createWindowWithLayerNamePanelMustBeActiveCheck())
+					.add(
+							checkFactory
+							.createAtLeastNLayersMustExistCheck(1)));
+	
+	//======================================
+	featureInstaller.addMenuSeparator(MENU_TOOLS_ANALYSIS);
+	featureInstaller
+	.addMainMenuItem(
+			unionPlugIn,
+			MENU_TOOLS_ANALYSIS,
+			unionPlugIn.getName() + "...",
+			false,
+			null,
+			new MultiEnableCheck()
+			.add(
+					checkFactory
+					.createWindowWithLayerNamePanelMustBeActiveCheck())
+					.add(
+							checkFactory
+							.createAtLeastNLayersMustExistCheck(1)));
+	featureInstaller
+	.addMainMenuItem(
+			bufferPlugIn,
+			MENU_TOOLS_ANALYSIS,
+			bufferPlugIn.getName() + "...",
+			false,
+			null,
+			new MultiEnableCheck()
+			.add(
+					checkFactory
+					.createWindowWithLayerNamePanelMustBeActiveCheck())
+					.add(
+							checkFactory
+							.createAtLeastNLayersMustExistCheck(1)));
+	//TODO: implement
+	//featureInstaller
+	//.addMainMenuItem(
+	//		convexHullPI,
+	//        MENU_TOOLS_ANALYSIS,
+	//        convexHullPI.getName() + "...",
+	//        false,
+	//        null, convexHullPI.getEnableCheck(checkFactory)
+	//	);
+	
+	
+	//======================================
+	featureInstaller.addMenuSeparator(MENU_TOOLS_ANALYSIS);
+	featureInstaller
+	.addMainMenuItem(
+			overlayPlugIn,
+			MENU_TOOLS_ANALYSIS,
+			overlayPlugIn.getName() + "...",
+			false,
+			null,
+			new MultiEnableCheck()
+			.add(checkFactory.createWindowWithLayerNamePanelMustBeActiveCheck())
+			.add(checkFactory.createAtLeastNLayersMustExistCheck(2)));
+	
+	//======================================
+	featureInstaller.addMenuSeparator(MENU_TOOLS_ANALYSIS);
+	
+	featureInstaller.addMainMenuItem(calculateAreasAndLengthsPlugIn,
+			new String[] { MenuNames.TOOLS, MenuNames.TOOLS_ANALYSIS},
+			calculateAreasAndLengthsPlugIn.getName() + "...", false, null,
+			calculateAreasAndLengthsPlugIn.createEnableCheck(workbenchContext));
+	
+	new WarpingPlugIn().initialize(new PlugInContext(workbenchContext,
+			null, null, null, null));
+	
+	new AffineTransformPlugIn().initialize(new PlugInContext(
+			workbenchContext, null, null, null, null));
+	
+	new RandomTrianglesPlugIn().initialize(new PlugInContext(
+			workbenchContext, null, null, null, null));
+	new RandomArrowsPlugIn().initialize(new PlugInContext(workbenchContext,
+			null, null, null, null));
+	
+}
+
+public static String MENU_EDIT = MenuNames.EDIT;
+public static String[] MENU_TOOLS_EDIT
+	= new String[] { MENU_TOOLS, MENU_EDIT};
+
+//private PrecisionReducerPlugIn precisionReducerPlugIn = new PrecisionReducerPlugIn();
+
+private void configToolsEdit(final WorkbenchContext workbenchContext,
+            final EnableCheckFactory checkFactory,
+            FeatureInstaller featureInstaller) throws Exception {
+//	TODO: implement
+//    featureInstaller.addMainMenuItem(precisionReducerPlugIn,
+//    		MENU_TOOLS_EDIT,
+//            precisionReducerPlugIn.getName() + "...", false, null,
+//            precisionReducerPlugIn.createEnableCheck(workbenchContext));
+}
+
+public static String MENU_QA = MenuNames.TOOLS_QA;
+public static String[] MENU_TOOLS_QA
+	= new String[] { MENU_TOOLS, MENU_QA};
+
+private ValidateSelectedLayersPlugIn validateSelectedLayersPlugIn = new ValidateSelectedLayersPlugIn();
+private LayerStatisticsPlugIn layerStatisticsPlugIn = new LayerStatisticsPlugIn();
+private FeatureStatisticsPlugIn featureStatisticsPlugIn = new FeatureStatisticsPlugIn();
+
+//private DiffSegmentsPlugIn diffSegmentsPlugIn = new DiffSegmentsPlugIn();
+//private DiffGeometryPlugIn diffGeometryPlugIn = new DiffGeometryPlugIn();
+
+private void configToolsQA(final WorkbenchContext workbenchContext,
+		final EnableCheckFactory checkFactory,
+		FeatureInstaller featureInstaller) throws Exception {
+	featureInstaller
+	.addMainMenuItem(validateSelectedLayersPlugIn,
+			MENU_TOOLS_QA,
+			validateSelectedLayersPlugIn.getName() + "...",
+			false,
+			null,
+			new MultiEnableCheck()
+			.add(checkFactory.createWindowWithLayerNamePanelMustBeActiveCheck())
+			.add(checkFactory.createAtLeastNLayersMustBeSelectedCheck(1)));
+	featureInstaller
+	.addMainMenuItem(layerStatisticsPlugIn,
+			MENU_TOOLS_QA,
+			layerStatisticsPlugIn.getName(),
+			false,
+			null,
+			new MultiEnableCheck()
+			.add(checkFactory.createWindowWithLayerNamePanelMustBeActiveCheck())
+			.add(checkFactory.createAtLeastNLayersMustBeSelectedCheck(1)));
+	featureInstaller
+	.addMainMenuItem(featureStatisticsPlugIn,
+			MENU_TOOLS_QA,
+			featureStatisticsPlugIn.getName(),
+			false,
+			null,
+			new MultiEnableCheck()
+			.add(checkFactory.createWindowWithLayerNamePanelMustBeActiveCheck())
+			.add(checkFactory.createAtLeastNLayersMustBeSelectedCheck(1)));
+	
+	/*
+	 // MD - not used now
+	  featureInstaller.addMainMenuItem(diffSegmentsPlugIn,
+	  MENU_TOOLS_QA,
+	  diffSegmentsPlugIn.getName() + "...",
+	  false,
+	  null,
+	  new MultiEnableCheck()
+	  .add(checkFactory.createWindowWithLayerNamePanelMustBeActiveCheck())
+	  .add(checkFactory.createAtLeastNLayersMustExistCheck(2)));
+	  */
+	//TODO: implement
+	//featureInstaller.addMainMenuItem(diffGeometryPlugIn,
+	//            MENU_TOOLS_QA,
+	//            diffGeometryPlugIn.getName() + "...",
+	//            false,
+	//            null,
+	//            new MultiEnableCheck()
+	//                    .add(checkFactory.createWindowWithLayerNamePanelMustBeActiveCheck())
+	//                    .add(checkFactory.createAtLeastNLayersMustExistCheck(2)));
+
+}
+
+public void configureDatastores(final WorkbenchContext context) throws Exception {
+//TODO implement
+//	context.getRegistry().
+//    createEntry(DataStoreDriver.REGISTRY_CLASSIFICATION,new PostgisDataStoreDriver());
+//    final ApplicationExitHandler oldApplicationExitHandler = context
+//            .getWorkbench().getFrame().getApplicationExitHandler();
+//    context.getWorkbench().getFrame().setApplicationExitHandler(
+//            new ApplicationExitHandler() {
+//                public void exitApplication(JFrame mainFrame) {
+//                    try {
+//                        ConnectionManager.instance(
+//                                context.getBlackboard())
+//                                .closeConnections();
+//                    } catch (DataStoreException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                    oldApplicationExitHandler.exitApplication(mainFrame);
+//                }
+//            });
+}
 
     private void configureStyles(WorkbenchContext workbenchContext) {
         WorkbenchFrame frame = workbenchContext.getWorkbench().getFrame();
