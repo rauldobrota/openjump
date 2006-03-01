@@ -43,33 +43,33 @@ import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureCollection;
 import com.vividsolutions.jump.warp.AffineTransform;
 import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
-import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
-import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
-import com.vividsolutions.jump.workbench.plugin.PlugInContext;
+import com.vividsolutions.jump.workbench.plugin.*;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
-
 
 /**
  *  Applies an affine transform to the selected layers. The affine transform is
  *  specified using three vectors drawn by the user.
  */
 public class AffineTransformPlugIn extends AbstractPlugIn {
-    //<<TODO:NAMING>> Rename datageneration to conflate [Jon Aquino]
     public AffineTransformPlugIn() {
     }
 
+    public static EnableCheck getEnableCheck(EnableCheckFactory checkFactory) {
+        return new MultiEnableCheck().add(
+        		checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck())
+    .add(checkFactory
+                .createWindowWithLayerNamePanelMustBeActiveCheck())
+    .add(checkFactory
+                .createExactlyNLayersMustBeSelectedCheck(1))
+    .add(checkFactory
+                .createBetweenNAndMVectorsMustBeDrawnCheck(1, 3))  ; 	
+    }
+    
     public void initialize(PlugInContext context) throws Exception {
-        context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this,
+        context.getFeatureInstaller().addMainMenuItem(this,
             new String[] { MenuNames.TOOLS, MenuNames.TOOLS_WARP }, getName(), false, null,
-            new MultiEnableCheck().add(context.getCheckFactory()
-                                              .createWindowWithLayerViewPanelMustBeActiveCheck())
-                                  .add(context.getCheckFactory()
-                                              .createWindowWithLayerNamePanelMustBeActiveCheck())
-                                  .add(context.getCheckFactory()
-                                              .createExactlyNLayersMustBeSelectedCheck(1))
-                                  .add(context.getCheckFactory()
-                                              .createBetweenNAndMVectorsMustBeDrawnCheck(1,
-                    3)));
+            getEnableCheck(context.getCheckFactory())
+        );
     }
 
     public boolean execute(PlugInContext context) throws Exception {

@@ -119,6 +119,24 @@
   </basic-style>
   <basic-style enabled="true">
     <fill enabled="false">
+      <color>255, 224, 104, 255</color>
+    </fill>
+    <line enabled="true" width="4">
+      <color>255, 153, 0, 255</color>
+    </line>
+    <alpha>255</alpha>
+  </basic-style>
+  <basic-style enabled="true">
+    <fill enabled="false">
+      <color>152, 78, 163, 255</color>
+    </fill>
+    <line enabled="true" width="4">
+      <color>106, 54, 114, 255</color>
+    </line>
+    <alpha>255</alpha>
+  </basic-style>
+  <basic-style enabled="true">
+    <fill enabled="false">
       <color>0, 0, 0, 0</color>
     </fill>
     <line enabled="true" width="4">
@@ -187,6 +205,56 @@
     </fill>
     <line enabled="true" width="1">
       <color>178, 0, 178, 255</color>
+    </line>
+    <alpha>255</alpha>
+  </basic-style>
+  <basic-style enabled="true">
+    <fill enabled="false">
+      <color>0, 0, 0, 255</color>
+    </fill>
+    <line enabled="true" width="1">
+      <pattern enabled="true">2,2</pattern>
+      <color>0, 0, 0, 255</color>
+    </line>
+    <alpha>255</alpha>
+  </basic-style>
+  <basic-style enabled="true">
+    <fill enabled="false">
+      <color>0, 0, 255, 255</color>
+    </fill>
+    <line enabled="true" width="2">
+      <pattern enabled="true">3,3</pattern>
+      <color>0, 0, 255, 255</color>
+    </line>
+    <alpha>255</alpha>
+  </basic-style>
+  <basic-style enabled="true">
+    <fill enabled="false">
+      <color>255, 0, 0, 255</color>
+    </fill>
+    <line enabled="true" width="2">
+      <pattern enabled="true">3,3</pattern>
+      <color>255, 0, 0, 255</color>
+    </line>
+    <alpha>255</alpha>
+  </basic-style>
+  <basic-style enabled="true">
+    <fill enabled="true">
+      <color>226, 226, 255, 255</color>
+    </fill>
+    <line enabled="true" width="2">
+      <pattern enabled="true">3,3</pattern>
+      <color>0, 0, 255, 255</color>
+    </line>
+    <alpha>255</alpha>
+  </basic-style>
+  <basic-style enabled="true">
+    <fill enabled="true">
+      <color>255, 226, 226, 255</color>
+    </fill>
+    <line enabled="true" width="2">
+      <pattern enabled="true">3,3</pattern>
+      <color>255, 0, 0, 255</color>
     </line>
     <alpha>255</alpha>
   </basic-style>

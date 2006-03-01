@@ -36,6 +36,7 @@ package com.vividsolutions.jump.workbench.ui.plugin.analysis;
 import java.util.*;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jump.I18N;
+import com.vividsolutions.jts.operation.buffer.BufferOp;
 import com.vividsolutions.jump.feature.*;
 import com.vividsolutions.jump.task.*;
 import com.vividsolutions.jump.workbench.model.*;
@@ -49,14 +50,25 @@ public class BufferPlugIn
 {
   private final static String LAYER = I18N.get("ui.plugin.analysis.BufferPlugIn.layer");
   private final static String DISTANCE = I18N.get("ui.plugin.analysis.BufferPlugIn.buffer-distance");
+  private final static String END_CAP_STYLE = I18N.get("ui.plugin.analysis.BufferPlugIn.End-Cap-Style");
+
+  private final static String CAP_STYLE_ROUND = I18N.get("ui.plugin.analysis.BufferPlugIn.Round");
+  private final static String CAP_STYLE_SQUARE = I18N.get("ui.plugin.analysis.BufferPlugIn.Square");
+  private final static String CAP_STYLE_BUTT = I18N.get("ui.plugin.analysis.BufferPlugIn.Butt");
+
+  private List endCapStyles = new ArrayList();
 
   private MultiInputDialog dialog;
   private Layer layer;
   private double bufferDistance = 1.0;
+  private String endCapStyle = CAP_STYLE_ROUND;
   private boolean exceptionThrown = false;
 
   public BufferPlugIn()
   {
+    endCapStyles.add(CAP_STYLE_ROUND);
+    endCapStyles.add(CAP_STYLE_SQUARE);
+    endCapStyles.add(CAP_STYLE_BUTT);
   }
 
   public boolean execute(PlugInContext context) throws Exception {
@@ -79,7 +91,8 @@ public class BufferPlugIn
 
     Collection resultColl = runBuffer(layer.getFeatureCollectionWrapper());
     resultFC = FeatureDatasetFactory.createFromGeometry(resultColl);
-    context.addLayer(StandardCategoryNames.WORKING, "Buffer-" + layer.getName(), resultFC);
+    context.getLayerManager().addCategory(StandardCategoryNames.RESULT, 0);
+    context.addLayer(StandardCategoryNames.RESULT, I18N.get("com.vividsolutions.jump.workbench.ui.plugin.analysis.BufferPlugIn")+"-" + layer.getName(), resultFC);
     if (exceptionThrown)
       context.getWorkbenchFrame().warnUser(I18N.get("ui.plugin.analysis.BufferPlugIn.errors-found-while-executing-buffer"));
   }
@@ -102,7 +115,10 @@ public class BufferPlugIn
   {
     Geometry result = null;
     try {
-      result = a.buffer(bufferDistance);
+      BufferOp bufOp = new BufferOp(a);
+      bufOp.setEndCapStyle(endCapStyleCode(endCapStyle));
+      result = bufOp.getResultGeometry(bufferDistance);
+      //result = a.buffer(bufferDistance);
       return result;
     }
     catch (RuntimeException ex) {
@@ -119,10 +135,19 @@ public class BufferPlugIn
     //Initial layer value is null
     dialog.addLayerComboBox(LAYER, layer, context.getLayerManager());
     dialog.addDoubleField(DISTANCE, bufferDistance, 10, null);
+    dialog.addComboBox(END_CAP_STYLE, endCapStyle, endCapStyles, null);
   }
 
   private void getDialogValues(MultiInputDialog dialog) {
     layer = dialog.getLayer(LAYER);
     bufferDistance = dialog.getDouble(DISTANCE);
+    endCapStyle = dialog.getText(END_CAP_STYLE);
+  }
+
+  private static int endCapStyleCode(String capStyle)
+  {
+    if (capStyle == CAP_STYLE_BUTT) return BufferOp.CAP_BUTT;
+    if (capStyle == CAP_STYLE_SQUARE) return BufferOp.CAP_SQUARE;
+    return BufferOp.CAP_ROUND;
   }
 }

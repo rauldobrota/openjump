@@ -63,15 +63,23 @@ public class Angle {
   }
 
   /**
-   * Returns the angle of the vector from p0 to p1. The angle will be between
-   * -Pi and Pi.
-   * @return the angle (in radians) that p0p1 makes with the positive x-axis.
+   * Returns the angle of the vector from p0 to p1.
+   * The angle will be between -Pi and Pi.
+   * @return the angle (in radians) that p0-p1 makes with the positive x-axis.
    */
   public static double angle(Coordinate p0, Coordinate p1) {
       double dx = p1.x - p0.x;
       double dy = p1.y - p0.y;
-
       return Math.atan2(dy, dx);
+  }
+
+  /**
+   * Returns the angle of the vector from (0,) to p.
+   * The angle will be between -Pi and Pi.
+   * @return the angle (in radians) that p makes with the positive x-axis.
+   */
+  public static double angle(Coordinate p) {
+      return Math.atan2(p.y, p.x);
   }
 
   /**

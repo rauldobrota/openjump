@@ -33,13 +33,11 @@
 
 package com.vividsolutions.jump.workbench.ui;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 
 import javax.swing.JPanel;
 
+import com.vividsolutions.jump.workbench.ui.renderer.style.BasicStyle;
 
 /**
  * Displays a colour.
@@ -56,6 +54,7 @@ public class ColorPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        Graphics2D g2 = (Graphics2D) g;
         //Before I simply set the ColorPanel's background colour. But I found this
         //caused weird paint effects e.g. a second copy of the panel appearing
         //at the top left corner of the rendered image. [Jon Aquino].
@@ -65,6 +64,7 @@ public class ColorPanel extends JPanel {
         ((Graphics2D)g).setStroke(fillStroke);
         g.fillRect(0, 0, getWidth() - 1, getHeight() - 1);
         g.setColor(fillColor);
+        if (fillPattern != null) ((Graphics2D)g).setPaint(fillPattern);
         g.fillRect(margin, margin, getWidth() - 1 - margin - margin,
             getHeight() - 1 - margin - margin);
 
@@ -108,16 +108,32 @@ public class ColorPanel extends JPanel {
     public Color getLineColor() {
         return lineColor;
     }
-    
+
     private BasicStroke fillStroke = new BasicStroke(1);
+    private Paint fillPattern = null;
     private int lineWidth = 1;
     private BasicStroke lineStroke = new BasicStroke(lineWidth);
-    
+
     public void setLineWidth(int lineWidth) {
         lineStroke = new BasicStroke(lineWidth);
         this.lineWidth = lineWidth;
     }
-    
+
+    public void setStyle(BasicStyle style)
+    {
+      //if (style.isRenderingLinePattern())
+        setLineStroke(style.getLineStroke());
+      if (style.isRenderingFillPattern())
+        fillPattern = style.getFillPattern();
+    }
+
+    public void setLineStroke(BasicStroke stroke) {
+      float width = Math.min(3, stroke.getLineWidth());
+      lineStroke = new BasicStroke(width,
+                                   BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1.0f,
+            stroke.getDashArray(), 0);
+    }
+
     public int getLineWidth() {
         return lineWidth;
     }

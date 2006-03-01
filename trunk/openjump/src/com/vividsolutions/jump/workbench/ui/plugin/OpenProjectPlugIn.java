@@ -1,27 +1,27 @@
 /*
  * The Unified Mapping Platform (JUMP) is an extensible, interactive GUI for
  * visualizing and manipulating spatial features with geometry and attributes.
- * 
+ *
  * Copyright (C) 2003 Vivid Solutions
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
  * Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * For more information, contact:
- * 
+ *
  * Vivid Solutions Suite #1A 2328 Government Street Victoria BC V8T 5G5 Canada
- * 
+ *
  * (250)385-6040 www.vividsolutions.com
  */
 
@@ -68,23 +68,30 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
 	}
 
     public void initialize(PlugInContext context) throws Exception {
-        //Don't initialize fileChooser in field declaration -- seems too early
-        // because
-        //we sometimes get a WindowsFileChooserUI NullPointerException [Jon
-        // Aquino 12/10/2003]
-        fileChooser = GUIUtil.createJFileChooserWithExistenceChecking();
-        fileChooser.setDialogTitle(I18N.get("ui.plugin.OpenProjectPlugIn.open-project"));
-        fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.setMultiSelectionEnabled(false);
-        GUIUtil.removeChoosableFileFilters(fileChooser);
-        fileChooser
-                .addChoosableFileFilter(SaveProjectAsPlugIn.JUMP_PROJECT_FILE_FILTER);
-        fileChooser.addChoosableFileFilter(GUIUtil.ALL_FILES_FILTER);
-        fileChooser.setFileFilter(SaveProjectAsPlugIn.JUMP_PROJECT_FILE_FILTER);
+    }
+
+    private void initFileChooser()
+    {
+      if (fileChooser != null) return;
+
+      //Don't initialize fileChooser in field declaration -- seems too early
+      // because
+      //we sometimes get a WindowsFileChooserUI NullPointerException [Jon
+      // Aquino 12/10/2003]
+      fileChooser = GUIUtil.createJFileChooserWithExistenceChecking();
+      fileChooser.setDialogTitle(I18N.get("ui.plugin.OpenProjectPlugIn.open-project"));
+      fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
+      fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+      fileChooser.setMultiSelectionEnabled(false);
+      GUIUtil.removeChoosableFileFilters(fileChooser);
+      fileChooser
+              .addChoosableFileFilter(SaveProjectAsPlugIn.JUMP_PROJECT_FILE_FILTER);
+      fileChooser.addChoosableFileFilter(GUIUtil.ALL_FILES_FILTER);
+      fileChooser.setFileFilter(SaveProjectAsPlugIn.JUMP_PROJECT_FILE_FILTER);
     }
 
     public boolean execute(PlugInContext context) throws Exception {
+      initFileChooser();
         reportNothingToUndoYet(context);
 
         if (JFileChooser.APPROVE_OPTION != fileChooser.showOpenDialog(context
@@ -97,12 +104,12 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
 
     public void run(TaskMonitor monitor, PlugInContext context)
             throws Exception {
-        loadLayers(sourceTask, newTask.getLayerManager(),
+        loadLayers(sourceTask.getLayerManager(), newTask.getLayerManager(),
                 CoordinateSystemRegistry.instance(context.getWorkbenchContext()
                         .getBlackboard()), monitor);
     }
 
-    protected void open(File file, WorkbenchFrame workbenchFrame)
+     public void open(File file, WorkbenchFrame workbenchFrame)
             throws Exception {
         FileReader reader = new FileReader(file);
 
@@ -115,11 +122,10 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
             // Probably to reverse the order of the layerables. See comments.
             // Probably also to set the LayerManager coordinate system.
             // [Jon Aquino 2005-03-16]
-            newTask = new Task();
-            newTask.setProjectFile(file);            
-            sourceTask.setProjectFile(file);            
             initializeDataSources(sourceTask, workbenchFrame.getContext());
+            newTask = new Task();
             newTask.setName(GUIUtil.nameWithoutExtension(file));
+            newTask.setProjectFile(file);
             workbenchFrame.addTaskFrame(newTask);
         } finally {
             reader.close();
@@ -127,25 +133,19 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
     }
 
     private void initializeDataSources(Task task, WorkbenchContext context) {
-        
         for (Iterator i = task.getLayerManager().getLayers().iterator(); i
                 .hasNext();) {
             Layer layer = (Layer) i.next();
-
             if (layer.getDataSourceQuery().getDataSource() instanceof WorkbenchContextReference) {
-                
-                ((WorkbenchContextReference)layer.getDataSourceQuery()
+                ((WorkbenchContextReference) layer.getDataSourceQuery()
                         .getDataSource()).setWorkbenchContext(context);
             }
         }
     }
 
-    private void loadLayers( Task sourceTask,
+    private void loadLayers(LayerManager sourceLayerManager,
             LayerManager newLayerManager, CoordinateSystemRegistry registry,
             TaskMonitor monitor) throws Exception {
-        
-        LayerManager sourceLayerManager = sourceTask.getLayerManager();
-        
         for (Iterator i = sourceLayerManager.getCategories().iterator(); i
                 .hasNext();) {
             Category sourceLayerCategory = (Category) i.next();
@@ -169,7 +169,7 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
 
                 if (layerable instanceof Layer) {
                     Layer layer = (Layer) layerable;
-                    load( sourceTask.getProjectFile(), layer, registry, monitor);
+                    load(layer, registry, monitor);
                 }
 
                 newLayerManager.addLayerable(sourceLayerCategory.getName(),
@@ -178,22 +178,10 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
         }
     }
 
-    public static void load( File parentFile, Layer layer, CoordinateSystemRegistry registry, TaskMonitor monitor) throws Exception {
-        
-        DataSource dataSource = layer.getDataSourceQuery().getDataSource();
-        
-        String filename = (String) dataSource.getProperties().get(DataSource.FILE_KEY);
-        
-        //this is to keep backwards compatibility
-        File f = new File( filename );
-        if ( !f.isAbsolute() ) {
-            filename = parentFile.getParentFile() + File.separator + filename;
-            dataSource.getProperties().put( DataSource.FILE_KEY, 
-                     filename );
-        }
-        
+    public static void load(Layer layer, CoordinateSystemRegistry registry, TaskMonitor monitor) throws Exception {
         layer.setFeatureCollection(executeQuery(layer
-                .getDataSourceQuery().getQuery(), dataSource, registry,
+                .getDataSourceQuery().getQuery(), layer
+                .getDataSourceQuery().getDataSource(), registry,
                 monitor));
         layer.setFeatureCollectionModified(false);
     }
@@ -209,5 +197,4 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
             connection.close();
         }
     }
-    
 }

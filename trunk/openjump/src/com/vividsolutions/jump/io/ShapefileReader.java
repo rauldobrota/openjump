@@ -89,6 +89,10 @@ import java.io.*;
 public class ShapefileReader implements JUMPReader {
     private File delete_this_tmp_dbf = null;
 
+	public static final String FILE_PROPERTY_KEY = "File";
+	public static final String DEFAULT_VALUE_PROPERTY_KEY = "DefaultValue";
+	public static final String COMPRESSED_FILE_PROPERTY_KEY = "CompressedFile";
+	
     /** Creates new ShapeReader */
     public ShapefileReader() {
     }
@@ -102,10 +106,10 @@ public class ShapefileReader implements JUMPReader {
     public FeatureCollection read(DriverProperties dp)
         throws IllegalParametersException, Exception {
 
-        String shpfileName = dp.getProperty("File");
+        String shpfileName = dp.getProperty(FILE_PROPERTY_KEY);
 
         if (shpfileName == null) {
-            shpfileName = dp.getProperty("DefaultValue");
+            shpfileName = dp.getProperty(DEFAULT_VALUE_PROPERTY_KEY);
         }
 
         if (shpfileName == null) {
@@ -127,8 +131,8 @@ public class ShapefileReader implements JUMPReader {
 
         //okay, have .shp and .dbf file paths, lets start
         // install Shapefile and DbfFile
-        Shapefile myshape = getShapefile(shpfileName, dp.getProperty("CompressedFile"));
-        DbfFile mydbf = getDbfFile(dbfFileName, dp.getProperty("CompressedFile"));
+        Shapefile myshape = getShapefile(shpfileName, dp.getProperty(COMPRESSED_FILE_PROPERTY_KEY));
+        DbfFile mydbf = getDbfFile(dbfFileName, dp.getProperty(COMPRESSED_FILE_PROPERTY_KEY));
         GeometryFactory factory = new GeometryFactory();
         GeometryCollection collection = myshape.read(factory);
         FeatureSchema fs = new FeatureSchema();

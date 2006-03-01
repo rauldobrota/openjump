@@ -1,23 +1,23 @@
 /*
- * The Unified Mapping Platform (JUMP) is an extensible, interactive GUI 
+ * The Unified Mapping Platform (JUMP) is an extensible, interactive GUI
  * for visualizing and manipulating spatial features with geometry and attributes.
  *
  * Copyright (C) 2003 Vivid Solutions
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
+ *
  * For more information, contact:
  *
  * Vivid Solutions
@@ -47,7 +47,7 @@ import javax.swing.ListCellRenderer;
 import com.vividsolutions.jump.workbench.ui.ColorPanel;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
 
-public class BasicStyleListCellRenderer implements ListCellRenderer {                               
+public class BasicStyleListCellRenderer implements ListCellRenderer {
 
     protected ColorPanel colorPanel = new ColorPanel();
     private JPanel panel = new JPanel();
@@ -91,7 +91,7 @@ public class BasicStyleListCellRenderer implements ListCellRenderer {
     protected void setColorPanelSize(Dimension d) {
         colorPanel.setMinimumSize(d);
         colorPanel.setMaximumSize(d);
-        colorPanel.setPreferredSize(d);        
+        colorPanel.setPreferredSize(d);
     }
     private int alpha = 255;
     public void setAlpha(int alpha) {
@@ -113,7 +113,9 @@ public class BasicStyleListCellRenderer implements ListCellRenderer {
                 cellHasFocus);
         }
         BasicStyle basicStyle = (BasicStyle) value;
-        colorPanel.setLineWidth(Math.min(3, basicStyle.getLineWidth()));        
+        //colorPanel.setLineWidth(Math.min(3, basicStyle.getLineWidth()));
+        //colorPanel.setLineStroke(basicStyle.getLineStroke());
+        colorPanel.setStyle(basicStyle);
         colorPanel.setLineColor(
             basicStyle instanceof BasicStyle
                 && ((BasicStyle) basicStyle).isRenderingLine()

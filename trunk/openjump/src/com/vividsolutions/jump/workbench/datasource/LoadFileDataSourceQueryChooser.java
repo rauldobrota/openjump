@@ -31,28 +31,32 @@
  */
 package com.vividsolutions.jump.workbench.datasource;
 
-import java.io.File;
-import java.util.Collection;
-
-import javax.swing.JFileChooser;
-
-import com.vividsolutions.jump.I18N;
+import com.vividsolutions.jump.coordsys.CoordinateSystem;
 import com.vividsolutions.jump.coordsys.CoordinateSystemSupport;
 import com.vividsolutions.jump.util.Blackboard;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
 
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.io.File;
+
+import java.util.Collection;
+
+import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
+
 /**
  * UI for picking a file-based dataset to load.
  */
 public class LoadFileDataSourceQueryChooser extends FileDataSourceQueryChooser {
-    private static final String FILE_CHOOSER_DIRECTORY_KEY = LoadFileDataSourceQueryChooser.class.getName() +
-        " - "+I18N.get("datasource.LoadFileDataSourceQueryChooser.file-chooser-directory");
-    private static final String FILE_CHOOSER_COORDINATE_SYSTEM_KEY = LoadFileDataSourceQueryChooser.class.getName() +
-        " - "+I18N.get("datasource.LoadFileDataSourceQueryChooser.file-chooser-coordinate-system");
-    
-    
+    public static final String FILE_CHOOSER_DIRECTORY_KEY = LoadFileDataSourceQueryChooser.class.getName() +
+        " - FILE CHOOSER DIRECTORY";
+    public static final String FILE_CHOOSER_COORDINATE_SYSTEM_KEY = LoadFileDataSourceQueryChooser.class.getName() +
+        " - FILE CHOOSER COORDINATE SYSTEM";
     private WorkbenchContext context;
 
     /**

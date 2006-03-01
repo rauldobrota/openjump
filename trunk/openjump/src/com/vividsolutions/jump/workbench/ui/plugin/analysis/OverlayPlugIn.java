@@ -117,7 +117,8 @@ public class OverlayPlugIn extends AbstractPlugIn implements ThreadedPlugIn {
                                     .getFeatureCollectionWrapper();
         FeatureCollection overlay = overlayEngine.overlay(a, b, mapping(a, b),
                 monitor);
-        context.addLayer(StandardCategoryNames.WORKING, I18N.get("ui.plugin.analysis.OverlayPlugIn.overlay"), overlay);
+        context.getLayerManager().addCategory(StandardCategoryNames.RESULT, 0);
+        context.addLayer(StandardCategoryNames.RESULT, I18N.get("ui.plugin.analysis.OverlayPlugIn.overlay"), overlay);
     }
 
     private AttributeMapping mapping(FeatureCollection a, FeatureCollection b) {

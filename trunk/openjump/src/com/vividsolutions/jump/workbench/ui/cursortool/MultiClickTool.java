@@ -1,24 +1,24 @@
 
 /*
- * The Unified Mapping Platform (JUMP) is an extensible, interactive GUI 
+ * The Unified Mapping Platform (JUMP) is an extensible, interactive GUI
  * for visualizing and manipulating spatial features with geometry and attributes.
  *
  * Copyright (C) 2003 Vivid Solutions
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
+ *
  * For more information, contact:
  *
  * Vivid Solutions
@@ -57,8 +57,23 @@ public abstract class MultiClickTool extends AbstractCursorTool {
 
     private List coordinates = new ArrayList();
     private Coordinate tentativeCoordinate;
+    // set this to true if rubber band should be closed
+    private boolean closeRing = false;
+    private CoordinateListMetrics metrics = null;
 
     public MultiClickTool() {
+    }
+
+    protected void setMetricsDisplay(CoordinateListMetrics metrics)
+    {
+      this.metrics = metrics;
+    }
+
+    protected CoordinateListMetrics getMetrics() { return metrics; }
+
+    protected void setCloseRing(boolean closeRing)
+    {
+      this.closeRing = closeRing;
     }
 
     /**
@@ -84,7 +99,7 @@ public abstract class MultiClickTool extends AbstractCursorTool {
         try {
             //Can't assert that coordinates is not empty at this point because
             //of the following situation: NClickTool, n=1, user double-clicks.
-            //Two events are generated: clickCount=1 and clickCount=2. 
+            //Two events are generated: clickCount=1 and clickCount=2.
             //When #mouseReleased is called with the clickCount=1 event,
             //coordinates is not empty. But then #finishGesture is called and the
             //coordinates are cleared. When #mouseReleased is then called with
@@ -132,18 +147,30 @@ public abstract class MultiClickTool extends AbstractCursorTool {
 
             tentativeCoordinate = snap(e.getPoint());
             redrawShape();
+            displayMetrics(e);
         } catch (Throwable t) {
             getPanel().getContext().handleThrowable(t);
         }
     }
 
+    private void displayMetrics(MouseEvent e)
+        throws NoninvertibleTransformException
+    {
+      if (metrics == null) return;
+      if (isShapeOnScreen()) {
+        ArrayList currentCoordinates = new ArrayList(getCoordinates());
+        currentCoordinates.add(getPanel().getViewport().toModelCoordinate(e.getPoint()));
+        metrics.displayMetrics(currentCoordinates, getPanel());
+      }
+    }
+
     public void mouseMoved(MouseEvent e) {
         mouseLocationChanged(e);
     }
-    
+
     public void mouseDragged(MouseEvent e) {
         mouseLocationChanged(e);
-    }    
+    }
 
     protected void add(Coordinate c) {
         coordinates.add(c);
@@ -181,6 +208,9 @@ public abstract class MultiClickTool extends AbstractCursorTool {
         }
         Point2D tentativePoint = getPanel().getViewport().toViewPoint(tentativeCoordinate);
         path.lineTo((int) tentativePoint.getX(), (int) tentativePoint.getY());
+        // close path (for rings only)
+        if (closeRing)
+          path.lineTo((int) firstPoint.getX(), (int) firstPoint.getY());
 
         return path;
     }

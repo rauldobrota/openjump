@@ -201,6 +201,11 @@ import java.util.*;
  *  @todo The link referencing the DBF format specification is broken - fix it!
  **/
 public class ShapefileWriter implements JUMPWriter {
+
+	public static final String FILE_PROPERTY_KEY = "File";
+	public static final String DEFAULT_VALUE_PROPERTY_KEY = "DefaultValue";
+	public static final String SHAPE_TYPE_PROPERTY_KEY = "ShapeType";
+	
     protected static CGAlgorithms cga = new RobustCGAlgorithms();
 
     /** Creates new ShapefileWriter */
@@ -227,10 +232,10 @@ public class ShapefileWriter implements JUMPWriter {
 
         GeometryCollection gc;
 
-        shpfileName = dp.getProperty("File");
+        shpfileName = dp.getProperty(FILE_PROPERTY_KEY);
 
         if (shpfileName == null) {
-            shpfileName = dp.getProperty("DefaultValue");
+            shpfileName = dp.getProperty(DEFAULT_VALUE_PROPERTY_KEY);
         }
 
         if (shpfileName == null) {
@@ -269,8 +274,8 @@ public class ShapefileWriter implements JUMPWriter {
 
         shapeType = 2; //x,y
 
-        if (dp.getProperty("ShapeType") != null) {
-            String st = dp.getProperty("ShapeType");
+        if (dp.getProperty(SHAPE_TYPE_PROPERTY_KEY) != null) {
+            String st = dp.getProperty(SHAPE_TYPE_PROPERTY_KEY);
 
             if (st.equalsIgnoreCase("xy")) {
                 shapeType = 2;

@@ -266,6 +266,8 @@ public class BasicStylePanel extends JPanel {
                     newBasicStyle.setFillColor(basicStyle.getFillColor());
                     newBasicStyle.setLineColor(basicStyle.getLineColor());
                     newBasicStyle.setLineWidth(basicStyle.getLineWidth());
+                    newBasicStyle.setLinePattern(basicStyle.getLinePattern());
+                    newBasicStyle.setRenderingLinePattern(basicStyle.isRenderingLinePattern());
                     newBasicStyle.setRenderingFill(basicStyle.isRenderingFill());
                     newBasicStyle.setRenderingLine(basicStyle.isRenderingLine());
                     setBasicStyle(newBasicStyle);

@@ -41,10 +41,7 @@ import com.vividsolutions.jump.geom.EnvelopeUtil;
 import com.vividsolutions.jump.workbench.ui.Viewport;
 
 import java.awt.*;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Shape;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
 
@@ -97,24 +94,61 @@ public class StyleUtil {
         throws NoninvertibleTransformException {
         //At high magnifications, Java rendering can be sped up by clipping
         //the Geometry to only that portion visible inside the viewport.
-        //Hence the code below. [Jon Aquino]            
+        //Hence the code below. [Jon Aquino]
         Envelope bufferedEnvelope = EnvelopeUtil.bufferByFraction(viewport.getEnvelopeInModelCoordinates(),
                 0.05);
         Geometry actualGeometry = geometry;
-        if (!bufferedEnvelope.contains(actualGeometry.getEnvelopeInternal())) {
-            try {
-                actualGeometry = EnvelopeUtil.toGeometry(bufferedEnvelope)
-                                             .intersection(actualGeometry);
-            } catch (Exception e) {
-                //Can get a TopologyException if the Geometry is invalid. Eat it. [Jon Aquino]
-                //Can get an AssertionFailedException (unable to assign hole to a shell)
-                //at high magnifications. Eat it. [Jon Aquino]    
-                //Alvaro Zabala reports that we can get here with an 
-                //IllegalArgumentException (points must form a closed linestring) 
-                //for bad geometries. Eat it. [Jon Aquino]                    
-            }
+        Envelope geomEnv = actualGeometry.getEnvelopeInternal();
+        if (! bufferedEnvelope.contains(geomEnv)) {
+          /**
+           * MD - letting Java2D do more clipping actually seems to be slower!
+           * So don't use following "optimization"
+           */
+          //if (isRatioLarge(bufferedEnvelope, geomEnv, 2)) {
+            actualGeometry = clipGeometry(geometry, bufferedEnvelope);
+            //System.out.println("cl");
+          //}
         }
-
         return viewport.getJava2DConverter().toShape(actualGeometry);
+    }
+
+    /**
+     * Clipping a geometry using JTS produces higher quality results than letting Java2D do it.
+     * It may also be faster!
+     *
+     * @param geom
+     * @param env
+     * @return
+     */
+    private static Geometry clipGeometry(Geometry geom, Envelope env)
+    {
+      try {
+          Geometry clipGeom = EnvelopeUtil.toGeometry(env)
+                                       .intersection(geom);
+          return clipGeom;
+      } catch (Exception e) {
+          //Can get a TopologyException if the Geometry is invalid. Eat it. [Jon Aquino]
+          //Can get an AssertionFailedException (unable to assign hole to a shell)
+          //at high magnifications. Eat it. [Jon Aquino]
+
+          //Alvaro Zabala reports that we can get here with an
+          //IllegalArgumentException (points must form a closed linestring)
+          //for bad geometries. Eat it. [Jon Aquino]
+      }
+      return geom;
+    }
+
+    private static boolean isRatioLarge(Envelope viewEnv,
+        Envelope geomEnv,
+        double factor)
+    {
+      if (isRatioLarge(viewEnv.getHeight(), geomEnv.getHeight(), factor)) return true;
+      if (isRatioLarge(viewEnv.getWidth(), geomEnv.getWidth(), factor)) return true;
+      return false;
+    }
+
+    private static boolean isRatioLarge(double winDim, double geomDim, double factor)
+    {
+      return (geomDim / winDim) < factor;
     }
 }
