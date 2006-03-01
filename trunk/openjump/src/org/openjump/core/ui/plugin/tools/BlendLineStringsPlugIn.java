@@ -82,7 +82,7 @@ public class BlendLineStringsPlugIn extends AbstractPlugIn {
         dialog.setVisible(true);
         if (! dialog.wasOKPressed()) { return false; }
         getDialogValues(dialog);
-        context.getLayerViewPanel().setToolTipText(sToolTipText);
+        //context.getLayerViewPanel().setToolTipText(sToolTipText);
         Collection selectedFeatures = context.getLayerViewPanel().getSelectionManager().getFeaturesWithSelectedItems(); 
         Feature currFeature = ((Feature) selectedFeatures.iterator().next());
         Collection selectedCategories = context.getLayerNamePanel().getSelectedCategories();
