@@ -13,22 +13,23 @@ package org.openjump;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
+import org.openjump.core.ccordsys.srid.EnsureAllLayersHaveSRIDStylePlugIn;
 import org.openjump.core.ui.plugin.edit.ReplicateSelectedItemsPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectAllLayerItemsPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectByTypePlugIn;
 import org.openjump.core.ui.plugin.edit.SelectItemsByCircleFromSelectedLayersPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectItemsByFenceFromSelectedLayersPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.ConstrainedMoveVertexPlugIn;
+import org.openjump.core.ui.plugin.edittoolbox.DrawCircleWithGivenRadiusPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedArcPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedCirclePlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedLineStringPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.DrawConstrainedPolygonPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.RotateSelectedItemPlugIn;
-import org.openjump.core.ui.plugin.edittoolbox.ScaleSelectedItemsPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.SelectOneItemPlugIn;
-import org.openjump.core.ui.plugin.edittoolbox.DrawCircleWithGivenRadiusPlugIn;
 import org.openjump.core.ui.plugin.file.SaveImageAsSVGPlugIn;
 import org.openjump.core.ui.plugin.layer.AddSIDLayerPlugIn;
+import org.openjump.core.ui.plugin.layer.ChangeSRIDPlugIn;
 import org.openjump.core.ui.plugin.layer.ToggleVisiblityPlugIn;
 import org.openjump.core.ui.plugin.mousemenu.EditSelectedSidePlugIn;
 import org.openjump.core.ui.plugin.mousemenu.MoveAlongAnglePlugIn;
@@ -41,7 +42,6 @@ import org.openjump.core.ui.plugin.tools.DeleteEmptyGeometriesPlugIn;
 import org.openjump.core.ui.plugin.tools.JoinWithArcPlugIn;
 import org.openjump.core.ui.plugin.tools.LineSimplifyJTS15AlgorithmPlugIn;
 import org.openjump.core.ui.plugin.tools.MeasureM_FPlugIn;
-import org.openjump.core.ui.plugin.tools.ProjectionPlugIn;
 import org.openjump.core.ui.plugin.tools.ReducePointsISAPlugIn;
 import org.openjump.core.ui.plugin.view.InstallKeyPanPlugIn;
 import org.openjump.core.ui.plugin.view.MapToolTipPlugIn;
@@ -54,9 +54,7 @@ import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
-import com.vividsolutions.jump.workbench.ui.cursortool.editing.EditingPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
-import com.vividsolutions.jump.workbench.ui.toolbox.ToolboxDialog;
 
 
 /**
@@ -135,6 +133,11 @@ public class OpenJumpConfiguration{
 		
 		AddSIDLayerPlugIn myMrSIDPlugIn= new AddSIDLayerPlugIn();
 		myMrSIDPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		/*
+		ChangeSRIDPlugIn myChangeSRIDPlugIn= new ChangeSRIDPlugIn();
+		myChangeSRIDPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		*/
 		
 		/***********************
 		 *  menu TOOLS
@@ -247,6 +250,10 @@ public class OpenJumpConfiguration{
 		// takes care of keyboard navigation
 		new InstallKeyPanPlugIn().initialize( new PlugInContext(workbenchContext, null, null, null, null) );
 		
+		/*
+		EnsureAllLayersHaveSRIDStylePlugIn ensureLayerSRIDPlugin = new EnsureAllLayersHaveSRIDStylePlugIn();
+		ensureLayerSRIDPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		*/
 		
 		/***********************
 		 *  testing
