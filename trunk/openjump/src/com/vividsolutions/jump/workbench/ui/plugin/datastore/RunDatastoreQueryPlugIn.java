@@ -13,7 +13,7 @@ import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 public class RunDatastoreQueryPlugIn extends
         AbstractAddDatastoreLayerPlugIn {
     
-    public void initialize(PlugInContext context) throws Exception {
+    public void XXinitialize(PlugInContext context) throws Exception {
         createLayerMenu(2, context);
     }    
 
