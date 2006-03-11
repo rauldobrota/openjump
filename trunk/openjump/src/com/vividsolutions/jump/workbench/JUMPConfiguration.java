@@ -35,16 +35,12 @@ import com.vividsolutions.jts.util.*;
 import org.openjump.OpenJumpConfiguration;
 import com.vividsolutions.jump.I18N;
 
-import com.vividsolutions.jump.datastore.DataStoreDriver;
-import com.vividsolutions.jump.datastore.DataStoreException;
-import com.vividsolutions.jump.datastore.postgis.PostgisDataStoreDriver;
-import com.vividsolutions.jump.plugin.qa.DiffGeometryPlugIn;
-import com.vividsolutions.jump.plugin.qa.DiffSegmentsPlugIn;
+import com.vividsolutions.jump.datastore.*;
+import com.vividsolutions.jump.datastore.postgis.*;
 import com.vividsolutions.jump.workbench.datasource.*;
+import com.vividsolutions.jump.workbench.datastore.*;
 import com.vividsolutions.jump.workbench.datasource.LoadDatasetPlugIn;
 import com.vividsolutions.jump.workbench.datasource.SaveDatasetAsPlugIn;
-import com.vividsolutions.jump.workbench.datasource.SaveDatasetAsFilePlugIn;
-import com.vividsolutions.jump.workbench.datastore.ConnectionManager;
 import com.vividsolutions.jump.workbench.plugin.*;
 import com.vividsolutions.jump.workbench.ui.*;
 import com.vividsolutions.jump.workbench.ui.cursortool.*;
@@ -52,10 +48,8 @@ import com.vividsolutions.jump.workbench.ui.cursortool.editing.*;
 import com.vividsolutions.jump.workbench.ui.plugin.*;
 import com.vividsolutions.jump.workbench.ui.plugin.analysis.*;
 import com.vividsolutions.jump.workbench.ui.plugin.clipboard.*;
-import com.vividsolutions.jump.workbench.ui.plugin.datastore.AddDatastoreLayerPlugIn;
-import com.vividsolutions.jump.workbench.ui.plugin.datastore.InstallDatastoreLayerRendererHintsPlugIn;
-import com.vividsolutions.jump.workbench.ui.plugin.datastore.RunDatastoreQueryPlugIn;
-import com.vividsolutions.jump.workbench.ui.plugin.edit.PrecisionReducerPlugIn;
+import com.vividsolutions.jump.workbench.ui.plugin.datastore.*;
+import com.vividsolutions.jump.workbench.ui.plugin.edit.*;
 import com.vividsolutions.jump.workbench.ui.plugin.scalebar.*;
 import com.vividsolutions.jump.workbench.ui.plugin.skin.InstallSkinsPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.test.*;
@@ -66,6 +60,7 @@ import com.vividsolutions.jump.workbench.ui.style.*;
 import com.vividsolutions.jump.workbench.ui.task.*;
 import com.vividsolutions.jump.workbench.ui.warp.*;
 import com.vividsolutions.jump.workbench.ui.zoom.*;
+import com.vividsolutions.jump.plugin.qa.*;
 import java.awt.event.*;
 import java.lang.reflect.*;
 import javax.swing.*;
@@ -478,6 +473,7 @@ public class JUMPConfiguration implements Setup {
                         .createEnableCheck(workbenchContext));
     }
 
+
     private void configureMainMenus(final WorkbenchContext workbenchContext,
             final EnableCheckFactory checkFactory,
 		//-- FILE
@@ -692,62 +688,60 @@ public class JUMPConfiguration implements Setup {
         private InstallDatastoreLayerRendererHintsPlugIn installDatastoreLayerRendererHintsPlugIn = new InstallDatastoreLayerRendererHintsPlugIn();
 
     private void configLayer(final WorkbenchContext workbenchContext,
-    		final EnableCheckFactory checkFactory,
-			FeatureInstaller featureInstaller) throws Exception {
-    	
-    	featureInstaller.addLayerViewMenuItem(addNewLayerPlugIn, MENU_LAYER,
-    			addNewLayerPlugIn.getName());
+                final EnableCheckFactory checkFactory,
+                FeatureInstaller featureInstaller) throws Exception {
 
-    	 featureInstaller.addLayerViewMenuItem(addDatastoreLayerPlugIn, MENU_LAYER,
-    	 addDatastoreLayerPlugIn.getName() + "...");
-    	 featureInstaller.addLayerViewMenuItem(runDatastoreQueryPlugIn, MENU_LAYER,
-    	 runDatastoreQueryPlugIn.getName() + "...");
+      featureInstaller.addLayerViewMenuItem(addNewLayerPlugIn, MENU_LAYER,
+              addNewLayerPlugIn.getName());
+      featureInstaller.addLayerViewMenuItem(addDatastoreLayerPlugIn, MENU_LAYER,
+              addDatastoreLayerPlugIn.getName() + "...");
+      featureInstaller.addLayerViewMenuItem(runDatastoreQueryPlugIn, MENU_LAYER,
+              runDatastoreQueryPlugIn.getName() + "...");
 
-    	featureInstaller.addLayerViewMenuItem(addWMSQueryPlugIn, MENU_LAYER,
-    			addWMSQueryPlugIn.getName() + "...");
-    	featureInstaller.addMainMenuItem(addNewCategoryPlugIn, MENU_LAYER,
-    			addNewCategoryPlugIn.getName(), null, addNewCategoryPlugIn
-				.createEnableCheck(workbenchContext));
-    	featureInstaller.addMenuSeparator(MenuNames.LAYER); // ===================
-    	featureInstaller.addMainMenuItem(cutSelectedLayersPlugIn, MENU_LAYER,
-    			cutSelectedLayersPlugIn.getNameWithMnemonic(), null,
-				cutSelectedLayersPlugIn.createEnableCheck(workbenchContext));
-    	featureInstaller.addMainMenuItem(copySelectedLayersPlugIn, MENU_LAYER,
-    			copySelectedLayersPlugIn.getNameWithMnemonic(), null,
-				copySelectedLayersPlugIn.createEnableCheck(workbenchContext));
-    	featureInstaller.addMainMenuItem(pasteLayersPlugIn, MENU_LAYER,
-    			pasteLayersPlugIn.getNameWithMnemonic(), null,
-				pasteLayersPlugIn.createEnableCheck(workbenchContext));
-    	featureInstaller.addMenuSeparator(MenuNames.LAYER); // ===================
-    	featureInstaller.addMainMenuItem(removeSelectedLayersPlugIn, MENU_LAYER,
-    			removeSelectedLayersPlugIn.getName(), null,
-				removeSelectedLayersPlugIn.createEnableCheck(workbenchContext));
-    	featureInstaller.addMainMenuItem(removeSelectedCategoriesPlugIn,
-    			MENU_LAYER, removeSelectedCategoriesPlugIn.getName(), null,
-				removeSelectedCategoriesPlugIn
-				.createEnableCheck(workbenchContext));
-    }    	
-   
+        featureInstaller.addLayerViewMenuItem(addWMSQueryPlugIn, MENU_LAYER,
+                addWMSQueryPlugIn.getName() + "...");
+        featureInstaller.addMainMenuItem(addNewCategoryPlugIn, MENU_LAYER,
+                addNewCategoryPlugIn.getName(), null, addNewCategoryPlugIn
+                        .createEnableCheck(workbenchContext));
+        featureInstaller.addMenuSeparator(MENU_LAYER); // ===================
+        featureInstaller.addMainMenuItem(cutSelectedLayersPlugIn, MENU_LAYER,
+                cutSelectedLayersPlugIn.getNameWithMnemonic(), null,
+                cutSelectedLayersPlugIn.createEnableCheck(workbenchContext));
+        featureInstaller.addMainMenuItem(copySelectedLayersPlugIn, MENU_LAYER,
+                copySelectedLayersPlugIn.getNameWithMnemonic(), null,
+                copySelectedLayersPlugIn.createEnableCheck(workbenchContext));
+        featureInstaller.addMainMenuItem(pasteLayersPlugIn, MENU_LAYER,
+                pasteLayersPlugIn.getNameWithMnemonic(), null,
+                pasteLayersPlugIn.createEnableCheck(workbenchContext));
+        featureInstaller.addMenuSeparator(MENU_LAYER); // ===================
+        featureInstaller.addMainMenuItem(removeSelectedLayersPlugIn, MENU_LAYER,
+                removeSelectedLayersPlugIn.getName(), null,
+                removeSelectedLayersPlugIn.createEnableCheck(workbenchContext));
+        featureInstaller.addMainMenuItem(removeSelectedCategoriesPlugIn,
+                MENU_LAYER, removeSelectedCategoriesPlugIn.getName(), null,
+                removeSelectedCategoriesPlugIn
+                        .createEnableCheck(workbenchContext));
+                }
 
-// MD - following is proposed new pattern for defining built-in menus
+    // MD - following is proposed new pattern for defining built-in menus
 
 public static String MENU_TOOLS = MenuNames.TOOLS;
 public static String MENU_ANALYSIS = MenuNames.TOOLS_ANALYSIS;
 public static String[] MENU_TOOLS_ANALYSIS = new String[] { MENU_TOOLS, MENU_ANALYSIS};
 
-// these must be defined as instance vars for initialization to be performed
-private SpatialQueryPlugIn spatialQueryPlugIn = new SpatialQueryPlugIn();
-private AttributeQueryPlugIn attrQueryPlugIn = new AttributeQueryPlugIn();
-private UnionPlugIn unionPlugIn = new UnionPlugIn();
-private GeometryFunctionPlugIn geometryFunctionPlugIn = new GeometryFunctionPlugIn();
-private OverlayPlugIn overlayPlugIn = new OverlayPlugIn();
-private ConvexHullPlugIn convexHullPI = new ConvexHullPlugIn();
-private BufferPlugIn bufferPlugIn = new BufferPlugIn();
-private CalculateAreasAndLengthsPlugIn calculateAreasAndLengthsPlugIn = new CalculateAreasAndLengthsPlugIn();
+    // these must be defined as instance vars for initialization to be performed
+	private SpatialQueryPlugIn spatialQueryPlugIn = new SpatialQueryPlugIn();
+    private AttributeQueryPlugIn attrQueryPlugIn = new AttributeQueryPlugIn();
+    private UnionPlugIn unionPlugIn = new UnionPlugIn();
+    private GeometryFunctionPlugIn geometryFunctionPlugIn = new GeometryFunctionPlugIn();
+    private OverlayPlugIn overlayPlugIn = new OverlayPlugIn();
+    private ConvexHullPlugIn convexHullPI = new ConvexHullPlugIn();
+    private BufferPlugIn bufferPlugIn = new BufferPlugIn();
+    private CalculateAreasAndLengthsPlugIn calculateAreasAndLengthsPlugIn = new CalculateAreasAndLengthsPlugIn();
 
-private void configToolsAnalysis(final WorkbenchContext workbenchContext,
-		final EnableCheckFactory checkFactory,
-		FeatureInstaller featureInstaller) throws Exception {
+    private void configToolsAnalysis(final WorkbenchContext workbenchContext,
+                final EnableCheckFactory checkFactory,
+                FeatureInstaller featureInstaller) throws Exception {
 
 	featureInstaller
 	.addMainMenuItem(
@@ -974,6 +968,8 @@ public void configureDatastores(final WorkbenchContext context) throws Exception
     private void configureStyles(WorkbenchContext workbenchContext) {
         WorkbenchFrame frame = workbenchContext.getWorkbench().getFrame();
         frame
+                .addChoosableStyleClass(VertexXYLineSegmentStyle.VertexXY.class);
+        frame
                 .addChoosableStyleClass(VertexIndexLineSegmentStyle.VertexIndex.class);
         frame
                 .addChoosableStyleClass(MetricsLineStringSegmentStyle.LengthAngle.class);
@@ -1125,7 +1121,7 @@ public void configureDatastores(final WorkbenchContext context) throws Exception
     /**
      * Call each PlugIn's #initialize() method. Uses reflection to build a list
      * of plug-ins.
-     * 
+     *
      * @param workbenchContext
      *                   Description of the Parameter
      * @exception Exception
