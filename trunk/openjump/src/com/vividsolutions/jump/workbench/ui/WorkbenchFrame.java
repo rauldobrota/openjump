@@ -49,6 +49,8 @@ import com.vividsolutions.jump.workbench.model.WMSLayer;
 import com.vividsolutions.jump.workbench.plugin.*;
 import com.vividsolutions.jump.workbench.plugin.EnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugIn;
+import com.vividsolutions.jump.workbench.plugin.PlugInContext;
+import com.vividsolutions.jump.workbench.plugin.ThreadedPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.CloneWindowPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 import com.vividsolutions.jump.workbench.ui.renderer.style.ChoosableStyle;
@@ -272,9 +274,8 @@ public class WorkbenchFrame extends JFrame implements LayerViewPanelContext,
 		this.workbenchContext = workbenchContext;
 		this.icon = icon;
 		toolBar = new WorkbenchToolBar(workbenchContext);
-//		[UT] FIXedME
-        toolBar.setTaskMonitorManager( new TaskMonitorManager() );
-		try {
+                toolBar.setTaskMonitorManager( new TaskMonitorManager() );
+                try {
 			jbInit();
 			configureStatusLabel(messageLabel, 300);
 			configureStatusLabel(coordinateLabel, 150);
@@ -956,17 +957,17 @@ public class WorkbenchFrame extends JFrame implements LayerViewPanelContext,
 	private HashMap keyCodeAndModifiersToPlugInAndEnableCheckMap = new HashMap();
 	/**
 	 * Adds a keyboard shortcut for a plugin. logs plugin exceptions.
-	 * 
+	 *
 	 * note - attaching to keyCode 'a', modifiers =1 will detect shift-A
 	 * events. It will *not* detect caps-lock-'a'. This is due to
 	 * inconsistencies in java.awt.event.KeyEvent. In the unlikely event you
 	 * actually do want to also also attach to caps-lock-'a', then make two
 	 * shortcuts - one to keyCode 'a' and modifiers =1 (shift-A) and one to
 	 * keyCode 'A' and modifiers=0 (caps-lock A).
-	 * 
+	 *
 	 * For more details, see the java.awt.event.KeyEvent class - it has a full
 	 * explaination.
-	 * 
+	 *
 	 * @param keyCode
 	 *                  What key to attach to (See java.awt.event.KeyEvent)
 	 * @param modifiers 0=
