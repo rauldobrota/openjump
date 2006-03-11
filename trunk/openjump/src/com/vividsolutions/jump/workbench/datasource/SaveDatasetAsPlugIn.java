@@ -31,25 +31,10 @@
  */
 package com.vividsolutions.jump.workbench.datasource;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Collection;
 
-import sun.security.action.GetLongAction;
-
-import com.vividsolutions.jts.util.Assert;
-
-import com.vividsolutions.jump.I18N;
-import com.vividsolutions.jump.io.datasource.Connection;
-import com.vividsolutions.jump.io.datasource.DataSourceQuery;
-import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
-import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
-import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
-import com.vividsolutions.jump.workbench.plugin.PlugInContext;
-import com.vividsolutions.jump.workbench.plugin.ThreadedBasePlugIn;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
-import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
 
 /**
  * Prompts the user to pick a dataset to save.
