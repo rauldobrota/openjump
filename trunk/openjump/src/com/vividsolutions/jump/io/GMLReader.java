@@ -49,7 +49,7 @@ import java.util.StringTokenizer;
  *  GMLReader is a {@link JUMPReader} specialized to read GML files.
  *
  *  <p>
- *     DataProperties for the JCSReader load(DataProperties) interface: 
+ *     DataProperties for the JCSReader load(DataProperties) interface:
  *  </p>
  *  <p>
  *  <table border='1' cellspacing='0' cellpadding='4'>
@@ -79,14 +79,14 @@ import java.util.StringTokenizer;
  *    <tr>
  *      <td>CompressedFile</td>
  *      <td>
- *        File name (a .zip or .gz) with a .jml/.xml/.gml inside 
+ *        File name (a .zip or .gz) with a .jml/.xml/.gml inside
  *        (specified by File)
  *      </td>
  *    </tr>
  *
  *    <tr>
  *      <td>
- *        CompressedFileTemplate</td><td>File name (.zip or .gz) 
+ *        CompressedFileTemplate</td><td>File name (.zip or .gz)
  *        with the input template in (specified by InputTemplateFile)
  *      </td>
  *    </tr>
@@ -105,7 +105,7 @@ import java.util.StringTokenizer;
  *     gmlReader = new GMLReader();
  *     gmlReader.load( DriverProperties) ; // has InputFile and InputTemplate
  *  </pre>
- *  or: 
+ *  or:
  *  <pre>
  *     gmlReader.setInputTemplate( GMLInputTemplate);
  *     gmlReader.load( <Reader> , <stream name> );
@@ -140,7 +140,7 @@ import java.util.StringTokenizer;
  *                  \|
  *        4<-------->3
  *           Geometry start/end
- *</PRE> 
+ *</PRE>
  *  <br>
  *  For multi-geometries <br>
  *  On start Multi-geometry, increment state by 1 (or jump to 1000 if at state
@@ -190,10 +190,10 @@ import java.util.StringTokenizer;
  *  BEGIN innerboundary BEGIN linearring END linearring -> put points in
  *  linearRing END innerboundary -> add linearRing to innerBoundary list END
  *  polygon -> build polygon (put in geometry, which is recursivegeometry[0] END
- *  geometry => add to feature collection 
+ *  geometry => add to feature collection
  *  </pre>
  *
- *  Most of the work is done in the endTag method! 
+ *  Most of the work is done in the endTag method!
  *  <br>
  * <br>
  * New additions: Jan 2005 by Dave Blasby
@@ -202,16 +202,16 @@ import java.util.StringTokenizer;
  *      <gml:LineString srsName="EPSG:42102">
  *        ....
  *      </gml:LineString>
- *   The SRID of the created geometry will be 42102. 
- *    It accepts srsNames of the form "<letters>:<number>". 
+ *   The SRID of the created geometry will be 42102.
+ *    It accepts srsNames of the form "<letters>:<number>".
  *      ie. "EPSG:111" or "DAVE:222" or "BCGOV:333" etc...
  *    The Geometry's SRID will be the number.
  *    If you have a GEOMETRYCOLLECTION with more than one SRID specified
  *    the SRID of the result will be indeterminate (this isnt correct GML).
- * 
+ *
  *    Geometries without a srsName will get SRID 0.
- * 
- *    This functionality defaults to off for compatibility.  
+ *
+ *    This functionality defaults to off for compatibility.
  *    To turn it on or off, call the acceptSRID(true|false) function.
  *
  *   New Addition: Jan, 2005by Dave Blasby
@@ -275,18 +275,15 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
     // low-level geometry objects
     Coordinate singleCoordinate = new Coordinate();
     String streamName; //result geometry  -
-    //-- now we use StringBuffer since it is much faster [sstein, 10.10.2005]
-    //   thanx to Joe Desbonet
-    //String tagBody;
     StringBuffer tagBody;
     XMLReader xr; //see above
-    
+
     int SRID =0; // srid to give the created geometries
-    public boolean parseSRID = false ; //true = put SRID for srsName="EPSG:42102" 
+    public boolean parseSRID = false ; //true = put SRID for srsName="EPSG:42102"
     /**
      * true => for 'OBJECT' types, if you find more than 1 item, make a list and store all the results
      */
-    public boolean multiItemsAsLists = false;  
+    public boolean multiItemsAsLists = false;
     /**
      *  Constructor - make a SAXParser and have this GMLReader be its
      *  ContentHandler and ErrorHandler.
@@ -299,14 +296,14 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
     }
 
     /**
-     * parse SRID information in geometry tags 
+     * parse SRID information in geometry tags
      * @param parseTheSRID true = parse
      */
     public void acceptSRID(boolean parseTheSRID)
     {
-       parseSRID =parseTheSRID; 
+       parseSRID =parseTheSRID;
     }
-    
+
     /**
      *    Added slightly better support for type=OBJECT.  It sticks a String in.  Before it would probably throw an error.
  *    Added support for multi-objects for example:
@@ -324,7 +321,7 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
     {
     	multiItemsAsLists=accept;
     }
-    
+
     /**
      *  Attach a GMLInputTemplate information class.
      *
@@ -345,10 +342,7 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
     public void characters(char[] ch, int start, int length)
         throws SAXException {
         try {
-            String part;
-            part = new String(ch, start, length);
-            //tagBody = tagBody + part; [sstein, 10.10.2005]
-            tagBody.append(ch,start,length);
+          tagBody.append(ch,start,length);
         } catch (Exception e) {
             throw new SAXException(e.getMessage());
         }
@@ -378,8 +372,8 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
 
             // System.out.println("End element: " + qName);
             if (STATE == STATE_INIT) {
-                //tagBody = ""; [sstein, 10.10.2005]
-                tagBody = new StringBuffer();
+              tagBody = new StringBuffer();
+
                 return; //something wrong
             }
 
@@ -404,8 +398,7 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
                 }
 
                 if (GMLinput.isGeometryElement(qName)) {
-                    //tagBody = ""; [sstein, 10.10.2005]
-                    tagBody = new StringBuffer();
+                  tagBody = new StringBuffer();
                     STATE = STATE_GET_COLUMNS;
 
                     finalGeometry = geometryFactory.buildGeometry(geometry);
@@ -420,19 +413,13 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
                 //these correspond to <coord><X>0.0</X><Y>0.0</Y></coord>
                 if ((qName.compareToIgnoreCase("X") == 0) ||
                         (qName.compareToIgnoreCase("gml:X") == 0)) {
-                    //singleCoordinate.x = (new Double(tagBody)).doubleValue(); [sstein, 10.10.2005]
-                    singleCoordinate.x = (new 
-                    		Double(tagBody.toString())).doubleValue();
+                    singleCoordinate.x = (new Double(tagBody.toString())).doubleValue();
                 } else if ((qName.compareToIgnoreCase("Y") == 0) ||
-                        (qName.compareToIgnoreCase("gml:y") == 0)) {                	
-                    //singleCoordinate.y = (new Double(tagBody)).doubleValue(); [sstein, 10.10.2005]
-                	singleCoordinate.y = (new
-                			Double(tagBody.toString())).doubleValue();
+                        (qName.compareToIgnoreCase("gml:y") == 0)) {
+                    singleCoordinate.y = (new Double(tagBody.toString())).doubleValue();
                 } else if ((qName.compareToIgnoreCase("Z") == 0) ||
                         (qName.compareToIgnoreCase("gml:z") == 0)) {
-                    //singleCoordinate.z = (new Double(tagBody)).doubleValue(); [sstein, 10.10.2005]
-                	singleCoordinate.z = (new
-                			Double(tagBody.toString())).doubleValue();
+                    singleCoordinate.z = (new Double(tagBody.toString())).doubleValue();
                 } else if ((qName.compareToIgnoreCase("COORD") == 0) ||
                         (qName.compareToIgnoreCase("gml:coord") == 0)) {
                     pointList.add(new Coordinate(singleCoordinate)); //remember it
@@ -443,7 +430,6 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
                     //tagBody has a wack-load of points in it - we need
                     // to parse them into the pointList list.
                     // assume that the x,y,z coordinate are "," separated, and the points are " " separated
-                    //parsePoints(tagBody, geometryFactory); [sstein, 10.10.2005]
                     parsePoints(tagBody.toString(), geometryFactory);
                 } else if ((qName.compareToIgnoreCase("linearring") == 0) ||
                         (qName.compareToIgnoreCase("gml:linearring") == 0)) {
@@ -483,7 +469,6 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
                 }
             } else if (STATE == STATE_GET_COLUMNS) {
                 if (qName.compareToIgnoreCase(GMLinput.featureTag) == 0) {
-                    //tagBody = ""; [sstein, 10.10.2005]
                     tagBody = new StringBuffer();
                     STATE = STATE_WAIT_FEATURE_TAG;
 
@@ -511,11 +496,11 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
                 	//     process it once.
                     try {
                         if (   ((index = GMLinput.match(lastStartTag_qName,lastStartTag_atts)) > -1) &&
-                        		(lastStartTag_qName.equalsIgnoreCase(qName))  
+                        		(lastStartTag_qName.equalsIgnoreCase(qName))
 						   )
                         {
                             // System.out.println("value of " + GMLinput.columnName(index)+" : " +  GMLinput.getColumnValue(index,tagBody, lastStartTag_atts) );
-                        	
+
                         	// if the column already has a value and multiItems support is turned on
                         	//..and its type ==object
                         	if ( ( multiItemsAsLists) && (currentFeature.getAttribute(GMLinput.columnName(index)) != null)
@@ -525,30 +510,21 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
                          			if (oldValue instanceof List)
                          			{
                          				//already a list there - just stuff another thing in!
-                         				//-- [sstein, 10.10.2005]
-                         				//((List)oldValue).add( GMLinput.getColumnValue(index, tagBody,lastStartTag_atts) );
-                         				((List)oldValue).add(
-                         						GMLinput.getColumnValue(index, tagBody.toString(),lastStartTag_atts)
-                         						);
+                         				((List)oldValue).add( GMLinput.getColumnValue(index, tagBody.toString(), lastStartTag_atts) );
                          			}
                          			else
                          			{
                          				//no list currently there - make a list and replace
                          				List l = new ArrayList();
                          				l.add(oldValue);
-                         				//[sstein, 10.10.2005]
-                         				//l.add(GMLinput.getColumnValue(index, tagBody,lastStartTag_atts)); // new value
-                         				l.add(GMLinput.getColumnValue(index,
-                         						tagBody.toString(),lastStartTag_atts)); // new value
+                         				l.add(GMLinput.getColumnValue(index, tagBody.toString(), lastStartTag_atts)); // new value
                          				currentFeature.setAttribute(GMLinput.columnName(index), l );
                          			}
                          	}
                         	else  // handle normally
-                        	{	
+                        	{
 	                            currentFeature.setAttribute(GMLinput.columnName(index),
-	                                //[sstein, 10.10.2005]
-	                                //GMLinput.getColumnValue(index, tagBody,lastStartTag_atts));
-	                                GMLinput.getColumnValue(index, tagBody.toString(),lastStartTag_atts));
+	                                GMLinput.getColumnValue(index, tagBody.toString(), lastStartTag_atts));
                         	}
                         }
                     } catch (Exception e) {
@@ -557,7 +533,6 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
                         e.printStackTrace();
                     }
 
-                    //tagBody = ""; [sstein, 10.10.2005]
                     tagBody = new StringBuffer();
                 }
             } else if (STATE == STATE_WAIT_FEATURE_TAG) {
@@ -565,13 +540,13 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
                     STATE = STATE_INIT; //finish
 
                     //System.out.println("DONE!");
-                    //tagBody = ""; [sstein, 10.10.2005]
                     tagBody = new StringBuffer();
+
                     return;
                 }
             } else if (STATE == STATE_WAIT_COLLECTION_TAG) {
-                //tagBody = ""; [sstein, 10.10.2005]
-            	tagBody = new StringBuffer();
+                tagBody = new StringBuffer();
+
                 return; //still look for start collection tag
             }
         } catch (Exception e) {
@@ -738,7 +713,6 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
      */
     public void startDocument() {
         //System.out.println("Start document");
-        //tagBody = ""; [sstein, 10.10.2005]
         tagBody = new StringBuffer();
         STATE = STATE_WAIT_COLLECTION_TAG;
     }
@@ -757,7 +731,6 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
         Attributes atts) throws SAXException {
         try {
             //System.out.println("Start element: " + qName);
-            //tagBody = ""; [sstein, 10.10.2005]
             tagBody = new StringBuffer();
             lastStartTag_uri = uri;
             lastStartTag_name = name;
@@ -809,7 +782,7 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
             {
             	//System.out.println("src="+atts.getValue("srsName"));
             	//System.out.println("srid="+ parseSRID(atts.getValue("srsName")));
-            	
+
             	int newSRID =  parseSRID(atts.getValue("srsName"));
             	//NOTE: if parseSRID it usually means that there was an error parsing
             	//      but, it could actually be specified as 'EPGS:0'.  Thats not
@@ -821,8 +794,8 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
             			geometryFactory = new GeometryFactory(new PrecisionModel(), SRID);
             	}
             }
-            		
-            
+
+
             if ((STATE >= STATE_PARSE_GEOM_SIMPLE) &&
                     ((qName.compareToIgnoreCase("coord") == 0) ||
                     (qName.compareToIgnoreCase("gml:coord") == 0))) {
@@ -893,7 +866,7 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
                 (s.compareToIgnoreCase("linestring") == 0) ||
                 (s.compareToIgnoreCase("point") == 0)||
                 (s.compareToIgnoreCase("geometrycollection") == 0)
-			) 
+			)
         {
             return true;
         }
@@ -988,7 +961,7 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
                     coord.x = Double.parseDouble(numb);
                 } else if (dim == 1) {
                     coord.y = Double.parseDouble(numb);
-                } else if (dim == 2) { //[UT] 17.11.2005 was dim == 3, changed to dim == 2
+                } else if (dim == 2) {
                     coord.z = Double.parseDouble(numb);
                 }
 
@@ -1016,7 +989,7 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
 
         return gmlTemplate;
     }
-    
+
     /**
      *  parses the given srs text and returns the SRID
      * @param srsName srsName of the type "EPSG:<number>"
@@ -1025,15 +998,15 @@ public class GMLReader extends DefaultHandler implements JUMPReader {
     private int parseSRID(String srsName)
     {
     	try{
-	    	int semicolonLoc = srsName.lastIndexOf(':');	    	
+	    	int semicolonLoc = srsName.lastIndexOf(':');
 	    	if (semicolonLoc == -1)
-	    		return 0;	    	
+	    		return 0;
 	    	srsName = srsName.substring(semicolonLoc+1).trim();
     		return Integer.parseInt(srsName);
     	}
     	catch (Exception e)
 		{
     		return 0;
-		}    	
+		}
     }
 }
