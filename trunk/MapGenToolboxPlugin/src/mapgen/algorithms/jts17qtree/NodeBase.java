@@ -31,17 +31,18 @@
  *     (250)385-6040
  *     www.vividsolutions.com
  */
-package mapgen.algorithms.jts15quadtree;
+package mapgen.algorithms.jts17qtree;
 
 import java.util.*;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.index.*;
 
 /**
  * The base class for nodes in a {@link Quadtree}.
  *
- * @version 1.4
+ * @version 1.7
  */
 public abstract class NodeBase {
 

@@ -31,14 +31,16 @@
  *     (250)385-6040
  *     www.vividsolutions.com
  */
-package mapgen.algorithms.jts15quadtree;
+package mapgen.algorithms.jts17qtree;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import mapgen.algorithms.jts17qtree.ItemVisitor;
+import mapgen.algorithms.jts17qtree.SpatialIndex;
 
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.index.*;
+
 /**
  * A Quadtree is a spatial index structure for efficient querying
  * of 2D rectangles.  If other kinds of spatial objects
@@ -61,7 +63,7 @@ import com.vividsolutions.jts.index.*;
  * This data structure is also known as an <i>MX-CIF quadtree</i>
  * following the usage of Samet and others.
  *
- * @version 1.4
+ * @version 1.7
  */
 public class Quadtree
     implements SpatialIndex

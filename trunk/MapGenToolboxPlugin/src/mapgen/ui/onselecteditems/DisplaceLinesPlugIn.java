@@ -19,7 +19,7 @@
  *  The displacement algorithm is based on the "Snakes technique" <p>
  * 	Literature: <p>
  *  See Steiniger and Meier (2004): Snakes a technique for line displacement and smoothing.
- *  See also Burgardt and Meier (1997), Burghardt (2001) or Bader (2001) (e.g. use http://schoolar.google.com)
+ *  See also Burghardt and Meier (1997), Burghardt (2001) or Bader (2001) (e.g. use http://schoolar.google.com)
  * ================= 
  * TODO: implement external displacement forces resulting from polygons 
  * 		 => see #evaluateLineWithDataset()
@@ -91,7 +91,7 @@ public class DisplaceLinesPlugIn extends AbstractPlugIn implements ThreadedPlugI
         FeatureInstaller featureInstaller = new FeatureInstaller(context.getWorkbenchContext());
     	featureInstaller.addMainMenuItem(
     	        this,								//exe
-                new String[] {"Map Generalisation", "Scale Dependent Algorithms","Lines"}, 	//menu path
+                new String[] {"PlugIns","Map Generalisation", "Scale Dependent Algorithms","Lines"}, 	//menu path
                 this.getName(), //name methode .getName recieved by AbstractPlugIn 
                 false,			//checkbox
                 null,			//icon
@@ -137,7 +137,7 @@ public class DisplaceLinesPlugIn extends AbstractPlugIn implements ThreadedPlugI
     private void setDialogValues(MultiInputDialog dialog, PlugInContext context)
 	  {
 	    dialog.setSideBarDescription(
-	        "Displace lines: map scale is used to detect narror parts");
+	        "Displace lines: map scale is used to detect narrow parts");
 	    dialog.addIntegerField(T1, 25000, 7,T1);
 	    dialog.addDoubleField(T3, 1.0, 4);
 	    //dialog.addCheckBox(T5,true);
@@ -158,7 +158,7 @@ public class DisplaceLinesPlugIn extends AbstractPlugIn implements ThreadedPlugI
 	  }
 
     public void run(TaskMonitor monitor, PlugInContext context) throws Exception{
-        	
+        
 	    	final Collection features = context.getLayerViewPanel().getSelectionManager().getFeaturesWithSelectedItems();
 	    	
 	    	monitor.report("start calculations: see console for status report");
@@ -167,8 +167,12 @@ public class DisplaceLinesPlugIn extends AbstractPlugIn implements ThreadedPlugI
 	    	LineDisplacementSnakes dispSnakes = new LineDisplacementSnakes(features,this.iterMax, 
 	    			this.signatureRadiusA, this.scale, monitor);
 */	    	
+	    	System.gc();
 	    	LineDisplacementSnakes dispSnakes = new LineDisplacementSnakes(features,this.iterMax, 
-	    			this.signatureRadiusA, this.scale);	    	
+	    			this.signatureRadiusA, this.scale);	 
+	    	
+	    	System.gc();
+	    	
 	    	FeatureCollection lines = dispSnakes.getDisplacedLines();
 	    	if(lines.size() > 0){ 
 	    	    context.addLayer(StandardCategoryNames.WORKING, "displaced lines", lines);

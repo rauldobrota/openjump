@@ -1,9 +1,9 @@
-package mapgen.algorithms.jts15quadtree;
+package mapgen.algorithms.jts17qtree;
 
 /**
  * A visitor for items in an index.
  *
- * @version 1.4
+ * @version 1.7
  */
 
 public interface ItemVisitor

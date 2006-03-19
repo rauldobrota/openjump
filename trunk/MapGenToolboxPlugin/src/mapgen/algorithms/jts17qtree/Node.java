@@ -31,7 +31,7 @@
  *     (250)385-6040
  *     www.vividsolutions.com
  */
-package mapgen.algorithms.jts15quadtree;
+package mapgen.algorithms.jts17qtree;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -42,7 +42,7 @@ import com.vividsolutions.jts.util.Assert;
  * items which have a spatial extent corresponding to the node's position
  * in the quadtree.
  *
- * @version 1.4
+ * @version 1.7
  */
 public class Node
   extends NodeBase

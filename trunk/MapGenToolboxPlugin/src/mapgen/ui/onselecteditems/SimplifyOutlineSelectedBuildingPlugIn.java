@@ -1,3 +1,30 @@
+/*
+ * The Unified Mapping Platform (JUMP) is an extensible, interactive GUI 
+ * for visualizing and manipulating spatial features with geometry and attributes.
+ *
+ * JUMP is Copyright (C) 2003 Vivid Solutions
+ *
+ * This program implements extensions to JUMP and is
+ * Copyright (C) Stefan Steiniger.
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * 
+ * For more information, contact:
+ * Stefan Steiniger
+ * perriger@gmx.de
+ */
 /*****************************************************
  * created:  		07.06.2005
  * last modified:  	21.11.2005
@@ -70,8 +97,8 @@ public class SimplifyOutlineSelectedBuildingPlugIn extends AbstractPlugIn implem
         FeatureInstaller featureInstaller = new FeatureInstaller(context.getWorkbenchContext());
     	featureInstaller.addMainMenuItem(
     	        this,								//exe
-                new String[] {"Map Generalisation", "Scale Dependent Algorithms","Buildings"}, 	//menu path
-                this.getName(), //name methode .getName recieved by AbstractPlugIn 
+                new String[] {"PlugIns","Map Generalisation", "Scale Dependent Algorithms","Buildings"}, 	//menu path
+                "Simplify Building", //name methode .getName recieved by AbstractPlugIn 
                 false,			//checkbox
                 null,			//icon
                 createEnableCheck(context.getWorkbenchContext())); //enable check        

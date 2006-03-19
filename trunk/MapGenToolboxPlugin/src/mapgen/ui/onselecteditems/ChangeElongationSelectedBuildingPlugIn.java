@@ -26,22 +26,23 @@
  * perriger@gmx.de
  */
 /*****************************************************
- * created:  		02.07.2004
+ * created:  		07.01.2004
  * last modified:  	
  * 
- * @author sstein
- * 
  * description:
- * 	changes a building / polygon to a rectangle<p>
- *  The solution algorithm deletes the holes. 
+ * 	changes the elongation of a building / polygon 
+ *  by a given ScaleFactor using PolygonChangeElongation algorithm
+ *  (Angle and center point can be given as well if 
+ *  plugin will be changed)
+ * 
  *****************************************************/
 
 package mapgen.ui.onselecteditems;
 
-import mapgen.algorithms.polygons.BuildingEnlargeToRectangle;
-import com.vividsolutions.jts.geom.Geometry;
+import mapgen.algorithms.polygons.PolygonChangeElongation;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jump.feature.Feature;
+import com.vividsolutions.jump.feature.FeatureCollection;
+import com.vividsolutions.jump.feature.FeatureDatasetFactory;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
@@ -49,28 +50,32 @@ import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.ThreadedPlugIn;
-import com.vividsolutions.jump.workbench.ui.EditTransaction;
+import com.vividsolutions.jump.workbench.ui.GUIUtil;
+import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
+import com.vividsolutions.jump.workbench.ui.zoom.*;
+import java.util.ArrayList;
 import java.util.Iterator;
-import com.vividsolutions.jump.workbench.model.Layer;
+import java.util.List;
+import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
 import java.util.Collection;
 
 /**
- * @description:
- * 	changes a building / polygon to a rectangle. <p>
- *  The solution algorithm deletes the holes. <p>
- *   
  * @author sstein
  *
  **/
-public class SimplifyBuildingToRectanglePlugIn extends AbstractPlugIn implements ThreadedPlugIn{
+public class ChangeElongationSelectedBuildingPlugIn extends AbstractPlugIn implements ThreadedPlugIn{
+
+    private ZoomToSelectedItemsPlugIn myZoom = new ZoomToSelectedItemsPlugIn();
+    private static String T1 = "scalefactor";
+    double scale = 1;
 
     public void initialize(PlugInContext context) throws Exception {
         FeatureInstaller featureInstaller = new FeatureInstaller(context.getWorkbenchContext());
     	featureInstaller.addMainMenuItem(
     	        this,								//exe
                 new String[] {"PlugIns","Map Generalisation","Not Scale Dependent Algorithms" ,"Buildings"}, 	//menu path
-                this.getName(), //name methode .getName recieved by AbstractPlugIn 
+                "Change Elongation of Building", //name methode .getName recieved by AbstractPlugIn 
                 false,			//checkbox
                 null,			//icon
                 createEnableCheck(context.getWorkbenchContext())); //enable check        
@@ -85,52 +90,70 @@ public class SimplifyBuildingToRectanglePlugIn extends AbstractPlugIn implements
     }
     
 	public boolean execute(PlugInContext context) throws Exception{
-		
-		this.reportNothingToUndoYet(context);
-	    return true;
+	    MultiInputDialog dialog = new MultiInputDialog(
+	            context.getWorkbenchFrame(), getName(), true);
+	        setDialogValues(dialog, context);
+	        GUIUtil.centreOnWindow(dialog);
+	        dialog.setVisible(true);
+	        if (! dialog.wasOKPressed()) { return false; }
+	        getDialogValues(dialog);
+	        return true;
 	}
 	
+    private void setDialogValues(MultiInputDialog dialog, PlugInContext context)
+	  {
+	    dialog.setSideBarDescription(
+	        "Change Building Elongation");
+	    dialog.addDoubleField(T1, 1.0, 3);
+	  }
+
+	private void getDialogValues(MultiInputDialog dialog) {
+	    this.scale = dialog.getDouble(T1);
+	  }
+
     public void run(TaskMonitor monitor, PlugInContext context) throws Exception{
         
     	    //this.zoom2Feature(context);	    
-    	    this.changeToRectangle(context, monitor);
+    	    this.changeElong(context, this.scale);
     	    System.gc();    		
     	}
 	
-	protected Layer layer(PlugInContext context) {
-		return (Layer) context.getLayerViewPanel().getSelectionManager()
-				.getLayersWithSelectedItems().iterator().next();
+	/**
+	 * centers the selected feature
+	 * @param context
+	 * @throws Exception
+	 */
+	private void zoom2Feature(PlugInContext context) throws Exception{
+		    
+	    this.myZoom.execute(context);	    
 	}
-	
-	private boolean changeToRectangle(PlugInContext context, TaskMonitor monitor) throws Exception{
+
+	private boolean changeElong(PlugInContext context, double scale) throws Exception{
 	    
 	    System.gc(); //flush garbage collector
 	    // --------------------------	    
 	    //-- get selected items
-	    final Collection features = context.getLayerViewPanel().getSelectionManager().getFeaturesWithSelectedItems();
-
-		EditTransaction transaction = new EditTransaction(features, this.getName(), layer(context),
-						this.isRollingBackInvalidEdits(context), false, context.getWorkbenchFrame());
-	    
-	    int count=0; int noItems = features.size(); Geometry resultgeom = null;
-	    //--get single object in selection to analyse
-      	for (Iterator iter = features.iterator(); iter.hasNext();) {
-      		count++;
-      		Feature f = (Feature)iter.next();
-	   		Geometry geom = f.getGeometry(); //= erste Geometrie
-	   		Polygon poly = null;
-	       	if ( geom instanceof Polygon){
-	       		poly = (Polygon) geom; //= erste Geometrie
-           	    BuildingEnlargeToRectangle enlarge = new BuildingEnlargeToRectangle(poly);
-           	    transaction.setGeometry(count-1, enlarge.getOutPolygon());
-	       	}
-	       	else{
-	       	    context.getWorkbenchFrame().warnUser("no polygon selected");
-	       	}
-		    String mytext = "item: " + count + " / " + noItems + " : squaring finalized";
-		    monitor.report(mytext);	       		       	
-      	}// end loop over item selection
-       	transaction.commit();
+	    final Collection geometries = context.getLayerViewPanel().getSelectionManager().getSelectedItems();	    
+	    //--get first/single object in selection to analyse
+      	Iterator i = geometries.iterator();
+      	Object geom = i.next();
+       	Polygon poly = null;       	
+       	if ( geom instanceof Polygon){
+       		poly = (Polygon) geom; //= erste Geometrie
+    	    // --------------------------
+           	List resultList = new ArrayList();
+           	PolygonChangeElongation pce = new PolygonChangeElongation(poly,scale);
+           	resultList.add(pce.getOutPolygon());
+           	//resultList.add(pce.getCenter());
+           	context.getWorkbenchFrame().setStatusMessage("horizontal angle: " + pce.getAngle());
+    	    FeatureCollection myCollB = FeatureDatasetFactory.createFromGeometry(resultList);
+    	    if (myCollB.size() > 0){
+    		    context.addLayer(StandardCategoryNames.WORKING, "result", myCollB);
+    		    }
+       	}
+       	else{
+       	    context.getWorkbenchFrame().warnUser("no polygon selected");
+       	}
         return true;        
 	}
     

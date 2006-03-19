@@ -45,10 +45,13 @@
 package mapgen.ui.onselecteditems;
 
 
-import ch.unizh.geo.agents.goals.BuildingGoals;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
 import mapgen.algorithms.polygons.BuildingEnlargeWidthLocaly;
 import mapgen.constraints.buildings.BuildingLocalWidth;
-import mapgen.constraints.buildings.BuildingShortestEdge;
+import ch.unizh.geo.agents.goals.BuildingGoals;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
@@ -61,23 +64,17 @@ import com.vividsolutions.jump.feature.FeatureDatasetFactory;
 import com.vividsolutions.jump.feature.FeatureSchema;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
+import com.vividsolutions.jump.workbench.model.Layer;
+import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.ThreadedPlugIn;
-import com.vividsolutions.jump.workbench.ui.EditTransaction;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
-import com.vividsolutions.jump.workbench.ui.zoom.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import com.vividsolutions.jump.workbench.model.Layer;
-import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
-import java.util.Collection;
+import com.vividsolutions.jump.workbench.ui.zoom.ZoomToSelectedItemsPlugIn;
 
 /**
  * @description:
@@ -111,7 +108,7 @@ public class BuildingSpreadNarrowPartsPlugIn extends AbstractPlugIn implements T
         FeatureInstaller featureInstaller = new FeatureInstaller(context.getWorkbenchContext());
     	featureInstaller.addMainMenuItem(
     	        this,								//exe
-                new String[] {"Map Generalisation", "Scale Dependent Algorithms","Buildings"}, 	//menu path
+                new String[] {"PlugIns", "Map Generalisation", "Scale Dependent Algorithms","Buildings"}, 	//menu path
                 this.getName(), //name methode .getName recieved by AbstractPlugIn 
                 false,			//checkbox
                 null,			//icon
@@ -141,7 +138,7 @@ public class BuildingSpreadNarrowPartsPlugIn extends AbstractPlugIn implements T
     private void setDialogValues(MultiInputDialog dialog, PlugInContext context)
 	  {
 	    dialog.setSideBarDescription(
-	        "Spread narrow parts: map scale is used to detect to narrow (inlegible) parts");
+	        "Spread narrow parts: map scale is used to detect narrow (inlegible) parts");
 	    dialog.addIntegerField(T1, 25000, 7,T1);
 	    dialog.addCheckBox(T5,true);
 	    dialog.addIntegerField(T2, 30, 4,T2);
@@ -338,7 +335,7 @@ public class BuildingSpreadNarrowPartsPlugIn extends AbstractPlugIn implements T
 	       	    fnew.setAttribute(this.newAttributString, "no polygon");
 	       	}
        	    resultFeatures.add(fnew);
-		    String mytext = "item: " + count + " / " + noItems + " : squaring finalized";
+		    String mytext = "item: " + count + " / " + noItems + " : spreading finalized";
 		    monitor.report(mytext);	       	
       	}//  end loop for selection
       	/**

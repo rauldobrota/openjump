@@ -84,7 +84,7 @@ public class EliminateSmallBuildingsPlugIn extends AbstractPlugIn implements Thr
         FeatureInstaller featureInstaller = new FeatureInstaller(context.getWorkbenchContext());
     	featureInstaller.addMainMenuItem(
     	        this,								//exe
-                new String[] {"Map Generalisation","Scale Dependent Algorithms" ,"Buildings"}, 	//menu path
+                new String[] {"PlugIns","Map Generalisation","Scale Dependent Algorithms" ,"Buildings"}, 	//menu path
                 this.getName(), //name methode .getName recieved by AbstractPlugIn 
                 false,			//checkbox
                 null,			//icon

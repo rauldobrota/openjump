@@ -31,7 +31,7 @@
  *     (250)385-6040
  *     www.vividsolutions.com
  */
-package mapgen.algorithms.jts15quadtree;
+package mapgen.algorithms.jts17qtree;
 
 /**
  * Provides a test for whether an interval is
@@ -42,7 +42,7 @@ package mapgen.algorithms.jts15quadtree;
  * computing a midpoint value which does not lie strictly between the
  * endpoints.
  *
- * @version 1.4
+ * @version 1.7
  */
 public class IntervalSize {
 

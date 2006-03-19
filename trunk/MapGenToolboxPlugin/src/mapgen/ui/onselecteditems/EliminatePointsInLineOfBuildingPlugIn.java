@@ -32,18 +32,21 @@
  * @author sstein
  * 
  * description:
- * 	eliminates a building / polygon if the AreaSize is to small.
+ * 		deletes the points on a line which could emerge from the union operation of adjacent polygons 
+ * 		it deletes the points only if the angle is about 180degrees and the 
+ *      distance (point, to new building wall) is smaller than a threshold 
  *****************************************************/
 
-package mapgen.algorithms.polygons;
+package mapgen.ui.onselecteditems;
 
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import mapgen.agents.goals.BuildingGoals;
-import mapgen.constraints.polygons.PolygonMinimalArea;
+import ch.unizh.geo.agents.goals.BuildingGoals;
+import mapgen.algorithms.polygons.BuildingDeletePointsInLine;
+import mapgen.constraints.buildings.BuildingPointInLine;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
@@ -51,6 +54,7 @@ import com.vividsolutions.jump.feature.AttributeType;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureCollection;
 import com.vividsolutions.jump.feature.FeatureDataset;
+import com.vividsolutions.jump.feature.FeatureDatasetFactory;
 import com.vividsolutions.jump.feature.FeatureSchema;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
@@ -68,12 +72,14 @@ import com.vividsolutions.jump.workbench.ui.zoom.ZoomToSelectedItemsPlugIn;
 
 /**
  * @description:
- * 	eliminates a building / polygon if the AreaSize is to small.
+ * 		deletes the points on a line which could emerge from the union operation of adjacent polygons 
+ * 		it deletes the points only if the angle is about 180degrees and the 
+ *      distance (point, to new building wall) is smaller than a threshold 
  * 
  * @author sstein
  *
  **/
-public class EliminateSmallBuildingsPlugIn extends AbstractPlugIn implements ThreadedPlugIn{
+public class EliminatePointsInLineOfBuildingPlugIn extends AbstractPlugIn implements ThreadedPlugIn{
 
     private ZoomToSelectedItemsPlugIn myZoom = new ZoomToSelectedItemsPlugIn();
     private static String T1 = "MapScale";
@@ -84,7 +90,7 @@ public class EliminateSmallBuildingsPlugIn extends AbstractPlugIn implements Thr
         FeatureInstaller featureInstaller = new FeatureInstaller(context.getWorkbenchContext());
     	featureInstaller.addMainMenuItem(
     	        this,								//exe
-                new String[] {"Map Generalisation","Scale Dependent Algorithms" ,"Buildings"}, 	//menu path
+                new String[] {"PlugIns","Map Generalisation","Scale Dependent Algorithms" ,"Buildings"}, 	//menu path
                 this.getName(), //name methode .getName recieved by AbstractPlugIn 
                 false,			//checkbox
                 null,			//icon
@@ -115,7 +121,7 @@ public class EliminateSmallBuildingsPlugIn extends AbstractPlugIn implements Thr
     private void setDialogValues(MultiInputDialog dialog, PlugInContext context)
 	  {
 	    dialog.setSideBarDescription(
-	        "Eliminate too small buidlings using the size of area as criterion. A tolerance value is used so the building can be a bit smaller than necessary");
+	        "Eliminate points on a line (wall of) buidlings where a change of wall direction is not visible for the specific scale");
 	    dialog.addIntegerField(T1, 25000, 7,T1);	    	    
 	  }
 
@@ -127,10 +133,7 @@ public class EliminateSmallBuildingsPlugIn extends AbstractPlugIn implements Thr
         
     	    //this.zoom2Feature(context);	    
     	    FeatureCollection fc = this.eliminate(context, this.scale, monitor);
-    	    context.addLayer(StandardCategoryNames.WORKING, "buildings with minArea", fc); 
-    	    if (this.elimFeatures.size() > 0){
-    	    	context.addLayer(StandardCategoryNames.WORKING, "eliminated buildings", this.elimFeatures);
-    	    }
+    	    context.addLayer(StandardCategoryNames.WORKING, "buildings wall simplify", fc); 
     	    System.gc();    		
     	}
 	
@@ -152,6 +155,7 @@ public class EliminateSmallBuildingsPlugIn extends AbstractPlugIn implements Thr
 	private FeatureCollection eliminate(PlugInContext context, int scale, 
 	                           TaskMonitor monitor) throws Exception{
 	    
+	    double flexInRad = 10.0*Math.PI/180;
 	    System.gc(); //flush garbage collector
 	    // --------------------------	    
 	    //-- get selected items
@@ -163,9 +167,10 @@ public class EliminateSmallBuildingsPlugIn extends AbstractPlugIn implements Thr
 	    FeatureDataset resultFeatures = null;
 	    FeatureDataset elimFeatures = null;
 	    ArrayList problematicEdges = new ArrayList();
+	    ArrayList errorBdgs = new ArrayList();
        	//List resultList = new ArrayList();
        	FeatureSchema fs = new FeatureSchema();
-       	int eliminated = 0;
+       	int modified = 0;
       	for (Iterator iter = features.iterator(); iter.hasNext();) {
       		count++;
       		Feature ft = (Feature)iter.next();
@@ -181,24 +186,26 @@ public class EliminateSmallBuildingsPlugIn extends AbstractPlugIn implements Thr
 	   		Polygon poly = null;
 	       	if ( geom instanceof Polygon){
 	       		poly = (Polygon) geom; //= erste Geometrie
-	    	    // --------------------------
-	           	/*	       		
-	           	List resultList = new ArrayList();
-	           	List conflictListA = new ArrayList();
-	           	List conflictListB = new ArrayList();
-	           	*/
-	           	//---- detect conflicts
+	    	    // ---- init goals
 	           	BuildingGoals goals = new BuildingGoals(scale);
-	           	PolygonMinimalArea pma = new PolygonMinimalArea(poly,goals.getMinAreaReal(),goals.getMinAreaFlexibility());
-	           	//---
-	            if(pma.isfullfilled() == false){	           		
-		           	context.getWorkbenchFrame().setStatusMessage("to small bldg id: " + ft.getID());
-		           	elimFeatures.add(f);
-		           	eliminated++;
-	            }
-	           	else{//if area is larger as necessary or within tolerance 
-	           	    resultFeatures.add(f);
+	           	//---- detect point in line conflicts
+	           	BuildingPointInLine bpil = new BuildingPointInLine(poly, goals.getPositionAccuracy(),flexInRad);
+	           	if (bpil.isfullfilled() == false){
+	           	 try{   
+		           	    BuildingDeletePointsInLine dpil = new BuildingDeletePointsInLine(poly,bpil.measure.getConflicList());  
+		           	    poly = dpil.getOutPolygon();
+		           	    f.setGeometry(poly);
+		           	    modified++;
+		           	}
+		           	catch(Exception e){
+		           	    errorBdgs.add((Geometry)f.getGeometry().clone());
+		           	    System.out.println("xxxxxxxxxxxxxxxxxxxxxxx");
+		           	    System.out.println("Exception: Bdg delete points in line");
+		           	    System.out.println(e);
+		           	    System.out.println("xxxxxxxxxxxxxxxxxxxxxxx");		           	    		           	    
+		           	}	           	    
 	           	}
+           	    resultFeatures.add(f);	           		       		
 	       	}
 	       	else{
 	       	    context.getWorkbenchFrame().warnUser("no polygon selected");
@@ -206,7 +213,13 @@ public class EliminateSmallBuildingsPlugIn extends AbstractPlugIn implements Thr
 		    String mytext = "item: " + count + " / " + noItems + " : tested";
 		    monitor.report(mytext);	       		       	
       	}// end loop over item selection
-      	context.getWorkbenchFrame().warnUser("eliminated: " + eliminated + " from: " + count);
+	    if (errorBdgs.size() > 0){
+    	    FeatureCollection myCollE = FeatureDatasetFactory.createFromGeometry(errorBdgs);
+    	    if (myCollE.size() > 0){
+    		    context.addLayer(StandardCategoryNames.WORKING, "Exception Bdg", myCollE);
+    		    }
+	    }      	
+      	context.getWorkbenchFrame().warnUser("polygons modified: " + modified + " from: " + count);
       	this.elimFeatures = elimFeatures;
         return resultFeatures;        
 	}

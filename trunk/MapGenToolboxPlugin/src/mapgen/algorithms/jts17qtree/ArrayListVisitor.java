@@ -1,9 +1,11 @@
-package mapgen.algorithms.jts15quadtree;
+package mapgen.algorithms.jts17qtree;
 
 import java.util.*;
 
+import mapgen.algorithms.jts17qtree.ItemVisitor;
+
 /**
- * @version 1.4
+ * @version 1.7
  */
 public class ArrayListVisitor
     implements ItemVisitor

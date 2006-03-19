@@ -87,7 +87,7 @@ public class EnlargeBuildingToRectanglePlugIn extends AbstractPlugIn implements 
         FeatureInstaller featureInstaller = new FeatureInstaller(context.getWorkbenchContext());
     	featureInstaller.addMainMenuItem(
     	        this,								//exe
-                new String[] {"Map Generalisation","Scale Dependent Algorithms" ,"Buildings"}, 	//menu path
+                new String[] {"PlugIns","Map Generalisation","Scale Dependent Algorithms" ,"Buildings"}, 	//menu path
                 this.getName(), //name methode .getName recieved by AbstractPlugIn 
                 false,			//checkbox
                 null,			//icon

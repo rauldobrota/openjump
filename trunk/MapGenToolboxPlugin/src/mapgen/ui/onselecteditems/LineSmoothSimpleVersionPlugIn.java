@@ -104,8 +104,8 @@ public class LineSmoothSimpleVersionPlugIn extends AbstractPlugIn implements Thr
         FeatureInstaller featureInstaller = new FeatureInstaller(context.getWorkbenchContext());
     	featureInstaller.addMainMenuItem(
     	        this,								//exe
-                new String[] {"Map Generalisation","Not Scale Dependent Algorithms", "Lines"}, 	//menu path
-                this.getName(), //name methode .getName recieved by AbstractPlugIn 
+                new String[] {"PlugIns","Map Generalisation","Not Scale Dependent Algorithms", "Lines"}, 	//menu path
+                "Line Smoothing Simple Version", //name methode .getName recieved by AbstractPlugIn 
                 false,			//checkbox
                 null,			//icon
                 createEnableCheck(context.getWorkbenchContext())); //enable check        

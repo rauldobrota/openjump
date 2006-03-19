@@ -17,11 +17,6 @@
  ***********************************************/
 package mapgen.measures;
 
-import javax.swing.JFrame;
-
-import org.jmathplot.gui.FrameView;
-import org.jmathplot.gui.Plot2DPanel;
-
 import ch.unizh.geo.algorithms.Rotate;
 import ch.unizh.geo.geomutilities.SecondGeodeticTask2d;
 
@@ -37,7 +32,7 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  *
  * @description: 
- * 		calcualtes the orientation for 
+ * 		calculates the orientation for 
  * 		a) mathematical correct MBR
  * 		b) statictical orientation
  * 

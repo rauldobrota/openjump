@@ -2,8 +2,8 @@ package mapgen.algorithms.jtssimplify;
 
 import java.util.*;
 
-import mapgen.algorithms.jts15quadtree.ItemVisitor;
-import mapgen.algorithms.jts15quadtree.Quadtree;
+import mapgen.algorithms.jts17qtree.ItemVisitor;
+import mapgen.algorithms.jts17qtree.Quadtree;
 
 import com.vividsolutions.jts.geom.*;
 

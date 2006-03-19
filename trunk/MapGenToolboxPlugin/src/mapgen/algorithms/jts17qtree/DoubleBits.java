@@ -31,7 +31,8 @@
  *     (250)385-6040
  *     www.vividsolutions.com
  */
-package mapgen.algorithms.jts15quadtree;
+package mapgen.algorithms.jts17qtree;
+
 
 /**
  * DoubleBits manipulates Double numbers
@@ -43,7 +44,7 @@ package mapgen.algorithms.jts15quadtree;
  * The algorithms and constants in this class
  * apply only to IEEE-754 double-precision floating point format.
  *
- * @version 1.4
+ * @version 1.7
  */
 public class DoubleBits {
 

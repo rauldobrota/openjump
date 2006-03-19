@@ -32,8 +32,13 @@
  * @author sstein
  * 
  * description:
- * 	changes a building / polygon to a rectangle if AreaSize is to small.
- *  The solution algorithm deletes the holes. 
+ * Rectifies (squares) the walls of a building. Therefore the building main 
+ * directions are obtained from the longest building walls. The algorithm works 
+ * with respect to two thresholds:  First it allows a maximum change in the 
+ * wall angle given by the user; second it respects a maximum point displacement 
+ * of the corner points calculated from the user given target map scale value. 
+ * The Algorithm is described by N. Regnauld, A. Edwardes and M. Barrault 
+ * (ACI Workshop, 1999) and in Agent Work Package D1.
  *
  *****************************************************/
 
@@ -64,8 +69,13 @@ import java.util.Collection;
 
 /**
  * @description:
- * 	changes a building / polygon to a rectangle if AreaSize is to small.
- *  The solution algorithm deletes the holes. 
+ * Rectifies (squares) the walls of a building. Therefore the building main 
+ * directions are obtained from the longest building walls. The algorithm works 
+ * with respect to two thresholds:  First it allows a maximum change in the 
+ * wall angle given by the user; second it respects a maximum point displacement 
+ * of the corner points calculated from the user given target map scale value. 
+ * The Algorithm is described by N. Regnauld, A. Edwardes and M. Barrault 
+ * (ACI Workshop, 1999) and in Agent Work Package D1.
  * 
  * @author sstein
  *
@@ -82,7 +92,7 @@ public class SquareBuildingPlugIn extends AbstractPlugIn implements ThreadedPlug
         FeatureInstaller featureInstaller = new FeatureInstaller(context.getWorkbenchContext());
     	featureInstaller.addMainMenuItem(
     	        this,								//exe
-                new String[] {"Map Generalisation","Scale Dependent Algorithms", "Buildings"}, 	//menu path
+                new String[] {"PlugIns","Map Generalisation","Scale Dependent Algorithms", "Buildings"}, 	//menu path
                 this.getName(), //name methode .getName recieved by AbstractPlugIn 
                 false,			//checkbox
                 null,			//icon

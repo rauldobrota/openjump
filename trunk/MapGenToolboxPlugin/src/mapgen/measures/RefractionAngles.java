@@ -18,9 +18,6 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
-import org.jmathplot.gui.FrameView;
-import org.jmathplot.gui.Plot2DPanel;
-
 import ch.unizh.geo.geomutilities.SecondGeodeticTask2d;
 import mapgen.geomutilities.JumpAngle;
 import com.vividsolutions.jts.geom.Coordinate;
