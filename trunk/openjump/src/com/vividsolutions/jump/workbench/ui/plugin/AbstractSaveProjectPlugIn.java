@@ -33,14 +33,12 @@
 package com.vividsolutions.jump.workbench.ui.plugin;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
 import com.vividsolutions.jump.I18N;
-import com.vividsolutions.jump.io.datasource.DataSource;
 import com.vividsolutions.jump.util.FileUtil;
 import com.vividsolutions.jump.util.java2xml.Java2XML;
 import com.vividsolutions.jump.workbench.model.Layer;
@@ -62,7 +60,7 @@ public abstract class AbstractSaveProjectPlugIn extends AbstractPlugIn {
         //original file -- we don't want to damage the original if an error occurs.
         //[Jon Aquino]
         StringWriter stringWriter = new StringWriter();
-        removeAbsolutePathFormLayers( task, file );
+
         try {
             new Java2XML().write(task, "project", stringWriter);
         } finally {
@@ -92,7 +90,6 @@ public abstract class AbstractSaveProjectPlugIn extends AbstractPlugIn {
 
             frame.warnUser(warning);
         }
-        
     }
 
     private Collection ignoredLayers(Task task) {
@@ -101,40 +98,12 @@ public abstract class AbstractSaveProjectPlugIn extends AbstractPlugIn {
         for (Iterator i = task.getLayerManager().getLayers().iterator();
                 i.hasNext();) {
             Layer layer = (Layer) i.next();
+
             if (!layer.hasReadableDataSource()) {
                 ignoredLayers.add(layer);
             }
         }
 
         return ignoredLayers;
-    }
-
-    private void removeAbsolutePathFormLayers( Task task, File taskFile) {
-        for (Iterator i = task.getLayerManager().getLayers().iterator();
-            i.hasNext();) {
-            Layer layer = (Layer) i.next();
-            if ( layer.hasReadableDataSource() ) {
-                DataSource ds = layer.getDataSourceQuery().getDataSource();
-                String f = (String)ds.getProperties().get( DataSource.FILE_KEY );
-                f = stripAbsoluteFilename( taskFile, f );
-                ds.getProperties().put( DataSource.FILE_KEY, f );
-                
-            }
-        }
-    }
-    
-    private String stripAbsoluteFilename( File parent, String filename ) {
-        
-        String p = parent.getParent().replace( '\\', '/' );
-        String fname = filename.replace( '\\', '/' );
-        if ( fname.indexOf( p ) > -1 ) {
-            String[] s = fname.split( p );
-            
-            if ( s[1].charAt( 0 ) == '/' || s[1].charAt( 0 ) == '\\' ) {
-                System.out.println("s0: '" + s[0]+ "'" );
-                return s[1].substring( 1, s[1].length());
-            }
-        }
-        return filename;
     }
 }
