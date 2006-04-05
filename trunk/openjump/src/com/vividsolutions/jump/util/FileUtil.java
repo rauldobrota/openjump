@@ -205,8 +205,4 @@ public class FileUtil {
         return new File(path);
     }
 
-    public static String separatorsToNative( String filename ) {
-        return filename.replace( '/', File.separatorChar );
-    }
-
 }
