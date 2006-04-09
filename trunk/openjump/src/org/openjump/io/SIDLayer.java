@@ -30,6 +30,8 @@
  *
  * (850)862-7321
  * www.ashs.isa.com
+ * 
+ * 02.04.2006 changed by sstein to make compilation with free JVMs possible (see below)
  */
 
 
@@ -43,7 +45,6 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -53,10 +54,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.FileImageInputStream;
+
 import org.openjump.core.ui.plugin.layer.AddSIDLayerPlugIn;
 
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGImageDecoder;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.util.Assert;
 import com.vividsolutions.jump.I18N;
@@ -296,9 +299,13 @@ public class SIDLayer extends WMSLayer
                     
                     if (((jpgFile.exists()) && (jpgFile.isFile()) && (jpgFile.canRead())))
                     {
-                        FileInputStream in = new FileInputStream(jpgFilename);
-                        JPEGImageDecoder decoder = JPEGCodec.createJPEGDecoder(in);
-                        BufferedImage image = decoder.decodeAsBufferedImage();
+                    	//-- [sstein 02.04.2006] changed to javax to work with free JavaVM
+                    	//   as proposed by Petter Reinholdtsen (see jpp-devel 12.03.2006)
+                    	FileImageInputStream in = new FileImageInputStream(new File(jpgFilename));
+                    	ImageReader decoder = (ImageReader) ImageIO.getImageReadersByFormatName("JPEG");
+                    	decoder.setInput(in);
+                    	BufferedImage image = decoder.read(0);
+                    	decoder.dispose();
                         in.close();
 
                         if (!sid_colorspace.equals("GREYSCALE"))
