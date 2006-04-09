@@ -56,6 +56,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 /**
  * This class is responsible for setting up and displaying the main JUMP
@@ -71,7 +75,6 @@ public class JUMPWorkbench {
 			//splashImage = IconLoader.icon("splash.png");
 			splashImage = IconLoader.icon(I18N.get("JUMPWorkbench.splash.png"));
 		}
-		
 		return splashImage;
 	}
 
@@ -118,8 +121,8 @@ public class JUMPWorkbench {
 
 	/**
 	 * @param s
-	 *    a visible SplashWindow to close when initialization is
-	 *     complete and the WorkbenchFrame is opened
+	 *                  a visible SplashWindow to close when initialization is
+	 *                  complete and the WorkbenchFrame is opened
 	 */
 	public JUMPWorkbench(String title, String[] args, ImageIcon icon,
 			final JWindow s, TaskMonitor monitor) throws Exception {
@@ -146,9 +149,6 @@ public class JUMPWorkbench {
 								+ propertiesFile);
 			}
 		}
-		
-
-		
 
 		File extensionsDirectory = null;
 		if (commandLine.hasOption(PLUG_IN_DIRECTORY_OPTION)) {
@@ -171,6 +171,7 @@ public class JUMPWorkbench {
 		}
 		
 		plugInManager = new PlugInManager(context, extensionsDirectory, monitor);
+
 		//Load drivers before initializing the frame because part of the frame
 		//initialization is the initialization of the driver dialogs. [Jon
 		// Aquino]
@@ -191,7 +192,7 @@ public class JUMPWorkbench {
 					.newInstance();
 			SplashPanel splashPanel = new SplashPanel(splashImage(), 
 									I18N.get("JUMPWorkbench.version")+" "
-									+ VERSION_TEXT);
+									+ VERSION_TEXT /*+ JUMPVersion.CURRENT_VERSION*/); //[sstein] added but disabled JumpVersion
 			splashPanel.add(progressMonitor, new GridBagConstraints(0, 10, 1,
 					1, 1, 0, GridBagConstraints.NORTHWEST,
 					GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 10), 0,
@@ -208,7 +209,7 @@ public class JUMPWorkbench {
 	 * setupClass is specified as a String to prevent it from being loaded
 	 * before we display the splash screen, in case setupClass takes a long time
 	 * to load.
-	 * 
+	 *
 	 * @param setupClass
 	 *                  the name of a class that implements Setup
 	 * @param splashWindow
@@ -241,7 +242,6 @@ public class JUMPWorkbench {
 	}
 
 	private static void initLookAndFeel() throws Exception {
-	    
 		if (LangUtil.ifNull(System.getProperty("initLookAndFeel"), "true")
 				.toString().equalsIgnoreCase("false")) {
 			return;

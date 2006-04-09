@@ -17,6 +17,7 @@ import com.vividsolutions.jump.io.FeatureInputStream;
 import com.vividsolutions.jump.parameter.ParameterList;
 import com.vividsolutions.jump.util.Blackboard;
 import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
+import com.vividsolutions.jump.workbench.WorkbenchContext;
 
 /**
  * Reuses existing connections where possible.
@@ -30,11 +31,16 @@ public class ConnectionManager {
                 ConnectionDescriptor connectionDescriptor);
     }
 
+
+    private WorkbenchContext context;
+
     /**
      * @param connectionDescriptors
      *            a collection that is kept up to date by the ConnectionManager
      */
-    private ConnectionManager(final Collection connectionDescriptors) {
+    private ConnectionManager(WorkbenchContext context,
+                              final Collection connectionDescriptors) {
+      this.context = context;
         for (Iterator i = connectionDescriptors.iterator(); i.hasNext();) {
             ConnectionDescriptor connectionDescriptor = (ConnectionDescriptor) i
                     .next();
@@ -66,10 +72,31 @@ public class ConnectionManager {
             ConnectionDescriptor connectionDescriptor) throws Exception {
         if (getConnection(connectionDescriptor).isClosed()) {
             connectionDescriptorToConnectionMap.put(connectionDescriptor,
-                    connectionDescriptor.createConnection());
+                    connectionDescriptor.createConnection(
+                    getDriver(connectionDescriptor.getDataStoreDriverClassName())));
         }
         return getConnection(connectionDescriptor);
     }
+
+    public DataStoreDriver getDriver(String driverClassName)
+    {
+      DataStoreDriver driver = findDriverRegistryEntry(driverClassName);
+      if (driver == null)
+        throw new RuntimeException("Can't find DataStoreDriver: " + driverClassName);
+      return driver;
+    }
+
+    private DataStoreDriver findDriverRegistryEntry(String driverClassName)
+    {
+      List drivers = context.getRegistry().getEntries(DataStoreDriver.REGISTRY_CLASSIFICATION);
+      for (Iterator i = drivers.iterator(); i.hasNext(); ) {
+        DataStoreDriver driver = (DataStoreDriver) i.next();
+        if (driver.getClass().getName().equals(driverClassName))
+          return driver;
+      }
+      return null;
+    }
+
 
     private static final DataStoreConnection DUMMY_CONNECTION = new DataStoreConnection() {
         public DataStoreMetadata getMetadata() {
@@ -140,13 +167,15 @@ public class ConnectionManager {
         }
     }
 
-    public static ConnectionManager instance(Blackboard blackboard) {
+    public static ConnectionManager instance(WorkbenchContext context) {
+      Blackboard blackboard = context.getBlackboard();
         String INSTANCE_KEY = ConnectionManager.class.getName() + " - INSTANCE";
         if (blackboard.get(INSTANCE_KEY) == null) {
             // If the blackboard has an associated PersistentBlackboard,
             // that will be used to persist the DataStoreDrivers.
             // [Jon Aquino 2005-03-11]
             blackboard.put(INSTANCE_KEY, new ConnectionManager(
+                context,
                     (Collection) PersistentBlackboardPlugIn.get(blackboard)
                             .get(
                                     ConnectionManager.class.getName()

@@ -79,7 +79,7 @@ public class ConnectionPanel extends JPanel
     }
 
     protected ConnectionManager connectionManager() {
-        return ConnectionManager.instance(context.getBlackboard());
+        return ConnectionManager.instance(context);
     }
 
     protected Object[] sortByString(Object[] objects) {
@@ -110,7 +110,7 @@ public class ConnectionPanel extends JPanel
 
     private void chooseConnection() {
         ConnectionManagerPanel panel = new ConnectionManagerPanel(
-                ConnectionManager.instance(getContext().getBlackboard()),
+                ConnectionManager.instance(getContext()),
                 getContext().getRegistry(), getContext().getErrorHandler(),context);
         OKCancelDialog dialog = new OKCancelDialog((Dialog) SwingUtilities
                 .windowForComponent(ConnectionPanel.this), "Connection Manager",

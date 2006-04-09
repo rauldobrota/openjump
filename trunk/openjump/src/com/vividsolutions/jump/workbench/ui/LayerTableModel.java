@@ -45,6 +45,7 @@ import java.util.List;
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 
+import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.util.Assert;
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.AttributeType;
@@ -93,9 +94,9 @@ public class LayerTableModel extends ColumnBasedTableModel {
         }
     };
 
-        private Column buttonColumn = new MyColumn(" ", null) {//button column [Jon Aquino]
-    protected Object getValue(Feature feature) {
-            return null;
+    private Column geomButtonColumn = new MyColumn(" ", null) {//button column [Jon Aquino]
+        protected Object getValue(Feature feature) {
+            return feature;
         }
 
         protected void setValue(Object value, Feature feature) {
@@ -151,7 +152,7 @@ public class LayerTableModel extends ColumnBasedTableModel {
     private void initColumns(final Layer layer) {
         schema = layer.getFeatureCollectionWrapper().getFeatureSchema();
         ArrayList columns = new ArrayList();
-        columns.add(buttonColumn);
+        columns.add(geomButtonColumn);
         columns.add(fidColumn);
 
         for (int i = 0; i < schema.getAttributeCount(); i++) {
@@ -240,7 +241,7 @@ public class LayerTableModel extends ColumnBasedTableModel {
             return false;
         }
 
-        if (getColumn(columnIndex) == buttonColumn) {
+        if (getColumn(columnIndex) == geomButtonColumn) {
             return false;
         }
 
@@ -329,22 +330,41 @@ public class LayerTableModel extends ColumnBasedTableModel {
             private int ascendingCompare(Object o1, Object o2) {
                 Feature f1 = (Feature) o1;
                 Feature f2 = (Feature) o2;
-                Comparable attribute1 = (Comparable) ((MyColumn) getColumn(column)).getValue(f1);
-                Comparable attribute2 = (Comparable) ((MyColumn) getColumn(column)).getValue(f2);
-
-                if (attribute1 == null) {
-                    return -1;
-                }
-
-                if (attribute2 == null) {
-                    return 1;
-                }
-
-                return attribute1.compareTo(attribute2);
+                
+                Object v1 = ((MyColumn) getColumn(column)).getValue(f1);
+                Object v2 = ((MyColumn) getColumn(column)).getValue(f2);
+                return compareValue(v1, v2);
             }
         });
     }
 
+    private static int compareValue(Object o1, Object o2)
+    {
+      if (o1 == null) return -1;
+      if (o2 == null) return 1;
+      
+      if (o1 instanceof Boolean) {
+        return compareBoolean((Boolean) o1, (Boolean) o2);
+      }
+      else if (o1 instanceof Geometry) {
+        return 0;  // for now - change to compare type
+      }
+      else if (o1 instanceof Comparable) {
+        Comparable attribute1 = (Comparable) o1;
+        Comparable attribute2 = (Comparable) o2;
+        return attribute1.compareTo(attribute2);
+      }
+      return 0;
+    }
+    
+    private static int compareBoolean(Boolean b1, Boolean b2)
+    {
+      boolean bool1 = b1.booleanValue();
+      boolean bool2 = b2.booleanValue();
+      if (bool1 == bool2) return 0;
+      return bool1 ? 1 : -1;
+    }
+    
     public String getType(int column) {
         return null;
     }

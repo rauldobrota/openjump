@@ -22,7 +22,7 @@ public class SpatialQueryExecuter
   private GeometryPredicate predicate;
 
   private boolean complementResult = false;
-
+  private boolean allowDuplicatesInResult = false;
   private boolean isExceptionThrown = false;
 
   private Geometry geoms[] = new Geometry[2];
@@ -32,6 +32,26 @@ public class SpatialQueryExecuter
   {
     this.maskFC = maskFC;
     this.sourceFC = sourceFC;
+  }
+
+  /**
+   * Sets whether duplicate features are allowed in the result set.
+   *
+   * @param isRemoveDuplicates true if duplicates are allowed
+   */
+  public void setAllowDuplicates(boolean isAllowDuplicates)
+  {
+    this.allowDuplicatesInResult = isAllowDuplicates;
+  }
+
+  /**
+   * Sets whether the result set should be complemented
+   *
+   * @param complementResult true if the result should be complemented
+   */
+  public void setComplementResult(boolean complementResult)
+  {
+    this.complementResult = complementResult;
   }
 
   private FeatureCollection getQueryFeatureCollection()
@@ -57,10 +77,6 @@ public class SpatialQueryExecuter
     return resultSet.contains(f);
   }
 
-  public void setComplementResult(boolean complementResult)
-  {
-    this.complementResult = complementResult;
-  }
 
   /**
    * Computes geomSrc.func(geomMask)
@@ -76,6 +92,7 @@ public class SpatialQueryExecuter
                                      FeatureCollection resultFC
                                      )
   {
+    
     FeatureCollection queryFC = getQueryFeatureCollection();
 
     int total = maskFC.size();
@@ -98,6 +115,7 @@ public class SpatialQueryExecuter
       for (Iterator iSrc = queryResult.iterator(); iSrc.hasNext(); ) {
         Feature fSrc = (Feature) iSrc.next();
 
+        // optimization - if feature already in result no need to re-test
         if (isInResult(fSrc))
           continue;
 
@@ -107,16 +125,23 @@ public class SpatialQueryExecuter
         boolean isInResult = isTrue(func, gSrc, gMask, params);
 
         if (isInResult) {
-          resultSet.add(fSrc);
+          if (allowDuplicatesInResult) {
+            addToResult(fSrc, resultFC);
+          }
+          else {
+            resultSet.add(fSrc);
+          }
         }
       }
     }
 
-    if (complementResult) {
-      loadComplement(resultFC);
-    }
-    else {
-      loadResult(resultFC);
+    if (! allowDuplicatesInResult) {
+      if (complementResult) {
+        loadComplement(resultFC);
+      }
+      else {
+        loadResult(resultFC);
+      }
     }
   }
 
@@ -125,7 +150,7 @@ public class SpatialQueryExecuter
     for (Iterator i = sourceFC.iterator(); i.hasNext(); ) {
       Feature f = (Feature) i.next();
       if (! resultSet.contains(f)) {
-        resultFC.add(f);
+        addToResult(f, resultFC);
       }
     }
   }
@@ -134,8 +159,14 @@ public class SpatialQueryExecuter
   {
     for (Iterator i = resultSet.iterator(); i.hasNext(); ) {
       Feature f = (Feature) i.next();
-      resultFC.add(f);
+      addToResult(f, resultFC);
     }
+  }
+
+  private void addToResult(Feature f, FeatureCollection resultFC)
+  {
+    Feature fResult = f.clone(true);
+    resultFC.add(fResult);
   }
 
   private boolean isTrue(GeometryPredicate func, Geometry geom0, Geometry geom1, double[] params)

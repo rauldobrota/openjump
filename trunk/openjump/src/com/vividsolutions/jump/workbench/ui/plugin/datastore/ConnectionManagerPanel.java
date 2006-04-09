@@ -21,21 +21,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.DefaultListModel;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListModel;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.*;
+import javax.swing.event.*;
 
 import com.vividsolutions.jump.datastore.DataStoreConnection;
 import com.vividsolutions.jump.datastore.DataStoreDriver;
@@ -51,28 +38,25 @@ import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.OKCancelDialog;
 
 public class ConnectionManagerPanel extends JPanel {
+  private Icon CONNECTED_ICON = new ImageIcon(ConnectionManagerPanel.class.getResource("green_circle.png"));
+  private Icon DISCONNECTED_ICON = new ImageIcon(ConnectionManagerPanel.class.getResource("small_red_x.png"));
+  private Icon DBS_ICON = new ImageIcon(ConnectionManagerPanel.class.getResource("databases.gif"));
+  private Icon NEW_DB_ICON = new ImageIcon(ConnectionManagerPanel.class.getResource("newDatabase.gif"));
+  private Icon DELETE_DB_ICON = new ImageIcon(ConnectionManagerPanel.class.getResource("deleteDatabase.gif"));
+
     // Partially generated using Eclipse Visual Editor [Jon Aquino 2005-03-08]
 
     private JScrollPane scrollPane = null;
-
     private JList connectionJList = null;
-
     private JPanel buttonPanel = null;
-
     private JButton addButton = null;
-
+    private JButton copyButton = null;
     private JButton deleteButton = null;
-
     private JButton connectButton = null;
-
     private JPanel fillerPanel = null;
-
     private JButton disconnectButton = null;
-
     private ConnectionManager connectionManager;
-
     private ErrorHandler errorHandler;
-
     private Registry registry;
     private WorkbenchContext context;
 
@@ -99,6 +83,10 @@ public class ConnectionManagerPanel extends JPanel {
     }
 
     private void updateButtons() {
+      boolean hasDrivers = ! registry.getEntries(DataStoreDriver.REGISTRY_CLASSIFICATION).isEmpty();
+      boolean hasSelected = ! getSelectedConnectionDescriptors().isEmpty();
+      addButton.setEnabled(hasDrivers);
+      copyButton.setEnabled(hasDrivers && hasSelected);
         deleteButton.setEnabled(!getSelectedConnectionDescriptors().isEmpty());
         connectButton.setEnabled(findSelectedConnection(new Block() {
             public Object yield(Object connection) {
@@ -169,7 +157,7 @@ public class ConnectionManagerPanel extends JPanel {
         // connection list is pre-populated with items, the preferred
         // size will be based on the preferred sizes of the items,
         // and will probably be too narrow. [Jon Aquino 2005-03-11]
-        this.setPreferredSize(new Dimension(300, 200));
+        this.setPreferredSize(new Dimension(400, 300));
         gridBagConstraints2.gridx = 0;
         gridBagConstraints2.gridy = 0;
         gridBagConstraints2.weightx = 1.0;
@@ -199,13 +187,6 @@ public class ConnectionManagerPanel extends JPanel {
         if (connectionJList == null) {
             connectionJList = new JList();
             connectionJList.setCellRenderer(new DefaultListCellRenderer() {
-                private Icon CONNECTED_ICON = new ImageIcon(
-                        ConnectionManagerPanel.class
-                                .getResource("green_circle.png"));
-
-                private Icon DISCONNECTED_ICON = new ImageIcon(
-                        ConnectionManagerPanel.class
-                                .getResource("small_red_x.png"));
 
                 public Component getListCellRendererComponent(JList list,
                         Object value, int index, boolean isSelected,
@@ -229,25 +210,29 @@ public class ConnectionManagerPanel extends JPanel {
     }
 
     private JPanel getButtonPanel() {
-        if (buttonPanel == null) {
-            GridLayout gridLayout3 = new GridLayout();
-            buttonPanel = new JPanel();
-            buttonPanel.setLayout(gridLayout3);
-            gridLayout3.setRows(4);
-            gridLayout3.setVgap(5);
-            gridLayout3.setColumns(1);
-            gridLayout3.setHgap(0);
-            buttonPanel.add(getAddButton(), null);
-            buttonPanel.add(getDeleteButton(), null);
-            buttonPanel.add(getConnectButton(), null);
-            buttonPanel.add(getDisconnectButton(), null);
-        }
-        return buttonPanel;
+      if (buttonPanel == null) {
+        GridLayout gridLayout3 = new GridLayout();
+        gridLayout3.setRows(6);
+        gridLayout3.setVgap(5);
+        gridLayout3.setColumns(1);
+        gridLayout3.setHgap(0);
+
+        buttonPanel = new JPanel();
+        buttonPanel.setLayout(gridLayout3);
+        buttonPanel.add(getAddButton(), null);
+        buttonPanel.add(getCopyButton(), null);
+        buttonPanel.add(getDeleteButton(), null);
+        buttonPanel.add(new JLabel());
+        buttonPanel.add(getConnectButton(), null);
+        buttonPanel.add(getDisconnectButton(), null);
+      }
+      return buttonPanel;
     }
 
     private JButton getAddButton() {
         if (addButton == null) {
             addButton = new JButton();
+            addButton.setIcon(NEW_DB_ICON);
             addButton.setText("Add...");
             addButton.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -264,7 +249,32 @@ public class ConnectionManagerPanel extends JPanel {
         return addButton;
     }
 
+    private JButton getCopyButton() {
+        if (copyButton == null) {
+            copyButton = new JButton();
+            copyButton.setIcon(DBS_ICON);
+            copyButton.setText("Copy...");
+            copyButton.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    ConnectionDescriptor connectionDescriptor = copyConnection();
+                    initializeConnectionJList();
+                    if (connectionDescriptor != null) {
+                        getConnectionJList().setSelectedValue(
+                                connectionDescriptor, true);
+                    }
+                    updateButtons();
+                }
+            });
+        }
+        return copyButton;
+    }
+
+    private ConnectionDescriptor copyConnection() {
+      return addOrCopyConnection("Copy Connection", getSelectedConnection());
+    }
+
     private ConnectionDescriptor addConnection() {
+      // MD - this behavior no longer needed?
         if (registry.getEntries(DataStoreDriver.REGISTRY_CLASSIFICATION)
                 .isEmpty()) {
             JOptionPane.showMessageDialog(SwingUtilities
@@ -272,10 +282,10 @@ public class ConnectionManagerPanel extends JPanel {
                     "No datastore drivers are loaded.");
             return null;
         }
-        return addConnectionProper();
+        return addOrCopyConnection("Add Connection", null);
     }
 
-    private ConnectionDescriptor addConnectionProper() {
+    private ConnectionDescriptor addOrCopyConnection(String title, ConnectionDescriptor connDesc) {
         Window window = SwingUtilities
                 .windowForComponent(ConnectionManagerPanel.this);
         OKCancelDialog.Validator validator = new OKCancelDialog.Validator() {
@@ -284,10 +294,12 @@ public class ConnectionManagerPanel extends JPanel {
             }
         };
         final ConnectionDescriptorPanel connectionDescriptorPanel = new ConnectionDescriptorPanel(registry, context);
+        if (connDesc != null)
+          connectionDescriptorPanel.setParameters(connDesc);
         final OKCancelDialog dialog = window instanceof Dialog ? new OKCancelDialog(
-                (Dialog) window, "Add Connection", true,
+                (Dialog) window, title, true,
                 connectionDescriptorPanel, validator)
-                : new OKCancelDialog((Frame) window, "Add Connection", true,
+                : new OKCancelDialog((Frame) window, title, true,
                         connectionDescriptorPanel, validator);
         dialog.setVisible(true);
         if (!dialog.wasOKPressed()) {
@@ -312,6 +324,7 @@ public class ConnectionManagerPanel extends JPanel {
     private JButton getDeleteButton() {
         if (deleteButton == null) {
             deleteButton = new JButton();
+            deleteButton.setIcon(DELETE_DB_ICON);
             deleteButton.setText("Delete");
             deleteButton.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -331,6 +344,7 @@ public class ConnectionManagerPanel extends JPanel {
     private JButton getConnectButton() {
         if (connectButton == null) {
             connectButton = new JButton();
+            connectButton.setIcon(CONNECTED_ICON);
             connectButton.setText("Connect");
             connectButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -358,6 +372,7 @@ public class ConnectionManagerPanel extends JPanel {
     private JButton getDisconnectButton() {
         if (disconnectButton == null) {
             disconnectButton = new JButton();
+            disconnectButton.setIcon(DISCONNECTED_ICON);
             disconnectButton.setText("Disconnect");
             disconnectButton
                     .addActionListener(new java.awt.event.ActionListener() {
@@ -377,6 +392,23 @@ public class ConnectionManagerPanel extends JPanel {
 
     private void repaintConnectionJList() {
         connectionJList.repaint();
+    }
+
+    /**
+     * Gets the first selected connection, or null if none.
+     *
+     * @return the first selected connection
+     * @return null if none selected
+     */
+    private ConnectionDescriptor getSelectedConnection()
+    {
+      for (Iterator i = getSelectedConnectionDescriptors().iterator(); i
+              .hasNext();) {
+          ConnectionDescriptor connectionDescriptor = (ConnectionDescriptor) i
+                  .next();
+          return connectionDescriptor;
+      }
+      return null;
     }
 
     private void deleteSelectedConnections() throws DataStoreException {

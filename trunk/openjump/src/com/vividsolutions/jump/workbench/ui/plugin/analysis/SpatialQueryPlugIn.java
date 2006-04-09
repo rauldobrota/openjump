@@ -55,11 +55,6 @@ public class SpatialQueryPlugIn
     extends AbstractPlugIn
     implements ThreadedPlugIn
 {
-  private final static String MASK_LAYER = "Mask Layer";
-  private final static String SRC_LAYER = "Source Layer";
-  private final static String PREDICATE = "Relation";
-  private final static String PARAM = "Parameter";
-  private final static String DIALOG_COMPLEMENT = "Complement Result";
 
   private Collection functionNames;
   private MultiInputDialog dialog;
@@ -67,6 +62,7 @@ public class SpatialQueryPlugIn
   private String funcNameToRun;
   private GeometryPredicate functionToRun = null;
   private boolean complementResult = false;
+  private boolean allowDups = false;
   private boolean exceptionThrown = false;
 
   private Geometry geoms[] = new Geometry[2];
@@ -116,6 +112,7 @@ public class SpatialQueryPlugIn
     int nArgs = functionToRun.getGeometryArgumentCount();
 
     SpatialQueryExecuter executer = new SpatialQueryExecuter(maskFC, sourceFC);
+    executer.setAllowDuplicates(allowDups);
     executer.setComplementResult(complementResult);
     FeatureCollection resultFC = executer.getResultFC();
     executer.execute(monitor, functionToRun, params, resultFC);
@@ -130,6 +127,13 @@ public class SpatialQueryPlugIn
       context.getWorkbenchFrame().warnUser("Errors found while executing query");
   }
 
+  private final static String MASK_LAYER = "Mask Layer";
+  private final static String SRC_LAYER = "Source Layer";
+  private final static String PREDICATE = "Relation";
+  private final static String PARAM = "Parameter";
+  private final static String DIALOG_COMPLEMENT = "Complement Result";
+  private final static String ALLOW_DUPS = "Allow Duplicates in Result";
+
   private JTextField paramField;
 
   private void setDialogValues(MultiInputDialog dialog, PlugInContext context)
@@ -140,12 +144,13 @@ public class SpatialQueryPlugIn
         + " (i.e. where Source.Relationship(Mask) = true)");
     //Set initial layer values to the first and second layers in the layer list.
     //In #initialize we've already checked that the number of layers >= 1. [Jon Aquino]
-    dialog.addLayerComboBox(SRC_LAYER, srcLayer, context.getLayerManager());
+    dialog.addLayerComboBox(SRC_LAYER, context.getCandidateLayer(0), context.getLayerManager());
     JComboBox functionComboBox = dialog.addComboBox(PREDICATE, funcNameToRun, functionNames, null);
     functionComboBox.addItemListener(new MethodItemListener());
     dialog.addLayerComboBox(MASK_LAYER, maskLyr, context.getLayerManager());
 
     paramField = dialog.addDoubleField(PARAM, params[0], 10);
+    dialog.addCheckBox(ALLOW_DUPS, false);
     dialog.addCheckBox(DIALOG_COMPLEMENT, false);
 
     updateUIForFunction(funcNameToRun);
@@ -157,6 +162,7 @@ public class SpatialQueryPlugIn
     funcNameToRun = dialog.getText(PREDICATE);
     functionToRun = GeometryPredicate.getPredicate(funcNameToRun);
     params[0] = dialog.getDouble(PARAM);
+    allowDups = dialog.getBoolean(ALLOW_DUPS);
     complementResult = dialog.getBoolean(DIALOG_COMPLEMENT);
   }
 

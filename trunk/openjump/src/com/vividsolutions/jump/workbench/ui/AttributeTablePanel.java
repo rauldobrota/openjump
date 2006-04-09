@@ -59,6 +59,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import com.vividsolutions.jump.I18N;
+import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.util.FlexibleDateParser;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
@@ -127,8 +128,8 @@ public class AttributeTablePanel extends JPanel {
         //Java Look and Feel Design Guidelines: Advanced Topics [Jon Aquino]
         private final Color LIGHT_GRAY = new Color(230, 230, 230);
 
-        private DefaultTableCellRenderer defaultTableCellRenderer = new DefaultTableCellRenderer();
-
+        private GeometryCellRenderer geomCellRenderer = new GeometryCellRenderer();
+        
         public TableCellRenderer getCellRenderer(int row, int column) {
             if (!isEditButtonColumn(column)) {
                 JComponent renderer = (JComponent) super.getCellRenderer(row,
@@ -142,21 +143,58 @@ public class AttributeTablePanel extends JPanel {
                                 : LIGHT_GRAY);
                 return (TableCellRenderer) renderer;
             }
-            return new TableCellRenderer() {
-
-                private JButton button = new JButton(IconLoader
-                        .icon("Pencil.gif"));
-
-                public Component getTableCellRendererComponent(JTable table,
-                        Object value, boolean isSelected, boolean hasFocus,
-                        int row, int column) {
-                    button.setToolTipText(I18N.get("ui.AttributeTablePanel.edit-geometry"));
-                    return button;
-                }
-            };
+            return geomCellRenderer;
         }
     };
 
+   private class GeometryCellRenderer implements TableCellRenderer 
+   {
+     private JButton button = new JButton(IconLoader.icon("Pencil.gif"));
+     private JButton buttonPoint = new JButton(IconLoader.icon("EditPoint.gif"));
+     private JButton buttonMultiPoint = new JButton(IconLoader.icon("EditMultiPoint.gif"));
+     private JButton buttonLineString = new JButton(IconLoader.icon("EditLineString.gif"));
+     private JButton buttonMultiLineString = new JButton(IconLoader.icon("EditMultiLineString.gif"));
+     private JButton buttonPolygon = new JButton(IconLoader.icon("EditPolygon.gif"));
+     private JButton buttonMultiPolygon = new JButton(IconLoader.icon("EditMultiPolygon.gif"));
+     private JButton buttonGC = new JButton(IconLoader.icon("EditGeometryCollection.gif"));
+     private JButton buttonEmptyGC = new JButton(IconLoader.icon("EditEmptyGC.gif"));
+
+    GeometryCellRenderer()
+    {
+      buttonPoint.setToolTipText("View/Edit Point");
+      buttonMultiPoint.setToolTipText("View/Edit MultiPoint");
+      buttonLineString.setToolTipText("View/Edit LineString");
+      buttonMultiLineString.setToolTipText("View/Edit MultiLineString");
+      buttonPolygon.setToolTipText("View/Edit Polygon");
+      buttonMultiPolygon.setToolTipText("View/Edit MultiPolygon");
+      buttonGC.setToolTipText("View/Edit GeometryCollection");
+      buttonEmptyGC.setToolTipText("View/Edit empty GeometryCollection");
+      button.setToolTipText("View/Edit Geometry");
+    }
+    
+    public Component getTableCellRendererComponent(JTable table, Object value,
+        boolean isSelected, boolean hasFocus, int row, int column) 
+    {
+      Feature f = (Feature) value;
+      Geometry g = f.getGeometry();
+      if (g instanceof com.vividsolutions.jts.geom.Point)
+        return buttonPoint;
+      if (g instanceof com.vividsolutions.jts.geom.MultiPoint)
+        return buttonMultiPoint;
+      if (g instanceof com.vividsolutions.jts.geom.LineString)
+        return buttonLineString;
+      if (g instanceof com.vividsolutions.jts.geom.MultiLineString)
+        return buttonMultiLineString;
+      if (g instanceof com.vividsolutions.jts.geom.Polygon)
+        return buttonPolygon;
+      if (g instanceof com.vividsolutions.jts.geom.MultiPolygon)
+        return buttonMultiPolygon;
+      if (g.isEmpty())
+        return buttonEmptyGC; 
+      return buttonGC;
+    }
+  }
+   
     private boolean columnWidthsInitialized = false;
 
     private MyTable table = new MyTable();
@@ -363,7 +401,6 @@ public class AttributeTablePanel extends JPanel {
         this.add(layerNameRenderer, new GridBagConstraints(0, 0, 2, 1, 1.0,
                 0.0, GridBagConstraints.NORTHWEST,
                 GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
-
         this.add(table.getTableHeader(), new GridBagConstraints(0, 1, 1, 1, 0,
                 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
                 new Insets(0, 0, 0, 0), 0, 0));
@@ -371,12 +408,12 @@ public class AttributeTablePanel extends JPanel {
         //in which to resize last column. [Jon Aquino]
         this.add(table, new GridBagConstraints(0, 2, 1, 1, 0, 0,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-                        0, 0, 0, 200), 0, 0));
+                        0, 0, 0, 200), 0, 0));                  
     }
 
     private void initColumnWidths() {
         GUIUtil.chooseGoodColumnWidths(table);
-        int editButtonWidth = 15;
+        int editButtonWidth = 16;
         table.getColumnModel().getColumn(0).setMinWidth(editButtonWidth);
         table.getColumnModel().getColumn(0).setMaxWidth(editButtonWidth);
         table.getColumnModel().getColumn(0).setPreferredWidth(editButtonWidth);

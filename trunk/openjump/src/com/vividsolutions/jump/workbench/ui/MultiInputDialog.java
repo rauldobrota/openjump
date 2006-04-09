@@ -44,9 +44,9 @@ import com.vividsolutions.jump.workbench.model.Layer;
 import com.vividsolutions.jump.workbench.model.LayerManager;
 import com.vividsolutions.jump.workbench.plugin.EnableCheck;
 import java.awt.*;
+
 /**
- *  Flexible generic dialog for prompting the user 
- *  to type in several values.
+ *  Flexible generic dialog for prompting the user to type in several values.
  */
 public class MultiInputDialog extends JDialog {
     public EnableCheck createDoubleCheck(final String fieldName) {
@@ -238,12 +238,19 @@ public class MultiInputDialog extends JDialog {
         return comboBox;
     }
     public JLabel addLabel(String text) {
-        //Take advantage of #addRow's special rule for JLabels: they span all
-        //the columns of the GridBagLayout. [Jon Aquino]
-        JLabel lbl = new JLabel(text);
-        addRow(lbl);
-        return lbl;
-    }
+      //Take advantage of #addRow's special rule for JLabels: they span all
+      //the columns of the GridBagLayout. [Jon Aquino]
+      JLabel lbl = new JLabel(text);
+      addRow(lbl);
+      return lbl;
+  }
+    public JButton addButton(String text) {
+      //Take advantage of #addRow's special rule for JLabels: they span all
+      //the columns of the GridBagLayout. [Jon Aquino]
+      JButton button = new JButton(text);
+      addRow(button);
+      return button;
+  }
     public void addRow(JComponent c) {
         addRow("DUMMY", new JLabel(""), c, null, null);
     }

@@ -133,7 +133,7 @@ public class BufferPlugIn
     //dialog.setSideBarImage(new ImageIcon(getClass().getResource("DiffSegments.png")));
     dialog.setSideBarDescription(I18N.get("ui.plugin.analysis.BufferPlugIn.buffers-all-geometries-in-the-input-layer"));
     //Initial layer value is null
-    dialog.addLayerComboBox(LAYER, layer, context.getLayerManager());
+    dialog.addLayerComboBox(LAYER, context.getCandidateLayer(0), context.getLayerManager());
     dialog.addDoubleField(DISTANCE, bufferDistance, 10, null);
     dialog.addComboBox(END_CAP_STYLE, endCapStyle, endCapStyles, null);
   }

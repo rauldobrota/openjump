@@ -118,6 +118,9 @@ public abstract class AttributePredicate
   public static Object coerce(String constantValue, Object attrVal)
   {
     try {
+      if (attrVal instanceof Boolean) {
+        return new Boolean(getBooleanLoose(constantValue));
+      }
       if (attrVal instanceof Double) {
         return new Double(constantValue);
       }
@@ -144,9 +147,20 @@ public abstract class AttributePredicate
   protected static final int NOT_COMPARABLE = Integer.MIN_VALUE;
 
   protected static int compareTo(Object o1, Object o2) {
+    if (o1 instanceof Boolean && o2 instanceof Boolean)
+      return ((Boolean) o1).equals(o2) ? 0 : 1;
+
     if (! (o1 instanceof Comparable)) return NOT_COMPARABLE;
     if (! (o2 instanceof Comparable)) return NOT_COMPARABLE;
     return ((Comparable) o1).compareTo((Comparable) o2);
+  }
+
+  private static boolean getBooleanLoose(String boolStr)
+  {
+    return boolStr.equalsIgnoreCase("true")
+        || boolStr.equalsIgnoreCase("yes")
+        || boolStr.equalsIgnoreCase("1")
+    || boolStr.equalsIgnoreCase("y");
   }
 
   private static class EqualPredicate extends AttributePredicate {

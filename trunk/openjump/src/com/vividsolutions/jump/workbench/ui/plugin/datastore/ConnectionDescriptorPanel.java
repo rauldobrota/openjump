@@ -25,37 +25,44 @@ import com.vividsolutions.jump.workbench.datastore.ConnectionDescriptor;
 import com.vividsolutions.jump.workbench.registry.Registry;
 import com.vividsolutions.jump.workbench.ui.ValidatingTextField;
 import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
+import com.vividsolutions.jump.datastore.postgis.PostgisDataStoreDriver;
 
-public class ConnectionDescriptorPanel extends JPanel {
-    private ParameterListSchema schema = new ParameterListSchema(
-            new String[] {}, new Class[] {});
+public class ConnectionDescriptorPanel extends JPanel
+{
+  private WorkbenchContext context;
+  private ParameterListSchema schema = new ParameterListSchema(
+      new String[] {}, new Class[] {});
 
-    private JComboBox driverComboBox = null;
+  private static int createdConnectionCount = 0;
 
-    private List editComponentList = new ArrayList();
+  private JTextField nameText = new JTextField();
+  private JComboBox driverComboBox = null;
 
-    private void updateMainPanel(ParameterList parameterList,Blackboard bb) {
-        mainPanel.removeAll();
-        editComponentList.clear();
-        addEditComponent(0, "Driver", driverComboBox);
-        for (int i = 0; i < schema.getNames().length; i++) {
-            String name = schema.getNames()[i];
-            editComponentList.add(createEditComponent(name,
-                    schema.getClasses()[i], parameterList.getParameter(name),bb));
-            addEditComponent(i + 1, name, (Component) editComponentList
-                    .get(editComponentList.size() - 1));
-        }
-        revalidate();
-        repaint();
+  private List editComponentList = new ArrayList();
+
+  private void updateMainPanel(ParameterList parameterList,Blackboard bb) {
+    mainPanel.removeAll();
+    editComponentList.clear();
+    addEditComponent(0, "Name", nameText);
+    addEditComponent(1, "Driver", driverComboBox);
+    for (int i = 0; i < schema.getNames().length; i++) {
+      String name = schema.getNames()[i];
+      editComponentList.add(createEditComponent(name,
+          schema.getClasses()[i], parameterList.getParameter(name),bb));
+      addEditComponent(i + 2, name, (Component) editComponentList
+                       .get(editComponentList.size() - 1));
     }
+    revalidate();
+    repaint();
+  }
 
-    private void addEditComponent(int i, String name, Component editComponent) {
-        mainPanel.add(new JLabel(name), new GridBagConstraints(0, i, 1, 1, 0,
-                0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-                new Insets(2, 2, 2, 2), 0, 0));
-        mainPanel.add(editComponent, new GridBagConstraints(1, i, 1, 1, 0, 0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2,
-                        2, 2, 2), 0, 0));
+  private void addEditComponent(int i, String name, Component editComponent) {
+    mainPanel.add(new JLabel(name), new GridBagConstraints(0, i, 1, 1, 0,
+        0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+        new Insets(2, 2, 2, 2), 0, 0));
+    mainPanel.add(editComponent, new GridBagConstraints(1, i, 1, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2,
+        2, 2, 2), 0, 0));
     }
 
     private Component createEditComponent(String name, Class parameterClass,
@@ -270,7 +277,10 @@ public class ConnectionDescriptorPanel extends JPanel {
 
     public ConnectionDescriptorPanel(Registry registry, final WorkbenchContext context) {
         super(new GridBagLayout());
+        this.context = context;
 
+        nameText = new JTextField("", 20);
+        //nameText.setPreferredSize(new Dimension());
 
         driverComboBox = new JComboBox() {
             {
@@ -332,9 +342,20 @@ public class ConnectionDescriptorPanel extends JPanel {
         return collection;
     }
 
+    private String getValidConnectionName()
+    {
+      String fieldName = nameText.getText();
+      if (fieldName == null || fieldName.trim().length() == 0) {
+        return ((DataStoreDriver) driverComboBox.getSelectedItem()).getName() + " " + ++createdConnectionCount;
+      }
+      return fieldName.trim();
+    }
+
     public ConnectionDescriptor getConnectionDescriptor() {
-        return new ConnectionDescriptor(driverComboBox.getSelectedItem()
-                .getClass(), createParameterList());
+        return new ConnectionDescriptor(
+            getValidConnectionName(),
+            driverComboBox.getSelectedItem().getClass(),
+            createParameterList());
     }
 
     private ParameterList createParameterList() {
@@ -348,6 +369,27 @@ public class ConnectionDescriptorPanel extends JPanel {
         return parameterList;
     }
 
+    public void setParameters(ConnectionDescriptor connDesc)
+    {
+      nameText.setText(connDesc.getName());
+      int driverComboIndex = getDriverComboBoxIndex(connDesc.getDataStoreDriverClassName());
+      if (driverComboIndex >= 0) {
+        driverComboBox.setSelectedIndex(driverComboIndex);
+        schema = ((DataStoreDriver) driverComboBox.getSelectedItem()).getParameterListSchema();
+      }
+      updateMainPanel(connDesc.getParameterList(), PersistentBlackboardPlugIn.get(context));
+    }
+
+    private int getDriverComboBoxIndex(String driverClassName)
+    {
+      for (int i = 0; i < driverComboBox.getItemCount(); i++) {
+        DataStoreDriver driver = (DataStoreDriver) driverComboBox.getItemAt(i);
+        if (driver.getClass().getName().equals(driverClassName)) {
+          return i;
+        }
+      }
+      return -1;
+    }
 /*
     public static void main(String[] args) throws Exception {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -355,11 +397,11 @@ public class ConnectionDescriptorPanel extends JPanel {
         frame.getContentPane().add(
                 new ConnectionDescriptorPanel(new Registry().createEntry(
                         DataStoreDriver.REGISTRY_CLASSIFICATION,
-                        new OracleDataStoreDriver()),null));
+                        new PostgisDataStoreDriver()),null));
         frame.pack();
         frame.setVisible(true);
     }
-*/
+//*/
 
     public String validateInput() {
         for (int i = 0; i < editComponentList.size(); i++) {

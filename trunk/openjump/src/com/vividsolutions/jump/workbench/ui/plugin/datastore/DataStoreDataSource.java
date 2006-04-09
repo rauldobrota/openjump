@@ -103,7 +103,7 @@ public class DataStoreDataSource extends DataSource implements
         return new CachingFeatureCollection(new DynamicFeatureCollection(
                 (ConnectionDescriptor) getProperties().get(
                         CONNECTION_DESCRIPTOR_KEY), ConnectionManager
-                        .instance(context.getBlackboard()), query))
+                        .instance(context), query))
                 .setCachingByEnvelope(((Boolean) LangUtil.ifNull(
                         getProperties().get(CACHING_KEY), Boolean.TRUE))
                         .booleanValue());
@@ -116,7 +116,7 @@ public class DataStoreDataSource extends DataSource implements
             // GUI thread, so now is a good time to prompt for
             // a password if necessary. [Jon Aquino 2005-03-16]
             new PasswordPrompter().getOpenConnection(ConnectionManager
-                    .instance(context.getBlackboard()),
+                    .instance(context),
                     (ConnectionDescriptor) getProperties().get(
                             CONNECTION_DESCRIPTOR_KEY), context.getWorkbench()
                             .getFrame());

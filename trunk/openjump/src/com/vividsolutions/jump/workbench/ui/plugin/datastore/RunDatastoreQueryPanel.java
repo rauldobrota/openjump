@@ -125,16 +125,16 @@ public class RunDatastoreQueryPanel extends ConnectionPanel
     }
 
     protected Collection connectionDescriptors() {
+
         return CollectionUtil.select(super.connectionDescriptors(),
                 new Block() {
                     public Object yield(Object connectionDescriptor) {
                         try {
                             return Boolean
-                                    .valueOf(((DataStoreDriver) Class
-                                            .forName(
+                                    .valueOf(connectionManager()
+                                                .getDriver(
                                                     ((ConnectionDescriptor) connectionDescriptor)
                                                             .getDataStoreDriverClassName())
-                                            .newInstance())
                                             .isAdHocQuerySupported());
                         } catch (Exception e) {
                             throw new RuntimeException(e);

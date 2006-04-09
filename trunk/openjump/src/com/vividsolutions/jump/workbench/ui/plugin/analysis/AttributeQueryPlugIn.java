@@ -59,6 +59,9 @@ public class AttributeQueryPlugIn
   private final static String ATTR_GEOMETRY_LENGTH = "Geometry.Length";
   private final static String ATTR_GEOMETRY_NUMPOINTS = "Geometry.NumPoints";
   private final static String ATTR_GEOMETRY_NUMCOMPONENTS = "Geometry.NumComponents";
+  private final static String ATTR_GEOMETRY_ISCLOSED = "Geometry.IsClosed";
+  private final static String ATTR_GEOMETRY_ISSIMPLE = "Geometry.IsSimple";
+  private final static String ATTR_GEOMETRY_ISVALID = "Geometry.IsValid";
   private final static String ATTR_GEOMETRY_TYPE = "Geometry.Type";
 
   private final static String LAYER = "Source Layer";
@@ -73,7 +76,7 @@ public class AttributeQueryPlugIn
   private Layer srcLayer;
   private String attrName;
   private String funcNameToRun;
-  private String value;
+  private String value = "";
   private boolean complementResult = false;
   private boolean exceptionThrown = false;
 
@@ -129,7 +132,7 @@ public class AttributeQueryPlugIn
     FeatureCollection resultFC = executeQuery(sourceFC, attrName, value);
     // this will happen if plugin was cancelled
     context.getLayerManager().addCategory(StandardCategoryNames.RESULT, 0);
-    context.addLayer(StandardCategoryNames.RESULT, "Query-" + funcNameToRun, resultFC);
+    context.addLayer(StandardCategoryNames.RESULT, "Query-" + attrName, resultFC);
     if (exceptionThrown)
       context.getWorkbenchFrame().warnUser("Errors found while executing query");
   }
@@ -169,10 +172,28 @@ public class AttributeQueryPlugIn
       return new Double(len);
     }
     if (attrName == ATTR_GEOMETRY_NUMCOMPONENTS) {
-        Geometry g = f.getGeometry();
-        double len = (g == null) ? 0.0 : g.getNumGeometries();
-        return new Double(len);
-      }
+      Geometry g = f.getGeometry();
+      double len = (g == null) ? 0.0 : g.getNumGeometries();
+      return new Double(len);
+    }
+    if (attrName == ATTR_GEOMETRY_ISCLOSED) {
+      Geometry g = f.getGeometry();
+      if (g instanceof LineString)
+        return new Boolean( ((LineString) g).isClosed());
+      if (g instanceof MultiLineString)
+        return new Boolean( ((MultiLineString) g).isClosed());
+      return new Boolean(false);
+    }
+    if (attrName == ATTR_GEOMETRY_ISSIMPLE) {
+      Geometry g = f.getGeometry();
+      boolean bool = g.isSimple();
+      return new Boolean(bool);
+    }
+    if (attrName == ATTR_GEOMETRY_ISVALID) {
+      Geometry g = f.getGeometry();
+      boolean bool = g.isValid();
+      return new Boolean(bool);
+    }
     if (attrName == ATTR_GEOMETRY_TYPE) {
         Geometry g = f.getGeometry();
         return StringUtil.classNameWithoutQualifiers(g.getClass().getName());
@@ -195,7 +216,7 @@ public class AttributeQueryPlugIn
     attrComboBox = dialog.addComboBox(ATTRIBUTE, attrName, functionNames, null);
     dialog.addComboBox(PREDICATE, funcNameToRun, functionNames, null);
 
-    dialog.addTextField(VALUE, value, 10, null, null);
+    dialog.addTextField(VALUE, value, 20, null, null);
     //dialog.addCheckBox(DIALOG_COMPLEMENT, false);
 
     updateUI(srcLayer);
@@ -235,6 +256,9 @@ public class AttributeQueryPlugIn
     names.add(ATTR_GEOMETRY_LENGTH);
     names.add(ATTR_GEOMETRY_NUMPOINTS);
     names.add(ATTR_GEOMETRY_NUMCOMPONENTS);
+    names.add(ATTR_GEOMETRY_ISCLOSED);
+    names.add(ATTR_GEOMETRY_ISSIMPLE);
+    names.add(ATTR_GEOMETRY_ISVALID);
     names.add(ATTR_GEOMETRY_TYPE);
 
     return names;

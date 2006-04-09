@@ -61,6 +61,7 @@ import com.vividsolutions.jump.workbench.ui.task.*;
 import com.vividsolutions.jump.workbench.ui.warp.*;
 import com.vividsolutions.jump.workbench.ui.zoom.*;
 import com.vividsolutions.jump.plugin.qa.*;
+import com.vividsolutions.jump.plugin.edit.*;
 import java.awt.event.*;
 import java.lang.reflect.*;
 import javax.swing.*;
@@ -210,6 +211,10 @@ public class JUMPConfiguration implements Setup {
 
     private CutSelectedLayersPlugIn cutSelectedLayersPlugIn = new CutSelectedLayersPlugIn();
 
+    private CopyStylesPlugIn copyStylesPlugIn = new CopyStylesPlugIn();
+
+    private PasteStylesPlugIn pasteStylesPlugIn = new PasteStylesPlugIn();
+    
     private CombineSelectedFeaturesPlugIn combineSelectedFeaturesPlugIn = new CombineSelectedFeaturesPlugIn();
 
     private ExplodeSelectedFeaturesPlugIn explodeSelectedFeaturesPlugIn = new ExplodeSelectedFeaturesPlugIn();
@@ -346,6 +351,7 @@ public class JUMPConfiguration implements Setup {
         featureInstaller.addPopupMenuItem(layerNamePopupMenu, editablePlugIn,
                 editablePlugIn.getName(), true, null, editablePlugIn
                         .createEnableCheck(workbenchContext));
+
         layerNamePopupMenu.addSeparator(); // ===================
         featureInstaller.addPopupMenuItem(layerNamePopupMenu,
                 zoomToLayerPlugIn, zoomToLayerPlugIn.getName(), false, null,
@@ -354,6 +360,13 @@ public class JUMPConfiguration implements Setup {
                 changeStylesPlugIn, changeStylesPlugIn.getName() + "...",
                 false, GUIUtil.toSmallIcon(changeStylesPlugIn.getIcon()),
                 changeStylesPlugIn.createEnableCheck(workbenchContext));
+        featureInstaller.addPopupMenuItem(layerNamePopupMenu, copyStylesPlugIn,
+                copyStylesPlugIn.getName(), false, null,
+                CopyStylesPlugIn.createEnableCheck(workbenchContext));
+        featureInstaller.addPopupMenuItem(layerNamePopupMenu, pasteStylesPlugIn,
+                pasteStylesPlugIn.getName(), false, null,
+                PasteStylesPlugIn.createEnableCheck(workbenchContext)); 
+        
         featureInstaller.addPopupMenuItem(layerNamePopupMenu,
                 viewAttributesPlugIn, viewAttributesPlugIn.getName(), false,
                 GUIUtil.toSmallIcon(viewAttributesPlugIn.getIcon()),
@@ -361,11 +374,13 @@ public class JUMPConfiguration implements Setup {
         featureInstaller.addPopupMenuItem(layerNamePopupMenu, viewSchemaPlugIn,
                 viewSchemaPlugIn.getName(), false, ViewSchemaPlugIn.ICON,
                 ViewSchemaPlugIn.createEnableCheck(workbenchContext));
+
         layerNamePopupMenu.addSeparator(); // ===================
         featureInstaller.addPopupMenuItem(layerNamePopupMenu,
                 saveDatasetAsFilePlugIn, saveDatasetAsFilePlugIn.getName() + "...",
                 false, null, AbstractSaveDatasetAsPlugIn
                         .createEnableCheck(workbenchContext));
+
         layerNamePopupMenu.addSeparator(); // ===================
         featureInstaller.addPopupMenuItem(layerNamePopupMenu, moveUpPlugIn,
                 moveUpPlugIn.getName(), false, null, moveUpPlugIn
@@ -373,6 +388,7 @@ public class JUMPConfiguration implements Setup {
         featureInstaller.addPopupMenuItem(layerNamePopupMenu, moveDownPlugIn,
                 moveDownPlugIn.getName(), false, null, moveDownPlugIn
                         .createEnableCheck(workbenchContext));
+
         layerNamePopupMenu.addSeparator(); // ===================
         featureInstaller.addPopupMenuItem(layerNamePopupMenu,
                 cutSelectedLayersPlugIn, cutSelectedLayersPlugIn
@@ -386,6 +402,7 @@ public class JUMPConfiguration implements Setup {
                 removeSelectedLayersPlugIn, removeSelectedLayersPlugIn
                         .getName(), false, null, removeSelectedLayersPlugIn
                         .createEnableCheck(workbenchContext));
+
         layerNamePopupMenu.addSeparator(); // ===================
         featureInstaller.addPopupMenuItem(layerNamePopupMenu,
                 addNewFeaturesPlugIn, addNewFeaturesPlugIn.getName() + "...",
@@ -868,6 +885,7 @@ public static String[] MENU_TOOLS_EDIT
 	= new String[] { MENU_TOOLS, MENU_EDIT};
 
 private PrecisionReducerPlugIn precisionReducerPlugIn = new PrecisionReducerPlugIn();
+    private AffineTransformationPlugIn affineTransPlugIn = new AffineTransformationPlugIn();
 
 private void configToolsEdit(final WorkbenchContext workbenchContext,
             final EnableCheckFactory checkFactory,
@@ -877,6 +895,12 @@ private void configToolsEdit(final WorkbenchContext workbenchContext,
     		MENU_TOOLS_EDIT,
             precisionReducerPlugIn.getName() + "...", false, null,
             precisionReducerPlugIn.createEnableCheck(workbenchContext));
+            
+    featureInstaller.addMainMenuItem(affineTransPlugIn,
+          MENU_TOOLS_EDIT,
+          affineTransPlugIn.getName() + "...", false, null,
+          affineTransPlugIn.createEnableCheck(workbenchContext));
+
 }
 
 public static String MENU_QA = MenuNames.TOOLS_QA;
@@ -887,7 +911,6 @@ private ValidateSelectedLayersPlugIn validateSelectedLayersPlugIn = new Validate
 private LayerStatisticsPlugIn layerStatisticsPlugIn = new LayerStatisticsPlugIn();
 private FeatureStatisticsPlugIn featureStatisticsPlugIn = new FeatureStatisticsPlugIn();
 
-private DiffSegmentsPlugIn diffSegmentsPlugIn = new DiffSegmentsPlugIn();
 private DiffGeometryPlugIn diffGeometryPlugIn = new DiffGeometryPlugIn();
 
 private void configToolsQA(final WorkbenchContext workbenchContext,
@@ -921,18 +944,6 @@ private void configToolsQA(final WorkbenchContext workbenchContext,
 			.add(checkFactory.createWindowWithLayerNamePanelMustBeActiveCheck())
 			.add(checkFactory.createAtLeastNLayersMustBeSelectedCheck(1)));
 	
-	/*
-	 // MD - not used now - sstein: contained in Geometry-Diff
-	  featureInstaller.addMainMenuItem(diffSegmentsPlugIn,
-	  MENU_TOOLS_QA,
-	  diffSegmentsPlugIn.getName() + "...",
-	  false,
-	  null,
-	  new MultiEnableCheck()
-	  .add(checkFactory.createWindowWithLayerNamePanelMustBeActiveCheck())
-	  .add(checkFactory.createAtLeastNLayersMustExistCheck(2)));
-	  */
-
 	featureInstaller.addMainMenuItem(diffGeometryPlugIn,
 	            MENU_TOOLS_QA,
 	            diffGeometryPlugIn.getName() + "...",
@@ -954,8 +965,7 @@ public void configureDatastores(final WorkbenchContext context) throws Exception
             new ApplicationExitHandler() {
                 public void exitApplication(JFrame mainFrame) {
                     try {
-                        ConnectionManager.instance(
-                                context.getBlackboard())
+                        ConnectionManager.instance(context)
                                 .closeConnections();
                     } catch (DataStoreException e) {
                         throw new RuntimeException(e);

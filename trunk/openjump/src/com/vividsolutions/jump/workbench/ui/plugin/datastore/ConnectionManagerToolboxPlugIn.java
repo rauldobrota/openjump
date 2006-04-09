@@ -57,7 +57,7 @@ public class ConnectionManagerToolboxPlugIn extends ToolboxPlugIn {
     protected void initializeToolbox(ToolboxDialog toolbox) {
         ConnectionManagerPanel connectionManagerPanel = new ConnectionManagerPanel(
                 ConnectionManager
-                        .instance(toolbox.getContext().getBlackboard()),
+                        .instance(toolbox.getContext()),
                 toolbox.getContext().getRegistry(), toolbox.getContext()
                         .getErrorHandler(),toolbox.getContext());
         toolbox.getCenterPanel().add(connectionManagerPanel,

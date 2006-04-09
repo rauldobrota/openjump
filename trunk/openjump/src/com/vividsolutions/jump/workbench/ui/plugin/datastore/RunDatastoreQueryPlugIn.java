@@ -12,10 +12,6 @@ import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 
 public class RunDatastoreQueryPlugIn extends
         AbstractAddDatastoreLayerPlugIn {
-    
-    public void XXinitialize(PlugInContext context) throws Exception {
-        createLayerMenu(2, context);
-    }    
 
     private Layer createLayer(final RunDatastoreQueryPanel panel,
             TaskMonitor monitor, final PlugInContext context) throws Exception {
@@ -24,7 +20,7 @@ public class RunDatastoreQueryPlugIn extends
         int maxFeatures = ((Integer) LangUtil.ifNull(panel.getMaxFeatures(),
                 new Integer(Integer.MAX_VALUE))).intValue();
         FeatureInputStream featureInputStream = ConnectionManager.instance(
-                context.getWorkbenchContext().getBlackboard())
+                context.getWorkbenchContext())
                 .getOpenConnection(panel.getConnectionDescriptor()).execute(
                         new AdhocQuery(panel.getQuery()));
         try {

@@ -51,6 +51,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
 import com.vividsolutions.jump.I18N;
+import com.vividsolutions.jump.JUMPVersion;
 import com.vividsolutions.jump.util.StringUtil;
 import com.vividsolutions.jump.workbench.JUMPWorkbench;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
@@ -112,7 +113,7 @@ public class AboutDialog extends JDialog {
         super(frame, I18N.get("ui.AboutDialog.about-jump"), true);
         extensionsAboutPanel.setPlugInManager(frame.getContext().getWorkbench().getPlugInManager());
         this.splashPanel =
-            new SplashPanel(JUMPWorkbench.splashImage(), I18N.get("ui.AboutDialog.version")+" " + JUMPWorkbench.VERSION_TEXT);
+            new SplashPanel(JUMPWorkbench.splashImage(), I18N.get("ui.AboutDialog.version")+" " + JUMPVersion.CURRENT_VERSION);
 
         try {
             jbInit();
