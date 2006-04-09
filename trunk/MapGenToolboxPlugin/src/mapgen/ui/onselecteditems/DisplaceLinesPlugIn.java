@@ -177,6 +177,7 @@ public class DisplaceLinesPlugIn extends AbstractPlugIn implements ThreadedPlugI
 	    	if(lines.size() > 0){ 
 	    	    context.addLayer(StandardCategoryNames.WORKING, "displaced lines", lines);
 	    	}
+	    	/*
 	    	FeatureCollection nrgPoints = dispSnakes.getInitialPointEnergies();
 	    	if(nrgPoints.size() > 0){ 
 	    	    context.addLayer(StandardCategoryNames.WORKING, "initial energy vertices", nrgPoints);	    	    
@@ -186,11 +187,12 @@ public class DisplaceLinesPlugIn extends AbstractPlugIn implements ThreadedPlugI
 	    	if(netNodes.size() > 0){ 
 	    	    context.addLayer(StandardCategoryNames.WORKING, "networkNodes and Splits", netNodes);	    	    
 	    	}
-	    	
+	    	*/
 	    	FeatureCollection buffers = dispSnakes.getMinDistAndSignatureBuffers(); 
 	    	if(buffers.size() > 0){ 
 	    	    context.addLayer(StandardCategoryNames.WORKING, "mindist + signature buffers", buffers);	    	    
 	    	}
+	    	
 	        
     }
 	

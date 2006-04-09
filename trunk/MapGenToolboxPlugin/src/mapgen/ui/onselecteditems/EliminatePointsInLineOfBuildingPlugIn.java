@@ -219,7 +219,7 @@ public class EliminatePointsInLineOfBuildingPlugIn extends AbstractPlugIn implem
     		    context.addLayer(StandardCategoryNames.WORKING, "Exception Bdg", myCollE);
     		    }
 	    }      	
-      	context.getWorkbenchFrame().warnUser("polygons modified: " + modified + " from: " + count);
+      	context.getWorkbenchFrame().setStatusMessage("polygons modified: " + modified + " from: " + count);
       	this.elimFeatures = elimFeatures;
         return resultFeatures;        
 	}

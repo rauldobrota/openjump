@@ -91,7 +91,7 @@ public class MergeSelectedPolygonsPlugIn extends ThreadedBasePlugIn{
 	private boolean mergeGeomsB = false;
 	private boolean mergeByTypeB = false;
 	private boolean workOnLayer = false;
-	private final static String WORK_ON_LAYER = "use layer items";
+	private final static String WORK_ON_LAYER = "use all layer items";
 	private Layer srcLayer = null;
 	private final static String SRC_LAYER = "source layer";
 	private String attrName = ""; 
@@ -343,19 +343,19 @@ public class MergeSelectedPolygonsPlugIn extends ThreadedBasePlugIn{
 	{
 		//dialog.setSideBarImage(new ImageIcon(getClass().getResource("")));
 		dialog.setSideBarDescription("Choose a method to merge polygon features!" + 
-				"Be aware of either using selected item or items of a layer." +
-		"Merging 2 polygons with attributes works only for 2 selected items." );
+				" Be aware of either using selected item or items of a layer." +
+		" Merging 2 polygons with attributes works only for 2 selected items." );
 		
 		final String OUTPUT_GROUP = "action";
 		
-		merge2polysRB = dialog.addRadioButton(MERGE2POLYS, OUTPUT_GROUP, false,"Merging 2 selected polygons while preserving attributes.");
+		merge2polysRB = dialog.addRadioButton(MERGE2POLYS, OUTPUT_GROUP, false,"Merge 2 selected polygons while preserving attributes.");
 		if (context.getWorkbenchContext().getLayerViewPanel().getSelectionManager().getSelectedItems().size() > 1){
 			merge2polysRB.setEnabled(true);
 		}
 		else{
 			merge2polysRB.setEnabled(false);
 		}	    
-		mergeGeomsRB = dialog.addRadioButton(MERGEGEOMS, OUTPUT_GROUP, false,"Merging a set of overlaping or touching polygons either the selected or from a layer)");
+		mergeGeomsRB = dialog.addRadioButton(MERGEGEOMS, OUTPUT_GROUP, false,"Merge a set of overlaping or touching polygons either the selected or from a layer)");
 		mergeGeomsRB.addItemListener(new MethodItemListener());	    
 		mergeGeomsByTypeRB = dialog.addRadioButton(MERGEBYTYPE, OUTPUT_GROUP, false,"Merging a set of overlaping or touching polygons which must be of same type and in same layer");
 		mergeGeomsByTypeRB.setEnabled(true);

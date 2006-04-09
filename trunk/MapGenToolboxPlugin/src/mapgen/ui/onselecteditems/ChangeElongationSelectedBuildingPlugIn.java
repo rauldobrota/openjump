@@ -40,9 +40,15 @@
 package mapgen.ui.onselecteditems;
 
 import mapgen.algorithms.polygons.PolygonChangeElongation;
+
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jump.feature.AttributeType;
+import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureCollection;
+import com.vividsolutions.jump.feature.FeatureDataset;
 import com.vividsolutions.jump.feature.FeatureDatasetFactory;
+import com.vividsolutions.jump.feature.FeatureSchema;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
@@ -113,9 +119,10 @@ public class ChangeElongationSelectedBuildingPlugIn extends AbstractPlugIn imple
 
     public void run(TaskMonitor monitor, PlugInContext context) throws Exception{
         
-    	    //this.zoom2Feature(context);	    
-    	    this.changeElong(context, this.scale);
-    	    System.gc();    		
+	    //this.zoom2Feature(context);	    
+	    FeatureCollection fc = this.changeElong(context, this.scale, monitor);
+	    context.addLayer(StandardCategoryNames.WORKING, "modified buildings", fc); 
+	    System.gc();          		
     	}
 	
 	/**
@@ -128,34 +135,61 @@ public class ChangeElongationSelectedBuildingPlugIn extends AbstractPlugIn imple
 	    this.myZoom.execute(context);	    
 	}
 
-	private boolean changeElong(PlugInContext context, double scale) throws Exception{
-	    
-	    System.gc(); //flush garbage collector
-	    // --------------------------	    
-	    //-- get selected items
-	    final Collection geometries = context.getLayerViewPanel().getSelectionManager().getSelectedItems();	    
-	    //--get first/single object in selection to analyse
-      	Iterator i = geometries.iterator();
-      	Object geom = i.next();
-       	Polygon poly = null;       	
-       	if ( geom instanceof Polygon){
-       		poly = (Polygon) geom; //= erste Geometrie
-    	    // --------------------------
-           	List resultList = new ArrayList();
-           	PolygonChangeElongation pce = new PolygonChangeElongation(poly,scale);
-           	resultList.add(pce.getOutPolygon());
-           	//resultList.add(pce.getCenter());
-           	context.getWorkbenchFrame().setStatusMessage("horizontal angle: " + pce.getAngle());
-    	    FeatureCollection myCollB = FeatureDatasetFactory.createFromGeometry(resultList);
-    	    if (myCollB.size() > 0){
-    		    context.addLayer(StandardCategoryNames.WORKING, "result", myCollB);
-    		    }
-       	}
-       	else{
-       	    context.getWorkbenchFrame().warnUser("no polygon selected");
-       	}
-        return true;        
+	private FeatureDataset changeElong(PlugInContext context, double scale, TaskMonitor monitor) throws Exception{
+		
+		System.gc(); //flush garbage collector
+		// --------------------------	    
+		//-- get selected items
+		final Collection features = context.getLayerViewPanel().getSelectionManager().getFeaturesWithSelectedItems();
+		
+		int count=0; int noItems = features.size(); Geometry resultgeom = null;
+		
+		//--get single object in selection to analyse
+		FeatureDataset resultFeatures = null;
+		FeatureDataset elimFeatures = null;
+		ArrayList problematicEdges = new ArrayList();
+		//List resultList = new ArrayList();
+		FeatureSchema fs = new FeatureSchema();
+		int eliminated = 0;
+		for (Iterator iter = features.iterator(); iter.hasNext();) {
+			count++;
+			Feature ft = (Feature)iter.next();
+			//-- clone to avoid that original features get changed
+			Feature f= (Feature)ft.clone(); 
+			if (count == 1){      			
+				//-- not sure to do that, since feature schemas of selected objects might be different 
+				fs = copyFeatureSchema(f.getSchema());
+				resultFeatures = new FeatureDataset(fs);
+				elimFeatures =new FeatureDataset(fs);
+			}      		
+			Geometry geom = f.getGeometry(); //= erste Geometrie
+			Polygon poly = null;
+			if ( geom instanceof Polygon){
+				poly = (Polygon) geom; //= erste Geometrie
+				PolygonChangeElongation pce = new PolygonChangeElongation(poly,scale);
+				f.setGeometry(pce.getOutPolygon());
+				resultFeatures.add(f);	        
+			}
+			else{
+				context.getWorkbenchFrame().warnUser("no polygon selected");
+			}
+			String mytext = "item: " + count + " / " + noItems;
+			monitor.report(mytext);	       		       	
+		}// end loop over item selection
+		context.getWorkbenchFrame().warnUser("eliminated: " + eliminated + " from: " + count);
+		return resultFeatures;        
 	}
-    
+	
+	private FeatureSchema copyFeatureSchema(FeatureSchema oldSchema){
+		FeatureSchema fs = new FeatureSchema();
+		for (int i = 0; i < oldSchema.getAttributeCount(); i++) {
+			AttributeType at = oldSchema.getAttributeType(i);
+			String aname = oldSchema.getAttributeName(i);
+			fs.addAttribute(aname,at);
+			fs.setCoordinateSystem(oldSchema.getCoordinateSystem());
+		}		
+		return fs;
+	}
+	
   
 }

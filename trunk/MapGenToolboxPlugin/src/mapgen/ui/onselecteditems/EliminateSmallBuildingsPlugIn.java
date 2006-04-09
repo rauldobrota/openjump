@@ -79,6 +79,7 @@ public class EliminateSmallBuildingsPlugIn extends AbstractPlugIn implements Thr
     private ZoomToSelectedItemsPlugIn myZoom = new ZoomToSelectedItemsPlugIn();
     private static String T1 = "MapScale";
     int scale = 1;    
+    private FeatureDataset elimFeatures = null;
 
     public void initialize(PlugInContext context) throws Exception {
         FeatureInstaller featureInstaller = new FeatureInstaller(context.getWorkbenchContext());
@@ -128,6 +129,9 @@ public class EliminateSmallBuildingsPlugIn extends AbstractPlugIn implements Thr
     	    //this.zoom2Feature(context);	    
     	    FeatureCollection fc = this.eliminate(context, this.scale, monitor);
     	    context.addLayer(StandardCategoryNames.WORKING, "buildings with minArea", fc); 
+    	    if (this.elimFeatures.size() > 0){
+    	    	context.addLayer(StandardCategoryNames.WORKING, "eliminated buildings", this.elimFeatures);
+    	    }
     	    System.gc();    		
     	}
 	
@@ -158,6 +162,7 @@ public class EliminateSmallBuildingsPlugIn extends AbstractPlugIn implements Thr
 
 	    //--get single object in selection to analyse
 	    FeatureDataset resultFeatures = null;
+	    FeatureDataset elimF = null;
 	    ArrayList problematicEdges = new ArrayList();
        	//List resultList = new ArrayList();
        	FeatureSchema fs = new FeatureSchema();
@@ -171,6 +176,7 @@ public class EliminateSmallBuildingsPlugIn extends AbstractPlugIn implements Thr
       			//-- not sure to do that, since feature schemas of selected objects might be different 
       			fs = copyFeatureSchema(f.getSchema());
       			resultFeatures = new FeatureDataset(fs);
+    			elimF =new FeatureDataset(fs);
       		}      		
 	   		Geometry geom = f.getGeometry(); //= erste Geometrie
 	   		Polygon poly = null;
@@ -188,7 +194,8 @@ public class EliminateSmallBuildingsPlugIn extends AbstractPlugIn implements Thr
 	           	//---
 	            if(pma.isfullfilled() == false){	           		
 		           	context.getWorkbenchFrame().setStatusMessage("to small bldg id: " + ft.getID());
-		           	eliminated++;
+		           	elimF.add(f);
+		           	eliminated++;		           	
 	            }
 	           	else{//if area is larger as necessary or within tolerance 
 	           	    resultFeatures.add(f);
@@ -201,6 +208,7 @@ public class EliminateSmallBuildingsPlugIn extends AbstractPlugIn implements Thr
 		    monitor.report(mytext);	       		       	
       	}// end loop over item selection
       	context.getWorkbenchFrame().warnUser("eliminated: " + eliminated + " from: " + count);
+      	this.elimFeatures = elimF;      	
         return resultFeatures;        
 	}
 	
