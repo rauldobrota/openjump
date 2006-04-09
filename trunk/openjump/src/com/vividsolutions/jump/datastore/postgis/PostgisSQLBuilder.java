@@ -57,7 +57,7 @@ public class PostgisSQLBuilder
                + "," + env.getMaxX()
                + " " + env.getMaxY()
                );
-    buf.append(")'::box3d,-1);");
+    buf.append(")'::box3d,-1)");
     //buf.append(getSRID(SRID) + );
     return buf.toString();
   }

@@ -68,7 +68,9 @@ public class PostgisValueConverterFactory
     public Object getValue(ResultSet rs, int columnIndex)
         throws IOException, SQLException, ParseException
     {
-      Geometry geom = wkbReader.read((byte[]) rs.getObject(columnIndex));
+      Object obj = rs.getObject(columnIndex);
+      byte[] bytes = (byte[]) obj;
+      Geometry geom = wkbReader.read(bytes);
       return geom;
     }
   }

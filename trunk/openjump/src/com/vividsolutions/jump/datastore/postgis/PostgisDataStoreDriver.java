@@ -17,7 +17,7 @@ public class PostgisDataStoreDriver
 {
   public static final String DRIVER_NAME = "PostGIS";
   public static final String JDBC_CLASS = "org.postgresql.Driver";
-  public static final String URL_PREFIX = "jdbc:postgresql:";
+  public static final String URL_PREFIX = "jdbc:postgresql://";
 
   public static final String PARAM_Server = "Server";
   public static final String PARAM_Port = "Port";

@@ -1,23 +1,23 @@
 /*
- * The Unified Mapping Platform (JUMP) is an extensible, interactive GUI 
+ * The Unified Mapping Platform (JUMP) is an extensible, interactive GUI
  * for visualizing and manipulating spatial features with geometry and attributes.
  *
  * Copyright (C) 2003 Vivid Solutions
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
+ *
  * For more information, contact:
  *
  * Vivid Solutions
@@ -56,7 +56,7 @@ public abstract class LineStringStyle implements Style {
     protected boolean enabled = true;
 
     protected Stroke stroke;
-    
+
     public Object clone() {
         try {
             return super.clone();
@@ -64,7 +64,7 @@ public abstract class LineStringStyle implements Style {
             Assert.shouldNeverReachHere();
             return null;
         }
-    }    
+    }
 
     protected Color lineColorWithAlpha;
 
@@ -79,33 +79,27 @@ public abstract class LineStringStyle implements Style {
             return;
         }
 
-        if (geometry instanceof MultiPolygon) {
-            return;
-        }
+// MD - removed, to allow MultiPolygons to be styled as well
+//        if (geometry instanceof MultiPolygon) {
+//            return;
+//        }
 
         if (geometry instanceof GeometryCollection) {
             paintGeometryCollection((GeometryCollection) geometry, graphics,
                 viewport);
-
             return;
         }
-
         if (geometry instanceof Polygon) {
             paintPolygon((Polygon) geometry, graphics, viewport);
-
             return;
         }
-
         if (!(geometry instanceof LineString)) {
             return;
         }
-
         LineString lineString = (LineString) geometry;
-
         if (lineString.getNumPoints() < 2) {
             return;
         }
-
         paintLineString(lineString, viewport, graphics);
     }
 
