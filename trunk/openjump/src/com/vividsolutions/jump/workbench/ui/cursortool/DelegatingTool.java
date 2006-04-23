@@ -28,8 +28,6 @@
  *
  * (250)385-6040
  * www.vividsolutions.com
- *
- * modified by ISA
  */
 
 package com.vividsolutions.jump.workbench.ui.cursortool;
