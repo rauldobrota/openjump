@@ -36,6 +36,7 @@ import java.util.Iterator;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jump.geom.InteriorPointFinder;
 import com.vividsolutions.jump.util.Blackboard;
@@ -70,11 +71,13 @@ public class SnapToFeaturesPolicy implements SnapPolicy {
             i.hasNext();
             ) {
             Geometry candidate = (Geometry) i.next();
-            Geometry intersection = candidate.intersection(bufferedTransformedCursorLocation);
-            if (intersection.isEmpty()) {
-                continue;
+            if (!(candidate instanceof GeometryCollection)) {
+                Geometry intersection = candidate.intersection(bufferedTransformedCursorLocation);
+                if (intersection.isEmpty()) {
+                    continue;
+                }
+                return interiorPointFinder.findPoint(intersection);
             }
-            return interiorPointFinder.findPoint(intersection);
         }
         return null;
     }
