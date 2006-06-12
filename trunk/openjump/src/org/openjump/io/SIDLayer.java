@@ -302,7 +302,7 @@ public class SIDLayer extends WMSLayer
                     	//-- [sstein 02.04.2006] changed to javax to work with free JavaVM
                     	//   as proposed by Petter Reinholdtsen (see jpp-devel 12.03.2006)
                     	FileImageInputStream in = new FileImageInputStream(new File(jpgFilename));
-                    	ImageReader decoder = (ImageReader) ImageIO.getImageReadersByFormatName("JPEG");
+                    	ImageReader decoder = (ImageReader) ImageIO.getImageReadersByFormatName("JPEG").next();
                     	decoder.setInput(in);
                     	BufferedImage image = decoder.read(0);
                     	decoder.dispose();
