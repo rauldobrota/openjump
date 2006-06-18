@@ -38,6 +38,7 @@ import org.openjump.core.ui.plugin.mousemenu.SaveDatasetsPlugIn;
 import org.openjump.core.ui.plugin.queries.SimpleQueryPlugIn;
 import org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn;
 import org.openjump.core.ui.plugin.tools.ConvexHullPlugIn;
+import org.openjump.core.ui.plugin.tools.CreateThiessenPolygonsPlugIn;
 import org.openjump.core.ui.plugin.tools.DeleteEmptyGeometriesPlugIn;
 import org.openjump.core.ui.plugin.tools.JoinWithArcPlugIn;
 import org.openjump.core.ui.plugin.tools.LineSimplifyJTS15AlgorithmPlugIn;
@@ -144,6 +145,8 @@ public class OpenJumpConfiguration{
 		 **********************/
 		
 		/**** GENERATE ****/
+		CreateThiessenPolygonsPlugIn myThiessenPlugin = new CreateThiessenPolygonsPlugIn();
+		myThiessenPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));				
 		
 		/**** QUERY ****/
 		SimpleQueryPlugIn mySimpleQueryPlugIn = new SimpleQueryPlugIn();
