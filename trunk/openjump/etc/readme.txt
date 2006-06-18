@@ -128,5 +128,6 @@ Translation contributors are:
 - German: Florian Rengers, Stefan Steiniger
 - Portuguese (brazilian): Ezequias Rodrigues da Rocha
 
-
+others:
+- L. Paul Chew for providing the Delauney triangulation algorithm to create the Voronoi edges
 
