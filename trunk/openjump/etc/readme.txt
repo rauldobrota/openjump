@@ -1,7 +1,7 @@
 OpenJUMP readme file
 --------------------
 Version 1.00
-January 24th, 2006
+June 23rd, 2006
 
 Contents
 --------
