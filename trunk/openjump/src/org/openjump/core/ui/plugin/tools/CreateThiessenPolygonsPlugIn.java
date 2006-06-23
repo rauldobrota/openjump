@@ -87,7 +87,7 @@ public class CreateThiessenPolygonsPlugIn extends AbstractPlugIn implements Thre
     private String sideBarText = "Creates a Delaunay triangulation and returns the Voronoi regions.";
     private String msgCreateDG = "create triangulation";
     private String msgCreatePolys = "create polygons from voronoi edges";
-    private String msgNoPoint = "no point geoemtry";
+    private String msgNoPoint = "no point geometry";
     private Layer itemlayer = null;
 
     public void initialize(PlugInContext context) throws Exception {
@@ -97,7 +97,7 @@ public class CreateThiessenPolygonsPlugIn extends AbstractPlugIn implements Thre
     	    this.sideBarText = I18N.get("org.openjump.core.ui.plugin.tools.CreateThiessenPolygonsPlugIn.Creates-a-Delaunay-triangulation-and-returns-the-Voronoi-regions");
     	    this.msgCreateDG = I18N.get("org.openjump.core.ui.plugin.tools.CreateThiessenPolygonsPlugIn.create-triangulation");
     	    this.msgCreatePolys = I18N.get("org.openjump.core.ui.plugin.tools.CreateThiessenPolygonsPlugIn.create-polygons-from-voronoi-edges");
-    	    this.msgNoPoint =I18N.get("org.openjump.core.ui.plugin.tools.CreateThiessenPolygonsPlugIn.no-point-geoemtry");
+    	    this.msgNoPoint =I18N.get("org.openjump.core.ui.plugin.tools.CreateThiessenPolygonsPlugIn.no-point-geometry");
     			
 	        FeatureInstaller featureInstaller = new FeatureInstaller(context.getWorkbenchContext());
 	    	featureInstaller.addMainMenuItem(
@@ -160,31 +160,35 @@ public class CreateThiessenPolygonsPlugIn extends AbstractPlugIn implements Thre
                 context.getWorkbenchFrame().warnUser(this.msgNoPoint);
             }
         }
-	    monitor.report(this.msgCreateDG);
-	    DTriangulationForJTS tri = new DTriangulationForJTS(points);
-	    
-	    //ArrayList nodes = tri.drawAllSites();	    
-	    //FeatureCollection myCollA = FeatureDatasetFactory.createFromGeometry(nodes);	    
-		//context.addLayer(StandardCategoryNames.WORKING, "sites", myCollA);
-		
-		//ArrayList nodes2 = tri.getInitialSimmplexAsJTSPoints();
-	    //FeatureCollection myCollD = FeatureDatasetFactory.createFromGeometry(nodes2);	    
-		//context.addLayer(StandardCategoryNames.WORKING, "cornerpoints", myCollD);
-		
-	    //ArrayList edges = tri.drawAllVoronoi(); 
-	    //FeatureCollection myCollB = FeatureDatasetFactory.createFromGeometry(edges);	    
-		//context.addLayer(StandardCategoryNames.WORKING, "voronoi edges", myCollB);
-	    
-		//ArrayList bbox = new ArrayList(); 
-		//bbox.add(tri.getThiessenBoundingBox());
-	    //FeatureCollection myCollE = FeatureDatasetFactory.createFromGeometry(bbox);	    
-		//context.addLayer(StandardCategoryNames.WORKING, "bbox", myCollE);
-		
-	    monitor.report(this.msgCreatePolys);
-	    Collection polys = tri.getThiessenPolys();
-	    FeatureCollection myCollC = FeatureDatasetFactory.createFromGeometry(polys);	    
-		context.addLayer(StandardCategoryNames.WORKING, "Thiessen polygons", myCollC);
-
+	    if (points.size() > 0){
+		    monitor.report(this.msgCreateDG);
+		    DTriangulationForJTS tri = new DTriangulationForJTS(points);
+		    
+		    //ArrayList nodes = tri.drawAllSites();	    
+		    //FeatureCollection myCollA = FeatureDatasetFactory.createFromGeometry(nodes);	    
+			//context.addLayer(StandardCategoryNames.WORKING, "sites", myCollA);
+			
+			//ArrayList nodes2 = tri.getInitialSimmplexAsJTSPoints();
+		    //FeatureCollection myCollD = FeatureDatasetFactory.createFromGeometry(nodes2);	    
+			//context.addLayer(StandardCategoryNames.WORKING, "cornerpoints", myCollD);
+			
+		    //ArrayList edges = tri.drawAllVoronoi(); 
+		    //FeatureCollection myCollB = FeatureDatasetFactory.createFromGeometry(edges);	    
+			//context.addLayer(StandardCategoryNames.WORKING, "voronoi edges", myCollB);
+		    
+			//ArrayList bbox = new ArrayList(); 
+			//bbox.add(tri.getThiessenBoundingBox());
+		    //FeatureCollection myCollE = FeatureDatasetFactory.createFromGeometry(bbox);	    
+			//context.addLayer(StandardCategoryNames.WORKING, "bbox", myCollE);
+			
+		    monitor.report(this.msgCreatePolys);
+		    Collection polys = tri.getThiessenPolys();
+		    FeatureCollection myCollC = FeatureDatasetFactory.createFromGeometry(polys);	    
+			context.addLayer(StandardCategoryNames.WORKING, "Thiessen polygons", myCollC);
+	    }
+	    else{
+	    	context.getWorkbenchFrame().warnUser(this.msgNoPoint);
+	    }
 		return true;        		
 	}	  	
 }
