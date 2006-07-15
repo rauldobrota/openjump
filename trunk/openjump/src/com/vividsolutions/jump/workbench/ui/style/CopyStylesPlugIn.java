@@ -1,17 +1,14 @@
 package com.vividsolutions.jump.workbench.ui.style;
 
-import com.vividsolutions.jump.util.StringUtil;
+import java.util.Collection;
+
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.model.Layer;
-import com.vividsolutions.jump.workbench.model.Layerable;
-import com.vividsolutions.jump.workbench.model.WMSLayer;
-import com.vividsolutions.jump.workbench.plugin.*;
-
-import java.awt.Toolkit;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
+import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
+import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
+import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 /**
  * Copies the styles for a layer to a paste buffer
  * @author Martin Davis
@@ -26,7 +23,7 @@ public class CopyStylesPlugIn extends AbstractPlugIn {
   }
 
   public String getName() {
-    return "Copy Styles";
+    return I18N.get("ui.style.CopyStylesPlugIn.copy-styles");
   }
 
   public static MultiEnableCheck createEnableCheck(

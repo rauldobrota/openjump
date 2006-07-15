@@ -1,17 +1,12 @@
 package com.vividsolutions.jump.workbench.ui.style;
 
-import com.vividsolutions.jump.util.StringUtil;
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.model.Layer;
-import com.vividsolutions.jump.workbench.model.Layerable;
-import com.vividsolutions.jump.workbench.model.WMSLayer;
-import com.vividsolutions.jump.workbench.plugin.*;
-
-import java.awt.Toolkit;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
+import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
+import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
+import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 
 /**
  * Pastes the styles from the internal style paste buffer to a layer
@@ -33,7 +28,7 @@ public class PasteStylesPlugIn extends AbstractPlugIn {
   }
 
   public String getName() {
-    return "Paste Styles";
+  	return I18N.get("ui.style.PasteStylesPlugIn.paste-styles");
   }
 
   public boolean execute(PlugInContext context) throws Exception
