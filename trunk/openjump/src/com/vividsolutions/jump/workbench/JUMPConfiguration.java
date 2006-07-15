@@ -698,7 +698,7 @@ public class JUMPConfiguration implements Setup {
     // this is a new method in VividJump (December 2005) to initialize 
     // plugins working on layers
     //================================
-    public static String MENU_LAYER = MenuNames.LAYER;
+    //public static String MENU_LAYER = MenuNames.LAYER;
 
         private AddDatastoreLayerPlugIn addDatastoreLayerPlugIn = new AddDatastoreLayerPlugIn();
         private RunDatastoreQueryPlugIn runDatastoreQueryPlugIn = new RunDatastoreQueryPlugIn();
@@ -708,6 +708,7 @@ public class JUMPConfiguration implements Setup {
                 final EnableCheckFactory checkFactory,
                 FeatureInstaller featureInstaller) throws Exception {
 
+      String MENU_LAYER = MenuNames.LAYER;
       featureInstaller.addLayerViewMenuItem(addNewLayerPlugIn, MENU_LAYER,
               addNewLayerPlugIn.getName());
       featureInstaller.addLayerViewMenuItem(addDatastoreLayerPlugIn, MENU_LAYER,
@@ -742,9 +743,12 @@ public class JUMPConfiguration implements Setup {
 
     // MD - following is proposed new pattern for defining built-in menus
 
-public static String MENU_TOOLS = MenuNames.TOOLS;
-public static String MENU_ANALYSIS = MenuNames.TOOLS_ANALYSIS;
-public static String[] MENU_TOOLS_ANALYSIS = new String[] { MENU_TOOLS, MENU_ANALYSIS};
+//[sstein, 15.07.2006] - don't initialize as "static" (!) class variables because it causes
+//    					 that the menu names are not translated into the correct language.
+//						 I have put them now into the method.    
+//public static String MENU_TOOLS = MenuNames.TOOLS;
+//public static String MENU_ANALYSIS = MenuNames.TOOLS_ANALYSIS;
+//public static String[] MENU_TOOLS_ANALYSIS = new String[] { MENU_TOOLS, MENU_ANALYSIS};
 
     // these must be defined as instance vars for initialization to be performed
 	private SpatialQueryPlugIn spatialQueryPlugIn = new SpatialQueryPlugIn();
@@ -760,6 +764,10 @@ public static String[] MENU_TOOLS_ANALYSIS = new String[] { MENU_TOOLS, MENU_ANA
                 final EnableCheckFactory checkFactory,
                 FeatureInstaller featureInstaller) throws Exception {
 
+    String MENU_TOOLS = MenuNames.TOOLS;
+    String MENU_ANALYSIS = MenuNames.TOOLS_ANALYSIS;
+    String[] MENU_TOOLS_ANALYSIS = new String[] { MENU_TOOLS, MENU_ANALYSIS};
+    	
 	featureInstaller
 	.addMainMenuItem(
 			spatialQueryPlugIn,
@@ -880,16 +888,18 @@ public static String[] MENU_TOOLS_ANALYSIS = new String[] { MENU_TOOLS, MENU_ANA
 	
 }
 
-public static String MENU_EDIT = MenuNames.EDIT;
-public static String[] MENU_TOOLS_EDIT
-	= new String[] { MENU_TOOLS, MENU_EDIT};
+
 
 private PrecisionReducerPlugIn precisionReducerPlugIn = new PrecisionReducerPlugIn();
-    private AffineTransformationPlugIn affineTransPlugIn = new AffineTransformationPlugIn();
+private AffineTransformationPlugIn affineTransPlugIn = new AffineTransformationPlugIn();
 
 private void configToolsEdit(final WorkbenchContext workbenchContext,
             final EnableCheckFactory checkFactory,
             FeatureInstaller featureInstaller) throws Exception {
+
+	String MENU_TOOLS = MenuNames.TOOLS;
+	String MENU_EDIT = MenuNames.EDIT;
+	String[] MENU_TOOLS_EDIT = new String[] { MENU_TOOLS, MENU_EDIT};
 
     featureInstaller.addMainMenuItem(precisionReducerPlugIn,
     		MENU_TOOLS_EDIT,
@@ -903,10 +913,6 @@ private void configToolsEdit(final WorkbenchContext workbenchContext,
 
 }
 
-public static String MENU_QA = MenuNames.TOOLS_QA;
-public static String[] MENU_TOOLS_QA
-	= new String[] { MENU_TOOLS, MENU_QA};
-
 private ValidateSelectedLayersPlugIn validateSelectedLayersPlugIn = new ValidateSelectedLayersPlugIn();
 private LayerStatisticsPlugIn layerStatisticsPlugIn = new LayerStatisticsPlugIn();
 private FeatureStatisticsPlugIn featureStatisticsPlugIn = new FeatureStatisticsPlugIn();
@@ -916,6 +922,11 @@ private DiffGeometryPlugIn diffGeometryPlugIn = new DiffGeometryPlugIn();
 private void configToolsQA(final WorkbenchContext workbenchContext,
 		final EnableCheckFactory checkFactory,
 		FeatureInstaller featureInstaller) throws Exception {
+	
+	String MENU_TOOLS = MenuNames.TOOLS;
+	String MENU_QA = MenuNames.TOOLS_QA;
+	String[] MENU_TOOLS_QA= new String[] { MENU_TOOLS, MENU_QA};
+	
 	featureInstaller
 	.addMainMenuItem(validateSelectedLayersPlugIn,
 			MENU_TOOLS_QA,
