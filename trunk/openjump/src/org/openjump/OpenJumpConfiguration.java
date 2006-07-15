@@ -40,6 +40,7 @@ import org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn;
 import org.openjump.core.ui.plugin.tools.ConvexHullPlugIn;
 import org.openjump.core.ui.plugin.tools.CreateThiessenPolygonsPlugIn;
 import org.openjump.core.ui.plugin.tools.DeleteEmptyGeometriesPlugIn;
+import org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn;
 import org.openjump.core.ui.plugin.tools.JoinWithArcPlugIn;
 import org.openjump.core.ui.plugin.tools.LineSimplifyJTS15AlgorithmPlugIn;
 import org.openjump.core.ui.plugin.tools.MeasureM_FPlugIn;
@@ -143,6 +144,9 @@ public class OpenJumpConfiguration{
 		/***********************
 		 *  menu TOOLS
 		 **********************/
+		/**** ANALYSIS ****/
+		JoinAttributesSpatiallyPlugIn mySpatialJoin = new JoinAttributesSpatiallyPlugIn();
+		mySpatialJoin.initialize(new PlugInContext(workbenchContext, null, null, null, null));	
 		
 		/**** GENERATE ****/
 		CreateThiessenPolygonsPlugIn myThiessenPlugin = new CreateThiessenPolygonsPlugIn();
