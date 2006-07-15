@@ -76,15 +76,15 @@ import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 public class JoinAttributesSpatiallyPlugIn extends ThreadedBasePlugIn{
 	
 
-    private final static String sidebartext = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.Joins-attributes-of-source-layer-according-to-a-spatial-and-a-statistic-criterion");
-	private final static String SRC_LAYER = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.source-layer");
-	private final static String TGT_LAYER = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.target-layer");	
-	private final static String SRC_ATTRIB = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.select-attribute");
-	private final static String ATTRIB_OP = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.select-attribute-operation");	
-	private final static String SPATIAL_OP = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.select-spatial-operation");	
-	private final static String joinresult = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.join-result");
-	private final static String notimplemented= I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.not-implemented");
-	private final static String BUFFER_RADIUS = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.buffer-radius");
+    private String sidebartext = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.Joins-attributes-of-source-layer-according-to-a-spatial-and-a-statistic-criterion");
+	private String SRC_LAYER = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.source-layer");
+	private String TGT_LAYER = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.target-layer");	
+	private String SRC_ATTRIB = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.select-attribute");
+	private String ATTRIB_OP = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.select-attribute-operation");	
+	private String SPATIAL_OP = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.select-spatial-operation");	
+	private String joinresult = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.join-result");
+	private String notimplemented= I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.not-implemented");
+	private String BUFFER_RADIUS = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.buffer-radius");
 	//-- vars
 	private Layer srcLayer = null;
 	private Layer targetLayer = null;
@@ -105,7 +105,7 @@ public class JoinAttributesSpatiallyPlugIn extends ThreadedBasePlugIn{
 		featureInstaller.addMainMenuItem(
 				this,								//exe				
 				new String[] {MenuNames.TOOLS, MenuNames.TOOLS_ANALYSIS}, 	//menu path
-				this.getName(), //name methode .getName recieved by AbstractPlugIn 
+				this.getName()+"{pos:6}", //name methode .getName recieved by AbstractPlugIn 
 				false,			//checkbox
 				null,			//icon
 				createEnableCheck(context.getWorkbenchContext())); //enable check        
@@ -129,6 +129,16 @@ public class JoinAttributesSpatiallyPlugIn extends ThreadedBasePlugIn{
 	 */
 	public boolean execute(PlugInContext context) throws Exception {
 	    
+			sidebartext = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.Joins-attributes-of-source-layer-according-to-a-spatial-and-a-statistic-criterion");
+			SRC_LAYER = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.source-layer");
+			TGT_LAYER = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.target-layer");	
+			SRC_ATTRIB = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.select-attribute");
+			ATTRIB_OP = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.select-attribute-operation");	
+			SPATIAL_OP = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.select-spatial-operation");	
+			joinresult = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.join-result");
+			notimplemented= I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.not-implemented");
+			BUFFER_RADIUS = I18N.get("org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn.buffer-radius");
+
 	    	this.generateOpLists();
 	    	
 			this.dialog = new MultiInputDialog(
