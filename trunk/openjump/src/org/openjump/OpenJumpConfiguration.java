@@ -51,6 +51,9 @@ import org.openjump.core.ui.plugin.view.ShowFullPathPlugIn;
 import org.openjump.core.ui.plugin.view.ShowScalePlugIn;
 import org.openjump.core.ui.plugin.view.ZoomToScalePlugIn;
 import org.openjump.core.ui.plugin.wms.ZoomToWMSPlugIn;
+import org.openjump.sigle.plugin.geoprocessing.layers.SpatialJoinPlugIn;
+import org.openjump.sigle.plugin.geoprocessing.oneLayer.topology.PlanarGraphPlugIn;
+import org.openjump.sigle.plugin.joinTable.JoinTablePlugIn;
 
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
@@ -188,6 +191,25 @@ public class OpenJumpConfiguration{
 		MeasureM_FPlugIn myFeetPlugIn = new MeasureM_FPlugIn();
 		myFeetPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 
+		/***********************
+		 *  menu vector geoprocessing
+		 *  previously used by Projet-sigle.org   
+		 ***********************/
+				
+		//-- Two layers
+		
+		//-- TODO inlcude spatialjoin and translate
+		
+		SpatialJoinPlugIn spatialJoinPlugIn = new SpatialJoinPlugIn();
+		spatialJoinPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+				
+		//-- One Layer
+		
+		//-- TODO translate
+		//-- Topology
+		PlanarGraphPlugIn coveragePlugIn = new PlanarGraphPlugIn();
+		coveragePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+
 		
 		/***********************
 		 *  menu WINDOW
@@ -249,6 +271,13 @@ public class OpenJumpConfiguration{
 		ScaleSelectedItemsPlugIn myScaleItemsPlugin = new ScaleSelectedItemsPlugIn();
 		myScaleItemsPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		*/
+		
+		/***********************
+		 *  Attribut Erwan décembre 2005
+		 **********************/	
+	
+		JoinTablePlugIn joinTablePlugIn = new JoinTablePlugIn();
+		joinTablePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
 		/***********************
 		 *  others
