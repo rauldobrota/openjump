@@ -103,7 +103,7 @@ public class CreateThiessenPolygonsPlugIn extends AbstractPlugIn implements Thre
 	    	featureInstaller.addMainMenuItem(
 	    	        this,								//exe
 	                new String[] {MenuNames.TOOLS, MenuNames.TOOLS_GENERATE}, 	//menu path
-	                this.sName, //name methode .getName recieved by AbstractPlugIn 
+	                this.sName +"{pos:3}", //name methode .getName recieved by AbstractPlugIn 
 	                false,			//checkbox
 	                null,			//icon
 	                createEnableCheck(context.getWorkbenchContext())); //enable check

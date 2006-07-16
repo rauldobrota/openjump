@@ -105,7 +105,7 @@ public class JoinAttributesSpatiallyPlugIn extends ThreadedBasePlugIn{
 		featureInstaller.addMainMenuItem(
 				this,								//exe				
 				new String[] {MenuNames.TOOLS, MenuNames.TOOLS_ANALYSIS}, 	//menu path
-				this.getName()+"{pos:6}", //name methode .getName recieved by AbstractPlugIn 
+				this.getName()+"{pos:5}", //name methode .getName recieved by AbstractPlugIn 
 				false,			//checkbox
 				null,			//icon
 				createEnableCheck(context.getWorkbenchContext())); //enable check        
