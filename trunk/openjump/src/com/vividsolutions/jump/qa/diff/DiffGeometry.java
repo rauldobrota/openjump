@@ -46,9 +46,10 @@ public class DiffGeometry {
   private TaskMonitor monitor;
   private DiffGeometryMatcher diffMatcher = new ExactGeometryMatcher();
   private boolean splitIntoComponents = false;
-  final static String sfeatures = I18N.get("com.vividsolutions.jump.qa.diff.DiffGeometry.features");
-  final static String sMatchingfeatures = I18N.get("com.vividsolutions.jump.qa.diff.DiffGeometry.Matching-features");
-  
+  /*
+  private String sfeatures = I18N.get("com.vividsolutions.jump.qa.diff.DiffGeometry.features");
+  private String sMatchingfeatures = I18N.get("com.vividsolutions.jump.qa.diff.DiffGeometry.Matching-features");
+  */
   public DiffGeometry(FeatureCollection fc0, FeatureCollection fc1, TaskMonitor monitor)
   {
     inputFC[0] = fc0;
@@ -92,7 +93,7 @@ public class DiffGeometry {
   {
     DiffGeometryIndex diffIndex = new DiffGeometryIndex(fc1, diffMatcher, splitIntoComponents);
 
-    monitor.report(sMatchingfeatures);
+    monitor.report(I18N.get("com.vividsolutions.jump.qa.diff.DiffGeometry.Matching-features"));
     FeatureCollection[] diffFC = new FeatureCollection[2];
     diffFC[0] = matchFeatures(fc0, diffIndex);
     diffFC[1] = new FeatureDataset(fc1.getFeatureSchema());
@@ -108,7 +109,7 @@ public class DiffGeometry {
     int totalItems = fc0.size();
     for (Iterator i = fc0.iterator(); i.hasNext(); ) {
 
-      monitor.report(count++, totalItems, sfeatures);
+      monitor.report(count++, totalItems, I18N.get("com.vividsolutions.jump.qa.diff.DiffGeometry.features"));
 
       Feature f = (Feature) i.next();
       Geometry geom = f.getGeometry();
