@@ -5,7 +5,12 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.GridBagConstraints;
 import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Hashtable;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -22,23 +27,76 @@ import com.vividsolutions.jump.workbench.ui.ErrorHandler;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.OKCancelDialog;
 import com.vividsolutions.jump.workbench.ui.ValidatingTextField;
+import com.vividsolutions.jump.workbench.ui.RecordPanel;
+import com.vividsolutions.jump.workbench.ui.RecordPanelModel;
 
-public class RunDatastoreQueryPanel extends ConnectionPanel
-{
+public class RunDatastoreQueryPanel
+        extends ConnectionPanel
+        implements ActionListener, RecordPanelModel {
+
     private JTextField maxFeaturesTextField;
+    private Hashtable queryMap = new Hashtable();
+    private ArrayList currentConnectionQueries = new ArrayList();
+    private int currentIndex = -1;
+    private RecordPanel recordPanel = new RecordPanel(this);
+
 
     public RunDatastoreQueryPanel(WorkbenchContext context) {
         super(context);
         initialize();
     }
 
+
+    public int getRecordCount() {
+        int num = 0;
+        if ( currentConnectionQueries != null ) {
+            num = currentConnectionQueries.size();
+        }
+        return num;
+    }
+
+    public void setCurrentIndex(int index) {
+        currentIndex = index;
+        String query = null;
+
+        if ( index > -1 ) {
+            query = (String) currentConnectionQueries.get(index);
+        }
+
+        getQueryTextArea().setText(query);
+    }
+
+    public int getCurrentIndex() {
+        return currentIndex;
+    }
+
     private void initialize() {
+        addRow("Max Features:", getMaxFeaturesTextField(), null, false);
         addRow("Query:", new JScrollPane(getQueryTextArea()) {
             {
                 setPreferredSize(new Dimension(MAIN_COLUMN_WIDTH, 100));
             }
-        }, null);
-        addRow("Max Features:", getMaxFeaturesTextField(), null);
+        }, null, true);
+
+        //
+        // We are not using addRow becaus we want the widgets centered over the
+        // OK/Cancel buttons.
+        //
+        add( recordPanel,
+                 new GridBagConstraints( 0, //x
+                 3, // y
+                 3, // width
+                 1, // height
+                 1,
+                 0,
+                 GridBagConstraints.NORTHWEST,
+                 GridBagConstraints.HORIZONTAL,
+                 INSETS,
+                 0,
+                 0 )
+            );
+
+        getConnectionComboBox().addActionListener( this );
     }
 
     private JTextField getMaxFeaturesTextField() {
@@ -59,62 +117,50 @@ public class RunDatastoreQueryPanel extends ConnectionPanel
 
     private JTextArea queryTextArea;
 
-/*
-    public static void main(String[] args) throws Exception {
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        OKCancelDialog dialog = new OKCancelDialog((Frame) null,
-                "Add Datastore Ad-Hoc Query Layer", true,
-                new RunDatastoreQueryPanel(new WorkbenchContext() {
-                    {
-                        getRegistry().createEntry(
-                                DataStoreDriver.REGISTRY_CLASSIFICATION,
-                                new OracleDataStoreDriver());
-                    }
-
-                    private Blackboard blackboard = new Blackboard();
-
-                    public Blackboard getBlackboard() {
-                        return blackboard;
-                    }
-
-                    public ErrorHandler getErrorHandler() {
-                        return new ErrorHandler() {
-                            public void handleThrowable(Throwable t) {
-                                t.printStackTrace(System.err);
-                            }
-                        };
-                    }
-                }), new OKCancelDialog.Validator() {
-
-                    public String validateInput(Component component) {
-                        return ((RunDatastoreQueryPanel) component)
-                                .validateInput();
-                    }
-                });
-        dialog.addComponentListener(new ComponentAdapter() {
-            public void componentHidden(ComponentEvent e) {
-                System.exit(0);
-            }
-        });
-        dialog.pack();
-        GUIUtil.centreOnScreen(dialog);
-        dialog.setVisible(true);
-    }
-*/
 
     public String validateInput() {
-        if (super.validateInput() != null) {
-            return super.validateInput();
+        String errMsg = super.validateInput();
+
+        if ( errMsg == null ) {
+            if (getQuery().length() == 0) {
+                errMsg = "Required field missing: Query";
+            }
         }
-        if (getQuery().length() == 0) {
-            return "Required field missing: Query";
-        }
-        return null;
+
+        return errMsg;
     }
 
     public String getQuery() {
         return queryTextArea.getText().trim();
     }
+
+
+    public void saveQuery() {
+        ConnectionDescriptor cd = getConnectionDescriptor();
+        String query = getQuery();
+        // maybe we should check for duplicates
+        currentConnectionQueries.add(query);
+        currentIndex = currentConnectionQueries.size()-1;
+    }
+
+
+    public void actionPerformed( ActionEvent actionEvent ) {
+        ConnectionDescriptor cd = getConnectionDescriptor();
+
+        if ( cd != null ) {
+            if ( queryMap.containsKey(cd) ) {
+                ArrayList prevQueries = (ArrayList) queryMap.get(cd);
+                currentConnectionQueries = prevQueries;
+            } else {
+                currentConnectionQueries = new ArrayList();
+                queryMap.put( cd, currentConnectionQueries );
+            }
+
+            setCurrentIndex( currentConnectionQueries.size()-1 );
+            recordPanel.updateAppearance();
+        }
+    }
+
 
     /**
      * @return null if the user has left the Max Features text field blank.
@@ -125,7 +171,6 @@ public class RunDatastoreQueryPanel extends ConnectionPanel
     }
 
     protected Collection connectionDescriptors() {
-
         return CollectionUtil.select(super.connectionDescriptors(),
                 new Block() {
                     public Object yield(Object connectionDescriptor) {
@@ -142,4 +187,4 @@ public class RunDatastoreQueryPanel extends ConnectionPanel
                     }
                 });
     }
-} //  @jve:decl-index=0:visual-constraint="10,10"
+}

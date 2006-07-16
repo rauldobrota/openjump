@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * Hosts a custom component in a dialog with OK and Cancel buttons. Also
@@ -64,6 +66,14 @@ public class OKCancelDialog extends JDialog
                 setVisible(false);
             }
         });
+
+        addWindowListener(new WindowAdapter() {
+                public void windowClosing(WindowEvent e) {
+                    okCancelPanel.setOKPressed(false);
+                }
+            }
+        );
+
         getContentPane().add(okCancelPanel, BorderLayout.SOUTH);
         pack();
         // Don't centre dialog until its size has been determined

@@ -67,9 +67,17 @@ public class OverlayPlugIn extends AbstractPlugIn implements ThreadedPlugIn {
     private MultiInputDialog dialog;
     private OverlayEngine overlayEngine;
 
+
+
     public OverlayPlugIn() {
     }
 
+    private String categoryName = StandardCategoryNames.RESULT;
+
+    public void setCategoryName(String value) {
+        categoryName = value;
+    }
+    
     public boolean execute(PlugInContext context) throws Exception {
     	//[sstein, 15.07.2006] placed here again otherwise language settings wont work for i18n 
 		POLYGON_OUTPUT = I18N.get("ui.plugin.analysis.OverlayPlugIn.limit-output-to-polygons-only");
@@ -124,8 +132,8 @@ public class OverlayPlugIn extends AbstractPlugIn implements ThreadedPlugIn {
                                     .getFeatureCollectionWrapper();
         FeatureCollection overlay = overlayEngine.overlay(a, b, mapping(a, b),
                 monitor);
-        context.getLayerManager().addCategory(StandardCategoryNames.RESULT, 0);
-        context.addLayer(StandardCategoryNames.RESULT, I18N.get("ui.plugin.analysis.OverlayPlugIn.overlay"), overlay);
+        context.getLayerManager().addCategory(categoryName);
+        context.addLayer(categoryName, I18N.get("ui.plugin.analysis.OverlayPlugIn.overlay"), overlay);
     }
 
     private AttributeMapping mapping(FeatureCollection a, FeatureCollection b) {

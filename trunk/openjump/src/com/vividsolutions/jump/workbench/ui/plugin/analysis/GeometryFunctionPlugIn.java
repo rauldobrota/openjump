@@ -33,21 +33,30 @@
 
 package com.vividsolutions.jump.workbench.ui.plugin.analysis;
 
-import java.util.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
-import java.awt.Color;
-import java.awt.event.*;
-import javax.swing.text.*;
-import javax.swing.event.*;
-import javax.swing.*;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jump.I18N;
-import com.vividsolutions.jump.feature.*;
-import com.vividsolutions.jump.task.*;
-import com.vividsolutions.jump.workbench.model.*;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jump.feature.Feature;
+import com.vividsolutions.jump.feature.FeatureCollection;
+import com.vividsolutions.jump.feature.FeatureDataset;
+import com.vividsolutions.jump.task.TaskMonitor;
+import com.vividsolutions.jump.workbench.model.Layer;
+import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
+import com.vividsolutions.jump.workbench.model.UndoableCommand;
 import com.vividsolutions.jump.workbench.plugin.*;
-import com.vividsolutions.jump.workbench.ui.*;
+import com.vividsolutions.jump.workbench.plugin.util.*;
+import com.vividsolutions.jump.workbench.ui.GUIUtil;
+import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
+import com.vividsolutions.jump.I18N;
 
 /**
  * Provides basic functions for computation with {@link Geometry} objects.
@@ -98,12 +107,23 @@ public class GeometryFunctionPlugIn
   {
   }
 
+  private String categoryName = StandardCategoryNames.RESULT;
+
+  public void setCategoryName(String value) {
+    categoryName = value;
+  }
+
+  private boolean addToSourceAllowed = true;
+
+  public void setAddToSourceAllowed(boolean value) {
+    addToSourceAllowed = value;
+  }
+
   public void initialize(PlugInContext context) throws Exception {
     registerFunctions(context);
   }
 
-  private void registerFunctions(PlugInContext context)
-  {
+  private void registerFunctions(PlugInContext context){
     // register standard functions
     GeometryFunction[] functions = GeometryFunction.getFunctions();
     context.getWorkbenchContext().getRegistry().createClassification(GEOMETRY_FUNCTION_REG_KEY,GeometryFunction.class);
@@ -140,9 +160,9 @@ public class GeometryFunctionPlugIn
     return true;
   }
 
+
   public void run(TaskMonitor monitor, PlugInContext context)
-      throws Exception
-  {
+      throws Exception {
     monitor.allowCancellationRequests();
 
     // input-proofing
@@ -156,76 +176,85 @@ public class GeometryFunctionPlugIn
 
     monitor.report(I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Executing-function") + " " + functionToRun.getName() + "...");
 
-//    FeatureSchema featureSchema = new FeatureSchema();
-//    featureSchema.addAttribute("GEOMETRY", AttributeType.GEOMETRY);
-//    FeatureCollection resultFC = new FeatureDataset(featureSchema);
-
-//    getSelectedFeature(layer1, context);
-
+    ArrayList modifiedFeatures = new ArrayList();
     Collection resultFeatures = null;
     int nArgs = functionToRun.getGeometryArgumentCount();
+
     if (nArgs == 2) {
       if (maskLayer == null) return;
 
       Collection fc1 = getFeaturesToProcess(srcLayer, context);
       Collection fc2 = getFeaturesToProcess(maskLayer, context);
+
       // check for valid size of input
       if (fc2.size() != 1) {
         context.getWorkbenchFrame().warnUser(I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Mask-must-contain-exactly-one-geometry"));
         return;
       }
-      Geometry geomB = ((Feature) fc2.iterator().next()).getGeometry();
+      Geometry geomMask = ((Feature) fc2.iterator().next()).getGeometry();
 
-      resultFeatures = runGeometryMethod(monitor, fc1, geomB, functionToRun);
-      /*
-      else {
-        resultColl = runGeometryMethod(monitor,
-                                     layer1.getFeatureCollectionWrapper(),
-                                     layer2.getFeatureCollectionWrapper(),
-                                     functionToRun);
-      }
-      */
+      resultFeatures = runGeometryMethodWithMask(monitor, fc1, geomMask, functionToRun, modifiedFeatures);
+    } else {
+      Collection fc1 = getFeaturesToProcess(srcLayer, context);
+      resultFeatures = runGeometryMethod(monitor, fc1, functionToRun, modifiedFeatures);
     }
-    else {
-      resultFeatures = runGeometryMethod(monitor,
-                                     getFeaturesToProcess(srcLayer, context),
-                                     functionToRun);
-    }
+
     // this will happen if plugin was cancelled
     if (resultFeatures == null) return;
 
-    if (updateSource) {
-      srcLayer.setFeatureCollectionModified(true);
-      // don't need to create layer
-      return;
-    }
-
-    // at this point we expect result to contain some features
-    if (resultFeatures.size() == 0) {
+    if (modifiedFeatures.size() == 0) {
       context.getWorkbenchFrame().warnUser(I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.No-geometries-were-processed"));
       return;
     }
 
     if (createLayer) {
+      String outputLayerName = LayerNameGenerator.generateOperationOnLayerName(
+          functionToRun.toString(),
+          srcLayer.getName());
       FeatureCollection resultFC = new FeatureDataset(srcLayer.getFeatureCollectionWrapper().getFeatureSchema());
       resultFC.addAll(resultFeatures);
-//    FeatureCollection resultFC = FeatureDatasetFactory.createFromGeometry(resultColl);
-      context.getLayerManager().addCategory(StandardCategoryNames.RESULT, 0);
-      context.addLayer(StandardCategoryNames.RESULT,  sFunction + "-" + functionToRun, resultFC);
-      return;
-    }
-    if (addToSource) {
-      srcLayer.getFeatureCollectionWrapper().addAll(resultFeatures);
-      return;
+      context.getLayerManager().addCategory(categoryName);
+      context.addLayer(categoryName, outputLayerName, resultFC);
+    } else if (updateSource) {
+        final Collection undoableNewFeatures = resultFeatures;
+        final Collection undoableModifiedFeatures = modifiedFeatures;
+
+        UndoableCommand cmd = new UndoableCommand( getName() ) {
+            public void execute() {
+                srcLayer.getFeatureCollectionWrapper().removeAll( undoableModifiedFeatures );
+                srcLayer.getFeatureCollectionWrapper().addAll( undoableNewFeatures );
+            }
+
+            public void unexecute() {
+                srcLayer.getFeatureCollectionWrapper().removeAll( undoableNewFeatures );
+                srcLayer.getFeatureCollectionWrapper().addAll( undoableModifiedFeatures );
+            }
+        };
+
+        execute( cmd, context );
+    } else if (addToSource) {
+        final Collection undoableFeatures = resultFeatures;
+
+        UndoableCommand cmd = new UndoableCommand( getName() ) {
+            public void execute() {
+                srcLayer.getFeatureCollectionWrapper().addAll( undoableFeatures );
+            }
+
+            public void unexecute() {
+                srcLayer.getFeatureCollectionWrapper().removeAll( undoableFeatures );
+            }
+        };
+
+        execute( cmd, context );
     }
 
-
-    if (exceptionThrown)
+    if (exceptionThrown) {
       context.getWorkbenchFrame().warnUser(sErrorsFound);
+    }
   }
 
-  private Feature getSelectedFeature(Layer lyr, PlugInContext context)
-  {
+
+  private Feature getSelectedFeature(Layer lyr, PlugInContext context){
     Collection selected = context
                         .getLayerViewPanel()
                         .getSelectionManager().getFeaturesWithSelectedItems(lyr);
@@ -234,63 +263,30 @@ public class GeometryFunctionPlugIn
     return (Feature) selected.iterator().next();
   }
 
-  private Collection getSelectedFeatures(Layer lyr, PlugInContext context)
-  {
+
+  private Collection getSelectedFeatures(Layer lyr, PlugInContext context){
     Collection selected = context
                         .getLayerViewPanel()
                         .getSelectionManager().getFeaturesWithSelectedItems(lyr);
     return selected;
   }
 
-  private Collection getFeaturesToProcess(Layer lyr, PlugInContext context)
-  {
+
+  private Collection getFeaturesToProcess(Layer lyr, PlugInContext context){
     if (useSelected)
       return context.getLayerViewPanel()
                         .getSelectionManager().getFeaturesWithSelectedItems(lyr);
     return lyr.getFeatureCollectionWrapper().getFeatures();
   }
 
-/*
-  private Collection runGeometryMethod(TaskMonitor monitor,
-                                       FeatureCollection fcA,
-                                       FeatureCollection fcB,
-                                       GeometryFunction func
-                                       )
-  {
-    exceptionThrown = false;
-    Collection resultColl = new ArrayList();
-    FeatureCollection index = new IndexedFeatureCollection(fcB);
-    int total = fcA.size();
-    int count = 0;
-    for (Iterator ia = fcA.iterator(); ia.hasNext(); ) {
 
-      monitor.report(count++, total, "features");
-      if (monitor.isCancelRequested()) return null;
 
-      Feature fa = (Feature) ia.next();
-      Geometry ga = fa.getGeometry();
-      Collection queryResult = index.query(ga.getEnvelopeInternal());
-      for (Iterator ib = queryResult.iterator(); ib.hasNext(); ) {
-        Feature fb = (Feature) ib.next();
-        Geometry gb = fb.getGeometry();
-        geoms[0] = ga;
-        geoms[1] = gb;
-        Geometry result = execute(func, geoms, params);
-
-        if (result != null && ! result.isEmpty())
-          resultColl.add(result);
-      }
-    }
-    return resultColl;
-  }
-*/
-
-  private Collection runGeometryMethod(TaskMonitor monitor,
+  private Collection runGeometryMethodWithMask(TaskMonitor monitor,
                                        Collection fcA,
                                        Geometry geomB,
-                                       GeometryFunction func
-                                       )
-  {
+                                       GeometryFunction func,
+                                       Collection modifiedFeatures
+                                       ) {
     exceptionThrown = false;
     Collection resultColl = new ArrayList();
     int total = fcA.size();
@@ -306,24 +302,18 @@ public class GeometryFunctionPlugIn
       geoms[1] = geomB;
       Geometry result = execute(func, geoms, params);
 
-      saveResult(fa, result, resultColl);
-/*
-      if (result != null && ! result.isEmpty()) {
-        if (updateSource)
-          fa.setGeometry(result);
-        else
-          resultColl.add(result);
-      }
-      */
+      saveResult(fa, result, resultColl, modifiedFeatures);
+
     }
     return resultColl;
   }
 
+
   private Collection runGeometryMethod(TaskMonitor monitor,
                                        Collection fc,
-                                       GeometryFunction func
-                                       )
-  {
+                                       GeometryFunction func,
+                                       Collection modifiedFeatures
+                                       ){
     exceptionThrown = false;
     Collection resultColl = new ArrayList();
     int total = fc.size();
@@ -340,36 +330,24 @@ public class GeometryFunctionPlugIn
       geoms[0] = gSrc;
       Geometry result = execute(func, geoms, params);
 
-      saveResult(fSrc, result, resultColl);
-/*
-      if (result != null && ! result.isEmpty()) {
-        if (updateSource)
-          fSrc.setGeometry(result);
-        else {
-          resultColl.add(result);
-        }
-      }
-      */
+      saveResult(fSrc, result, resultColl, modifiedFeatures);
     }
+
     return resultColl;
   }
 
-  private void saveResult(Feature srcFeat, Geometry resultGeom, Collection resultColl)
-  {
-    if (resultGeom == null || resultGeom.isEmpty())
-      return;
-
-    if (updateSource)
-      srcFeat.setGeometry(resultGeom);
-    else {
+  private void saveResult(Feature srcFeat, Geometry resultGeom, Collection resultColl, Collection modifiedFeatures) {
+    if (resultGeom == null || resultGeom.isEmpty()) {
+        // do nothing
+    } else {
       Feature fNew = srcFeat.clone(true);
       fNew.setGeometry(resultGeom);
       resultColl.add(fNew);
+      modifiedFeatures.add(srcFeat);
     }
   }
 
-  private Geometry execute(GeometryFunction func, Geometry[] geoms, double[] params)
-  {
+  private Geometry execute(GeometryFunction func, Geometry[] geoms, double[] params){
     try {
       return func.execute(geoms, params);
     }
@@ -421,21 +399,16 @@ public class GeometryFunctionPlugIn
     		I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Create-a-new-layer-for-the-results"));
     updateSourceRB = dialog.addRadioButton(UPDATE_SRC, OUTPUT_GROUP, false,
     		I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Replace-the-geometry-of-Source-features-with-the-result-geometry") + "  ");
-    addToSourceRB = dialog.addRadioButton(ADD_TO_SRC, OUTPUT_GROUP, false,
-    		I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Add-the-result-geometry-to-the-Source-layer")+"  ");
 
-    // MD - can't get formatting to work reliably
-    //dialog.addLabel("<HTML>&nbsp;</HTML>");  // blank label for space
-    //labelField = dialog.addLabel("<html><i>Select a function</i><p><p><p></html>");
+    if ( addToSourceAllowed ) {
+        addToSourceRB = dialog.addRadioButton(ADD_TO_SRC, OUTPUT_GROUP, false,
+                I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Add-the-result-geometry-to-the-Source-layer")+"  ");
+    }
 
     updateUIForMethod(functionToRun);
   }
 
-  private void setFunctionDescription(String desc)
-  {
-    labelField.setText("<html><i>" + desc
-                       + "</i></html> ");
-  }
+
 
   private void getDialogValues(MultiInputDialog dialog) {
     srcLayer = dialog.getLayer(SRC_LAYER);
@@ -445,11 +418,13 @@ public class GeometryFunctionPlugIn
     useSelected = dialog.getBoolean(SELECTED_ONLY);
     createLayer = dialog.getBoolean(CREATE_LYR);
     updateSource = dialog.getBoolean(UPDATE_SRC);
-    addToSource = dialog.getBoolean(ADD_TO_SRC);
+
+    if ( addToSourceAllowed ) {
+        addToSource = dialog.getBoolean(ADD_TO_SRC);
+    }
   }
 
-  private void updateUIForMethod(GeometryFunction func)
-  {
+  private void updateUIForMethod(GeometryFunction func){
     boolean layer2Used = false;
     boolean paramUsed = false;
     if (func != null) {
@@ -461,20 +436,13 @@ public class GeometryFunctionPlugIn
     // this has the effect of making the background gray (disabled)
     paramField.setOpaque(paramUsed);
 
-    //if (func != null) {
-    //	setFunctionDescription(func.getDescription());
-    //}
     dialog.validate();
   }
 
-  private class MethodItemListener
-      implements ItemListener
-  {
+  private class MethodItemListener implements ItemListener {
     public void itemStateChanged(ItemEvent e) {
       updateUIForMethod((GeometryFunction) e.getItem());
     }
   }
 
 }
-
-

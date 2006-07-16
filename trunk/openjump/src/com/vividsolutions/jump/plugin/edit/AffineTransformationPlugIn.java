@@ -97,13 +97,13 @@ public class AffineTransformationPlugIn
        throws Exception
   {
     AffineTransformation trans = new AffineTransformation();
-    
-    AffineTransformation toOriginTrans 
+
+    AffineTransformation toOriginTrans
     = AffineTransformation.translationInstance(-originX, -originY);
     trans.compose(toOriginTrans);
 
     if (scaleX != 1.0 || scaleY != 1.0) {
-      AffineTransformation scaleTrans 
+      AffineTransformation scaleTrans
         = AffineTransformation.scaleInstance(scaleX, scaleY);
       //trans.compose(scaleTrans);
       trans.scale(scaleX, scaleY);
@@ -112,26 +112,26 @@ public class AffineTransformationPlugIn
       trans.shear(shearX, shearY);
     }
     if (rotationAngle != 0.0) {
-      AffineTransformation rotTrans 
+      AffineTransformation rotTrans
         = AffineTransformation.rotationInstance(Math.toRadians(rotationAngle));
 //      trans.compose(rotTrans);
       trans.rotate(Math.toRadians(rotationAngle));
     }
-    
-    AffineTransformation fromOriginTrans 
+
+    AffineTransformation fromOriginTrans
     = AffineTransformation.translationInstance(originX, originY);
     trans.compose(fromOriginTrans);
 
     if (transX != 0.0 || transY != 0.0) {
-      AffineTransformation translateTrans 
+      AffineTransformation translateTrans
         = AffineTransformation.translationInstance(transX, transY);
       trans.compose(translateTrans);
     }
 
     FeatureCollection fc = layer.getFeatureCollectionWrapper();
-    
+
     FeatureCollection resultFC = new FeatureDataset(fc.getFeatureSchema());
-    
+
     for (Iterator i = fc.iterator(); i.hasNext();) {
       Feature f = (Feature) i.next();
       Feature f2 = f.clone(true);
@@ -200,10 +200,10 @@ public class AffineTransformationPlugIn
 
     JButton buttonOriginLL = dialog.addButton(ORIGIN_FROM_LL);
     buttonOriginLL.addActionListener(new OriginLLListener(true));
-    
+
     JButton buttonOriginMid = dialog.addButton(ORIGIN_FROM_MIDPOINT);
     buttonOriginMid.addActionListener(new OriginLLListener(false));
-    
+
     dialog.addLabel("<HTML><B>Scaling</B></HTML>");
     scaleXField = dialog.addDoubleField(SCALE_X, scaleX, 20, "Scale X Factor");
     scaleYField = dialog.addDoubleField(SCALE_Y, scaleY, 20, "Scale Y Factor");
@@ -226,7 +226,7 @@ public class AffineTransformationPlugIn
     JButton setIdentityButton = dialog.addButton("Set to Identity");
     setIdentityButton.addActionListener(new SetIdentityListener());
     dialog.addSeparator();
-    
+
     dialog.addLabel("<HTML><B>Baseline Vectors</B></HTML>");
     dialog.addLayerComboBox(SRC_BASE_LAYER, context.getLayerManager().getLayer(0),
         context.getLayerManager());
@@ -250,32 +250,15 @@ public class AffineTransformationPlugIn
     rotationAngle = dialog.getDouble(ROTATE_ANGLE);
   }
 
-  /*
-  private void XXXupdateUI()
-  {
-    boolean doTranslate = dialog.getBoolean(DO_TRANS);
-    transXField.setEnabled(doTranslate);
-    transXField.setOpaque(doTranslate);
-    transYField.setEnabled(doTranslate);
-    transYField.setOpaque(doTranslate);
-
-    boolean doScale = dialog.getBoolean(DO_SCALE);
-    scaleFactorField.setEnabled(doScale);
-    scaleFactorField.setOpaque(doScale);
-
-    boolean doRotate = dialog.getBoolean(DO_ROTATE);
-    rotateAngleField.setEnabled(doRotate);
-    rotateAngleField.setOpaque(doRotate);
-  }
-*/
   private void updateOriginLL(boolean isLowerLeft)
   {
     Layer lyr = dialog.getLayer(LAYER);
     FeatureCollection fc = lyr.getFeatureCollectionWrapper();
     Envelope env = fc.getEnvelope();
-    
+
     double x = env.getMinX();
     double y = env.getMinY();
+    // if not LowerLeft, set to midpoint
     if (! isLowerLeft) {
       x = (env.getMinX() + env.getMaxX()) / 2;
       y = (env.getMinY() + env.getMaxY()) / 2;
@@ -283,30 +266,55 @@ public class AffineTransformationPlugIn
     originXField.setText(x + "");
     originYField.setText(y + "");
   }
-  
-  private void updateParams()
+
+  private String updateParams()
   {
     Layer layerSrc = dialog.getLayer(SRC_BASE_LAYER);
     Layer layerDest = dialog.getLayer(DEST_BASE_LAYER);
-    Coordinate[] srcVector = getVector(layerSrc);
-    Coordinate[] destVector = getVector(layerDest);
-    if (srcVector == null || destVector == null) 
-      return;
-    
-    originXField.setText(srcVector[0].x + "");
-    originYField.setText(srcVector[0].y + "");
-    
-    TransRotScaleBuilder trsBuilder = new TransRotScaleBuilder(srcVector, destVector);
-    
-    scaleXField.setText(trsBuilder.getScale() + "");
-    scaleYField.setText(trsBuilder.getScale() + "");
+
+    FeatureCollection fcSrc = layerSrc.getFeatureCollectionWrapper();
+    FeatureCollection fcDest = layerDest.getFeatureCollectionWrapper();
+
+    AffineTransControlPointExtracter controlPtExtracter = new AffineTransControlPointExtracter(fcSrc, fcDest);
+    String parseErrMsg = null;
+    if (controlPtExtracter.getInputType() == AffineTransControlPointExtracter.TYPE_UNKNOWN) {
+      parseErrMsg = controlPtExtracter.getParseErrorMessage();
+      return parseErrMsg;
+    }
+
+    Coordinate[] srcPts = controlPtExtracter.getSrcControlPoints();
+    Coordinate[] destPts = controlPtExtracter.getDestControlPoints();
+
+    TransRotScaleBuilder trsBuilder = null;
+    switch (srcPts.length) {
+      case 2:
+        trsBuilder = new TwoPointTransRotScaleBuilder(srcPts, destPts);
+        break;
+      case 3:
+        trsBuilder = new TriPointTransRotScaleBuilder(srcPts, destPts);
+        break;
+    }
+
+    if (trsBuilder != null)
+      updateParams(trsBuilder);
+    return null;
+  }
+
+  private void updateParams(TransRotScaleBuilder trsBuilder)
+  {
+    originXField.setText(trsBuilder.getOriginX() + "");
+    originYField.setText(trsBuilder.getOriginY() + "");
+
+    scaleXField.setText(trsBuilder.getScaleX() + "");
+    scaleYField.setText(trsBuilder.getScaleY() + "");
 
     transXField.setText(trsBuilder.getTranslateX() + "");
     transYField.setText(trsBuilder.getTranslateY() + "");
-    
-    rotateAngleField.setText(trsBuilder.getAngle() + "");
+
+    rotateAngleField.setText(trsBuilder.getRotationAngle() + "");
   }
-  
+
+
   private void setToIdentity()
   {
     scaleXField.setText("1.0");
@@ -317,53 +325,58 @@ public class AffineTransformationPlugIn
 
     transXField.setText("0.0");
     transYField.setText("0.0");
-    
+
     rotateAngleField.setText("0.0");
   }
-  
+
   /**
    * Gets the first two points from the first geometry on the layer (if any).
    * @param lyr the layer to extract from
    * @return a coordinate array of length 2 (the two points may be equal)
    * @return null if points could not be determined
    */
+  /*
   private Coordinate[] getVector(Layer lyr)
   {
     FeatureCollection fc = lyr.getFeatureCollectionWrapper();
     Iterator i = fc.iterator();
-    if (! i.hasNext()) 
+    if (! i.hasNext())
       return null;
     Feature f = (Feature) i.next();
     Geometry gFull = f.getGeometry();
     Geometry g = gFull.getGeometryN(0);
-    
+
     if (g instanceof com.vividsolutions.jts.geom.Polygon)
       g = ((com.vividsolutions.jts.geom.Polygon) g).getExteriorRing();
     Coordinate[] pts = g.getCoordinates();
-    if (pts.length < 1) 
+    if (pts.length < 1)
       return null;
     int index2 = 1;
     if (pts.length == 1)
       index2 = 0;
     return new Coordinate[] { pts[0], pts[index2] };
   }
-  
-  private class OriginLLListener implements ActionListener 
+*/
+
+  private class OriginLLListener implements ActionListener
   {
     private boolean isLowerLeft;
-    
+
     OriginLLListener(boolean isLowerLeft)
     {
       this.isLowerLeft = isLowerLeft;
     }
-    
+
     public void actionPerformed(ActionEvent e) {
       updateOriginLL(isLowerLeft);
     }
   }
   private class UpdateParamListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
-      updateParams();
+      String errMsg = updateParams();
+      if (errMsg != null) {
+         JOptionPane.showMessageDialog(null, errMsg, "Control Point Error", JOptionPane.ERROR_MESSAGE);
+      }
     }
   }
   private class SetIdentityListener implements ActionListener {
@@ -373,48 +386,146 @@ public class AffineTransformationPlugIn
   }
 }
 
-class TransRotScaleBuilder
+/**
+ * Computes a translation, scale and rotation
+ * from two vectors (each with a start and end point)
+ *
+ * @author Martin Davis
+ * @version 1.0
+ */
+abstract class TransRotScaleBuilder
 {
-  private double scale = 0.0;
-  private double dx = 0.0;
-  private double dy = 0.0;
-  private double angle = 0.0;  // in degrees
-  
-  TransRotScaleBuilder(Coordinate[] srcVector, Coordinate[] destVector)
+  protected double originX = 0.0;
+  protected double originY = 0.0;
+  protected double scaleX = 0.0;
+  protected double scaleY = 0.0;
+  protected double dx = 0.0;
+  protected double dy = 0.0;
+  protected double angle = 0.0;  // in degrees
+
+  public TransRotScaleBuilder(Coordinate[] srcPts, Coordinate[] destPts)
   {
-    init(srcVector, destVector);
+    compute(srcPts, destPts);
   }
-  
-  private void init(Coordinate[] srcVector, Coordinate[] destVector)
-  {
-    double srcLen = srcVector[0].distance(srcVector[1]);
-    double destLen = destVector[0].distance(destVector[1]);
-    
-    boolean isZeroLength = (srcLen == 0.0 || destLen == 0.0);
-    
-    if (! isZeroLength) {
-      scale = destLen / srcLen;
-      
-      double angleSrc = Angle.angle(srcVector[0], srcVector[1]);
-      double angleDest = Angle.angle(destVector[0], destVector[1]);
-      /*
-      Coordinate vecSrc = getUnitVector(srcVector);
-      Coordinate vecDest = getUnitVector(destVector);
-      */
-      double angleRad = angleDest - angleSrc;
-      angle = Math.toDegrees(angleRad);
-    }
-    
-    dx = destVector[0].x - srcVector[0].x;
-    dy = destVector[0].y - srcVector[0].y;
-  }
-  
-  public boolean isScale() { return scale > 0.0; }
-  public double getScale() { return scale; }
-  
+
+  protected abstract void compute(Coordinate[] srcPts, Coordinate[] destPts);
+
+  public double getOriginX() { return originX; }
+  public double getOriginY() { return originY; }
+
+  public boolean isScale() { return scaleX > 0.0; }
+  public double getScaleX() { return scaleX; }
+  public double getScaleY() { return scaleY; }
+
   public boolean isTranslate() { return dx != 0.0 | dy != 0.0; }
   public double getTranslateX() { return dx; }
   public double getTranslateY() { return dy; }
-  
-  public double getAngle() { return angle; }
+
+  public double getRotationAngle() { return angle; }
+
+}
+
+class TwoPointTransRotScaleBuilder
+    extends TransRotScaleBuilder
+{
+
+  /**
+   * Creates a builder from two Coordinate[2] arrays defining the src and dest vectors.
+   *
+   * @param srcVector the two Coordinates defining the src vector
+   * @param destVector the two Coordinates defining the dest vector
+   */
+  TwoPointTransRotScaleBuilder(Coordinate[] srcVector, Coordinate[] destVector)
+  {
+    super(srcVector, destVector);
+  }
+
+  protected void compute(Coordinate[] srcVector, Coordinate[] destVector)
+  {
+    originX = srcVector[0].x;
+    originY = srcVector[0].y;
+
+    double srcLen = srcVector[0].distance(srcVector[1]);
+    double destLen = destVector[0].distance(destVector[1]);
+
+    boolean isZeroLength = (srcLen == 0.0 || destLen == 0.0);
+
+    if (! isZeroLength) {
+      scaleX = destLen / srcLen;
+      scaleY = scaleX;
+
+      double angleSrc = Angle.angle(srcVector[0], srcVector[1]);
+      double angleDest = Angle.angle(destVector[0], destVector[1]);
+      double angleRad = angleDest - angleSrc;
+      angle = Math.toDegrees(angleRad);
+    }
+
+    dx = destVector[0].x - srcVector[0].x;
+    dy = destVector[0].y - srcVector[0].y;
+  }
+
+}
+class TriPointTransRotScaleBuilder
+    extends TransRotScaleBuilder
+{
+
+  /**
+   * Creates a builder from two Coordinate[3] arrays defining the src and dest control points
+   *
+   * @param srcVector the two Coordinates defining the src vector
+   * @param destVector the two Coordinates defining the dest vector
+   */
+  TriPointTransRotScaleBuilder(Coordinate[] srcPt, Coordinate[] destPt)
+  {
+    super(srcPt, destPt);
+  }
+
+  protected void compute(Coordinate[] srcPt, Coordinate[] destPt)
+  {
+    /**
+     * For now just extract a Y scale from the third pt.
+     * In future could do shear too.
+     */
+
+    /*
+    AffineTransformationBuilder atBuilder = new AffineTransformationBuilder(
+        srcPt[0],
+        srcPt[1],
+        srcPt[2],
+        destPt[0],
+        destPt[1],
+        destPt[2]
+        );
+    */
+
+    originX = srcPt[1].x;
+    originY = srcPt[1].y;
+
+    double srcLenBase = srcPt[1].distance(srcPt[2]);
+    double destLenBase = destPt[1].distance(destPt[2]);
+
+    double srcLenSide = srcPt[0].distance(srcPt[1]);
+    double destLenSide = destPt[0].distance(destPt[1]);
+
+    boolean isZeroLength = (srcLenBase == 0.0
+                            || destLenBase == 0.0
+                            || srcLenSide == 0.0
+                            || destLenSide == 0.0
+                            );
+
+
+    if (! isZeroLength) {
+      scaleX = destLenBase / srcLenBase;
+      scaleY = destLenSide / srcLenSide;
+
+      double angleSrc = Angle.angle(srcPt[1], srcPt[2]);
+      double angleDest = Angle.angle(destPt[1], destPt[2]);
+      double angleRad = angleDest - angleSrc;
+      angle = Math.toDegrees(angleRad);
+    }
+
+    dx = destPt[1].x - srcPt[1].x;
+    dy = destPt[1].y - srcPt[1].y;
+  }
+
 }

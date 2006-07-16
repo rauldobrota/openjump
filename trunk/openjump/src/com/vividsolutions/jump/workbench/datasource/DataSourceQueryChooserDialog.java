@@ -55,7 +55,7 @@ import javax.swing.*;
  * A bit confusing for files, as there are two "format" comboboxes for the user
  * to choose from: one for the DataSource type, and another for the file extension.
  * In the future, file DataSources may have their own dialog, eliminating the
- * first combobox. 
+ * first combobox.
  */
 public class DataSourceQueryChooserDialog extends JDialog {
     private CardLayout cardLayout = new CardLayout();
@@ -161,6 +161,19 @@ public class DataSourceQueryChooserDialog extends JDialog {
         return okCancelPanel.wasOKPressed();
     }
 
+
+    public void setOKPressed() {
+        //
+        // It is important to call setOKPressed before calling isInputValid
+        // otherwise we run into an infinite loop of actionPerformed calls.
+        //
+        okCancelPanel.setOKPressed(true);
+
+        if ( getCurrentChooser().isInputValid() ) {
+            setVisible(false);
+        }
+    }
+
     void formatComboBox_actionPerformed(ActionEvent e) {
         cardLayout.show(mainPanel, name(getCurrentChooser().getComponent()));
     }
@@ -175,7 +188,7 @@ public class DataSourceQueryChooserDialog extends JDialog {
             setVisible(false);
         }
     }
-    
+
     public String getSelectedFormat() {
         return formatComboBox.getSelectedItem().toString();
     }

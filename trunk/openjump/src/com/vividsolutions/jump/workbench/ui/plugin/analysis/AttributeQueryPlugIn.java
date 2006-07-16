@@ -32,21 +32,27 @@
 
 package com.vividsolutions.jump.workbench.ui.plugin.analysis;
 
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.*;
 
-import java.awt.Color;
-import java.awt.event.*;
-import javax.swing.text.*;
-import javax.swing.event.*;
-import javax.swing.*;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JRadioButton;
 
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jump.feature.*;
-import com.vividsolutions.jump.task.*;
+import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.util.StringUtil;
-import com.vividsolutions.jump.workbench.model.*;
+import com.vividsolutions.jump.workbench.model.Layer;
+import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
 import com.vividsolutions.jump.workbench.plugin.*;
-import com.vividsolutions.jump.workbench.ui.*;
+import com.vividsolutions.jump.workbench.plugin.util.*;
+import com.vividsolutions.jump.workbench.ui.GUIUtil;
+import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
+import com.vividsolutions.jump.workbench.ui.SelectionManager;
 
 /**
 * Queries a layer by a spatial predicate.
@@ -64,10 +70,7 @@ public class AttributeQueryPlugIn
   private final static String ATTR_GEOMETRY_ISVALID = "Geometry.IsValid";
   private final static String ATTR_GEOMETRY_TYPE = "Geometry.Type";
 
-  private final static String LAYER = "Source Layer";
-  private final static String ATTRIBUTE = "Attribute";
-  private final static String PREDICATE = "Relation";
-  private final static String VALUE = "Value";
+
   // MD - could easily add this later
   //private final static String DIALOG_COMPLEMENT = "Complement Result";
 
@@ -79,83 +82,99 @@ public class AttributeQueryPlugIn
   private String value = "";
   private boolean complementResult = false;
   private boolean exceptionThrown = false;
+  private JRadioButton updateSourceRB;
+  private JRadioButton createNewLayerRB;
+  private boolean createLayer = true;
 
-  public AttributeQueryPlugIn()
-  {
+  public AttributeQueryPlugIn() {
     functionNames = AttributePredicate.getNames();
   }
 
-  /*
-  // MD - for some reason this is now done in JUMPConfiguration
-    public void initialize(PlugInContext context) throws Exception {
-      context.getFeatureInstaller().addMainMenuItem(
-          this, "Tools", "Find Unaligned Segments...", null, new MultiEnableCheck()
-        .add(context.getCheckFactory().createWindowWithLayerNamePanelMustBeActiveCheck())
-          .add(context.getCheckFactory().createAtLeastNLayersMustExistCheck(1)));
-    }
-  */
+  private String categoryName = StandardCategoryNames.RESULT;
+
+  public void setCategoryName(String value) {
+    categoryName = value;
+  }
+
 
   public boolean execute(PlugInContext context) throws Exception {
-    dialog = new MultiInputDialog(
-        context.getWorkbenchFrame(), getName(), true);
+    dialog = new MultiInputDialog(context.getWorkbenchFrame(), getName(), true);
     setDialogValues(dialog, context);
     GUIUtil.centreOnWindow(dialog);
     dialog.setVisible(true);
+
     if (! dialog.wasOKPressed()) { return false; }
+
     getDialogValues(dialog);
+
+    // input-proofing
+    if (srcLayer == null) return false;
+    if (StringUtil.isEmpty(value)) return false;
+    if (StringUtil.isEmpty(attrName)) return false;
+    if (StringUtil.isEmpty(funcNameToRun)) return false;
+
     return true;
   }
 
   public void run(TaskMonitor monitor, PlugInContext context)
-      throws Exception
-  {
+      throws Exception {
     monitor.allowCancellationRequests();
-
-    // input-proofing
-    if (value == null) return;
-    if (srcLayer == null) return;
-    if (attrName == null) return;
 
     monitor.report("Executing query...");
 
     FeatureCollection sourceFC = srcLayer.getFeatureCollectionWrapper();
 
-
-//    SpatialQueryExecuter executer = new SpatialQueryExecuter(maskFC, sourceFC);
-//    executer.setComplementResult(complementResult);
-//    FeatureCollection resultFC = executer.getResultFC();
-//    executer.execute(monitor, functionToRun, params, resultFC);
-
-    if (monitor.isCancelRequested())
-      return;
+    if (monitor.isCancelRequested()) return;
 
     FeatureCollection resultFC = executeQuery(sourceFC, attrName, value);
-    // this will happen if plugin was cancelled
-    context.getLayerManager().addCategory(StandardCategoryNames.RESULT, 0);
-    context.addLayer(StandardCategoryNames.RESULT, "Query-" + attrName, resultFC);
-    if (exceptionThrown)
+
+    if (createLayer) {
+      String outputLayerName = LayerNameGenerator.generateOperationOnLayerName(
+          funcNameToRun,
+          srcLayer.getName());
+      context.getLayerManager().addCategory(categoryName);
+      context.addLayer(categoryName, outputLayerName, resultFC);
+    } else {
+      SelectionManager selectionManager = context.getLayerViewPanel().getSelectionManager();
+      selectionManager.clear();
+      selectionManager.getFeatureSelection().selectItems( srcLayer, resultFC.getFeatures() );
+    }
+
+    if (exceptionThrown) {
       context.getWorkbenchFrame().warnUser("Errors found while executing query");
+    }
   }
 
-  private FeatureCollection executeQuery(FeatureCollection sourceFC, String attrName,
-      String value)
-  {
+
+  private FeatureCollection executeQuery(
+          FeatureCollection sourceFC,
+          String attrName,
+          String value){
     AttributePredicate pred = AttributePredicate.getPredicate(funcNameToRun);
     FeatureCollection resultFC = new FeatureDataset(sourceFC.getFeatureSchema());
+
     for (Iterator i = sourceFC.iterator(); i.hasNext(); ) {
       Feature f = (Feature) i.next();
       Object fVal = getValue(f, attrName);
-//      Object fVal = f.getAttribute(attrName);
+      boolean predResult = pred.isTrue(fVal, value);
 
-      if (pred.isTrue(fVal, value))
-      //if (fVal.equals(value))
-        resultFC.add(f.clone(true));
+      if (complementResult)
+        predResult = ! predResult;
+
+      if (predResult) {
+          if (createLayer) {
+              resultFC.add(f.clone(true));
+          } else {
+              resultFC.add(f);
+          }
+      }
     }
+
     return resultFC;
   }
 
-  private Object getValue(Feature f, String attrName)
-  {
+
+  private Object getValue(Feature f, String attrName) {
     if (attrName == ATTR_GEOMETRY_AREA) {
       Geometry g = f.getGeometry();
       double area = (g == null) ? 0.0 : g.getArea();
@@ -201,25 +220,37 @@ public class AttributeQueryPlugIn
     return f.getAttribute(attrName);
   }
 
+  private final static String LAYER = "Source Layer";
+  private final static String ATTRIBUTE = "Attribute";
+  private final static String PREDICATE = "Relation";
+  private final static String VALUE = "Value";
+  private final static String DIALOG_COMPLEMENT = "Complement Result";
+
+  private final static String UPDATE_SRC = "Select features in the source layer.";
+  private final static String CREATE_LYR = "Create a new layer for the results.";
+
   private JComboBox attrComboBox;
 
-  private void setDialogValues(MultiInputDialog dialog, PlugInContext context)
-  {
-    //dialog.setSideBarImage(new ImageIcon(getClass().getResource("DiffSegments.png")));
+  private void setDialogValues(MultiInputDialog dialog, PlugInContext context){
     dialog.setSideBarDescription(
         "Finds the Source features which have attribute values satisfying a given condition");
 
     //Set initial layer values to the first and second layers in the layer list.
     //In #initialize we've already checked that the number of layers >= 1. [Jon Aquino]
-    JComboBox lyrCombo = dialog.addLayerComboBox(LAYER, srcLayer, context.getLayerManager());
+    Layer initLayer = (srcLayer == null)? context.getCandidateLayer(0) : srcLayer;
+
+    JComboBox lyrCombo = dialog.addLayerComboBox(LAYER, initLayer, context.getLayerManager());
     lyrCombo.addItemListener(new LayerItemListener());
     attrComboBox = dialog.addComboBox(ATTRIBUTE, attrName, functionNames, null);
     dialog.addComboBox(PREDICATE, funcNameToRun, functionNames, null);
-
     dialog.addTextField(VALUE, value, 20, null, null);
-    //dialog.addCheckBox(DIALOG_COMPLEMENT, false);
+    dialog.addCheckBox(DIALOG_COMPLEMENT, complementResult);
 
-    updateUI(srcLayer);
+    final String OUTPUT_GROUP = "OUTPUT_GROUP";
+    createNewLayerRB = dialog.addRadioButton(CREATE_LYR, OUTPUT_GROUP, createLayer,CREATE_LYR);
+    updateSourceRB = dialog.addRadioButton(UPDATE_SRC, OUTPUT_GROUP, !createLayer, UPDATE_SRC);
+
+    updateUI(initLayer);
   }
 
   private void getDialogValues(MultiInputDialog dialog) {
@@ -227,26 +258,26 @@ public class AttributeQueryPlugIn
     attrName = dialog.getText(ATTRIBUTE);
     funcNameToRun = dialog.getText(PREDICATE);
     value = dialog.getText(VALUE);
-    //complementResult = dialog.getBoolean(DIALOG_COMPLEMENT);
+    complementResult = dialog.getBoolean(DIALOG_COMPLEMENT);
+    createLayer = dialog.getBoolean(CREATE_LYR);
   }
 
-  private void updateUI(Layer lyr)
-  {
+  private void updateUI(Layer lyr) {
     List attrNames = null;
     if (lyr != null) {
       FeatureCollection fc = lyr.getFeatureCollectionWrapper();
       FeatureSchema fs = fc.getFeatureSchema();
 
       attrNames = getAttributeNames(fs);
-    }
-    else {
+    } else {
       attrNames = new ArrayList();
     }
     attrComboBox.setModel(new DefaultComboBoxModel(new Vector(attrNames)));
+    attrComboBox.setSelectedItem(attrName);
   }
 
-  private static List getAttributeNames(FeatureSchema fs)
-  {
+
+  private static List getAttributeNames(FeatureSchema fs) {
     List names = new ArrayList();
     for (int i = 0; i < fs.getAttributeCount(); i++) {
       if (fs.getAttributeType(i) != AttributeType.GEOMETRY)
@@ -264,9 +295,8 @@ public class AttributeQueryPlugIn
     return names;
   }
 
-  private class LayerItemListener
-      implements ItemListener
-  {
+
+  private class LayerItemListener implements ItemListener {
     public void itemStateChanged(ItemEvent e) {
       updateUI((Layer) e.getItem());
     }

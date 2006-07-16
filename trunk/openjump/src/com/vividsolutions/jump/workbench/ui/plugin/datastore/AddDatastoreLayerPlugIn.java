@@ -17,22 +17,34 @@ public class AddDatastoreLayerPlugIn extends AbstractAddDatastoreLayerPlugIn {
         return super.execute(context);
     }
 
-    private Layer createLayer(final AddDatastoreLayerPanel panel,
+    private Layer createLayer(
+            final AddDatastoreLayerPanel panel,
             final PlugInContext context) throws Exception {
-        Layer layer = new Layer(panel.getDatasetName(), context
-                .getLayerManager().generateLayerFillColor(), AddNewLayerPlugIn
-                .createBlankFeatureCollection(), context.getLayerManager());
-        layer.setDataSourceQuery(new DataSourceQuery(new DataStoreDataSource(
-                panel.getDatasetName(), panel.getGeometryAttributeName(), panel
-                        .getWhereClause(), panel.getConnectionDescriptor(),
-                panel.isCaching(), context.getWorkbenchContext()), null, panel
-                .getDatasetName()));
-        OpenProjectPlugIn
-                .load(layer, CoordinateSystemRegistry.instance(context
-                        .getWorkbenchContext().getBlackboard()),
-                        new DummyTaskMonitor());
+
+        Layer layer = new Layer(
+                panel.getDatasetName(),
+                context.getLayerManager().generateLayerFillColor(),
+                AddNewLayerPlugIn.createBlankFeatureCollection(),
+                context.getLayerManager());
+
+        DataStoreDataSource ds = new DataStoreDataSource(
+                panel.getDatasetName(),
+                panel.getGeometryAttributeName(),
+                panel.getWhereClause(),
+                panel.getConnectionDescriptor(),
+                panel.isCaching(),
+                context.getWorkbenchContext());
+
+        DataSourceQuery dsq = new DataSourceQuery(ds, null, panel.getDatasetName());
+
+        layer.setDataSourceQuery(dsq);
+
+        OpenProjectPlugIn.load( layer,
+                                CoordinateSystemRegistry.instance(context.getWorkbenchContext().getBlackboard()),
+                                new DummyTaskMonitor());
         return layer;
     }
+
 
     protected ConnectionPanel createPanel(PlugInContext context) {
         return new AddDatastoreLayerPanel(context.getWorkbenchContext());

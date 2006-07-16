@@ -49,6 +49,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
+
 /**
  * UI for picking a file-based dataset to load.
  */
@@ -57,6 +58,11 @@ public class LoadFileDataSourceQueryChooser extends FileDataSourceQueryChooser {
         " - FILE CHOOSER DIRECTORY";
     public static final String FILE_CHOOSER_COORDINATE_SYSTEM_KEY = LoadFileDataSourceQueryChooser.class.getName() +
         " - FILE CHOOSER COORDINATE SYSTEM";
+    public static final String FILE_CHOOSER_PANEL_KEY = LoadFileDataSourceQueryChooser.class.getName() +
+            " - FILE CHOOSER PANEL";
+    public static final String FILE_CHOOSER_KEY = LoadFileDataSourceQueryChooser.class.getName() +
+            " - FILE CHOOSER";
+
     private WorkbenchContext context;
 
     /**
@@ -73,17 +79,16 @@ public class LoadFileDataSourceQueryChooser extends FileDataSourceQueryChooser {
     }
 
     protected FileChooserPanel getFileChooserPanel() {
-        final String FILE_CHOOSER_PANEL_KEY = LoadFileDataSourceQueryChooser.class.getName() +
-            " - FILE CHOOSER PANEL";
-
         //LoadFileDataSourceQueryChoosers share the same JFileChooser so that the user's
         //work is not lost when he switches data-source types. Also, the JFileChooser options
-        //are set once because setting them is slow (freezes the GUI for a few seconds). 
+        //are set once because setting them is slow (freezes the GUI for a few seconds).
         //[Jon Aquino]
         if (blackboard().get(FILE_CHOOSER_PANEL_KEY) == null) {
             final JFileChooser fileChooser = GUIUtil.createJFileChooserWithExistenceChecking();
             fileChooser.setMultiSelectionEnabled(true);
             fileChooser.setControlButtonsAreShown(false);
+
+            blackboard().put(FILE_CHOOSER_KEY, fileChooser);
             blackboard().put(FILE_CHOOSER_PANEL_KEY,
                 new FileChooserPanel(fileChooser, blackboard()));
 
@@ -101,6 +106,7 @@ public class LoadFileDataSourceQueryChooser extends FileDataSourceQueryChooser {
 
         return (FileChooserPanel) blackboard().get(FILE_CHOOSER_PANEL_KEY);
     }
+
 
     public Collection getDataSourceQueries() {
         //User has pressed OK, so persist the directory. [Jon Aquino]

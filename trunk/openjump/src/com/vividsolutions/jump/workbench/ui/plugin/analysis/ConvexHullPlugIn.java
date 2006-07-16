@@ -57,6 +57,12 @@ public class ConvexHullPlugIn extends AbstractPlugIn implements ThreadedPlugIn {
     public ConvexHullPlugIn() {
     }
 
+    private String categoryName = StandardCategoryNames.RESULT;
+
+    public void setCategoryName(String value) {
+      categoryName = value;
+    }
+    
     public static EnableCheck getEnableCheck(EnableCheckFactory checkFactory) {
         return new MultiEnableCheck()
         .add(checkFactory
@@ -103,8 +109,8 @@ public class ConvexHullPlugIn extends AbstractPlugIn implements ThreadedPlugIn {
         
         if (hullFC == null) return;
         
-        context.getLayerManager().addCategory(StandardCategoryNames.RESULT, 0);
-        context.addLayer(StandardCategoryNames.RESULT, I18N.get("ui.plugin.analysis.ConvexHullPlugIn.Convex-Hull"), hullFC);
+        context.getLayerManager().addCategory(categoryName);
+        context.addLayer(categoryName, I18N.get("ui.plugin.analysis.ConvexHullPlugIn.Convex-Hull"), hullFC);
     }
 
     private FeatureCollection convexHhull(TaskMonitor monitor, FeatureCollection fc) {

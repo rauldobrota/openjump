@@ -138,7 +138,7 @@ public abstract class GeometryPredicate
     public boolean isTrue(Geometry geom0, Geometry geom1, double[] param) {
       return geom0.crosses(geom1);   }
   }
-  private static class DisjointPredicate extends GeometryPredicate {
+  public static class DisjointPredicate extends GeometryPredicate {
     public DisjointPredicate() {  super("Disjoint");  }
     public boolean isTrue(Geometry geom0, Geometry geom1, double[] param) {
       return geom0.disjoint(geom1);   }

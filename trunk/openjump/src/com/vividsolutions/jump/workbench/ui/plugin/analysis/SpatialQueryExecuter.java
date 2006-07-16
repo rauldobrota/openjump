@@ -19,11 +19,14 @@ public class SpatialQueryExecuter
 {
   private FeatureCollection maskFC;
   private FeatureCollection sourceFC;
-  private GeometryPredicate predicate;
+//  private GeometryPredicate predicate;
+
+  private FeatureCollection queryFC;
 
   private boolean complementResult = false;
   private boolean allowDuplicatesInResult = false;
   private boolean isExceptionThrown = false;
+
 
   private Geometry geoms[] = new Geometry[2];
   private Set resultSet = new HashSet();
@@ -54,15 +57,48 @@ public class SpatialQueryExecuter
     this.complementResult = complementResult;
   }
 
-  private FeatureCollection getQueryFeatureCollection()
+  /**
+   * Gets the featurec collection to query.
+   * This may be indexed if this would improve performance.
+   *
+   * @param func
+   * @return
+   */
+  private void createQueryFeatureCollection(GeometryPredicate pred)
   {
     boolean buildIndex = false;
     if (maskFC.size() > 10) buildIndex = true;
     if (sourceFC.size() > 100) buildIndex = true;
+    if (pred instanceof GeometryPredicate.DisjointPredicate) buildIndex = false;
+
     if (buildIndex) {
-      return new IndexedFeatureCollection(sourceFC);
+      queryFC = new IndexedFeatureCollection(sourceFC);
     }
-    return sourceFC;
+    else {
+      queryFC = sourceFC;
+    }
+  }
+
+  private Iterator query(GeometryPredicate pred, double[] params, Geometry gMask)
+  {
+    Envelope queryEnv = gMask.getEnvelopeInternal();
+    // special hack for withinDistance
+    if (pred instanceof GeometryPredicate.WithinDistancePredicate) {
+      queryEnv.expandBy(params[0]);
+    }
+
+    boolean useQuery = true;
+    if (pred instanceof GeometryPredicate.DisjointPredicate) useQuery = false;
+
+    Iterator queryIt = null;
+    if (useQuery) {
+      Collection queryResult = queryFC.query(queryEnv);
+      queryIt = queryResult.iterator();
+    }
+    else {
+      queryIt = queryFC.iterator();
+    }
+    return queryIt;
   }
 
   public boolean isExceptionThrown() { return isExceptionThrown; }
@@ -92,8 +128,8 @@ public class SpatialQueryExecuter
                                      FeatureCollection resultFC
                                      )
   {
-    
-    FeatureCollection queryFC = getQueryFeatureCollection();
+
+    createQueryFeatureCollection(func);
 
     int total = maskFC.size();
     int count = 0;
@@ -104,16 +140,10 @@ public class SpatialQueryExecuter
 
       Feature fMask = (Feature) iMask.next();
       Geometry gMask = fMask.getGeometry();
-      Envelope queryEnv = gMask.getEnvelopeInternal();
 
-      // special hack for withinDistance
-      if (func instanceof GeometryPredicate.WithinDistancePredicate) {
-        queryEnv.expandBy(params[0]);
-      }
-
-      Collection queryResult = queryFC.query(queryEnv);
-      for (Iterator iSrc = queryResult.iterator(); iSrc.hasNext(); ) {
-        Feature fSrc = (Feature) iSrc.next();
+      Iterator queryIt = query(func, params, gMask);
+      for (; queryIt.hasNext(); ) {
+        Feature fSrc = (Feature) queryIt.next();
 
         // optimization - if feature already in result no need to re-test
         if (isInResult(fSrc))
@@ -181,4 +211,5 @@ public class SpatialQueryExecuter
     return false;
 
   }
+
 }

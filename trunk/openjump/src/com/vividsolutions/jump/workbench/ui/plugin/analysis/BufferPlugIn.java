@@ -64,13 +64,18 @@ public class BufferPlugIn
   private String endCapStyle = CAP_STYLE_ROUND;
   private boolean exceptionThrown = false;
 
-  public BufferPlugIn()
-  {
+  public BufferPlugIn() {
     endCapStyles.add(CAP_STYLE_ROUND);
     endCapStyles.add(CAP_STYLE_SQUARE);
     endCapStyles.add(CAP_STYLE_BUTT);
   }
 
+  private String categoryName = StandardCategoryNames.RESULT;
+
+  public void setCategoryName(String value) {
+    categoryName = value;
+  }
+  
   public boolean execute(PlugInContext context) throws Exception {
   	//[sstein, 16.07.2006] set again to obtain correct language
     LAYER = I18N.get("ui.plugin.analysis.BufferPlugIn.layer");
@@ -92,16 +97,15 @@ public class BufferPlugIn
   }
 
   public void run(TaskMonitor monitor, PlugInContext context)
-      throws Exception
-  {
+      throws Exception{
     FeatureSchema featureSchema = new FeatureSchema();
     featureSchema.addAttribute("GEOMETRY", AttributeType.GEOMETRY);
     FeatureCollection resultFC = new FeatureDataset(featureSchema);
 
     Collection resultColl = runBuffer(layer.getFeatureCollectionWrapper());
     resultFC = FeatureDatasetFactory.createFromGeometry(resultColl);
-    context.getLayerManager().addCategory(StandardCategoryNames.RESULT, 0);
-    context.addLayer(StandardCategoryNames.RESULT, I18N.get("com.vividsolutions.jump.workbench.ui.plugin.analysis.BufferPlugIn")+"-" + layer.getName(), resultFC);
+    context.getLayerManager().addCategory(categoryName);
+    context.addLayer(categoryName, I18N.get("com.vividsolutions.jump.workbench.ui.plugin.analysis.BufferPlugIn")+"-" + layer.getName(), resultFC);
     if (exceptionThrown)
       context.getWorkbenchFrame().warnUser(I18N.get("ui.plugin.analysis.BufferPlugIn.errors-found-while-executing-buffer"));
   }

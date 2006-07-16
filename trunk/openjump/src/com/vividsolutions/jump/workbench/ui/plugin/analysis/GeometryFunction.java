@@ -37,6 +37,8 @@ import java.util.*;
 import com.vividsolutions.jts.algorithm.*;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.simplify.*;
+import com.vividsolutions.jts.operation.linemerge.*;
+import com.vividsolutions.jts.operation.polygonize.*;
 import com.vividsolutions.jump.I18N;
 
 /**
@@ -73,7 +75,10 @@ public abstract class GeometryFunction
     new SimplifyTopologyFunction(),
     new ConvexHullFunction(),
     new BoundaryFunction(),
-    new EnvelopeFunction()
+    new EnvelopeFunction(),
+    new LineMergeFunction(),
+    new LineSequenceFunction(),
+    new PolygonizeFunction()
   };
 
   public static List getNames()
@@ -118,7 +123,7 @@ public abstract class GeometryFunction
   {
 	  return method;
   }
-  
+
   private String name;
   private int nArguments;
   private int nParams;
@@ -144,13 +149,26 @@ public abstract class GeometryFunction
   }
 
   public String getDescription() { return description; }
-  
+
+  /**
+   * Exectute the function on the geometry(s) in the geom array.
+   * The function can expect that the correct number of geometry arguments
+   * is present in the array.
+   * Integer parameters must be passed as doubles.
+   * If no result can be computed for some reason, null should be returned
+   * to indicate this to the caller.
+   * Exceptions may be thrown and must be handled by the caller.
+   *
+   * @param geom the geometry arguments
+   * @param param any non-geometric arguments.
+   * @return the geometry result, or null if no result could be computed.
+   */
   public abstract Geometry execute(Geometry[] geom, double[] param);
 
   public String toString() { return name; }
-  
+
   //====================================================
-  
+
   private static class IntersectionFunction extends GeometryFunction {
     public IntersectionFunction() {
       super(I18N.get("ui.plugin.analysis.GeometryFunction.intersection"), 2, 0);
@@ -234,8 +252,8 @@ public abstract class GeometryFunction
   }
   private static class SimplifyFunction extends GeometryFunction {
     public SimplifyFunction() {
-      super("Simplify (D-P)", 1, 1, 
-    		  "Simplifies a geometry using the Douglas-Peucker algorithm");
+      super(I18N.get("ui.plugin.analysis.GeometryFunction.Simplify-(D-P)"), 1, 1, 
+      		I18N.get("ui.plugin.analysis.GeometryFunction.Simplifies-a-geometry-using-the-Douglas-Peucker-algorithm"));
     }
 
     public Geometry execute(Geometry[] geom, double[] param)
@@ -245,7 +263,7 @@ public abstract class GeometryFunction
   }
   private static class SimplifyTopologyFunction extends GeometryFunction {
     public SimplifyTopologyFunction() {
-      super("Simplify (preserve topology)", 1, 1);
+      super(I18N.get("ui.plugin.analysis.GeometryFunction.Simplify-(preserve-topology)"), 1, 1);
     }
 
     public Geometry execute(Geometry[] geom, double[] param)
@@ -255,7 +273,7 @@ public abstract class GeometryFunction
   }
   private static class ConvexHullFunction extends GeometryFunction {
     public ConvexHullFunction() {
-      super("Convex Hull", 1, 0);
+      super(I18N.get("ui.plugin.analysis.GeometryFunction.Convex-Hull"), 1, 0);
     }
 
     public Geometry execute(Geometry[] geom, double[] param)
@@ -266,7 +284,7 @@ public abstract class GeometryFunction
   }
   private static class BoundaryFunction extends GeometryFunction {
     public BoundaryFunction() {
-      super("Boundary", 1, 0);
+      super(I18N.get("ui.plugin.analysis.GeometryFunction.Boundary"), 1, 0);
     }
 
     public Geometry execute(Geometry[] geom, double[] param)
@@ -276,12 +294,51 @@ public abstract class GeometryFunction
   }
   private static class EnvelopeFunction extends GeometryFunction {
     public EnvelopeFunction() {
-      super("Envelope", 1, 0);
+      super(I18N.get("ui.plugin.analysis.GeometryFunction.Envelope"), 1, 0);
     }
 
     public Geometry execute(Geometry[] geom, double[] param)
     {
       return geom[0].getEnvelope();
+    }
+  }
+  private static class LineMergeFunction extends GeometryFunction {
+    public LineMergeFunction() {
+      super(I18N.get("ui.plugin.analysis.GeometryFunction.Line-Merge"), 1, 0);
+    }
+
+    public Geometry execute(Geometry[] geom, double[] param)
+    {
+      LineMerger merger = new LineMerger();
+      merger.add(geom[0]);
+      Collection lines = merger.getMergedLineStrings();
+      return geom[0].getFactory().buildGeometry(lines);
+    }
+  }
+  private static class LineSequenceFunction extends GeometryFunction {
+    public LineSequenceFunction() {
+      super(I18N.get("ui.plugin.analysis.GeometryFunction.Line-Sequence"), 1, 0);
+    }
+
+    public Geometry execute(Geometry[] geom, double[] param)
+    {
+      LineSequencer sequencer = new LineSequencer();
+      sequencer.add(geom[0]);
+      return sequencer.getSequencedLineStrings();
+    }
+  }
+  private static class PolygonizeFunction extends GeometryFunction {
+    public PolygonizeFunction() {
+      super(I18N.get("ui.plugin.analysis.GeometryFunction.Polygonize"), 1, 0);
+    }
+
+    public Geometry execute(Geometry[] geom, double[] param)
+    {
+      Polygonizer polygonizer = new Polygonizer();
+      polygonizer.add(geom[0]);
+      Collection polyColl = polygonizer.getPolygons();
+      Geometry[] polys = GeometryFactory.toGeometryArray(polyColl);
+      return geom[0].getFactory().createGeometryCollection(polys);
     }
   }
 }

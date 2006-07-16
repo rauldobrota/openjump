@@ -59,6 +59,12 @@ public class UnionPlugIn extends AbstractPlugIn implements ThreadedPlugIn {
     public UnionPlugIn() {
     }
 
+    private String categoryName = StandardCategoryNames.RESULT;
+
+    public void setCategoryName(String value) {
+      categoryName = value;
+    }
+    
     /*
       public void initialize(PlugInContext context) throws Exception {
         context.getFeatureInstaller().addMainMenuItem(
@@ -97,8 +103,8 @@ public class UnionPlugIn extends AbstractPlugIn implements ThreadedPlugIn {
         throws Exception {
         FeatureCollection a = dialog.getLayer(LAYER).getFeatureCollectionWrapper();
         FeatureCollection union = union(monitor, a);
-        context.getLayerManager().addCategory(StandardCategoryNames.RESULT, 0);
-        context.addLayer(StandardCategoryNames.RESULT, I18N.get("ui.plugin.analysis.UnionPlugIn.union"), union);
+        context.getLayerManager().addCategory(categoryName);
+        context.addLayer(categoryName, I18N.get("ui.plugin.analysis.UnionPlugIn.union"), union);
     }
 
     private FeatureCollection union(TaskMonitor monitor, FeatureCollection fc) {

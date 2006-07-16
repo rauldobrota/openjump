@@ -46,28 +46,43 @@ import com.vividsolutions.jump.workbench.ui.plugin.AddNewLayerPlugIn;
 import com.vividsolutions.jump.workbench.ui.renderer.style.*;
 
 /**
- * Adds colour, line-width, and other stylistic information to a Feature Collection.
+ * Adds colour, line-width, and other stylistic information to a Feature
+ * Collection.
  * <p>
  * When adding or removing multiple features to this Layer's FeatureCollection,
  * prefer #addAll and #removeAll to #add and #remove -- fewer events will be
  * fired.
  */
 public class Layer extends AbstractLayerable implements LayerManagerProxy {
-	public static final String FIRING_APPEARANCE_CHANGED_ON_ATTRIBUTE_CHANGE = Layer.class.getName() + 
-		" - FIRING APPEARANCE CHANGED ON ATTRIBUTE CHANGE";
+	public static final String FIRING_APPEARANCE_CHANGED_ON_ATTRIBUTE_CHANGE = Layer.class
+			.getName()
+			+ " - FIRING APPEARANCE CHANGED ON ATTRIBUTE CHANGE";
+
 	private String description = "";
+
 	private boolean drawingLast = false;
+
 	private FeatureCollectionWrapper featureCollectionWrapper;
+
 	private ArrayList styles = new ArrayList();
+
 	private boolean synchronizingLineColor = true;
+
 	private boolean editable = false;
+
+    private boolean selectable = true;
+
+    private boolean readonly = false;
+
 	private LayerListener layerListener = null;
+
 	private Blackboard blackboard = new Blackboard() {
 		private static final long serialVersionUID = 6504993615735124204L;
 		{
 			put(FIRING_APPEARANCE_CHANGED_ON_ATTRIBUTE_CHANGE, true);
 		}
 	};
+
 	private boolean featureCollectionModified = false;
 
 	private DataSourceQuery dataSourceQuery;
@@ -111,15 +126,48 @@ public class Layer extends AbstractLayerable implements LayerManagerProxy {
 	}
 
 	public void setDescription(String description) {
-		Assert.isTrue(description != null,
-			"Java2XML requires that the description be non-null. Use an empty string if necessary.");
+		Assert.isTrue(
+						description != null,
+						"Java2XML requires that the description be non-null. Use an empty string if necessary.");
 		this.description = description;
 	}
 
+    /**
+     * @return true if this layer should always be 'readonly' I.e.: The layer
+     * should never have the editable field set to true.
+    */
+    public boolean isReadonly() {
+        return readonly;
+    }
+
+    /**
+     * @Set whether this layer can be made editable.
+    */
+    public void setReadonly( boolean value ) {
+        readonly = value;
+    }
+
+
+    /**
+     * @return true if features in this layer can be selected.
+    */
+    public boolean isSelectable() {
+        return selectable;
+    }
+
+    /**
+     * Set whether or not features in this layer can be selected.
+     * @param value true if features in this layer can be selected
+    */
+    public void setSelectable( boolean value ) {
+        selectable = value;
+    }
+
 	/**
 	 * Used for lightweight layers like the Vector layer.
-	 * 
-	 * @param drawingLast  true if the layer should be among those drawn last
+	 *
+	 * @param drawingLast
+	 *            true if the layer should be among those drawn last
 	 */
 	public void setDrawingLast(boolean drawingLast) {
 		this.drawingLast = drawingLast;
@@ -180,7 +228,7 @@ public class Layer extends AbstractLayerable implements LayerManagerProxy {
 					//FEATURE_ADDED events, but I think the lengthy comment
 					//above still applies. [Jon Aquino]
 					//Drop #isEmpty checks, so that database-backed feature
-					//collections don't have to implement it. 
+					//collections don't have to implement it.
 					//[Jon Aquino 2005-03-02]
 					getLayerManager().fireFeaturesChanged(
 							oldFeatureCollection.getFeatures(),
@@ -253,7 +301,7 @@ public class Layer extends AbstractLayerable implements LayerManagerProxy {
 	 * Styles do not notify the Layer when their parameters change. Therefore,
 	 * after you modify a Style's parameters (for example, the fill colour of
 	 * BasicStyle), be sure to call #fireAppearanceChanged
-	 * 
+	 *
 	 * @param c
 	 *            Can even be the desired Style's superclass or interface
 	 * @return The style value

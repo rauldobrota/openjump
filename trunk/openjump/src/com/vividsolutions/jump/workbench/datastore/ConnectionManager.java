@@ -78,16 +78,14 @@ public class ConnectionManager {
         return getConnection(connectionDescriptor);
     }
 
-    public DataStoreDriver getDriver(String driverClassName)
-    {
+    public DataStoreDriver getDriver(String driverClassName) {
       DataStoreDriver driver = findDriverRegistryEntry(driverClassName);
       if (driver == null)
         throw new RuntimeException("Can't find DataStoreDriver: " + driverClassName);
       return driver;
     }
 
-    private DataStoreDriver findDriverRegistryEntry(String driverClassName)
-    {
+    private DataStoreDriver findDriverRegistryEntry(String driverClassName) {
       List drivers = context.getRegistry().getEntries(DataStoreDriver.REGISTRY_CLASSIFICATION);
       for (Iterator i = drivers.iterator(); i.hasNext(); ) {
         DataStoreDriver driver = (DataStoreDriver) i.next();

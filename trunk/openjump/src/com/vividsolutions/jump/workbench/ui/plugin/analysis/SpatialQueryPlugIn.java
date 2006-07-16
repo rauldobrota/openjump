@@ -46,6 +46,7 @@ import com.vividsolutions.jump.feature.*;
 import com.vividsolutions.jump.task.*;
 import com.vividsolutions.jump.workbench.model.*;
 import com.vividsolutions.jump.workbench.plugin.*;
+import com.vividsolutions.jump.workbench.plugin.util.*;
 import com.vividsolutions.jump.workbench.ui.*;
 
 /**
@@ -56,36 +57,46 @@ public class SpatialQueryPlugIn
     implements ThreadedPlugIn
 {
 
+  private final static String UPDATE_SRC = "Select features in the source layer.";
+  private final static String CREATE_LYR = "Create a new layer for the results.";
+  private final static String MASK_LAYER = "Mask Layer";
+  private final static String SRC_LAYER = "Source Layer";
+  private final static String PREDICATE = "Relation";
+  private final static String PARAM = "Parameter";
+  private final static String DIALOG_COMPLEMENT = "Complement Result";
+  private final static String ALLOW_DUPS = "Allow Duplicates in Result";
+
+  private JTextField paramField;
   private Collection functionNames;
   private MultiInputDialog dialog;
-  private Layer maskLyr, srcLayer;
+  private Layer maskLyr;
+  private Layer srcLayer;
   private String funcNameToRun;
   private GeometryPredicate functionToRun = null;
   private boolean complementResult = false;
   private boolean allowDups = false;
   private boolean exceptionThrown = false;
+  private JRadioButton updateSourceRB;
+  private JRadioButton createNewLayerRB;
+  private boolean createLayer = true;
 
   private Geometry geoms[] = new Geometry[2];
   private double[] params = new double[2];
 
-  public SpatialQueryPlugIn()
-  {
+  public SpatialQueryPlugIn() {
     functionNames = GeometryPredicate.getNames();
   }
 
-  /*
-  // MD - for some reason this is now done in JUMPConfiguration
-    public void initialize(PlugInContext context) throws Exception {
-      context.getFeatureInstaller().addMainMenuItem(
-          this, "Tools", "Find Unaligned Segments...", null, new MultiEnableCheck()
-        .add(context.getCheckFactory().createWindowWithLayerNamePanelMustBeActiveCheck())
-          .add(context.getCheckFactory().createAtLeastNLayersMustExistCheck(1)));
-    }
-  */
+  private String categoryName = StandardCategoryNames.RESULT;
+
+  public void setCategoryName(String value) {
+    categoryName = value;
+  }
+
+
 
   public boolean execute(PlugInContext context) throws Exception {
-    dialog = new MultiInputDialog(
-        context.getWorkbenchFrame(), getName(), true);
+    dialog = new MultiInputDialog(context.getWorkbenchFrame(), getName(), true);
     setDialogValues(dialog, context);
     GUIUtil.centreOnWindow(dialog);
     dialog.setVisible(true);
@@ -95,8 +106,7 @@ public class SpatialQueryPlugIn
   }
 
   public void run(TaskMonitor monitor, PlugInContext context)
-      throws Exception
-  {
+      throws Exception {
     monitor.allowCancellationRequests();
 
     // input-proofing
@@ -117,41 +127,49 @@ public class SpatialQueryPlugIn
     FeatureCollection resultFC = executer.getResultFC();
     executer.execute(monitor, functionToRun, params, resultFC);
 
-    if (monitor.isCancelRequested())
-      return;
+    if (monitor.isCancelRequested()) return;
 
-    context.getLayerManager().addCategory(StandardCategoryNames.RESULT, 0);
-    // this will happen if plugin was cancelled
-    context.addLayer(StandardCategoryNames.RESULT, "Query-" + funcNameToRun, resultFC);
-    if (exceptionThrown)
+    if (createLayer) {
+      String outputLayerName = LayerNameGenerator.generateOperationOnLayerName(
+          funcNameToRun,
+          srcLayer.getName());
+      context.getLayerManager().addCategory(categoryName);
+      context.addLayer(categoryName, outputLayerName, resultFC);
+    } else {
+      SelectionManager selectionManager = context.getLayerViewPanel().getSelectionManager();
+      selectionManager.clear();
+      selectionManager.getFeatureSelection().selectItems( srcLayer, resultFC.getFeatures() );
+    }
+
+    if (exceptionThrown) {
       context.getWorkbenchFrame().warnUser("Errors found while executing query");
+    }
   }
 
-  private final static String MASK_LAYER = "Mask Layer";
-  private final static String SRC_LAYER = "Source Layer";
-  private final static String PREDICATE = "Relation";
-  private final static String PARAM = "Parameter";
-  private final static String DIALOG_COMPLEMENT = "Complement Result";
-  private final static String ALLOW_DUPS = "Allow Duplicates in Result";
 
-  private JTextField paramField;
 
-  private void setDialogValues(MultiInputDialog dialog, PlugInContext context)
-  {
+  private void setDialogValues(MultiInputDialog dialog, PlugInContext context) {
     //dialog.setSideBarImage(new ImageIcon(getClass().getResource("DiffSegments.png")));
     dialog.setSideBarDescription(
         "Finds the Source features which have a given spatial relationship to some feature in the Mask layer"
         + " (i.e. where Source.Relationship(Mask) = true)");
+
     //Set initial layer values to the first and second layers in the layer list.
     //In #initialize we've already checked that the number of layers >= 1. [Jon Aquino]
-    dialog.addLayerComboBox(SRC_LAYER, context.getCandidateLayer(0), context.getLayerManager());
+    Layer initLayer = (srcLayer == null)? context.getCandidateLayer(0) : srcLayer;
+
+    dialog.addLayerComboBox(SRC_LAYER, initLayer, context.getLayerManager());
     JComboBox functionComboBox = dialog.addComboBox(PREDICATE, funcNameToRun, functionNames, null);
     functionComboBox.addItemListener(new MethodItemListener());
     dialog.addLayerComboBox(MASK_LAYER, maskLyr, context.getLayerManager());
 
     paramField = dialog.addDoubleField(PARAM, params[0], 10);
-    dialog.addCheckBox(ALLOW_DUPS, false);
-    dialog.addCheckBox(DIALOG_COMPLEMENT, false);
+    dialog.addCheckBox(ALLOW_DUPS, allowDups);
+    dialog.addCheckBox(DIALOG_COMPLEMENT, complementResult);
+
+    final String OUTPUT_GROUP = "OUTPUT_GROUP";
+    createNewLayerRB = dialog.addRadioButton(CREATE_LYR, OUTPUT_GROUP, createLayer,CREATE_LYR);
+    updateSourceRB = dialog.addRadioButton(UPDATE_SRC, OUTPUT_GROUP, !createLayer, UPDATE_SRC);
 
     updateUIForFunction(funcNameToRun);
   }
@@ -164,10 +182,10 @@ public class SpatialQueryPlugIn
     params[0] = dialog.getDouble(PARAM);
     allowDups = dialog.getBoolean(ALLOW_DUPS);
     complementResult = dialog.getBoolean(DIALOG_COMPLEMENT);
+    createLayer = dialog.getBoolean(CREATE_LYR);
   }
 
-  private void updateUIForFunction(String funcName)
-  {
+  private void updateUIForFunction(String funcName) {
     boolean paramUsed = false;
     GeometryPredicate func = GeometryPredicate.getPredicate(funcName);
     if (func != null) {
@@ -179,8 +197,7 @@ public class SpatialQueryPlugIn
   }
 
   private class MethodItemListener
-      implements ItemListener
-  {
+      implements ItemListener {
     public void itemStateChanged(ItemEvent e) {
       updateUIForFunction((String) e.getItem());
     }

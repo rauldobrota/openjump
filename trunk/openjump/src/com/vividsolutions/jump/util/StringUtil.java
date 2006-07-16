@@ -58,14 +58,14 @@ public class StringUtil {
     public static String ies(int n) {
         return (n != 1) ? "ies" : "y";
     }
-    
+
     public static String substitute(String string, Object[] substitutions) {
         for (int i = 0; i < substitutions.length; i++) {
             string = StringUtil.replaceAll(string, "$" + (i + 1),
                     substitutions[i].toString());
         }
         return string;
-    }    
+    }
 
     public static String classNameWithoutQualifiers(String className) {
         return className.substring(
@@ -119,13 +119,13 @@ public class StringUtil {
 
         return (word.charAt(0) + "").toUpperCase() + word.substring(1);
     }
-    
+
     public static String uncapitalize(String word) {
         if (word.length() == 0) {
             return word;
         }
 
-        return (word.charAt(0) + "").toLowerCase() + word.substring(1);        
+        return (word.charAt(0) + "").toLowerCase() + word.substring(1);
     }
 
     /**
@@ -133,9 +133,9 @@ public class StringUtil {
      * @param s a String with comma-delimited values
      * @return a List of the Strings that were delimited by commas
      */
-    public static List fromCommaDelimitedString(String s) {        
+    public static List fromCommaDelimitedString(String s) {
         if (s.trim().length() == 0) { return new ArrayList(); }
-        ArrayList result = new ArrayList();        
+        ArrayList result = new ArrayList();
         StringTokenizer tokenizer = new StringTokenizer(s, ",");
 
         while (tokenizer.hasMoreTokens()) {
@@ -163,7 +163,7 @@ public class StringUtil {
     public static String toFriendlyName(String className) {
         return toFriendlyName(className, null);
     }
-    
+
     public static String friendlyName(Class c) {
         return toFriendlyName(c.getName());
     }
@@ -281,7 +281,7 @@ public class StringUtil {
 
         return os.toString();
     }
-    
+
     public static String head(String s, int lines) {
         int newlinesEncountered = 0;
         for (int i = 0; i < s.length(); i++) {
@@ -317,7 +317,7 @@ public class StringUtil {
         } catch (NumberFormatException e) {
             return false;
         }
-    }  
+    }
 
     public static String toDelimitedString(Collection c, String delimiter) {
         if (c.isEmpty()) {
@@ -360,5 +360,10 @@ public class StringUtil {
                 + Fmt.fmt(seconds, 2, Fmt.ZF));
 
         return s;
+    }
+
+
+    public static boolean isEmpty(String value) {
+        return (value == null || value.trim().length() == 0);
     }
 }

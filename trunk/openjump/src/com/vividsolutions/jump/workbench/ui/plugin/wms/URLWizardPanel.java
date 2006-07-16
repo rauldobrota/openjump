@@ -104,7 +104,7 @@ public class URLWizardPanel extends JPanel implements WizardPanel {
         urlLabel.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e) && e.getClickCount() == 3) {
-                    urlTextField.setText("http://slkapps2.env.gov.bc.ca/servlet/com.esri.wms.Esrimap");
+                    urlTextField.setText("http://libcwms.gov.bc.ca/wmsconnector/com.esri.wsit.WMSServlet/ogc_layer_service");
                 }
                 super.mouseClicked(e);
             }

@@ -10,45 +10,52 @@ import com.vividsolutions.jump.workbench.model.Layer;
 import com.vividsolutions.jump.workbench.model.Layerable;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 
-public class RunDatastoreQueryPlugIn extends
-        AbstractAddDatastoreLayerPlugIn {
 
-    private Layer createLayer(final RunDatastoreQueryPanel panel,
-            TaskMonitor monitor, final PlugInContext context) throws Exception {
+public class RunDatastoreQueryPlugIn extends
+    AbstractAddDatastoreLayerPlugIn {
+
+
+    protected ConnectionPanel createPanel( PlugInContext context ) {
+        return new RunDatastoreQueryPanel( context.getWorkbenchContext() );
+    }
+
+    protected Layerable createLayerable(
+        ConnectionPanel panel,
+        TaskMonitor monitor,
+        PlugInContext context ) throws Exception {
+        return createLayer( ( RunDatastoreQueryPanel ) panel, monitor, context );
+    }
+
+
+    private Layer createLayer( final RunDatastoreQueryPanel panel,
+        TaskMonitor monitor,
+        final PlugInContext context ) throws Exception {
+
+        panel.saveQuery();
+
         monitor.allowCancellationRequests();
-        monitor.report("Creating layer");
-        int maxFeatures = ((Integer) LangUtil.ifNull(panel.getMaxFeatures(),
-                new Integer(Integer.MAX_VALUE))).intValue();
+        monitor.report( "Creating layer" );
+
+        int maxFeatures = ( ( Integer ) LangUtil.ifNull( panel.getMaxFeatures(),
+            new Integer( Integer.MAX_VALUE ) ) ).intValue();
         FeatureInputStream featureInputStream = ConnectionManager.instance(
-                context.getWorkbenchContext())
-                .getOpenConnection(panel.getConnectionDescriptor()).execute(
-                        new AdhocQuery(panel.getQuery()));
+            context.getWorkbenchContext() )
+            .getOpenConnection( panel.getConnectionDescriptor() ).execute(
+            new AdhocQuery( panel.getQuery() ) );
         try {
             FeatureDataset featureDataset = new FeatureDataset(
-                    featureInputStream.getFeatureSchema());
+                featureInputStream.getFeatureSchema() );
             int i = 0;
-            while (featureInputStream.hasNext()
-                    && featureDataset.size() < maxFeatures
-                    && !monitor.isCancelRequested()) {
-                featureDataset.add(featureInputStream.next());
-                monitor.report(++i, -1, "features");
+            while ( featureInputStream.hasNext()
+                 && featureDataset.size() < maxFeatures
+                 && !monitor.isCancelRequested() ) {
+                featureDataset.add( featureInputStream.next() );
+                monitor.report( ++i, -1, "features" );
             }
-            return new Layer(panel.getQuery(), context.getLayerManager()
-                    .generateLayerFillColor(), featureDataset, context
-                    .getLayerManager());
+            return new Layer( panel.getQuery(), context.getLayerManager()
+                .generateLayerFillColor(), featureDataset, context.getLayerManager() );
         } finally {
             featureInputStream.close();
         }
-    }
-
-    protected ConnectionPanel createPanel(PlugInContext context) {
-        return new RunDatastoreQueryPanel(context
-                .getWorkbenchContext());
-    }
-
-    protected Layerable createLayerable(ConnectionPanel panel,
-            TaskMonitor monitor, PlugInContext context) throws Exception {
-        return createLayer((RunDatastoreQueryPanel) panel, monitor,
-                context);
     }
 }

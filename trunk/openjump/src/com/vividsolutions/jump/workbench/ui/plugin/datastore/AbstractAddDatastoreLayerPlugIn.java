@@ -50,11 +50,10 @@ public abstract class AbstractAddDatastoreLayerPlugIn extends
         // Toolbox. So refresh the connectionComboBox.
         // [Jon Aquino 2005-03-15]
         panel(context).populateConnectionComboBox();
-        getDialog(context).setVisible(true);
-        if (!getDialog(context).wasOKPressed()) {
-            return false;
-        }
-        return true;
+        OKCancelDialog dlg = getDialog(context);
+        dlg.setVisible(true);
+
+        return dlg.wasOKPressed();
     }
 
     public void run(TaskMonitor monitor, final PlugInContext context)
