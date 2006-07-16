@@ -62,6 +62,7 @@ import com.vividsolutions.jump.workbench.ui.warp.*;
 import com.vividsolutions.jump.workbench.ui.zoom.*;
 import com.vividsolutions.jump.plugin.qa.*;
 import com.vividsolutions.jump.plugin.edit.*;
+
 import java.awt.event.*;
 import java.lang.reflect.*;
 import javax.swing.*;
@@ -832,7 +833,7 @@ public class JUMPConfiguration implements Setup {
 	featureInstaller
 	.addMainMenuItem(
 			bufferPlugIn,
-			MENU_TOOLS_ANALYSIS,
+			new String[] {MenuNames.TOOLS, MenuNames.TOOLS_GENERATE},
 			bufferPlugIn.getName() + "...",
 			false,
 			null,
@@ -847,7 +848,7 @@ public class JUMPConfiguration implements Setup {
 	featureInstaller
 	.addMainMenuItem(
 			convexHullPI,
-	        new String[] {MenuNames.TOOLS, MenuNames.TOOLS_JOIN},
+	        new String[] {MenuNames.TOOLS, MenuNames.TOOLS_GENERATE},
 	        convexHullPI.getName() + "...",
 	        false,
 	        null, ConvexHullPlugIn.getEnableCheck(checkFactory)
@@ -889,7 +890,8 @@ public class JUMPConfiguration implements Setup {
 }
 
 
-
+private ExtractSegmentsPlugIn extractSegmentsPlugIn = new ExtractSegmentsPlugIn();
+private PolygonizerPlugIn polygonizerPlugIn = new PolygonizerPlugIn();    
 private PrecisionReducerPlugIn precisionReducerPlugIn = new PrecisionReducerPlugIn();
 private AffineTransformationPlugIn affineTransPlugIn = new AffineTransformationPlugIn();
 
@@ -901,6 +903,16 @@ private void configToolsEdit(final WorkbenchContext workbenchContext,
 	String MENU_EDIT = MenuNames.EDIT;
 	String[] MENU_TOOLS_EDIT = new String[] { MENU_TOOLS, MENU_EDIT};
 
+    featureInstaller.addMainMenuItem(extractSegmentsPlugIn,
+            MENU_TOOLS_EDIT,
+                extractSegmentsPlugIn.getName() + "...", false, null,
+                extractSegmentsPlugIn.createEnableCheck(workbenchContext));
+    
+    featureInstaller.addMainMenuItem(polygonizerPlugIn,
+            MENU_TOOLS_EDIT,
+                polygonizerPlugIn.getName() + "...", false, null,
+                polygonizerPlugIn.createEnableCheck(workbenchContext));
+    
     featureInstaller.addMainMenuItem(precisionReducerPlugIn,
     		MENU_TOOLS_EDIT,
             precisionReducerPlugIn.getName() + "...", false, null,
