@@ -48,7 +48,8 @@ import com.vividsolutions.jump.I18N;
  */
 public abstract class GeometryFunction
 {
-
+  // [sstein, 16.07.2006] due to language setting problems loaded in corresponding class
+  /*
   private static final String METHOD_INTERSECTION = I18N.get("ui.plugin.analysis.GeometryFunction.intersection");
   private static final String METHOD_UNION = I18N.get("ui.plugin.analysis.GeometryFunction.union");
   private static final String METHOD_DIFFERENCE_AB = I18N.get("ui.plugin.analysis.GeometryFunction.difference-a-b");
@@ -58,7 +59,7 @@ public abstract class GeometryFunction
   static final String METHOD_BUFFER = I18N.get("ui.plugin.analysis.GeometryFunction.buffer");
   
   private static final String sFunction = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.function");
-  
+  */  
   private static GeometryFunction[] method = {
     new IntersectionFunction(),
     new UnionFunction(),
@@ -130,7 +131,7 @@ public abstract class GeometryFunction
 
   public GeometryFunction(String name, int nArgs, int nParams)
   {
-    this(name, nArgs, nParams, name + " " + sFunction);
+    this(name, nArgs, nParams, name + " " + I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.function"));
   }
 
   public GeometryFunction(String name, int nArgs, int nParams,
@@ -152,7 +153,7 @@ public abstract class GeometryFunction
   
   private static class IntersectionFunction extends GeometryFunction {
     public IntersectionFunction() {
-      super(METHOD_INTERSECTION, 2, 0);
+      super(I18N.get("ui.plugin.analysis.GeometryFunction.intersection"), 2, 0);
     }
 
     public Geometry execute(Geometry[] geom, double[] param)
@@ -163,7 +164,7 @@ public abstract class GeometryFunction
 
   private static class UnionFunction extends GeometryFunction {
     public UnionFunction() {
-      super(METHOD_UNION, 2, 0);
+      super(I18N.get("ui.plugin.analysis.GeometryFunction.union"), 2, 0);
     }
 
     public Geometry execute(Geometry[] geom, double[] param)
@@ -173,7 +174,7 @@ public abstract class GeometryFunction
   }
   private static class DifferenceABFunction extends GeometryFunction {
     public DifferenceABFunction() {
-      super(METHOD_DIFFERENCE_AB, 2, 0);
+      super(I18N.get("ui.plugin.analysis.GeometryFunction.difference-a-b"), 2, 0);
     }
 
     public Geometry execute(Geometry[] geom, double[] param)
@@ -183,7 +184,7 @@ public abstract class GeometryFunction
   }
   private static class DifferenceBAFunction extends GeometryFunction {
     public DifferenceBAFunction() {
-      super(METHOD_DIFFERENCE_BA, 2, 0);
+      super(I18N.get("ui.plugin.analysis.GeometryFunction.difference-b-a"), 2, 0);
     }
 
     public Geometry execute(Geometry[] geom, double[] param)
@@ -193,7 +194,7 @@ public abstract class GeometryFunction
   }
   private static class SymDifferenceFunction extends GeometryFunction {
     public SymDifferenceFunction() {
-      super(METHOD_SYMDIFF, 2, 0);
+      super(I18N.get("ui.plugin.analysis.GeometryFunction.symetric-difference"), 2, 0);
     }
 
     public Geometry execute(Geometry[] geom, double[] param)
@@ -203,7 +204,7 @@ public abstract class GeometryFunction
   }
   private static class CentroidFunction extends GeometryFunction {
     public CentroidFunction() {
-      super(METHOD_CENTROID_A, 1, 0);
+      super(I18N.get("ui.plugin.analysis.GeometryFunction.centroid-of-a"), 1, 0);
     }
 
     public Geometry execute(Geometry[] geom, double[] param)
@@ -223,7 +224,7 @@ public abstract class GeometryFunction
   }
   private static class BufferFunction extends GeometryFunction {
     public BufferFunction() {
-      super(METHOD_BUFFER, 1, 1);
+      super(I18N.get("ui.plugin.analysis.GeometryFunction.buffer"), 1, 1);
     }
 
     public Geometry execute(Geometry[] geom, double[] param)

@@ -65,18 +65,18 @@ public class GeometryFunctionPlugIn
   public static final String GEOMETRY_FUNCTION_REG_KEY = "Geometry Function Registry Key";
   
   //-- [sstein 15.02.2006]
-  private static final String sErrorsFound = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.errors-found-while-executing-function");
-  private static final String sFunction = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.function");
-  private static final String sFeatures = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.features");
+  private String sErrorsFound = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.errors-found-while-executing-function");
+  private String sFunction = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.function");
+  private String sFeatures = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.features");
   
-  private final static String SRC_LAYER = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Source");
-  private final static String MASK_LAYER = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Mask");
-  private final static String METHODS = sFunction;
-  private final static String PARAM = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Parameter");
-  private final static String SELECTED_ONLY = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Use-selected-features-only");
-  private final static String UPDATE_SRC = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Update-Source-features-with-result");
-  private final static String ADD_TO_SRC = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Add-result-to-Source-layer");
-  private final static String CREATE_LYR = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Create-new-layer-for-result");
+  private String SRC_LAYER = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Source");
+  private String MASK_LAYER = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Mask");
+  private String METHODS = sFunction;
+  private String PARAM = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Parameter");
+  private String SELECTED_ONLY = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Use-selected-features-only");
+  private String UPDATE_SRC = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Update-Source-features-with-result");
+  private String ADD_TO_SRC = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Add-result-to-Source-layer");
+  private String CREATE_LYR = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Create-new-layer-for-result");
 
   private Collection functions;
   private MultiInputDialog dialog;
@@ -114,6 +114,20 @@ public class GeometryFunctionPlugIn
   }
 
   public boolean execute(PlugInContext context) throws Exception {
+    //-- [sstein 16.07.2006] put here again for langugae settings
+    sErrorsFound = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.errors-found-while-executing-function");
+    sFunction = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.function");
+    sFeatures = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.features");
+    
+    SRC_LAYER = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Source");
+    MASK_LAYER = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Mask");
+    METHODS = sFunction;
+    PARAM = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Parameter");
+    SELECTED_ONLY = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Use-selected-features-only");
+    UPDATE_SRC = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Update-Source-features-with-result");
+    ADD_TO_SRC = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Add-result-to-Source-layer");
+    CREATE_LYR = I18N.get("ui.plugin.analysis.GeometryFunctionPlugIn.Create-new-layer-for-result");
+
     functions = context.getWorkbenchContext().getRegistry()
               .getEntries(GEOMETRY_FUNCTION_REG_KEY);
     dialog = new MultiInputDialog(

@@ -53,7 +53,7 @@ import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
 
 
 public class UnionPlugIn extends AbstractPlugIn implements ThreadedPlugIn {
-    private final static String LAYER = I18N.get("ui.plugin.analysis.UnionPlugIn.layer");
+    private String LAYER = I18N.get("ui.plugin.analysis.UnionPlugIn.layer");
     private MultiInputDialog dialog;
 
     public UnionPlugIn() {
@@ -68,6 +68,8 @@ public class UnionPlugIn extends AbstractPlugIn implements ThreadedPlugIn {
       }
     */
     public boolean execute(PlugInContext context) throws Exception {
+    	//[sstein, 16.07.2006] put here again to load correct language
+        LAYER = I18N.get("ui.plugin.analysis.UnionPlugIn.layer");
         //Unlike ValidatePlugIn, here we always call #initDialog because we want
         //to update the layer comboboxes. [Jon Aquino]
         initDialog(context);

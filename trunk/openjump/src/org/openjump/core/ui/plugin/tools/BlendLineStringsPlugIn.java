@@ -59,11 +59,11 @@ public class BlendLineStringsPlugIn extends AbstractPlugIn {
     
 	private WorkbenchContext workbenchContext;
     
-	private final static String sToolTipText = "huhu!  :)";
-    private final static String sTheBlendTolerance = I18N.get("org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn.The-blend-tolerance");
-    private final static String sNew = I18N.get("org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn.New");
-    private final static String TOLERANCE = I18N.get("org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn.Tolerance");
-    private final static String sName = I18N.get("org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn.Blend-LineStrings");
+	private String sToolTipText = "huhu!  :)";
+    private String sTheBlendTolerance = I18N.get("org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn.The-blend-tolerance");
+    private String sNew = I18N.get("org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn.New");
+    private String TOLERANCE = I18N.get("org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn.Tolerance");
+    private String sName = I18N.get("org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn.Blend-LineStrings");
     
     private double blendTolerance = 0.1;
 
@@ -75,6 +75,12 @@ public class BlendLineStringsPlugIn extends AbstractPlugIn {
     
     public boolean execute(final PlugInContext context) throws Exception
     {
+		sToolTipText = "huhu!  :)";
+		sTheBlendTolerance = I18N.get("org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn.The-blend-tolerance");
+		sNew = I18N.get("org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn.New");
+		TOLERANCE = I18N.get("org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn.Tolerance");
+		sName = I18N.get("org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn.Blend-LineStrings");
+    	
         reportNothingToUndoYet(context);
         
         MultiInputDialog dialog = new MultiInputDialog(context.getWorkbenchFrame(), getName(), true);

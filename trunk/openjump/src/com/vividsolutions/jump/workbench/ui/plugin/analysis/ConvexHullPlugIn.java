@@ -51,7 +51,7 @@ import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
 
 
 public class ConvexHullPlugIn extends AbstractPlugIn implements ThreadedPlugIn {
-    private final static String LAYER = I18N.get("ui.plugin.analysis.ConvexHullPlugIn.Source-Layer");
+    private String LAYER = I18N.get("ui.plugin.analysis.ConvexHullPlugIn.Source-Layer");
     private MultiInputDialog dialog;
 
     public ConvexHullPlugIn() {
@@ -66,6 +66,8 @@ public class ConvexHullPlugIn extends AbstractPlugIn implements ThreadedPlugIn {
     }
 
      public boolean execute(PlugInContext context) throws Exception {
+     	//[sstein, 16.07.2006] put here again for language settings
+        LAYER = I18N.get("ui.plugin.analysis.ConvexHullPlugIn.Source-Layer");
         //Unlike ValidatePlugIn, here we always call #initDialog because we want
         //to update the layer comboboxes. [Jon Aquino]
         initDialog(context);

@@ -69,6 +69,8 @@ public class EditingPlugIn extends ToolboxPlugIn {
     }
 
     protected void initializeToolbox(ToolboxDialog toolbox) {
+    	//-- [sstein, 15.07.2006] set again in correct language
+    	optionsButton.setText(I18N.get("ui.cursortool.editing.EditingPlugIn.options"));
         //The auto-generated title "Editing Toolbox" is too long to fit. [Jon Aquino]
         toolbox.setTitle(I18N.get("ui.cursortool.editing.EditingPlugIn.editing"));
         EnableCheckFactory checkFactory = new EnableCheckFactory(toolbox.getContext());

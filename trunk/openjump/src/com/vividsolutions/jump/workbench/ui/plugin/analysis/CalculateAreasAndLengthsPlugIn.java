@@ -77,7 +77,22 @@ import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 *
 */
 public class CalculateAreasAndLengthsPlugIn extends AbstractPlugIn {
+	
+    private String LAYER_COMBO_BOX = I18N.get("ui.plugin.analysis.CalculateAreasAndLengthsPlugIn.layer");
+    private String AREA_COMBO_BOX = I18N.get("ui.plugin.analysis.CalculateAreasAndLengthsPlugIn.area-attribute-name");
+    private String LENGTH_COMBO_BOX = I18N.get("ui.plugin.analysis.CalculateAreasAndLengthsPlugIn.length-attribute-name");
+    private String LENGTH_CHECK_BOX = I18N.get("ui.plugin.analysis.CalculateAreasAndLengthsPlugIn.calculate-length");
+    private String AREA_CHECK_BOX = I18N.get("ui.plugin.analysis.CalculateAreasAndLengthsPlugIn.calculate-area");
+
+	
     public boolean execute(PlugInContext context) throws Exception {
+    	//[sstein, 16.07.2006] set again to obtain correct language
+        LAYER_COMBO_BOX = I18N.get("ui.plugin.analysis.CalculateAreasAndLengthsPlugIn.layer");
+        AREA_COMBO_BOX = I18N.get("ui.plugin.analysis.CalculateAreasAndLengthsPlugIn.area-attribute-name");
+        LENGTH_COMBO_BOX = I18N.get("ui.plugin.analysis.CalculateAreasAndLengthsPlugIn.length-attribute-name");
+        LENGTH_CHECK_BOX = I18N.get("ui.plugin.analysis.CalculateAreasAndLengthsPlugIn.calculate-length");
+        AREA_CHECK_BOX = I18N.get("ui.plugin.analysis.CalculateAreasAndLengthsPlugIn.calculate-area");
+
         //<<TODO>> Undo? [Jon Aquino]
         //<<TODO>> Two-phase commit? [Jon Aquino]
         MultiInputDialog dialog = prompt(context);
@@ -278,11 +293,6 @@ public class CalculateAreasAndLengthsPlugIn extends AbstractPlugIn {
         }
         return candidateAttributeNames;
     }
-    private static final String LAYER_COMBO_BOX = I18N.get("ui.plugin.analysis.CalculateAreasAndLengthsPlugIn.layer");
-    private static final String AREA_COMBO_BOX = I18N.get("ui.plugin.analysis.CalculateAreasAndLengthsPlugIn.area-attribute-name");
-    private static final String LENGTH_COMBO_BOX = I18N.get("ui.plugin.analysis.CalculateAreasAndLengthsPlugIn.length-attribute-name");
-    private static final String LENGTH_CHECK_BOX = I18N.get("ui.plugin.analysis.CalculateAreasAndLengthsPlugIn.calculate-length");
-    private static final String AREA_CHECK_BOX = I18N.get("ui.plugin.analysis.CalculateAreasAndLengthsPlugIn.calculate-area");
     private static interface Op {
         public double compute(Geometry g);
     }

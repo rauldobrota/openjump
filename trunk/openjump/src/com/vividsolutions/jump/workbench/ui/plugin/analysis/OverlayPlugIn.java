@@ -59,11 +59,11 @@ import com.vividsolutions.jump.workbench.ui.images.IconLoader;
  */
 
 public class OverlayPlugIn extends AbstractPlugIn implements ThreadedPlugIn {
-    private final static String POLYGON_OUTPUT = I18N.get("ui.plugin.analysis.OverlayPlugIn.limit-output-to-polygons-only");
-    private final static String FIRST_LAYER = I18N.get("ui.plugin.analysis.OverlayPlugIn.first-layer");
-    private final static String SECOND_LAYER = I18N.get("ui.plugin.analysis.OverlayPlugIn.second-layer");
-    private final static String TRANSFER_ATTRIBUTES_FROM_FIRST_LAYER = I18N.get("ui.plugin.analysis.OverlayPlugIn.transfer-attributes-from-first-layer");
-    private final static String TRANSFER_ATTRIBUTES_FROM_SECOND_LAYER = I18N.get("ui.plugin.analysis.OverlayPlugIn.transfer-attributes-from-second-layer");
+    private String POLYGON_OUTPUT = I18N.get("ui.plugin.analysis.OverlayPlugIn.limit-output-to-polygons-only");
+    private String FIRST_LAYER = I18N.get("ui.plugin.analysis.OverlayPlugIn.first-layer");
+    private String SECOND_LAYER = I18N.get("ui.plugin.analysis.OverlayPlugIn.second-layer");
+    private String TRANSFER_ATTRIBUTES_FROM_FIRST_LAYER = I18N.get("ui.plugin.analysis.OverlayPlugIn.transfer-attributes-from-first-layer");
+    private String TRANSFER_ATTRIBUTES_FROM_SECOND_LAYER = I18N.get("ui.plugin.analysis.OverlayPlugIn.transfer-attributes-from-second-layer");
     private MultiInputDialog dialog;
     private OverlayEngine overlayEngine;
 
@@ -71,6 +71,13 @@ public class OverlayPlugIn extends AbstractPlugIn implements ThreadedPlugIn {
     }
 
     public boolean execute(PlugInContext context) throws Exception {
+    	//[sstein, 15.07.2006] placed here again otherwise language settings wont work for i18n 
+		POLYGON_OUTPUT = I18N.get("ui.plugin.analysis.OverlayPlugIn.limit-output-to-polygons-only");
+		FIRST_LAYER = I18N.get("ui.plugin.analysis.OverlayPlugIn.first-layer");
+		SECOND_LAYER = I18N.get("ui.plugin.analysis.OverlayPlugIn.second-layer");
+		TRANSFER_ATTRIBUTES_FROM_FIRST_LAYER = I18N.get("ui.plugin.analysis.OverlayPlugIn.transfer-attributes-from-first-layer");
+		TRANSFER_ATTRIBUTES_FROM_SECOND_LAYER = I18N.get("ui.plugin.analysis.OverlayPlugIn.transfer-attributes-from-second-layer");
+
         overlayEngine = prompt(context);
 
         return overlayEngine != null;

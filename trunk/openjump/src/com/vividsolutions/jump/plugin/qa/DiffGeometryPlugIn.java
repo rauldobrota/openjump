@@ -58,19 +58,19 @@ public class DiffGeometryPlugIn
   extends ThreadedBasePlugIn
   {
 
-  private final static String sLayer = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Layer");
-  private final static String LAYER1 = sLayer + " 1";
-  private final static String LAYER2 = sLayer + " 2";
-  private final static String MATCH_SEGMENTS = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Match-Segments");
-  private final static String MATCH_GEOMETRY = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Match-entire-Geometry");
-  private final static String EXACT_COORD_ORDER = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Test-for-identical-Start-point-and-Orientation");
-  private final static String USE_TOLERANCE = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Match-using-Distance-Tolerance");
-  private final static String DISTANCE_TOL = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Distance-Tolerance");
-  private final static String SPLIT_COMPONENTS = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Match-components-of-MultiGeometries");
+  private String sLayer = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Layer");
+  private String LAYER1 = sLayer + " 1";
+  private String LAYER2 = sLayer + " 2";
+  private String MATCH_SEGMENTS = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Match-Segments");
+  private String MATCH_GEOMETRY = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Match-entire-Geometry");
+  private String EXACT_COORD_ORDER = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Test-for-identical-Start-point-and-Orientation");
+  private String USE_TOLERANCE = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Match-using-Distance-Tolerance");
+  private String DISTANCE_TOL = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Distance-Tolerance");
+  private String SPLIT_COMPONENTS = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Match-components-of-MultiGeometries");
 
-  private final static String sSegmentDiffs = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Segment-Diffs"); 
-  private final static String sUnmGeoms = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Unmatched-Geometries-in-Layer");
-  private final static String sUnmSegms = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Unmatched-Segments-in-Geometry-Diffs-in-Layer");
+  private String sSegmentDiffs = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Segment-Diffs"); 
+  private String sUnmGeoms = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Unmatched-Geometries-in-Layer");
+  private String sUnmSegms = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Unmatched-Segments-in-Geometry-Diffs-in-Layer");
   //note: further strings below
   
   private MultiInputDialog dialog;
@@ -97,6 +97,22 @@ public class DiffGeometryPlugIn
   }
   
   public boolean execute(PlugInContext context) throws Exception {
+  	
+  	//[sstein, 16.07.2006] set again to obtain correct language
+    sLayer = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Layer");
+    LAYER1 = sLayer + " 1";
+    LAYER2 = sLayer + " 2";
+    MATCH_SEGMENTS = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Match-Segments");
+    MATCH_GEOMETRY = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Match-entire-Geometry");
+    EXACT_COORD_ORDER = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Test-for-identical-Start-point-and-Orientation");
+    USE_TOLERANCE = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Match-using-Distance-Tolerance");
+    DISTANCE_TOL = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Distance-Tolerance");
+    SPLIT_COMPONENTS = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Match-components-of-MultiGeometries");
+
+    sSegmentDiffs = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Segment-Diffs"); 
+    sUnmGeoms = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Unmatched-Geometries-in-Layer");
+    sUnmSegms = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Unmatched-Segments-in-Geometry-Diffs-in-Layer");
+    
     dialog = new MultiInputDialog(
         context.getWorkbenchFrame(), getName(), true);
     setDialogValues(dialog, context);

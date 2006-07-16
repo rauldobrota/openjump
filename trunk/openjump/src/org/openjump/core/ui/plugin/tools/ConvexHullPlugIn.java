@@ -60,11 +60,11 @@ import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
 
 public class ConvexHullPlugIn extends AbstractPlugIn {
     private WorkbenchContext workbenchContext;
-    private final static String TOLERANCE = I18N.get("org.openjump.core.ui.plugin.tools.ConvexHullPlugIn.Tolerance");
+    private String TOLERANCE = I18N.get("org.openjump.core.ui.plugin.tools.ConvexHullPlugIn.Tolerance");
     private MultiInputDialog dialog;
     private double blendTolerance = 0.1;
     private boolean exceptionThrown = false;
-    final static String sConvexHull = I18N.get("org.openjump.core.ui.plugin.tools.ConvexHullPlugIn.Convex-Hull");
+    private String sConvexHull = I18N.get("org.openjump.core.ui.plugin.tools.ConvexHullPlugIn.Convex-Hull");
 
     public void initialize(PlugInContext context) throws Exception
     {     
@@ -78,6 +78,9 @@ public class ConvexHullPlugIn extends AbstractPlugIn {
 
     public boolean execute(final PlugInContext context) throws Exception
     {
+        TOLERANCE = I18N.get("org.openjump.core.ui.plugin.tools.ConvexHullPlugIn.Tolerance");
+        sConvexHull = I18N.get("org.openjump.core.ui.plugin.tools.ConvexHullPlugIn.Convex-Hull");
+        
         reportNothingToUndoYet(context);
         Collection selectedFeatures = context.getLayerViewPanel().getSelectionManager().getFeaturesWithSelectedItems(); 
         Collection selectedCategories = context.getLayerNamePanel().getSelectedCategories();

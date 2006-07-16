@@ -46,14 +46,14 @@ import com.vividsolutions.jump.task.*;
 
 public class DiffSegmentsPlugIn extends ThreadedBasePlugIn {
 
-  private final static String sLayer = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Layer");
-  private final static String LAYER1 = sLayer + " 1";
-  private final static String LAYER2 = sLayer + " 2";
-  private final static String USE_TOLERANCE = I18N.get("jump.plugin.qa.DiffSegmentsPlugIn.Use-Distance-Tolerance");
-  private final static String DISTANCE_TOL = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Distance-Tolerance");
+  private String sLayer = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Layer");
+  private String LAYER1 = sLayer + " 1";
+  private String LAYER2 = sLayer + " 2";
+  private String USE_TOLERANCE = I18N.get("jump.plugin.qa.DiffSegmentsPlugIn.Use-Distance-Tolerance");
+  private String DISTANCE_TOL = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Distance-Tolerance");
   
-  private final static String sSegmentDiffs = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Segment-Diffs");
-  private final static String sUnmSegm = I18N.get("jump.plugin.qa.DiffSegmentsPlugIn.Unmatched-Segments-in-Layer");
+  private String sSegmentDiffs = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Segment-Diffs");
+  private String sUnmSegm = I18N.get("jump.plugin.qa.DiffSegmentsPlugIn.Unmatched-Segments-in-Layer");
   // further strings are below
   
   private Layer layer1, layer2;
@@ -76,6 +76,17 @@ public class DiffSegmentsPlugIn extends ThreadedBasePlugIn {
   }
   
   public boolean execute(PlugInContext context) throws Exception {
+  	
+  	//[sstein, 16.07.2006] set again to obtain correct language
+    sLayer = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Layer");
+    LAYER1 = sLayer + " 1";
+    LAYER2 = sLayer + " 2";
+    USE_TOLERANCE = I18N.get("jump.plugin.qa.DiffSegmentsPlugIn.Use-Distance-Tolerance");
+    DISTANCE_TOL = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Distance-Tolerance");
+    
+    sSegmentDiffs = I18N.get("jump.plugin.qa.DiffGeometryPlugIn.Segment-Diffs");
+    sUnmSegm = I18N.get("jump.plugin.qa.DiffSegmentsPlugIn.Unmatched-Segments-in-Layer");
+
     MultiInputDialog dialog = new MultiInputDialog(
         context.getWorkbenchFrame(), I18N.get("jump.plugin.qa.DiffSegmentsPlugIn.Diff-Segments"), true);
     setDialogValues(dialog, context);

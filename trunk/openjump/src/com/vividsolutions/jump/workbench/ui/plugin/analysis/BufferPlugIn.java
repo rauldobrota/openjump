@@ -48,13 +48,13 @@ public class BufferPlugIn
     extends AbstractPlugIn
     implements ThreadedPlugIn
 {
-  private final static String LAYER = I18N.get("ui.plugin.analysis.BufferPlugIn.layer");
-  private final static String DISTANCE = I18N.get("ui.plugin.analysis.BufferPlugIn.buffer-distance");
-  private final static String END_CAP_STYLE = I18N.get("ui.plugin.analysis.BufferPlugIn.End-Cap-Style");
+  private String LAYER = I18N.get("ui.plugin.analysis.BufferPlugIn.layer");
+  private String DISTANCE = I18N.get("ui.plugin.analysis.BufferPlugIn.buffer-distance");
+  private String END_CAP_STYLE = I18N.get("ui.plugin.analysis.BufferPlugIn.End-Cap-Style");
 
-  private final static String CAP_STYLE_ROUND = I18N.get("ui.plugin.analysis.BufferPlugIn.Round");
-  private final static String CAP_STYLE_SQUARE = I18N.get("ui.plugin.analysis.BufferPlugIn.Square");
-  private final static String CAP_STYLE_BUTT = I18N.get("ui.plugin.analysis.BufferPlugIn.Butt");
+  private String CAP_STYLE_ROUND = I18N.get("ui.plugin.analysis.BufferPlugIn.Round");
+  private String CAP_STYLE_SQUARE = I18N.get("ui.plugin.analysis.BufferPlugIn.Square");
+  private String CAP_STYLE_BUTT = I18N.get("ui.plugin.analysis.BufferPlugIn.Butt");
 
   private List endCapStyles = new ArrayList();
 
@@ -72,6 +72,15 @@ public class BufferPlugIn
   }
 
   public boolean execute(PlugInContext context) throws Exception {
+  	//[sstein, 16.07.2006] set again to obtain correct language
+    LAYER = I18N.get("ui.plugin.analysis.BufferPlugIn.layer");
+    DISTANCE = I18N.get("ui.plugin.analysis.BufferPlugIn.buffer-distance");
+    END_CAP_STYLE = I18N.get("ui.plugin.analysis.BufferPlugIn.End-Cap-Style");
+
+    CAP_STYLE_ROUND = I18N.get("ui.plugin.analysis.BufferPlugIn.Round");
+    CAP_STYLE_SQUARE = I18N.get("ui.plugin.analysis.BufferPlugIn.Square");
+    CAP_STYLE_BUTT = I18N.get("ui.plugin.analysis.BufferPlugIn.Butt");
+    
     MultiInputDialog dialog = new MultiInputDialog(
         context.getWorkbenchFrame(), getName(), true);
     setDialogValues(dialog, context);
@@ -146,6 +155,9 @@ public class BufferPlugIn
 
   private static int endCapStyleCode(String capStyle)
   {
+    String CAP_STYLE_SQUARE = I18N.get("ui.plugin.analysis.BufferPlugIn.Square");
+    String CAP_STYLE_BUTT = I18N.get("ui.plugin.analysis.BufferPlugIn.Butt");
+    
     if (capStyle == CAP_STYLE_BUTT) return BufferOp.CAP_BUTT;
     if (capStyle == CAP_STYLE_SQUARE) return BufferOp.CAP_SQUARE;
     return BufferOp.CAP_ROUND;
