@@ -55,4 +55,27 @@ public interface MenuNames {
 	public static String WINDOW = I18N.get("ui.MenuNames.WINDOW");
 	public static String HELP = I18N.get("ui.MenuNames.HELP");
 	public static String PLUGINS = I18N.get("ui.MenuNames.PLUGINS");
+	
+	//erwan début décembre 2005 --- SIGLE	
+	//Menu
+	public static String ATTRIBUTS = I18N.get("ui.MenuNames.ATTRIBUTS");
+	public static String SELECTION = I18N.get("ui.MenuNames.SELECTION");
+	public static String RASTER = I18N.get("ui.MenuNames.RASTER");
+	public static String STATISTICS = I18N.get("ui.MenuNames.STATISTICS");
+	public static String GEOPROCESSING = I18N.get("ui.MenuNames.GEOPROCESSING");
+	
+	//Submenu
+	public static String ONELAYER = I18N.get("ui.MenuNames.ONELAYER");
+	public static String TWOLAYERS = I18N.get("ui.MenuNames.TWOLAYERS");
+	public static String CONVERT = I18N.get("ui.MenuNames.CONVERT");
+	public static String EXTRACT = I18N.get("ui.MenuNames.EXTRACT");
+	public static String MERGE = I18N.get("ui.MenuNames.MERGE");
+	public static String GENERALIZATION = I18N.get("ui.MenuNames.GENERALIZATION");
+	public static String TOPOLOGY = I18N.get("ui.MenuNames.TOPOLOGY");
+	public static String QA = I18N.get("ui.MenuNames.QA");
+	public static String DELETE = I18N.get("ui.MenuNames.DELETE");
+	public static String DETECT = I18N.get("ui.MenuNames.DETECT");
+		
+	//	erwan fin décembre 2005
+
 }
