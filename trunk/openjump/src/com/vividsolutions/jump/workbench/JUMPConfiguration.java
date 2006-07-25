@@ -49,7 +49,6 @@ import com.vividsolutions.jump.workbench.ui.plugin.*;
 import com.vividsolutions.jump.workbench.ui.plugin.analysis.*;
 import com.vividsolutions.jump.workbench.ui.plugin.clipboard.*;
 import com.vividsolutions.jump.workbench.ui.plugin.datastore.*;
-import com.vividsolutions.jump.workbench.ui.plugin.edit.*;
 import com.vividsolutions.jump.workbench.ui.plugin.scalebar.*;
 import com.vividsolutions.jump.workbench.ui.plugin.skin.InstallSkinsPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.test.*;
