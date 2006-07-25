@@ -152,6 +152,9 @@ public class OpenJumpConfiguration{
 		mySpatialJoin.initialize(new PlugInContext(workbenchContext, null, null, null, null));	
 		
 		/**** GENERATE ****/
+		ConvexHullPlugIn myConvHullPlugIn = new ConvexHullPlugIn();
+		myConvHullPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+
 		CreateThiessenPolygonsPlugIn myThiessenPlugin = new CreateThiessenPolygonsPlugIn();
 		myThiessenPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));				
 		
@@ -159,12 +162,11 @@ public class OpenJumpConfiguration{
 		SimpleQueryPlugIn mySimpleQueryPlugIn = new SimpleQueryPlugIn();
 		mySimpleQueryPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
+		/**** QA ****/
 		DeleteEmptyGeometriesPlugIn myDelGeomPlugin= new DeleteEmptyGeometriesPlugIn(); 
 		myDelGeomPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
-		/**** JOIN ****/
-		ConvexHullPlugIn myConvHullPlugIn = new ConvexHullPlugIn();
-		myConvHullPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
-		
+	
+		/**** EDIT ****/		
 		JoinWithArcPlugIn myJoinWithArcPlugIn= new JoinWithArcPlugIn();
 		myJoinWithArcPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
