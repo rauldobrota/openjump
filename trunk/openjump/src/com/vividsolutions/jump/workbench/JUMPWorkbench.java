@@ -80,9 +80,10 @@ public class JUMPWorkbench {
 
 	private static final ImageIcon APP_ICON = IconLoader.icon(I18N.get("JUMPWorkbench.app-icon.gif"));
 	public static final String VERSION_TEXT = I18N.get("JUMPWorkbench.version.number");
-	public final static String PROPERTIES_OPTION = I18N.get("JUMPWorkbench.properties");
-	public final static String PLUG_IN_DIRECTORY_OPTION = I18N.get("JUMPWorkbench.plug-in-directory");
-	public final static String I18N_FILE = I18N.get("JUMPWorkbench.i18n-file");
+	//-- dont change the following strings 
+	public final static String PROPERTIES_OPTION = "properties";
+	public final static String PLUG_IN_DIRECTORY_OPTION = "plug-in-directory";
+	public final static String I18N_FILE = "i18n";
 	public static final String INITIAL_PROJECT_FILE = "project";
 	
 	// Added by STanner to allow I18N to have access to this
