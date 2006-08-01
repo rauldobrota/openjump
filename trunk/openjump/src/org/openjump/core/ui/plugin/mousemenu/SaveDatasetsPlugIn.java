@@ -36,28 +36,29 @@
 
 package org.openjump.core.ui.plugin.mousemenu;
 
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.filechooser.FileFilter;
 
 import org.openjump.core.geomutils.GeoUtils;
 
-import com.vividsolutions.jump.I18N;
-import com.vividsolutions.jump.util.FileUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jump.feature.AttributeType;
-import com.vividsolutions.jump.feature.BasicFeature;
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureCollectionWrapper;
 import com.vividsolutions.jump.feature.FeatureDataset;
@@ -71,6 +72,7 @@ import com.vividsolutions.jump.io.WKTWriter;
 import com.vividsolutions.jump.io.datasource.DataSource;
 import com.vividsolutions.jump.io.datasource.DataSourceQuery;
 import com.vividsolutions.jump.io.datasource.StandardReaderWriterFileDataSource;
+import com.vividsolutions.jump.util.FileUtil;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.model.Layer;
 import com.vividsolutions.jump.workbench.model.LayerManager;
@@ -79,9 +81,10 @@ import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
+import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
-import com.vividsolutions.jump.workbench.ui.plugin.SaveProjectPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.SaveProjectAsPlugIn;
+import com.vividsolutions.jump.workbench.ui.plugin.SaveProjectPlugIn;
 
 public class SaveDatasetsPlugIn extends AbstractPlugIn
 {
@@ -103,14 +106,32 @@ public class SaveDatasetsPlugIn extends AbstractPlugIn
 	private static final String sUnrecognizedFileType=I18N.get("org.openjump.core.ui.plugin.mousemenu.SaveDatasetsPlugIn.Unrecognized-file-type");
 	private static final String sNewLayerCreated=I18N.get("org.openjump.core.ui.plugin.mousemenu.SaveDatasetsPlugIn.New-layer-created");
 	private static final String sCouldNotWrite=I18N.get("org.openjump.core.ui.plugin.mousemenu.SaveDatasetsPlugIn.Could-not-write");
+	private static final String sEmptyLayerNotSaved = I18N.get("org.openjump.core.ui.plugin.mousemenu.SaveDatasetsPlugIn.Empty-layer-not-saved");
+	private static final String sSaveFilesFromReadOnlySources = I18N.get("org.openjump.core.ui.plugin.mousemenu.SaveDatasetsPlugIn.Save-files-from-read-only-sources");
+	private static final String sFiles = I18N.get("org.openjump.core.ui.plugin.mousemenu.SaveDatasetsPlugIn.Files");
+	private static final String sWantToSaveReadonly = I18N.get("org.openjump.core.ui.plugin.mousemenu.SaveDatasetsPlugIn.Do-you-want-to-save-the-read-only-layers");
+	private static final String sNoteLayerNameWillBeFileName = I18N.get("org.openjump.core.ui.plugin.mousemenu.SaveDatasetsPlugIn.Note-layer-name-will-be-filename");
+	private static final String sReadOnlyLayer = I18N.get("org.openjump.core.ui.plugin.mousemenu.SaveDatasetsPlugIn.read-only-layer");
+	private static final String sReplacesFile = I18N.get("org.openjump.core.ui.plugin.mousemenu.SaveDatasetsPlugIn.replaces-file");
+	private static final String sReadOnlyWillReplace = I18N.get("org.openjump.core.ui.plugin.mousemenu.SaveDatasetsPlugIn.read-only-source-will-replace-an-existing-file");
+	private static final String sNoteOutputWindow = I18N.get("org.openjump.core.ui.plugin.mousemenu.SaveDatasetsPlugIn.Note-Output-window-will-display-the-results-of-this-command");
+	private static final String sWouldHaveReplaced = I18N.get("org.openjump.core.ui.plugin.mousemenu.SaveDatasetsPlugIn.The-read-only-layer-would-have-replaced-the-following-file(s)");
+	private static final String sHasReplaced = I18N.get("org.openjump.core.ui.plugin.mousemenu.SaveDatasetsPlugIn.The-read-only-layer-has-replaced-the-following-file(s)");
+	private static final String sNoOutputDir = I18N.get("org.openjump.core.ui.plugin.mousemenu.SaveDatasetsPlugIn.No-output-directory-designated-for-read-only-source-could-not-save-layer");
+	private static final String sNoOutputFileExt = I18N.get("org.openjump.core.ui.plugin.mousemenu.SaveDatasetsPlugIn.No-output-file-extension-designated-for-read-only-source-could-not-save-layer");
+	
 	
 	private boolean saveAll = false;
-	
+	private int saveReadOnlySources = -1; //-1 - ask; 0 - don't save; 1 - save; 
+	private String pathToSaveReadOnlySources = "";
+	private String extToSaveReadOnlySources = "";
+	private JFileChooser fileChooser;
 	
     public void initialize(PlugInContext context) throws Exception
     {     
-        WorkbenchContext workbenchContext = context.getWorkbenchContext();
+    	WorkbenchContext workbenchContext = context.getWorkbenchContext();
         FeatureInstaller featureInstaller = new FeatureInstaller(workbenchContext);
+        
         JPopupMenu layerNamePopupMenu = workbenchContext.getWorkbench()
                                                         .getFrame()
                                                         .getLayerNamePopupMenu();
@@ -124,6 +145,26 @@ public class SaveDatasetsPlugIn extends AbstractPlugIn
     {
         try
         {
+        	WorkbenchContext workbenchContext = context.getWorkbenchContext();
+
+            fileChooser = new JFileChooser();
+            //fileChooser = GUIUtil.createJFileChooserWithOverwritePrompting();
+            fileChooser.setDialogTitle(sSaveFilesFromReadOnlySources);
+            fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+            fileChooser.setMultiSelectionEnabled(false);
+            GUIUtil.removeChoosableFileFilters(fileChooser);
+            FileFilter fileFilter1 = GUIUtil.createFileFilter("SHP " + sFiles, new String[]{"shp"});
+            fileChooser.addChoosableFileFilter(fileFilter1);
+            FileFilter fileFilter2 = GUIUtil.createFileFilter("GML " + sFiles, new String[]{"gml"});
+            fileChooser.addChoosableFileFilter(fileFilter2);
+            FileFilter fileFilter3 = GUIUtil.createFileFilter("JML " + sFiles, new String[]{"jml"});
+            fileChooser.addChoosableFileFilter(fileFilter3);
+            FileFilter fileFilter4 = GUIUtil.createFileFilter("FME " + sFiles, new String[]{"fme"});
+            fileChooser.addChoosableFileFilter(fileFilter4);
+            FileFilter fileFilter5 = GUIUtil.createFileFilter("WKT " + sFiles, new String[]{"wkt"});
+            fileChooser.addChoosableFileFilter(fileFilter5);
+            fileChooser.setFileFilter(fileFilter1);
+                     	        	
         	boolean writeWarning = false;
             String newLine = "";
             context.getWorkbenchFrame().getOutputFrame().createNewDocument();
@@ -151,11 +192,30 @@ public class SaveDatasetsPlugIn extends AbstractPlugIn
                 for (Iterator i = layerCollection.iterator(); i.hasNext();)
                 {
                 	Layer layer = (Layer) i.next();
-                	if (layer.isFeatureCollectionModified()) //just add modified layers
+                	boolean addIt = false;
+                	DataSourceQuery dsq = layer.getDataSourceQuery();
+                	if (dsq != null)
+                		if (!dsq.getDataSource().isWritable())
+                			addIt = true;
+                	if (layer.isFeatureCollectionModified() || addIt) //just add modified or read-only layers
                 		layerList.add(layer);
                 }
             }
                         
+            //remove empty layers
+            for (int i = layerList.size() - 1; i >= 0; i--)
+            {
+            	Layer layer = (Layer) layerList.get(i);
+
+        		if (layer.getFeatureCollectionWrapper().getFeatures().size() == 0) //layer is empty
+        		{
+        			context.getWorkbenchFrame().getOutputFrame().addText( sEmptyLayerNotSaved + ": " + layer.getName());
+        			writeWarning = true;
+        			layerList.remove(i);
+        			newLine = "\n";
+        		}
+            }
+            
             //remove any layers which have no data sources, ie, 
             //those that have not been previously saved
             for (int i = layerList.size() - 1; i >= 0; i--)
@@ -163,9 +223,31 @@ public class SaveDatasetsPlugIn extends AbstractPlugIn
             	Layer layer = (Layer) layerList.get(i);
         		DataSourceQuery dsq = layer.getDataSourceQuery();
 
+        		boolean writeSaveMsg = false;
+        		
         		if (dsq == null) //layer does not have a data source
         		{
-        			context.getWorkbenchFrame().getOutputFrame().addText(sUseSaveDatasetAsToSaveLayer +": " + layer.getName());
+        			writeSaveMsg = true;
+        		}
+        		else
+        		{
+                	DataSource ds = dsq.getDataSource();                	
+                	if (ds == null)
+                	{
+                		writeSaveMsg = true;
+                	}
+                	else
+                	{
+                		if (ds.getProperties().get("File") == null)
+                		{
+                			writeSaveMsg = true;
+                		}
+                	}        			
+        		}
+        		
+        		if (writeSaveMsg)
+        		{
+        			context.getWorkbenchFrame().getOutputFrame().addText(sUseSaveDatasetAsToSaveLayer + layer.getName());
         			writeWarning = true;
         			layerList.remove(i);
         			newLine = "\n";
@@ -173,6 +255,10 @@ public class SaveDatasetsPlugIn extends AbstractPlugIn
             }
             
             //remove any layers which have read-only sources, ie, SdeDataSources
+            saveReadOnlySources = -1; //initialize so that we ask user if these are to be saved
+            pathToSaveReadOnlySources = ""; //initialize to that WriteLayer will ask the first time
+            String chosenSaveFile = "";
+            
             for (int i = layerList.size() - 1; i >= 0; i--)
             {
             	Layer layer = (Layer) layerList.get(i);
@@ -180,10 +266,32 @@ public class SaveDatasetsPlugIn extends AbstractPlugIn
         		
         		if (!dsq.getDataSource().isWritable()) //data source is read-only
         		{
-        			context.getWorkbenchFrame().getOutputFrame().addText(newLine + sCanNotSaveReadOnly + ": " + layer.getName());
-        			newLine = "";
-        			writeWarning = true;
-        			layerList.remove(i);
+        			if (saveReadOnlySources == -1)
+        			{
+        				int response = JOptionPane.showConfirmDialog(workbenchContext.getLayerViewPanel(), 
+        						sWantToSaveReadonly + "\n" + "(" + sNoteLayerNameWillBeFileName + ")", 
+        						"JUMP", JOptionPane.YES_NO_OPTION);
+
+        				saveReadOnlySources = 0;
+    	                if (response == JOptionPane.YES_OPTION)
+    	                {
+	        	            if (JFileChooser.APPROVE_OPTION == fileChooser.showSaveDialog(workbenchContext.getLayerViewPanel()))
+	        	            {
+	        	            	File file = fileChooser.getSelectedFile();
+	        	            	pathToSaveReadOnlySources = file.getParent() + "\\";
+	        	            	extToSaveReadOnlySources = "." + FileUtil.getExtension(file);
+	        	            	saveReadOnlySources = 1;
+	        	            	chosenSaveFile = file.getPath();
+	        	            }
+    	                }
+        			}
+        			
+        			if (saveReadOnlySources == 0)
+        			{
+        				context.getWorkbenchFrame().getOutputFrame().addText(newLine + sCanNotSaveReadOnly + ": " + layer.getName());
+        				writeWarning = true;
+        				layerList.remove(i);
+        			}
         		}
             }
             
@@ -196,16 +304,22 @@ public class SaveDatasetsPlugIn extends AbstractPlugIn
             while (currRec < lastRec)
             {
             	Layer currLayer = (Layer) layerList.get(currRec);
-        		String currSource = currLayer.getDataSourceQuery().getDataSource().getProperties().get("File").toString();
-        		String dupLayers = "\n" + sFileName + ": " + currSource + "\n" + sLayerName + ": " + currLayer.getName();
+        		String currDestination = currLayer.getDataSourceQuery().getDataSource().getProperties().get("File").toString();
+        		if (!currLayer.getDataSourceQuery().getDataSource().isWritable()) //read-only source
+        			currDestination = pathToSaveReadOnlySources + currLayer.getName() + extToSaveReadOnlySources;
+        		
+            	String dupLayers = "\n" + sFileName + ": " + currDestination + "\n" + sLayerName + ": " + currLayer.getName();
+            	
         		int numDups = 0;
         		int checkRec = currRec + 1;
         		
         		while (checkRec <= lastRec)
             	{
         			Layer checkLayer = (Layer) layerList.get(checkRec);
-            		String checkSource = checkLayer.getDataSourceQuery().getDataSource().getProperties().get("File").toString();
-            		if (currSource.equals(checkSource)) //found duplicate source
+            		String checkDestination = checkLayer.getDataSourceQuery().getDataSource().getProperties().get("File").toString();
+            		if (!checkLayer.getDataSourceQuery().getDataSource().isWritable())
+            			checkDestination = pathToSaveReadOnlySources + checkLayer.getName() + extToSaveReadOnlySources;
+            		if (currDestination.equals(checkDestination)) //found duplicate source
             		{
             			dupLayers = dupLayers + "\n" + sLayerName + ": " + checkLayer.getName();
             			layerList.remove(checkRec);
@@ -239,9 +353,62 @@ public class SaveDatasetsPlugIn extends AbstractPlugIn
         		}
             }
             
-            newLine = "";
-            context.getWorkbenchFrame().getOutputFrame().addText(newLine);
+            //check to see if we need to warn user that files are about to be replaced
+            String replacedFiles = "";
+            int numReplaced = 0;
+            boolean fileMatches = false;
             
+            for (int i = 0; i < layerList.size(); i++)
+            {
+            	String destinationFile = "";
+            	Layer layer = (Layer) layerList.get(i);
+        		DataSourceQuery dsq = layer.getDataSourceQuery();
+        		
+        		if (!dsq.getDataSource().isWritable())
+        		{
+            		destinationFile = pathToSaveReadOnlySources + layer.getName() + extToSaveReadOnlySources;
+        		
+	    			if (new File(destinationFile).exists())
+	    			{
+	    				numReplaced++;
+	    				replacedFiles = replacedFiles + sReadOnlyLayer + ": " + layer.getName() + " " + sReplacesFile + ": " + destinationFile + "\n";
+	    				if (destinationFile.equalsIgnoreCase(chosenSaveFile))
+	    					fileMatches = true;
+	    			}
+        		}
+    			
+            }
+            
+			if ((numReplaced > 1) || ((numReplaced == 1) && (!fileMatches))) //need to ask user if it is OK to replace files
+			{
+				String prompt = numReplaced + " " + sReadOnlyWillReplace + "\n (" + sNoteOutputWindow + ")";
+				if (numReplaced > 1)
+					prompt = numReplaced + " " + sReadOnlyWillReplace + "\n (" + sNoteOutputWindow + ")";
+				
+				int response = JOptionPane.showConfirmDialog(workbenchContext.getLayerViewPanel(), 
+						prompt, "JUMP", JOptionPane.OK_CANCEL_OPTION);
+
+                if (response == JOptionPane.CANCEL_OPTION)
+                {
+                	if (numReplaced == 1)
+                		context.getWorkbenchFrame().getOutputFrame().addText(sWouldHaveReplaced + ":");
+                	else
+            			context.getWorkbenchFrame().getOutputFrame().addText(sWouldHaveReplaced + ":");
+                	
+                    context.getWorkbenchFrame().getOutputFrame().addText(replacedFiles);
+                    writeWarning = true;
+                    return true;
+                }
+                
+	        	if (numReplaced == 1)
+	        		context.getWorkbenchFrame().getOutputFrame().addText(sHasReplaced + ":");
+	        	else
+	    			context.getWorkbenchFrame().getOutputFrame().addText(sHasReplaced + ":");
+	            context.getWorkbenchFrame().getOutputFrame().addText(replacedFiles);
+			}
+
+			//save the files
+			//won't get here if user did not want files replaced
             for (int i = 0; i < layerList.size(); i++)
             {
             	Layer layer = (Layer) layerList.get(i);
@@ -255,11 +422,9 @@ public class SaveDatasetsPlugIn extends AbstractPlugIn
             	{
     				context.getWorkbenchFrame().getOutputFrame().addText(sCouldNotSaveLayer + ": " + layer.getName());
             	}
+                
             }
-            
-            if (writeWarning)
-    			context.getWorkbenchFrame().warnUser( sCouldNotSaveLayer + " --- " + sErrorSeeOutputWindow);
-            	
+			
             if (saveAll)
             {
             	if (context.getTask().getProjectFile() != null)
@@ -269,6 +434,9 @@ public class SaveDatasetsPlugIn extends AbstractPlugIn
             	}
             }
             
+            if (writeWarning)
+    			context.getWorkbenchFrame().warnUser(sCouldNotSaveLayer + " --- " + sErrorSeeOutputWindow);
+            	
             return true;
         }
         catch (Exception e)
@@ -295,7 +463,31 @@ public class SaveDatasetsPlugIn extends AbstractPlugIn
     
     private boolean WriteLayer(PlugInContext context, Layer layer)
     {
-    	String filename = layer.getDataSourceQuery().getDataSource().getProperties().get("File").toString();
+    	String filename = "";
+    	DataSourceQuery dsq = layer.getDataSourceQuery();
+		if (dsq.getDataSource().isWritable())
+		{
+			filename = dsq.getDataSource().getProperties().get("File").toString();
+		}
+		else //read-only source
+		{
+			filename = pathToSaveReadOnlySources + layer.getName() + extToSaveReadOnlySources;
+
+			//the following shouldn't happen
+			if (pathToSaveReadOnlySources.equals(""))
+			{
+	    		context.getWorkbenchFrame().getOutputFrame().addText(sNoOutputDir + ": " + layer.getName());
+	    		context.getWorkbenchFrame().warnUser(sWarningSeeOutputWindow);
+	    		return false;				
+			}
+			if (extToSaveReadOnlySources.equals(""))
+			{
+	    		context.getWorkbenchFrame().getOutputFrame().addText(sNoOutputFileExt + ": " + layer.getName());
+	    		context.getWorkbenchFrame().warnUser(sWarningSeeOutputWindow);
+	    		return false;				
+			}
+		}
+		
     	DriverProperties dp = new DriverProperties();
     	dp.set("File", filename);
     	
@@ -393,7 +585,7 @@ public class SaveDatasetsPlugIn extends AbstractPlugIn
             
     		FeatureCollectionWrapper featureCollection = layer.getFeatureCollectionWrapper();
             List featureList = featureCollection.getFeatures();
-            FeatureSchema fs = layer.getFeatureCollectionWrapper().getFeatureSchema();
+            FeatureSchema featureSchema = layer.getFeatureCollectionWrapper().getFeatureSchema();
             
             //first find and handle all empty geometries and GeometryCollections
             for (Iterator i = featureList.iterator(); i.hasNext();)
@@ -419,7 +611,7 @@ public class SaveDatasetsPlugIn extends AbstractPlugIn
             {
 				Feature feature = (Feature) groupFeatures.get(i);
 				GeometryCollection geometry = (GeometryCollection) feature.getGeometry();
-				explodeGeometryCollection(fs, pointFeatures, lineFeatures, polyFeatures, geometry);
+				explodeGeometryCollection(featureSchema, pointFeatures, lineFeatures, polyFeatures, geometry, feature);
             	featureCollection.remove(feature);
             }
 			
@@ -515,8 +707,6 @@ public class SaveDatasetsPlugIn extends AbstractPlugIn
             	layerBit = GeoUtils.setBit(layerBit, firstGeo); //this is the layer type
             }
 
-            FeatureSchema featureSchema = new FeatureSchema();
-            featureSchema.addAttribute("GEOMETRY", AttributeType.GEOMETRY);
             Collection selectedCategories = context.getLayerNamePanel().getSelectedCategories();
             
             for (Iterator i = featureList.iterator(); i.hasNext();)
@@ -599,7 +789,7 @@ public class SaveDatasetsPlugIn extends AbstractPlugIn
     	return newLayers;
     }
     
-    private void explodeGeometryCollection(FeatureSchema fs, ArrayList pointFeatures, ArrayList lineFeatures, ArrayList polyFeatures, GeometryCollection geometryCollection)
+    private void explodeGeometryCollection(FeatureSchema fs, ArrayList pointFeatures, ArrayList lineFeatures, ArrayList polyFeatures, GeometryCollection geometryCollection, Feature feature)
     {
     	for (int i = 0; i < geometryCollection.getNumGeometries(); i++)
     	{
@@ -607,11 +797,12 @@ public class SaveDatasetsPlugIn extends AbstractPlugIn
     		
     		if (geometry instanceof GeometryCollection)
     		{
-    			explodeGeometryCollection(fs, pointFeatures, lineFeatures, polyFeatures, (GeometryCollection) geometry);
+    			explodeGeometryCollection(fs, pointFeatures, lineFeatures, polyFeatures, (GeometryCollection) geometry, feature);
     		}
     		else
     		{
-    			Feature newFeature = new BasicFeature(fs);
+    			//Feature newFeature = new BasicFeature(fs);
+    			Feature newFeature = feature.clone(true);
     			newFeature.setGeometry(geometry);
     			BitSet featureBit = new BitSet();
     			featureBit = GeoUtils.setBit(featureBit, geometry);
