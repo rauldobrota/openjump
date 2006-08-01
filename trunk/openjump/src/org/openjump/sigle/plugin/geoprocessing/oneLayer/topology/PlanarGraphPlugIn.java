@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.*;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.algorithm.RobustCGAlgorithms;
@@ -48,9 +49,7 @@ import org.openjump.sigle.utilities.geom.FeatureCollectionUtil;
 public class PlanarGraphPlugIn extends ThreadedBasePlugIn {
     
        
-    GeometryFactory gf = new GeometryFactory();
-    
-    private String name = "Coverage";
+    GeometryFactory gf = new GeometryFactory();        
         
     //   Calcul des noeuds
     private static boolean nodeb = true;
@@ -67,8 +66,15 @@ public class PlanarGraphPlugIn extends ThreadedBasePlugIn {
     private static String INITIAL_NODE = "StartNode";
     private static String FINAL_NODE = "EndNode";
     
-    private String layerName;
-    
+    private String layerName;    
+        
+    //-- strings are replaced later
+    private String sNode="Node";
+    private String sFace="Face";
+    private String sEdge="Edge";
+    private String sCategoryName="Graph";
+    private String sMapping="Mapping";
+    	
     public Collection edges;
     
     private MultiInputDialog mid;
@@ -83,38 +89,38 @@ public class PlanarGraphPlugIn extends ThreadedBasePlugIn {
         FeatureCollection fcFace = null;        
     
         // recuperation de la couche et des options cochées
-        Layer layer = mid.getLayer("Couche à transformer en couverture");
+        Layer layer = mid.getLayer(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Select-layer-to-analyse"));
         FeatureCollection fcSource = layer.getFeatureCollectionWrapper();
         layerName = layer.getName();
-        nodeb = mid.getBoolean("Calculer la couche des noeuds");
-        faceb = mid.getBoolean("Calculer la couche des faces");
-        relb = mid.getBoolean("Calculer les relations arcs-noeuds et/ou arcs-faces");
-        attributesb = mid.getBoolean("Conserver les attributs"); 
+        nodeb = mid.getBoolean(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Calculate-nodes"));
+        faceb = mid.getBoolean(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Calculate-faces"));
+        relb = mid.getBoolean(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Calculate-the-relations-arcs-nodes-and-/or-arcs-faces"));
+        attributesb = mid.getBoolean(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Keep-attributes")); 
         
         // Get linear elements from all geometries in the layer
-        monitor.report("Trouver les composants linéaires...");
+        monitor.report(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Searching-for-linear-elements"));
         List list = getLines(fcSource);
-        monitor.report("Nombre de composants trouvés : " + list.size());
+        monitor.report(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Number-of-found-elements") + ": " + list.size());
         
         // Union the lines (unioning is the most expensive operation)
-        monitor.report("Créer la couche des arcs...");
+        monitor.report(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Generate-layer-of-arcs"));
         FeatureCollection fcEdge = createEdgeLayer(
             layer.getFeatureCollectionWrapper(), nodeb, faceb, relb, context);
-        monitor.report("...couche des arcs créée");
+        monitor.report(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Arc-layer-generated"));
         
         // Create the node Layer
-        monitor.report("Création des noeuds...");
+        monitor.report(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Create-nodes"));
         if (nodeb) {
             FeatureCollection fcNode = createNodeLayer(fcEdge, context, relb);
         }
-        monitor.report("...couche des noeuds créée");
+        monitor.report(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Layer-with-nodes-generated"));
         
         // Create face Layer from edges with Polygonizer
-        monitor.report("Création des faces...");
+        monitor.report(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Create-faces"));
         if (faceb) {
             fcFace = createFaceLayer(fcEdge, context, relb);
         }
-        monitor.report("...couche des faces créée");
+        monitor.report(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Layer-of-faces-generated"));
     
         //Erwan aout 2005
         //Ici on applique la procédure pour récuperer les attributs de la couche d'origine
@@ -130,7 +136,7 @@ public class PlanarGraphPlugIn extends ThreadedBasePlugIn {
                 //J'exploite la methode mapping pour recuperer les attributs
                 mapping = new AttributeMapping(new FeatureSchema(), new FeatureSchema());
                 List aFeatures = null;
-                monitor.report("...récupération des attributs");
+                monitor.report(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Transfer-of-attributes"));
                 if (FeatureCollectionUtil.getFeatureCollectionDimension(fcSource)==2){
                     mapping = new AttributeMapping(fcSource.getFeatureSchema(), fcFace.getFeatureSchema());
                     aFeatures = fcFace.getFeatures();
@@ -166,13 +172,13 @@ public class PlanarGraphPlugIn extends ThreadedBasePlugIn {
                     feature.setGeometry((Geometry) aFeature.getGeometry().clone()); 
                     fcRecup.add(feature);
                 }                           
-                context.getLayerManager().addLayer("Graph", layerName + "_Mapping", fcRecup);
+                context.getLayerManager().addLayer(this.sCategoryName, layerName + "_" + this.sMapping, fcRecup);
             }
             else {
                 // Michael Michaud : Debug : gcFace is not in this else statement
                 //context.getLayerManager().addLayer("Graph", layerName + "_Face", fcFace);
             }
-            context.getLayerManager().addLayer("Graph", layerName + "_Face", fcFace);
+            context.getLayerManager().addLayer(this.sCategoryName, layerName + "_" + this.sFace, fcFace);
         }
     }         
     
@@ -185,33 +191,40 @@ public class PlanarGraphPlugIn extends ThreadedBasePlugIn {
 
     public void initialize(PlugInContext context) throws Exception {
         context.getFeatureInstaller().addMainMenuItem(this,new String[] { MenuNames.GEOPROCESSING, MenuNames.ONELAYER,MenuNames.TOPOLOGY }, 
-                "Graphe planaire", false, null, 
+                this.getName(), false, null, 
                 new MultiEnableCheck().add(new EnableCheckFactory(context.getWorkbenchContext()).createTaskWindowMustBeActiveCheck())
                 .add(new EnableCheckFactory(context.getWorkbenchContext()).createAtLeastNLayersMustExistCheck(1))
                 ); 
     }
-
+   
     public boolean execute(PlugInContext context) throws Exception {
+    	this.sEdge = I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Edge");
+    	this.sFace = I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Face");
+    	this.sNode = I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Node");
+    	this.sCategoryName = I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Graph");
+    	this.sMapping = I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Mapping");
+    	
         initDialog(context);
         mid.setVisible(true);
         mid.wasOKPressed();
         return mid.wasOKPressed();
     }
 
-    public String getName() {
-        return name;
+    public String getName(){
+    	return I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Planar-Graph");	
     }
     
 
     private void initDialog(PlugInContext context) {
         
-        mid = new MultiInputDialog(context.getWorkbenchFrame(), "Fonctions topologiques", true);
-        mid.addLayerComboBox("Couche à transformer en couverture", context.getLayerManager().getLayer(0), context.getLayerManager());
-        mid.addLabel("La couche des arcs est toujours calculée");
-        mid.addCheckBox("Calculer la couche des noeuds", nodeb);
-        mid.addCheckBox("Calculer la couche des faces", faceb);
-        mid.addCheckBox("Calculer les relations arcs-noeuds et/ou arcs-faces", relb);
-        mid.addCheckBox("Conserver les attributs", attributesb);
+        mid = new MultiInputDialog(context.getWorkbenchFrame(), I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Topologic-Analysis"), true);
+        //-- note: the strings must be similar to those used in #run() to get the correct variables
+        mid.addLayerComboBox(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Select-layer-to-analyse"), context.getLayerManager().getLayer(0), context.getLayerManager());
+        mid.addLabel(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.The-layer-of-arcs-is-always-generated"));
+        mid.addCheckBox(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Calculate-nodes"), nodeb);
+        mid.addCheckBox(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Calculate-faces"), faceb);
+        mid.addCheckBox(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Calculate-the-relations-arcs-nodes-and-/or-arcs-faces"), relb);
+        mid.addCheckBox(I18N.get("org.openjump.sigle.plugin.PlanarGraphPlugIn.Keep-attributes"), attributesb);
         mid.pack();
         //mid.show();
     }
@@ -276,7 +289,7 @@ public class PlanarGraphPlugIn extends ThreadedBasePlugIn {
             f.setAttribute("ID", new Integer(++no));
             fcEdge.add(f);
         }
-        context.getLayerManager().addLayer("Graph", layerName+"_Edge", fcEdge);
+        context.getLayerManager().addLayer(this.sCategoryName, layerName+"_"+this.sEdge, fcEdge);
         return fcEdge;
     }
     
@@ -306,7 +319,7 @@ public class PlanarGraphPlugIn extends ThreadedBasePlugIn {
             nodes.put(f.getGeometry().getCoordinate(), f);
             fcNode.add(f);
         }
-        context.getLayerManager().addLayer("Graph", layerName+"_Node", fcNode);
+        context.getLayerManager().addLayer(this.sCategoryName, layerName+"_"+this.sNode, fcNode);
         
         // Compute the relation between edges and nodes
         if (relations) {
@@ -338,7 +351,7 @@ public class PlanarGraphPlugIn extends ThreadedBasePlugIn {
             Feature f = new BasicFeature(fsFace);
             f.setGeometry((Geometry)it.next());
             f.setAttribute("ID", new Integer(++no));
-            System.out.println("Face : " + f.getID() + " : " + f.getAttribute("ID"));
+            System.out.println(this.sFace + ": " + f.getID() + " : " + f.getAttribute("ID"));
             fcFace.add(f);
         }
         //context.getLayerManager().addLayer("Graph", layerName+"_Face", fcFace);
