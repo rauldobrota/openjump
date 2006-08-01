@@ -1,7 +1,7 @@
 /*
  * The Unified Mapping Platform (JUMP) is an extensible, interactive GUI for
  * visualizing and manipulating spatial features with geometry and attributes.
- * 
+ *
  * Copyright (C) 2003 Vivid Solutions
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -32,8 +32,13 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Vector;
+import java.io.FileNotFoundException;
 
 import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+import java.util.Map;
+import javax.swing.JOptionPane;
 
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.coordsys.CoordinateSystemRegistry;
@@ -104,12 +109,12 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
 
     public void run(TaskMonitor monitor, PlugInContext context)
             throws Exception {
-        loadLayers(sourceTask.getLayerManager(), newTask.getLayerManager(),
+        loadLayers(context, sourceTask.getLayerManager(), newTask.getLayerManager(),
                 CoordinateSystemRegistry.instance(context.getWorkbenchContext()
                         .getBlackboard()), monitor);
     }
 
-     public void open(File file, WorkbenchFrame workbenchFrame)
+    public void open(File file, WorkbenchFrame workbenchFrame)
             throws Exception {
         FileReader reader = new FileReader(file);
 
@@ -143,9 +148,12 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
         }
     }
 
-    private void loadLayers(LayerManager sourceLayerManager,
+    private void loadLayers(PlugInContext context, LayerManager sourceLayerManager,
             LayerManager newLayerManager, CoordinateSystemRegistry registry,
             TaskMonitor monitor) throws Exception {
+        FindFile findFile = new FindFile(context);
+        boolean displayDialog = true;
+        
         for (Iterator i = sourceLayerManager.getCategories().iterator(); i
                 .hasNext();) {
             Category sourceLayerCategory = (Category) i.next();
@@ -159,7 +167,7 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
             ArrayList layerables = new ArrayList(sourceLayerCategory
                     .getLayerables());
             Collections.reverse(layerables);
-
+            
             for (Iterator j = layerables.iterator(); j.hasNext();) {
                 Layerable layerable = (Layerable) j.next();
                 if ( monitor != null ){
@@ -169,7 +177,42 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
 
                 if (layerable instanceof Layer) {
                     Layer layer = (Layer) layerable;
-                    load(layer, registry, monitor);
+                    try
+                    {
+                    	load(layer, registry, monitor);
+                    }
+                	catch (FileNotFoundException ex)
+                	{
+                		if (displayDialog)
+                		{
+                			displayDialog = false;
+                			
+	        				int response = JOptionPane.showConfirmDialog(context.getWorkbenchFrame(), 
+	        						I18N.get("ui.plugin.OpenProjectPlugIn.At-least-one-file-in-the-task-could-not-be-found") + "\n" +
+	        						I18N.get("ui.plugin.OpenProjectPlugIn.Do-you-want-to-locate-it-and-continue-loading-the-task"), 
+	        						"JUMP", JOptionPane.YES_NO_OPTION);
+	
+	    	                if (response != JOptionPane.YES_OPTION)
+	    	                {
+	    	                	break;
+	    	                }
+                		}
+    	                
+                        String fname = layer.getDataSourceQuery().getDataSource().getProperties().get("File").toString();
+                        String filename = findFile.getFileName(fname);
+                        if (filename.length() > 0)
+                        {
+                            //set the new source for this layer
+                        	Map properties = layer.getDataSourceQuery().getDataSource().getProperties();
+                        	properties.put(DataSource.FILE_KEY, filename);
+                        	layer.getDataSourceQuery().getDataSource().setProperties(properties);                       
+                        	load(layer, registry, monitor);
+                        }
+                		else
+                		{
+                			break;
+                		}
+                	}
                 }
 
                 newLayerManager.addLayerable(sourceLayerCategory.getName(),
@@ -179,11 +222,11 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
     }
 
     public static void load(Layer layer, CoordinateSystemRegistry registry, TaskMonitor monitor) throws Exception {
-        layer.setFeatureCollection(executeQuery(layer
-                .getDataSourceQuery().getQuery(), layer
-                .getDataSourceQuery().getDataSource(), registry,
-                monitor));
-        layer.setFeatureCollectionModified(false);
+        	layer.setFeatureCollection(executeQuery(layer
+                    .getDataSourceQuery().getQuery(), layer
+                    .getDataSourceQuery().getDataSource(), registry,
+                    monitor));
+            layer.setFeatureCollectionModified(false);
     }
 
     private static FeatureCollection executeQuery(String query, DataSource dataSource,
@@ -197,4 +240,120 @@ public class OpenProjectPlugIn extends ThreadedBasePlugIn {
             connection.close();
         }
     }
+    
+    public class FindFile
+	{
+    	private Vector prefixList = new Vector(5, 5);
+    	private JFileChooser fileChooser;
+    	private PlugInContext context;
+    	
+    	public FindFile(PlugInContext context)
+    	{
+    		this.context = context;
+            fileChooser = new JFileChooser();
+            fileChooser = GUIUtil.createJFileChooserWithExistenceChecking();
+            fileChooser.setDialogTitle("Choose current location of: ");
+            fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileChooser.setMultiSelectionEnabled(false);
+    	}
+    	
+    	public FindFile(PlugInContext context, JFileChooser fileChooser)
+    	{
+    		this(context);
+    		this.fileChooser = fileChooser;
+        }
+    	
+    	public String getFileName(String filenamepath) throws Exception
+    	{
+    		//strip off file name
+    		File oldFile = new File(filenamepath);
+    		String oldPath = oldFile.getPath();
+    		//see if something in the prefixList matches all or part of oldPath  
+            for (Iterator i = prefixList.iterator(); i.hasNext();)
+            {
+            	PathPrefixes prefix = (PathPrefixes) i.next();
+                if (oldPath.toLowerCase().indexOf(prefix.getOldPrefix().toLowerCase()) > -1) //found match
+                {
+                	//replace matching portion with new prefix
+                	String newFileNamePath = filenamepath.substring(prefix.getOldPrefix().length());
+                	newFileNamePath = prefix.getNewPrefix() + newFileNamePath;
+                	File newFile = new File(newFileNamePath);
+                	if (newFile.exists()) 
+                		return newFileNamePath;
+                	//else continue to look through list
+                }
+            }
+            
+            //at this point didn't find a match
+            //ask user to find file
+            fileChooser.setDialogTitle("Choose current location of: " + filenamepath);
+            GUIUtil.removeChoosableFileFilters(fileChooser);
+            fileChooser.addChoosableFileFilter(GUIUtil.ALL_FILES_FILTER);
+            String ext = "";
+            int k = filenamepath.lastIndexOf('.');
+
+            if ((k > 0) && (k < (filenamepath.length() - 1))) 
+            {
+                ext = filenamepath.substring(k + 1);
+                FileFilter fileFilter = GUIUtil.createFileFilter(ext.toUpperCase() + " Files", new String[]{ext.toLowerCase()});
+                fileChooser.addChoosableFileFilter(fileFilter);
+                fileChooser.setFileFilter(fileFilter);
+            }
+            
+            if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(context.getWorkbenchFrame()))
+            {
+            	String newParent = fileChooser.getSelectedFile().getParent() + File.separator;
+            	String oldParent = new File(filenamepath).getParent() + File.separator;
+            	
+            	//find where they differ
+            	int i = newParent.length();
+            	int j = oldParent.length();
+            	while (newParent.substring(i).equalsIgnoreCase(oldParent.substring(j)))
+            	{
+            		i--;
+            		j--;
+            	}
+            	while (newParent.charAt(i) != File.separatorChar)
+            	{
+            		i++;
+            	}
+            	while (oldParent.charAt(j) != File.separatorChar)
+            	{
+            		j++;
+            	}
+            	
+            	String newPrefix = newParent.substring(0, ++i);
+            	String oldPrefix = oldParent.substring(0, ++j);
+            	
+            	PathPrefixes pathPrefix = new PathPrefixes(oldPrefix, newPrefix);
+            	prefixList.add(pathPrefix);
+            	return fileChooser.getSelectedFile().getPath(); 
+            }
+            return ""; //user canceled find file
+    	}
+	}
+
+    public class PathPrefixes
+	{
+    	private String oldPrefix = "";
+    	private String newPrefix = "";
+    	
+    	public PathPrefixes(String oldPrefix, String newPrefix)
+    	{
+    		this.oldPrefix = oldPrefix;
+    		this.newPrefix = newPrefix;
+    	}
+    	
+    	public String getOldPrefix()
+    	{
+    		return oldPrefix;
+    	}
+    	
+    	public String getNewPrefix()
+    	{
+    		return newPrefix;
+    	}
+	}
+    
 }
