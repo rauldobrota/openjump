@@ -61,6 +61,7 @@ import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 
+import de.latlon.deejump.plugin.style.LayerStyle2SLDPlugIn;
 
 /**
  * @description:
@@ -287,7 +288,10 @@ public class OpenJumpConfiguration{
 		
 		// takes care of keyboard navigation
 		new InstallKeyPanPlugIn().initialize( new PlugInContext(workbenchContext, null, null, null, null) );
-		
+			
+		// deeJUMP function by LAT/LON [01.08.2006 sstein]
+		new LayerStyle2SLDPlugIn().install(new PlugInContext(workbenchContext, null, null, null, null));
+
 		/*
 		EnsureAllLayersHaveSRIDStylePlugIn ensureLayerSRIDPlugin = new EnsureAllLayersHaveSRIDStylePlugIn();
 		ensureLayerSRIDPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
