@@ -37,6 +37,8 @@ import com.vividsolutions.jump.workbench.ui.renderer.style.VertexStyle;
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
+ * 
+ * [sstein 02.08.2006] - removed point size slider
  */
 public class VertexStyleChooser extends JPanel {
 	
@@ -60,7 +62,8 @@ public class VertexStyleChooser extends JPanel {
 	private JButton bitmapChangeButton;
 	private String selectedItem;
 	private String currentFilename;
-	private JSlider sizeSlider;
+//[sstein 02.08.2006] - removed because we would have two sliders
+//	private JSlider sizeSlider;
 	
 	public VertexStyleChooser(){
 		super();
@@ -96,30 +99,30 @@ public class VertexStyleChooser extends JPanel {
 			}
 			});
 		
-		sizeSlider = new JSlider();
-		sizeSlider.setBorder( BorderFactory.createTitledBorder( "Point size: "));
+//		sizeSlider = new JSlider();
+//		sizeSlider.setBorder( BorderFactory.createTitledBorder( "Point size: "));
 		
 		Hashtable labelTable = new Hashtable();
         labelTable.put(new Integer(5), new JLabel("5"));
         labelTable.put(new Integer(10), new JLabel("10"));
         labelTable.put(new Integer(15), new JLabel("15"));
         labelTable.put(new Integer(20), new JLabel("20"));
-        sizeSlider.setLabelTable(labelTable);
-		sizeSlider.setEnabled(true);
-		sizeSlider.setMajorTickSpacing(1);
-		sizeSlider.setMajorTickSpacing(0);
-		sizeSlider.setPaintLabels(true);
-		sizeSlider.setMinimum(4);
-		sizeSlider.setValue(4);
-		sizeSlider.setMaximum(20);
-		sizeSlider.setSnapToTicks(false);
-		sizeSlider.setPreferredSize(  new Dimension(130, 49));
+//        sizeSlider.setLabelTable(labelTable);
+//		sizeSlider.setEnabled(true);
+//		sizeSlider.setMajorTickSpacing(1);
+//		sizeSlider.setMajorTickSpacing(0);
+//		sizeSlider.setPaintLabels(true);
+//		sizeSlider.setMinimum(4);
+//		sizeSlider.setValue(4);
+//		sizeSlider.setMaximum(20);
+//		sizeSlider.setSnapToTicks(false);
+//		sizeSlider.setPreferredSize(  new Dimension(130, 49));
 		JPanel oberstPanel = new JPanel();
 		oberstPanel.add(new JLabel(I18N.get("deejump.ui.style.RenderingStylePanel.point-display-type")));
 		oberstPanel.add(pointTypeComboBox);
 		oberstPanel.add(bitmapChangeButton);
 		JPanel sliderPanel = new JPanel();
-		sliderPanel.add(sizeSlider);
+//		sliderPanel.add(sizeSlider);
 		setLayout(new BorderLayout());
 		add(oberstPanel, BorderLayout.NORTH);
 		add(sliderPanel, BorderLayout.CENTER);
@@ -143,10 +146,10 @@ public class VertexStyleChooser extends JPanel {
 	}
 	
 	public void addChangeListener( ChangeListener cl ){
-	    this.sizeSlider.addChangeListener( cl );		
+//	    this.sizeSlider.addChangeListener( cl );		
 	}
 	public void removeChangeListener( ChangeListener cl ){
-	    this.sizeSlider.removeChangeListener( cl );		
+//	    this.sizeSlider.removeChangeListener( cl );		
 	}
 
 	
@@ -200,7 +203,7 @@ public class VertexStyleChooser extends JPanel {
 	 	super.setEnabled( enabled );
         this.pointTypeComboBox.setEnabled( enabled ); 
         this.bitmapChangeButton.setEnabled( enabled  );
-        this.sizeSlider.setEnabled( enabled );
+//        this.sizeSlider.setEnabled( enabled );
         
 	 }
 	 
@@ -218,7 +221,7 @@ public class VertexStyleChooser extends JPanel {
 		
 		VertexStyle vertexStyle = VertexStylesFactory.createVertexStyle( wellKnowName );
 		if ( !(vertexStyle instanceof BitmapVertexStyle) ) {
-			vertexStyle.setSize( sizeSlider.getValue() );
+//			vertexStyle.setSize( sizeSlider.getValue() );
 		}
 		return vertexStyle;
 	}
