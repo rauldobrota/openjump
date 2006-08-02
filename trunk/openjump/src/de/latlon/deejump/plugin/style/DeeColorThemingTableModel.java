@@ -60,6 +60,7 @@ public class DeeColorThemingTableModel extends ColorThemingTableModel {
 		Map attributeValueToVertexStyleMap,
         FeatureSchema schema) {
         //Value doesn't matter. [Jon Aquino]
+        super(defaultStyle,attributeName,attributeValueToBasicStyleMap,attributeValueToLabelMap,schema);
         attributeMappings =
             new ImmutableFirstElementList(
                 new VerticedAttributeMapping(null, defaultStyle, null, null));
@@ -71,10 +72,10 @@ public class DeeColorThemingTableModel extends ColorThemingTableModel {
     /**
 	 * 
 	 */
-	public DeeColorThemingTableModel() {
-
+	//public DeeColorThemingTableModel() {
+	//    super(new BasicStyle(), );
 		// TODO Auto-generated constructor stub
-	}
+	//}
 
 	public static final int COLOR_COLUMN = 0;
     public static final int ATTRIBUTE_COLUMN = 1;
