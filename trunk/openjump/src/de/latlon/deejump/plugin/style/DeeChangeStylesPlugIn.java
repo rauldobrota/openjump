@@ -37,7 +37,6 @@ import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 
 import javax.swing.ImageIcon;
@@ -46,7 +45,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.util.Assert;
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.Feature;
@@ -61,11 +59,9 @@ import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
 import com.vividsolutions.jump.workbench.ui.images.IconLoader;
-import com.vividsolutions.jump.workbench.ui.renderer.style.BasicStyle;
 import com.vividsolutions.jump.workbench.ui.renderer.style.ColorThemingStylePanel;
 import com.vividsolutions.jump.workbench.ui.style.DecorationStylePanel;
 import com.vividsolutions.jump.workbench.ui.style.LabelStylePanel;
-import com.vividsolutions.jump.workbench.ui.style.RenderingStylePanel;
 import com.vividsolutions.jump.workbench.ui.style.ScaleStylePanel;
 import com.vividsolutions.jump.workbench.ui.style.StylePanel;
 

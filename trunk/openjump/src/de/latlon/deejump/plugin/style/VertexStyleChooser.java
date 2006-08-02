@@ -8,7 +8,6 @@ package de.latlon.deejump.plugin.style;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Toolkit;
@@ -27,15 +26,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 
 import com.vividsolutions.jump.I18N;
-import com.vividsolutions.jump.workbench.ui.renderer.style.Style;
 import com.vividsolutions.jump.workbench.ui.renderer.style.VertexStyle;
-
-import de.latlon.deejump.ui.Messages;
 
 /**
  * @author hamammi
@@ -75,12 +70,12 @@ public class VertexStyleChooser extends JPanel {
 	private void initGUI(){
 		pointTypeComboBox = new JComboBox();
 		pointTypeComboBox.setEditable(false);
-		pointTypeComboBox.addItem( Messages.getString( "ui.style.RenderingStylePanel.square"  ));
-		pointTypeComboBox.addItem( Messages.getString( "ui.style.RenderingStylePanel.circle" ) );
-		pointTypeComboBox.addItem( Messages.getString( "ui.style.RenderingStylePanel.triangle" ) );
-		pointTypeComboBox.addItem( Messages.getString( "ui.style.RenderingStylePanel.cross" ) );
-		pointTypeComboBox.addItem( Messages.getString( "ui.style.RenderingStylePanel.star" ) );
-		pointTypeComboBox.addItem( Messages.getString( "ui.style.RenderingStylePanel.bitmap" ) );
+		pointTypeComboBox.addItem( I18N.get("deejump.ui.style.RenderingStylePanel.square"  ));
+		pointTypeComboBox.addItem( I18N.get("deejump.ui.style.RenderingStylePanel.circle" ) );
+		pointTypeComboBox.addItem( I18N.get("deejump.ui.style.RenderingStylePanel.triangle" ) );
+		pointTypeComboBox.addItem( I18N.get("deejump.ui.style.RenderingStylePanel.cross" ) );
+		pointTypeComboBox.addItem( I18N.get("deejump.ui.style.RenderingStylePanel.star" ) );
+		pointTypeComboBox.addItem( I18N.get("deejump.ui.style.RenderingStylePanel.bitmap" ) );
 		
 		pointTypeComboBox.addActionListener( new ActionListener(){
 			public void actionPerformed(ActionEvent e) {		
@@ -94,7 +89,7 @@ public class VertexStyleChooser extends JPanel {
 			}
 		});
 		
-		bitmapChangeButton = new JButton( Messages.getString("ui.style.RenderingStylePanel.bitmap-change" ));
+		bitmapChangeButton = new JButton( I18N.get("deejump.ui.style.RenderingStylePanel.bitmap-change" ));
 		bitmapChangeButton.addActionListener( new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 		        OpenFileChooser();
@@ -120,7 +115,7 @@ public class VertexStyleChooser extends JPanel {
 		sizeSlider.setSnapToTicks(false);
 		sizeSlider.setPreferredSize(  new Dimension(130, 49));
 		JPanel oberstPanel = new JPanel();
-		oberstPanel.add(new JLabel(Messages.getString("ui.style.RenderingStylePanel.point-display-type")));
+		oberstPanel.add(new JLabel(I18N.get("deejump.ui.style.RenderingStylePanel.point-display-type")));
 		oberstPanel.add(pointTypeComboBox);
 		oberstPanel.add(bitmapChangeButton);
 		JPanel sliderPanel = new JPanel();
