@@ -60,6 +60,7 @@
                         <or>
                                 <filename name="com/**" casesensitive="no"/>
                                 <filename name="org/**" casesensitive="no"/>
+                                <filename name="de/**" casesensitive="no"/>                        	
                         </or>
                         <not>
                                 <or>
@@ -91,6 +92,7 @@
                         <or>
                                 <filename name="com/**" casesensitive="no"/>
                                 <filename name="org/**" casesensitive="no"/>
+                                <filename name="de/**" casesensitive="no"/>                        	
                         </or>
                 </and>
         </selector>     
