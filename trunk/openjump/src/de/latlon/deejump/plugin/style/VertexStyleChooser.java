@@ -7,7 +7,6 @@
 package de.latlon.deejump.plugin.style;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Toolkit;
@@ -19,13 +18,11 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 
