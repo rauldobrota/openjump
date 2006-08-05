@@ -569,9 +569,6 @@ public class JUMPConfiguration implements Setup {
         featureInstaller.addMainMenuItem(pasteItemsPlugIn, new String[] {MenuNames.EDIT},
                 pasteItemsPlugIn.getNameWithMnemonic(), false, null, PasteItemsPlugIn
                         .createEnableCheck(workbenchContext));
-        featureInstaller.addMainMenuItemWithJava14Fix(copyImagePlugIn, new String[]{MenuNames.EDIT},
-                copyImagePlugIn.getName(), false, null, CopyImagePlugIn
-                        .createEnableCheck(workbenchContext));
         featureInstaller.addMenuSeparator(MenuNames.EDIT); // ===================
         featureInstaller.addMainMenuItemWithJava14Fix(deleteSelectedItemsPlugIn, new String[] {MenuNames.EDIT},
                 deleteSelectedItemsPlugIn.getName(), false, null,
@@ -583,6 +580,9 @@ public class JUMPConfiguration implements Setup {
 		//-- VIEW        
         editingPlugIn.createMainMenuItem(new String[] { MenuNames.VIEW}, GUIUtil
                 .toSmallIcon(EditingPlugIn.ICON), workbenchContext);
+        featureInstaller.addMainMenuItemWithJava14Fix(copyImagePlugIn, new String[]{MenuNames.VIEW},
+                copyImagePlugIn.getName(), false, null, CopyImagePlugIn
+                        .createEnableCheck(workbenchContext));        
         featureInstaller.addMenuSeparator(MenuNames.VIEW); // ===================
         featureInstaller.addMainMenuItemWithJava14Fix(featureInfoPlugIn, new String[] {MenuNames.VIEW},
                 featureInfoPlugIn.getName(), false,GUIUtil

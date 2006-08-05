@@ -13,7 +13,6 @@ package org.openjump;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
-import org.openjump.core.ccordsys.srid.EnsureAllLayersHaveSRIDStylePlugIn;
 import org.openjump.core.ui.plugin.edit.ReplicateSelectedItemsPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectAllLayerItemsPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectByTypePlugIn;
@@ -29,7 +28,6 @@ import org.openjump.core.ui.plugin.edittoolbox.RotateSelectedItemPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.SelectOneItemPlugIn;
 import org.openjump.core.ui.plugin.file.SaveImageAsSVGPlugIn;
 import org.openjump.core.ui.plugin.layer.AddSIDLayerPlugIn;
-import org.openjump.core.ui.plugin.layer.ChangeSRIDPlugIn;
 import org.openjump.core.ui.plugin.layer.ToggleVisiblityPlugIn;
 import org.openjump.core.ui.plugin.mousemenu.EditSelectedSidePlugIn;
 import org.openjump.core.ui.plugin.mousemenu.MoveAlongAnglePlugIn;
@@ -61,6 +59,7 @@ import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 
+import de.latlon.deejump.plugin.manager.ExtensionManagerPlugIn;
 import de.latlon.deejump.plugin.style.LayerStyle2SLDPlugIn;
 
 /**
@@ -121,7 +120,13 @@ public class OpenJumpConfiguration{
 				
 		MapToolTipPlugIn myMapTipPlugIn= new MapToolTipPlugIn();
 		myMapTipPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
-				 
+			
+		//-- deeJUMP function by LAT/LON [01.08.2006 sstein]		
+		LayerStyle2SLDPlugIn mySytle2SLDplugIn= new LayerStyle2SLDPlugIn();
+		mySytle2SLDplugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		//-- to install in Toolbar
+		//mySytle2SLDplugIn.install(new PlugInContext(workbenchContext, null, null, null, null));
+
 		//--this caused problems with the postgis plugin [sstein]
 		//  TODO: the problem has been solved (using try/catch) but still class has to be
 		//        changed using LayerListener LayerEventType.ADDED event instead of 
@@ -148,6 +153,7 @@ public class OpenJumpConfiguration{
 		/***********************
 		 *  menu TOOLS
 		 **********************/
+				
 		/**** ANALYSIS ****/
 		JoinAttributesSpatiallyPlugIn mySpatialJoin = new JoinAttributesSpatiallyPlugIn();
 		mySpatialJoin.initialize(new PlugInContext(workbenchContext, null, null, null, null));	
@@ -191,6 +197,10 @@ public class OpenJumpConfiguration{
 		fi.createMenusIfNecessary(menuTools, new String[]{MenuNames.TOOLS_PROGRAMMING});
 		//---
 
+		//-- deeJUMP function by LAT/LON [05.08.2006 sstein]	
+		ExtensionManagerPlugIn extensionManagerPlugIn = new ExtensionManagerPlugIn();
+		extensionManagerPlugIn.install(new PlugInContext(workbenchContext, null, null, null, null));
+
 		MeasureM_FPlugIn myFeetPlugIn = new MeasureM_FPlugIn();
 		myFeetPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 
@@ -201,8 +211,7 @@ public class OpenJumpConfiguration{
 				
 		//-- Two layers
 		
-		//-- TODO inlcude spatialjoin and translate
-		
+		//-- TODO inlcude spatialjoin and translate		
 		SpatialJoinPlugIn spatialJoinPlugIn = new SpatialJoinPlugIn();
 		spatialJoinPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 				
@@ -289,9 +298,6 @@ public class OpenJumpConfiguration{
 		// takes care of keyboard navigation
 		new InstallKeyPanPlugIn().initialize( new PlugInContext(workbenchContext, null, null, null, null) );
 			
-		// deeJUMP function by LAT/LON [01.08.2006 sstein]
-		new LayerStyle2SLDPlugIn().install(new PlugInContext(workbenchContext, null, null, null, null));
-
 		/*
 		EnsureAllLayersHaveSRIDStylePlugIn ensureLayerSRIDPlugin = new EnsureAllLayersHaveSRIDStylePlugIn();
 		ensureLayerSRIDPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));

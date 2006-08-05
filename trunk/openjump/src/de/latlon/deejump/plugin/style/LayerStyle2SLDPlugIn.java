@@ -70,6 +70,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.openjump.core.ui.util.ScreenScale;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.BasicFeature;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.task.TaskMonitor;
@@ -83,7 +84,9 @@ import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
+import com.vividsolutions.jump.workbench.ui.MenuNames;
 import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
+import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 
 /**
  * ...
@@ -99,25 +102,25 @@ public class LayerStyle2SLDPlugIn extends AbstractPlugIn {
      */
     protected static Transformer transformer = null;
 
-    private static final String WMS_LAYER_NAME = "WMS Layer name"; 
+    private static String WMS_LAYER_NAME = I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.WMS-Layer-name"); 
 
-    private static final String STYLE_NAME = "Style name"; 
+    private static String STYLE_NAME = I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.Style-name"); 
 
-    private static final String STYLE_TITLE = "Style title"; 
+    private static String STYLE_TITLE = I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.Style-title"); 
     
-    private static final String FEATURETYPE_STYLE = "Feature Type Style"; 
+    private static String FEATURETYPE_STYLE = I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.Feature-Type-Style"); 
     
-    private static final String GEOTYPE = "geoType"; 
+    private static String GEOTYPE = I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.geoType"); 
     
     private static final String UTF_8 = "UTF-8";
 
     private static final String ISO_8859_1 = "ISO-8859-1";
     
-    private static final String GEOM_PROPERTY = "geomProperty"; 
+    private static String GEOM_PROPERTY = I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.geomProperty"); 
 
-    private static String SCALE_MIN = "minScale"; 
+    private static String SCALE_MIN = I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.minScale"); 
 
-    private static String SCALE_MAX = "maxScale"; 
+    private static String SCALE_MAX = I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.maxScale"); 
 
     
     static{
@@ -143,9 +146,14 @@ public class LayerStyle2SLDPlugIn extends AbstractPlugIn {
     private String geoProperty = "GEOM";
     
     public String getName() {
-        return "Transform layer style into sld";
+        return I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.Transform-layer-style-into-sld");
     }
 
+    /**
+     * use this method to install the LayerStyle2SLD plugin in the toolbar
+     * @param context
+     * @throws Exception
+     */
     public void install( PlugInContext context ) throws Exception {
 
         context.getWorkbenchContext().getWorkbench().getFrame().getToolBar().addPlugIn(
@@ -153,12 +161,39 @@ public class LayerStyle2SLDPlugIn extends AbstractPlugIn {
             this, 
             createEnableCheck(context.getWorkbenchContext()),
             context.getWorkbenchContext()
-        );
+        );  	
+    	
+    }
+    
+    public void initialize(PlugInContext context) throws Exception {
+    	   			
+	        FeatureInstaller featureInstaller = new FeatureInstaller(context.getWorkbenchContext());
+	    	featureInstaller.addMainMenuItem(
+	    	        this,								//exe
+	                new String[] {MenuNames.VIEW}, 	//menu path
+	                this.getName() +"{pos:2}", //name methode .getName recieved by AbstractPlugIn 
+	                false,			//checkbox
+	                null,			//icon
+	                createEnableCheck(context.getWorkbenchContext())); //enable check
     }
 
+    private void initStrings(){
+
+    	WMS_LAYER_NAME = I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.WMS-Layer-name"); 
+    	STYLE_NAME = I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.Style-name"); 
+    	STYLE_TITLE = I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.Style-title"); 
+        FEATURETYPE_STYLE = I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.Feature-Type-Style");         
+        GEOTYPE = I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.geoType"); 
+        GEOM_PROPERTY = I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.geomProperty"); 
+        SCALE_MIN = I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.minScale"); 
+        String SCALE_MAX = I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.maxScale"); 
+
+    }
     public boolean execute( PlugInContext context ) throws Exception {
         reportNothingToUndoYet( context );
         
+    	this.initStrings();
+    	
         Layer layer = context.getSelectedLayer( 0 );
         if ( layer == null ) {
             return false;
@@ -180,8 +215,8 @@ public class LayerStyle2SLDPlugIn extends AbstractPlugIn {
         
         if ( fileChooser == null ) {
             fileChooser = new JFileChooser();
-            fileChooser.setApproveButtonText( "Save" );
-            fileChooser.setDialogTitle( "Save style as SLD" );
+            fileChooser.setApproveButtonText( I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.Save"));
+            fileChooser.setDialogTitle( I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.Save-style-as-SLD"));
         }
         
         if (JFileChooser.APPROVE_OPTION == 
@@ -227,11 +262,11 @@ public class LayerStyle2SLDPlugIn extends AbstractPlugIn {
     private void initDialog(PlugInContext context) {
         if( dialog == null ){
             
-	        dialog = new MultiInputDialog(context.getWorkbenchFrame(),"SLD Parameters", true);
+	        dialog = new MultiInputDialog(context.getWorkbenchFrame(),I18N.get("ui.style.LayerStyle2SLDPlugIn.SLD-Parameters"), true);
 	        
 	        dialog.addSeparator();
 	        
-            dialog.addTextField( GEOM_PROPERTY, geoProperty, 25, null, "Input the name of the geometry property" );
+            dialog.addTextField( GEOM_PROPERTY, geoProperty, 25, null, I18N.get("ui.style.LayerStyle2SLDPlugIn.Input-the-name-of-the-geometry-property") );
             
             dialog.addSeparator();
             String name = context.getCandidateLayer( 0 ).getName();
