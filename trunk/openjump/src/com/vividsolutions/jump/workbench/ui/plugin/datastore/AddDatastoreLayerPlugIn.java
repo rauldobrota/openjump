@@ -1,5 +1,6 @@
 package com.vividsolutions.jump.workbench.ui.plugin.datastore;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.coordsys.CoordinateSystemRegistry;
 import com.vividsolutions.jump.io.datasource.DataSourceQuery;
 import com.vividsolutions.jump.task.DummyTaskMonitor;
@@ -17,6 +18,10 @@ public class AddDatastoreLayerPlugIn extends AbstractAddDatastoreLayerPlugIn {
         return super.execute(context);
     }
 
+    public String getName(){
+    	return I18N.get("jump.workbench.ui.plugin.datastore.AddDatastoreLayerPlugIn.Add-Datastore-Layer");
+    }
+    
     private Layer createLayer(
             final AddDatastoreLayerPanel panel,
             final PlugInContext context) throws Exception {
@@ -52,7 +57,7 @@ public class AddDatastoreLayerPlugIn extends AbstractAddDatastoreLayerPlugIn {
 
     protected Layerable createLayerable(ConnectionPanel panel,
             TaskMonitor monitor, PlugInContext context) throws Exception {
-        monitor.report("Creating layer");
+        monitor.report(I18N.get("jump.workbench.ui.plugin.datastore.AddDatastoreLayerPlugIn.Creating-layer"));
         return createLayer((AddDatastoreLayerPanel) panel, context);
     }
 

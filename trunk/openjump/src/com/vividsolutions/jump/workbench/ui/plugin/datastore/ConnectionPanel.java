@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import javax.swing.*;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.datastore.ConnectionDescriptor;
 import com.vividsolutions.jump.workbench.datastore.ConnectionManager;
@@ -64,7 +65,7 @@ public class ConnectionPanel extends JPanel {
 
     public String validateInput() {
         if ( getConnectionDescriptor() == null ) {
-            return "Required field missing: Connection";
+            return I18N.get("jump.workbench.ui.plugin.datastore.ConnectionPanel.Required-field-missing-Connection");
         }
         return null;
     }
@@ -161,7 +162,7 @@ public class ConnectionPanel extends JPanel {
             ImageIcon icon = new ImageIcon( ConnectionManagerPanel.class
                 .getResource( "databases.gif" ) );
             chooseConnectionButton.setIcon( icon );
-            chooseConnectionButton.setToolTipText( "Connection Manager" );
+            chooseConnectionButton.setToolTipText( I18N.get("jump.workbench.ui.plugin.datastore.ConnectionPanel.Connection-Manager"));
             chooseConnectionButton.setMargin( new Insets( 0, 0, 0, 0 ) );
             chooseConnectionButton.addActionListener(
                 new ActionListener() {
@@ -175,14 +176,15 @@ public class ConnectionPanel extends JPanel {
 
     private void initialize() {
         setLayout( new GridBagLayout() );
-        addRow( "Connection:", getConnectionComboBox(), getChooseConnectionButton(), false );
+        addRow( I18N.get("jump.workbench.ui.plugin.datastore.ConnectionPanel.Connection"), getConnectionComboBox(), getChooseConnectionButton(), false );
     }
 
     private void chooseConnection() {
         ConnectionManagerPanel panel = new ConnectionManagerPanel(
             ConnectionManager.instance( getContext() ),
             getContext().getRegistry(), getContext().getErrorHandler(), context );
-        OKCancelDialog dialog = new OKCancelDialog( ( Dialog ) SwingUtilities.windowForComponent( ConnectionPanel.this ), "Connection Manager",
+        OKCancelDialog dialog = new OKCancelDialog( ( Dialog ) SwingUtilities.windowForComponent( ConnectionPanel.this ), 
+        	I18N.get("jump.workbench.ui.plugin.datastore.ConnectionPanel.Connection-Manager"),
             true, panel,
             new OKCancelDialog.Validator() {
                 public String validateInput( Component component ) {

@@ -5,12 +5,14 @@ import java.awt.BorderLayout;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.util.Blackboard;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.datastore.ConnectionManager;
 import com.vividsolutions.jump.workbench.plugin.EnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
+import com.vividsolutions.jump.workbench.ui.MenuNames;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 import com.vividsolutions.jump.workbench.ui.toolbox.ToolboxDialog;
 import com.vividsolutions.jump.workbench.ui.toolbox.ToolboxPlugIn;
@@ -27,7 +29,7 @@ public class ConnectionManagerToolboxPlugIn extends ToolboxPlugIn {
     public String getName() {
         // Specify name explicitly, as auto-name-generator
         // says "Connection Manager Toolbox" [Jon Aquino 2005-03-14]
-        return "Connection Manager";
+        return I18N.get("jump.workbench.ui.plugin.datastore.ConnectionManagerToolboxPlugIn.Connection-Manager");
     }
 
     public static final ConnectionManagerToolboxPlugIn instance(
@@ -44,7 +46,7 @@ public class ConnectionManagerToolboxPlugIn extends ToolboxPlugIn {
                     "To do: fix: ConnectionManagerToolbox does not stay in sync with ConnectionManager object. Implement eventing. [Jon Aquino 2005-03-24]");
         }
         new FeatureInstaller(context.getWorkbenchContext()).addMainMenuItem(
-                this, (new String[] { "View" }), getName() + "...{pos:1}",
+                this, (new String[] { MenuNames.VIEW }), getName() + "...{pos:1}",
                 true, null, new EnableCheck() {
                     public String check(JComponent component) {
                         ((JCheckBoxMenuItem) component).setSelected(getToolbox(

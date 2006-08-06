@@ -21,6 +21,7 @@ import javax.swing.UIManager;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.datastore.DataStoreDriver;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.util.Blackboard;
@@ -161,10 +162,10 @@ public class AddDatastoreLayerPanel extends ConnectionPanel {
             return super.validateInput();
         }
         if ( ( ( String ) LangUtil.ifNull( getDatasetName(), "" ) ).length() == 0 ) {
-            return "Required field missing: Dataset";
+            return I18N.get("jump.workbench.ui.plugin.datastore.AddDatastoreLayerPanel.Required-field-missing-Dataset");
         }
         if ( ( ( String ) LangUtil.ifNull( getGeometryAttributeName(), "" ) ).length() == 0 ) {
-            return "Required field missing: Geometry";
+            return I18N.get("jump.workbench.ui.plugin.datastore.AddDatastoreLayerPanel.Required-field-missing-Geometry");
         }
         return null;
     }
@@ -228,8 +229,10 @@ public class AddDatastoreLayerPanel extends ConnectionPanel {
     private JCheckBox getCachingCheckBox() {
         if ( cachingCheckBox == null ) {
             cachingCheckBox = new JCheckBox();
-            cachingCheckBox.setText( "Cache features" );
-            cachingCheckBox.setToolTipText( "<html>Prevents unnecessary queries to the datastore.<br>The recommended setting is to leave this checked.</html>" );
+            cachingCheckBox.setText( I18N.get("jump.workbench.ui.plugin.datastore.AddDatastoreLayerPanel.Cache-features"));
+            String s1= I18N.get("jump.workbench.ui.plugin.datastore.AddDatastoreLayerPanel.Prevents-unnecessary-queries-to-the-datastore");
+            String s2= I18N.get("jump.workbench.ui.plugin.datastore.AddDatastoreLayerPanel.The-recommended-setting-is-to-leave-this-checked");
+            cachingCheckBox.setToolTipText( "<html>"+ s1 + "<br>"+s2+"</html>" );
             cachingCheckBox.setSelected( true );
         }
         return cachingCheckBox;
@@ -282,7 +285,7 @@ public class AddDatastoreLayerPanel extends ConnectionPanel {
         // that the user can kill the thread if desired
         // [Jon Aquino 2005-03-16]
         return ( String[] ) runInKillableThread(
-            "Retrieving list of geometry attributes", getContext(),
+        		I18N.get("jump.workbench.ui.plugin.datastore.AddDatastoreLayerPanel.Retrieving-list-of-geometry-attributes"), getContext(),
             new Block() {
                 public Object yield() throws Exception {
                     try {
@@ -311,7 +314,7 @@ public class AddDatastoreLayerPanel extends ConnectionPanel {
             // that the user can kill the thread if desired
             // [Jon Aquino 2005-03-11]
             String[] datasetNames = ( String[] ) runInKillableThread(
-                "Retrieving list of datasets", getContext(),
+            		I18N.get("jump.workbench.ui.plugin.datastore.AddDatastoreLayerPanel.Retrieving-list-of-datasets"), getContext(),
                 new Block() {
                     public Object yield() throws Exception {
                         return new PasswordPrompter().getOpenConnection(
@@ -334,10 +337,10 @@ public class AddDatastoreLayerPanel extends ConnectionPanel {
         JScrollPane sp = new JScrollPane( getWhereTextArea() );
         sp.setPreferredSize( new Dimension( MAIN_COLUMN_WIDTH, 100 ) );
 
-        addRow( "Dataset:", getDatasetComboBox(), null, false );
-        addRow( "Geometry:", getGeometryAttributeComboBox(), null, false );
-        addRow( "Where:", sp, null, true );
-        addRow( "Caching:", getCachingCheckBox(), null, false );
+        addRow( I18N.get("jump.workbench.ui.plugin.datastore.AddDatastoreLayerPanel.Dataset"), getDatasetComboBox(), null, false );
+        addRow( I18N.get("jump.workbench.ui.plugin.datastore.AddDatastoreLayerPanel.Geometry"), getGeometryAttributeComboBox(), null, false );
+        addRow( I18N.get("jump.workbench.ui.plugin.datastore.AddDatastoreLayerPanel.Where"), sp, null, true );
+        addRow( I18N.get("jump.workbench.ui.plugin.datastore.AddDatastoreLayerPanel.Caching"), getCachingCheckBox(), null, false );
     }
 
     /**

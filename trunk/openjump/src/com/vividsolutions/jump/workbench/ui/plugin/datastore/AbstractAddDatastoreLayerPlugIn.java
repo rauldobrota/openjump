@@ -14,6 +14,7 @@ import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.ThreadedBasePlugIn;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
+import com.vividsolutions.jump.workbench.ui.MenuNames;
 import com.vividsolutions.jump.workbench.ui.OKCancelDialog;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 
@@ -37,7 +38,7 @@ public abstract class AbstractAddDatastoreLayerPlugIn extends
         new FeatureInstaller(context.getWorkbenchContext())
                 .addMainMenuItemWithJava14Fix(
                         this,
-                        new String[] { "Layer" },
+                        new String[] { MenuNames.LAYER },
                         getName() + "...{pos:" + layerMenuPosition + "}",
                         false,
                         null,

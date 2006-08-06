@@ -17,6 +17,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.datastore.DataStoreDriver;
 import com.vividsolutions.jump.util.Blackboard;
 import com.vividsolutions.jump.util.Block;
@@ -71,8 +72,8 @@ public class RunDatastoreQueryPanel
     }
 
     private void initialize() {
-        addRow("Max Features:", getMaxFeaturesTextField(), null, false);
-        addRow("Query:", new JScrollPane(getQueryTextArea()) {
+        addRow(I18N.get("jump.workbench.ui.plugin.datastore.RunDatastoreQueryPanel.Max-Features"), getMaxFeaturesTextField(), null, false);
+        addRow(I18N.get("jump.workbench.ui.plugin.datastore.RunDatastoreQueryPanel.Query"), new JScrollPane(getQueryTextArea()) {
             {
                 setPreferredSize(new Dimension(MAIN_COLUMN_WIDTH, 100));
             }
@@ -123,7 +124,7 @@ public class RunDatastoreQueryPanel
 
         if ( errMsg == null ) {
             if (getQuery().length() == 0) {
-                errMsg = "Required field missing: Query";
+                errMsg = I18N.get("jump.workbench.ui.plugin.datastore.RunDatastoreQueryPanel.Required-field-missing-Query");
             }
         }
 

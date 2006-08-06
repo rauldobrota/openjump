@@ -1,5 +1,6 @@
 package com.vividsolutions.jump.workbench.ui.plugin.datastore;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.datastore.AdhocQuery;
 import com.vividsolutions.jump.feature.FeatureDataset;
 import com.vividsolutions.jump.io.FeatureInputStream;
@@ -26,6 +27,9 @@ public class RunDatastoreQueryPlugIn extends
         return createLayer( ( RunDatastoreQueryPanel ) panel, monitor, context );
     }
 
+    public String getName(){
+    	return I18N.get("jump.workbench.ui.plugin.datastore.RunDatastoreQueryPlugIn.Run-Datastore-Query");
+    }
 
     private Layer createLayer( final RunDatastoreQueryPanel panel,
         TaskMonitor monitor,
@@ -34,7 +38,7 @@ public class RunDatastoreQueryPlugIn extends
         panel.saveQuery();
 
         monitor.allowCancellationRequests();
-        monitor.report( "Creating layer" );
+        monitor.report( I18N.get("jump.workbench.ui.plugin.datastore.AddDatastoreLayerPlugIn.Creating-layer") );
 
         int maxFeatures = ( ( Integer ) LangUtil.ifNull( panel.getMaxFeatures(),
             new Integer( Integer.MAX_VALUE ) ) ).intValue();
@@ -50,7 +54,7 @@ public class RunDatastoreQueryPlugIn extends
                  && featureDataset.size() < maxFeatures
                  && !monitor.isCancelRequested() ) {
                 featureDataset.add( featureInputStream.next() );
-                monitor.report( ++i, -1, "features" );
+                monitor.report( ++i, -1, I18N.get("jump.workbench.ui.plugin.datastore.RunDatastoreQueryPlugIn.features"));
             }
             return new Layer( panel.getQuery(), context.getLayerManager()
                 .generateLayerFillColor(), featureDataset, context.getLayerManager() );

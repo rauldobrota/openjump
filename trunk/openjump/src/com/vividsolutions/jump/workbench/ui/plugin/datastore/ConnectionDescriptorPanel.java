@@ -14,6 +14,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.filechooser.FileFilter;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.datastore.DataStoreDriver;
 import com.vividsolutions.jump.parameter.ParameterList;
 import com.vividsolutions.jump.parameter.ParameterListSchema;
@@ -43,8 +44,8 @@ public class ConnectionDescriptorPanel extends JPanel
   private void updateMainPanel(ParameterList parameterList,Blackboard bb) {
     mainPanel.removeAll();
     editComponentList.clear();
-    addEditComponent(0, "Name", nameText);
-    addEditComponent(1, "Driver", driverComboBox);
+    addEditComponent(0, I18N.get("jump.workbench.ui.plugin.datastore.ConnectionDescriptorPanel.Name"), nameText);
+    addEditComponent(1, I18N.get("jump.workbench.ui.plugin.datastore.ConnectionDescriptorPanel.Driver"), driverComboBox);
     for (int i = 0; i < schema.getNames().length; i++) {
       String name = schema.getNames()[i];
       editComponentList.add(createEditComponent(name,
@@ -409,7 +410,7 @@ public class ConnectionDescriptorPanel extends JPanel
                     schema.getClasses()[i]).getParameter(
                     (Component) editComponentList.get(i));
             if (parameter == null || parameter.equals("")) {
-                return "Required field missing: " + schema.getNames()[i];
+                return (I18N.get("jump.workbench.ui.plugin.datastore.ConnectionDescriptorPanel.Required-field-missing") + " " + schema.getNames()[i]);
             }
         }
         return null;
