@@ -59,6 +59,7 @@ import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 
+import de.latlon.deejump.plugin.SaveLegendPlugIn;
 import de.latlon.deejump.plugin.manager.ExtensionManagerPlugIn;
 import de.latlon.deejump.plugin.style.LayerStyle2SLDPlugIn;
 
@@ -250,6 +251,15 @@ public class OpenJumpConfiguration{
 		SaveDatasetsPlugIn mySaveDataSetPlugIn = new SaveDatasetsPlugIn();
 		mySaveDataSetPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
+		//-- deeJUMP plugin
+	  	SaveLegendPlugIn saveLegend = new SaveLegendPlugIn();
+	  	saveLegend.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+        
+	  	//-- SIGLE plugin
+		JoinTablePlugIn joinTablePlugIn = new JoinTablePlugIn();
+		joinTablePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		
 		/***********************
 		 *  EDITing toolbox
 		 **********************/
@@ -282,14 +292,7 @@ public class OpenJumpConfiguration{
 		/*
 		ScaleSelectedItemsPlugIn myScaleItemsPlugin = new ScaleSelectedItemsPlugIn();
 		myScaleItemsPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
-		*/
-		
-		/***********************
-		 *  Attribut Erwan décembre 2005
-		 **********************/	
-	
-		JoinTablePlugIn joinTablePlugIn = new JoinTablePlugIn();
-		joinTablePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		*/		
 		
 		/***********************
 		 *  others
