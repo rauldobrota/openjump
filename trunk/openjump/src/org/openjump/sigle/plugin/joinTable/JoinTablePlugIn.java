@@ -55,7 +55,7 @@ public class JoinTablePlugIn extends AbstractPlugIn {
 		context.getFeatureInstaller().addPopupMenuItem(
 				context.getWorkbenchContext().getWorkbench().getFrame().getLayerNamePopupMenu(), 
 			    this, 
-				I18N.get("org.openjump.sigle.plugin.joinTable.Join_data") , 
+				I18N.get("org.openjump.sigle.plugin.joinTable.Join_data")+"{pos:14}" , 
 				false, 
 				null, 
 				new EnableCheckFactory(context.getWorkbenchContext()).createAtLeastNLayersMustExistCheck(1));
