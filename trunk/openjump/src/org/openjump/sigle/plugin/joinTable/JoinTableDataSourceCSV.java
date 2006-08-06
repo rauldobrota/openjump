@@ -81,7 +81,7 @@ public class JoinTableDataSourceCSV implements JoinTableDataSource {
 					line= bufferedReader.readLine();
 					nl++;
 					if (line==null)
-						throw (new Exception(I18N.get("org.openjump.sigle.plugin.joinTable.Empty file")));
+						throw (new Exception(I18N.get("org.openjump.sigle.plugin.joinTable.Empty_file")));
 					nl=1;
 					while (line!=null) {
 						// [OBEDEL]on encadre la chaine de la ligne pour que la fonction split 
@@ -102,7 +102,7 @@ public class JoinTableDataSourceCSV implements JoinTableDataSource {
 								valeurs= val;  
 							}
 							else */
-								throw (new Exception(I18N.get("org.openjump.sigle.plugin.joinTable.Field_problem_at_line_:") + nl));
+								throw (new Exception(I18N.get("org.openjump.sigle.plugin.joinTable.Field_problem_at_line") + nl));
 						
 						// on elimine les valeurs que l'on a rajoute en debut et en fin de ligne
 						for (int i=0;i<valeurs.length;i++)
