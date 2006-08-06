@@ -5,32 +5,39 @@ package org.openjump.sigle.plugin.geoprocessing.oneLayer.topology;
  */
 
 
-import java.util.Iterator;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
-import com.vividsolutions.jump.I18N;
-import com.vividsolutions.jump.feature.*;
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.algorithm.RobustCGAlgorithms;
-import com.vividsolutions.jump.workbench.ui.MenuNames;
-import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
-import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
-import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
-import com.vividsolutions.jump.workbench.plugin.ThreadedBasePlugIn;
-import com.vividsolutions.jump.task.TaskMonitor;
-import com.vividsolutions.jump.tools.AttributeMapping;
-import com.vividsolutions.jump.workbench.plugin.PlugInContext;
-import com.vividsolutions.jump.workbench.model.Layer;
+import org.openjump.sigle.utilities.geom.FeatureCollectionUtil;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.util.LinearComponentExtracter;
 import com.vividsolutions.jts.operation.linemerge.LineMerger;
 import com.vividsolutions.jts.operation.polygonize.Polygonizer;
+import com.vividsolutions.jump.I18N;
+import com.vividsolutions.jump.feature.AttributeType;
+import com.vividsolutions.jump.feature.BasicFeature;
+import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureCollection;
-
-import org.openjump.sigle.utilities.geom.FeatureCollectionUtil;
+import com.vividsolutions.jump.feature.FeatureDataset;
+import com.vividsolutions.jump.feature.FeatureSchema;
+import com.vividsolutions.jump.feature.IndexedFeatureCollection;
+import com.vividsolutions.jump.task.TaskMonitor;
+import com.vividsolutions.jump.tools.AttributeMapping;
+import com.vividsolutions.jump.workbench.model.Layer;
+import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
+import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
+import com.vividsolutions.jump.workbench.plugin.PlugInContext;
+import com.vividsolutions.jump.workbench.plugin.ThreadedBasePlugIn;
+import com.vividsolutions.jump.workbench.ui.MenuNames;
+import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
 
 /**
  * PlanarGraphPlugIn compute a planar graph from a set of features.
