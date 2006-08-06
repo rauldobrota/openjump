@@ -136,7 +136,7 @@ public class SaveDatasetsPlugIn extends AbstractPlugIn
                                                         .getFrame()
                                                         .getLayerNamePopupMenu();
         featureInstaller.addPopupMenuItem(layerNamePopupMenu,
-            this, sSaveSelectedDatasets +"{pos:10}",
+            this, sSaveSelectedDatasets +"{pos:12}",
             false, null,
             SaveDatasetsPlugIn.createEnableCheck(workbenchContext));
     }

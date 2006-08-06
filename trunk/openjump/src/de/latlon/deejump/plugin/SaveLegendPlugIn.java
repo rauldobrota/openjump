@@ -99,7 +99,7 @@ public class SaveLegendPlugIn extends AbstractPlugIn {
 		context.getFeatureInstaller().addPopupMenuItem(
 				context.getWorkbenchContext().getWorkbench().getFrame().getLayerNamePopupMenu(), 
 				this, 
-				this.getName(), 				
+				this.getName()+"{pos:13}", 				
 				false, 
 				null, 
 				null);		
@@ -183,7 +183,11 @@ public class SaveLegendPlugIn extends AbstractPlugIn {
 			String filename)
 	
 		throws IOException {
-		
+		//-- [sstein, 06.08.2006]
+		if (!filename.endsWith(".png")){
+			filename=filename + ".png";
+		}
+		//--
 		Dimension size = myComponent.getSize();
 		BufferedImage myImage = 
 			new BufferedImage(size.width, size.height,
@@ -258,6 +262,10 @@ public class SaveLegendPlugIn extends AbstractPlugIn {
 /* ********************************************************************
 Changes to this class. What the people have been up to:
 $Log$
+Revision 1.2  2006/08/06 16:48:28  mentaer
+changed menu pos
+improved SaveLegendPlugIn by adding file ending ".png"
+
 Revision 1.1  2006/08/06 16:22:11  mentaer
 added savelegend
 

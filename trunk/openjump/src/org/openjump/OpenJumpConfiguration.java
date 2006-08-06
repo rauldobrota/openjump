@@ -246,8 +246,7 @@ public class OpenJumpConfiguration{
 		
 		EditSelectedSidePlugIn myEditSidePlugin = new EditSelectedSidePlugIn();
 		myEditSidePlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
-		
-		//--this plugin causes problems with the postgis plugin [sstein]
+				
 		SaveDatasetsPlugIn mySaveDataSetPlugIn = new SaveDatasetsPlugIn();
 		mySaveDataSetPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
