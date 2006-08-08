@@ -113,7 +113,7 @@ import com.vividsolutions.jump.workbench.ui.style.StylePanel;
 
 public class DeeColorThemingStylePanel extends JPanel implements StylePanel {
 //	GH 2005.09.22
-	VertexStyleChooser vertexStyleChooser = new VertexStyleChooser();
+	VertexStyleChooser vertexStyleChooser = new VertexStyleChooser(true);
 	private static final String CUSTOM_ENTRY = I18N.get("ui.renderer.style.ColorThemingPanel.custom");
     public static final String TITLE = I18N.get("ui.renderer.style.ColorThemingPanel.colour-theming");
     public static final String COLOR_SCHEME_KEY = DeeColorThemingStylePanel.class.getName() +

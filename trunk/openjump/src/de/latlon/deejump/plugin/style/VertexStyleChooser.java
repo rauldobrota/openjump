@@ -7,6 +7,7 @@
 package de.latlon.deejump.plugin.style;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Toolkit;
@@ -18,11 +19,13 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 
@@ -60,11 +63,13 @@ public class VertexStyleChooser extends JPanel {
 	private String selectedItem;
 	private String currentFilename;
 //[sstein 02.08.2006] - removed because we would have two sliders
-//	private JSlider sizeSlider;
+	public JSlider sizeSlider;
+	private boolean activateOwnSlider = false;	
 	
-	public VertexStyleChooser(){
+	public VertexStyleChooser(boolean activateOwnSlider){
 		super();
 		initGUI();
+		this.activateOwnSlider = activateOwnSlider;
 	}
 	
 	private void initGUI(){
@@ -95,34 +100,38 @@ public class VertexStyleChooser extends JPanel {
 		        OpenFileChooser();
 			}
 			});
-		
-//		sizeSlider = new JSlider();
-//		sizeSlider.setBorder( BorderFactory.createTitledBorder( "Point size: "));
-		
-		Hashtable labelTable = new Hashtable();
-        labelTable.put(new Integer(5), new JLabel("5"));
-        labelTable.put(new Integer(10), new JLabel("10"));
-        labelTable.put(new Integer(15), new JLabel("15"));
-        labelTable.put(new Integer(20), new JLabel("20"));
-//        sizeSlider.setLabelTable(labelTable);
-//		sizeSlider.setEnabled(true);
-//		sizeSlider.setMajorTickSpacing(1);
-//		sizeSlider.setMajorTickSpacing(0);
-//		sizeSlider.setPaintLabels(true);
-//		sizeSlider.setMinimum(4);
-//		sizeSlider.setValue(4);
-//		sizeSlider.setMaximum(20);
-//		sizeSlider.setSnapToTicks(false);
-//		sizeSlider.setPreferredSize(  new Dimension(130, 49));
+			if ( sizeSlider== null){
+				sizeSlider = new JSlider(); //[sstein] init only if needed
+			}
+			sizeSlider.setBorder( BorderFactory.createTitledBorder( "Point size: "));
+		if (this.activateOwnSlider == true){
+			Hashtable labelTable = new Hashtable();
+        	labelTable.put(new Integer(5), new JLabel("5"));
+        	labelTable.put(new Integer(10), new JLabel("10"));
+        	labelTable.put(new Integer(15), new JLabel("15"));
+        	labelTable.put(new Integer(20), new JLabel("20"));
+	        sizeSlider.setLabelTable(labelTable);
+			sizeSlider.setEnabled(true);
+			sizeSlider.setMajorTickSpacing(1);
+			sizeSlider.setMajorTickSpacing(0);
+			sizeSlider.setPaintLabels(true);
+			sizeSlider.setMinimum(4);
+			sizeSlider.setValue(4);
+			sizeSlider.setMaximum(20);
+			sizeSlider.setSnapToTicks(false);
+			sizeSlider.setPreferredSize(  new Dimension(130, 49));
+		}
 		JPanel oberstPanel = new JPanel();
 		oberstPanel.add(new JLabel(I18N.get("deejump.ui.style.RenderingStylePanel.point-display-type")));
 		oberstPanel.add(pointTypeComboBox);
-		oberstPanel.add(bitmapChangeButton);
-		JPanel sliderPanel = new JPanel();
-//		sliderPanel.add(sizeSlider);
+		oberstPanel.add(bitmapChangeButton);		
+		JPanel sliderPanel = new JPanel(); //[sstein] always init although it may not be needed
+		sliderPanel.add(sizeSlider);
 		setLayout(new BorderLayout());
 		add(oberstPanel, BorderLayout.NORTH);
-		add(sliderPanel, BorderLayout.CENTER);
+		if (this.activateOwnSlider == true){		
+			add(sliderPanel, BorderLayout.CENTER);
+		}
         
 	}
 	
@@ -143,10 +152,14 @@ public class VertexStyleChooser extends JPanel {
 	}
 	
 	public void addChangeListener( ChangeListener cl ){
-//	    this.sizeSlider.addChangeListener( cl );		
+		if (this.activateOwnSlider == true){
+			this.sizeSlider.addChangeListener( cl );
+		}
 	}
 	public void removeChangeListener( ChangeListener cl ){
-//	    this.sizeSlider.removeChangeListener( cl );		
+		if (this.activateOwnSlider == true){		
+			this.sizeSlider.removeChangeListener( cl );
+		}
 	}
 
 	
@@ -200,8 +213,9 @@ public class VertexStyleChooser extends JPanel {
 	 	super.setEnabled( enabled );
         this.pointTypeComboBox.setEnabled( enabled ); 
         this.bitmapChangeButton.setEnabled( enabled  );
-//        this.sizeSlider.setEnabled( enabled );
-        
+		if (this.activateOwnSlider == true){
+			this.sizeSlider.setEnabled( enabled );
+		}
 	 }
 	 
 	/**
@@ -209,16 +223,23 @@ public class VertexStyleChooser extends JPanel {
 	 */
 	public VertexStyle getSelectedStyle() {
 		String wellKnowName = (String)STYLE_NAMES.get( this.pointTypeComboBox.getSelectedIndex() );
+		//-- sstein [08.08.2006] changed a bit to avoid null pointer exception if no file has been
+		//	 					 specified
 		if ( VertexStylesFactory.BITMAP_STYLE.equals( wellKnowName )){
 			wellKnowName = this.getCurrentFileName();
+			//String s = getCurrentFileName();
+			//System.out.println(s);
+			if(getCurrentFileName() != null){
+				wellKnowName = this.getCurrentFileName();
+			}
+			else{
+				//reset to the first style
+				wellKnowName = (String)STYLE_NAMES.get(0);
+			}
         }
-		if(getCurrentFileName() != null){
-			wellKnowName = this.getCurrentFileName();
-		}
-		
 		VertexStyle vertexStyle = VertexStylesFactory.createVertexStyle( wellKnowName );
 		if ( !(vertexStyle instanceof BitmapVertexStyle) ) {
-//			vertexStyle.setSize( sizeSlider.getValue() );
+			vertexStyle.setSize( sizeSlider.getValue() );
 		}
 		return vertexStyle;
 	}

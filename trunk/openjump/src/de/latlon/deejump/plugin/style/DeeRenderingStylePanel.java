@@ -87,7 +87,7 @@ import com.vividsolutions.jump.workbench.ui.style.StylePanel;
 
 public class DeeRenderingStylePanel extends BasicStylePanel implements StylePanel {
 	
-	VertexStyleChooser vertexStyleChooser = new VertexStyleChooser();
+	VertexStyleChooser vertexStyleChooser = new VertexStyleChooser(false);
     private Layer layer;
     private JTextArea fillPatternTipLabel = new JTextArea();    
     private JCheckBox vertexCheckBox = new JCheckBox(){};
@@ -204,6 +204,7 @@ public class DeeRenderingStylePanel extends BasicStylePanel implements StylePane
      * Parameterless constructor for JBuilder GUI designer.
      */
     public DeeRenderingStylePanel() {
+    	this.vertexStyleChooser.sizeSlider = this.vertexSlider;
     }
     
     // GH 2005.09.22 this Methode returns the current VertexStyle
@@ -264,8 +265,8 @@ public class DeeRenderingStylePanel extends BasicStylePanel implements StylePane
         previewPanel.repaint();
         
 //    	GH 2005-09-08  set pointDisplayType enable
-        vertexSlider.setEnabled(vertexCheckBox.isSelected());
-        vertexStyleChooser.setEnabled( vertexCheckBox.isSelected() );
+		vertexSlider.setEnabled(vertexCheckBox.isSelected());
+		vertexStyleChooser.setEnabled( vertexCheckBox.isSelected() );
 
 
 //// GH 2005-09-08  set pointDisplayType enable
