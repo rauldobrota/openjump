@@ -38,6 +38,7 @@ import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.OptionsDialog;
 import com.vividsolutions.jump.workbench.ui.TaskFrame;
 import com.vividsolutions.jump.workbench.ui.plugin.InstallRendererPlugIn;
+import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
 import com.vividsolutions.jump.workbench.ui.renderer.Renderer;
 
 public class InstallGridPlugIn extends InstallRendererPlugIn {
@@ -47,7 +48,8 @@ public class InstallGridPlugIn extends InstallRendererPlugIn {
     protected Renderer.Factory createFactory(final TaskFrame frame) {
         return new Renderer.Factory() {
                 public Renderer create() {
-                    return new GridRenderer(workbench.getBlackboard(), frame.getLayerViewPanel());
+//                    return new GridRenderer(workbench.getBlackboard(), frame.getLayerViewPanel());
+                	return new GridRenderer(PersistentBlackboardPlugIn.get(workbench.getContext()), frame.getLayerViewPanel());
                 }
             };
     }
@@ -57,7 +59,8 @@ public class InstallGridPlugIn extends InstallRendererPlugIn {
         super.initialize(context);
         OptionsDialog.instance(context.getWorkbenchContext().getWorkbench()).addTab(
             I18N.get("ui.snap.InstallGridPlugIn.snap-grid"),
-            new SnapOptionsPanel(context.getWorkbenchContext().getWorkbench().getBlackboard()));   
+//            new SnapOptionsPanel(context.getWorkbenchContext().getWorkbench().getBlackboard()));   
+            new SnapOptionsPanel(PersistentBlackboardPlugIn.get(context.getWorkbenchContext())));
         //[sstein: 29.10.2005] added the following lines to get sure that "snap-tab" will be on top
         int noTabs = OptionsDialog.instance(context.getWorkbenchContext().getWorkbench()).getTabbedPane().getTabCount();
         OptionsDialog.instance(context.getWorkbenchContext().getWorkbench()).getTabbedPane().setSelectedIndex(noTabs-1);
