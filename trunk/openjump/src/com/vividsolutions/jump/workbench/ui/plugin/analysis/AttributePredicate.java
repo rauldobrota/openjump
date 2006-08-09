@@ -33,12 +33,15 @@
 
 package com.vividsolutions.jump.workbench.ui.plugin.analysis;
 
-import java.util.*;
-import java.text.*;
-import com.vividsolutions.jump.util.*;
-import com.vividsolutions.jts.algorithm.*;
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.simplify.*;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jump.I18N;
+import com.vividsolutions.jump.util.FlexibleDateParser;
+import com.vividsolutions.jump.workbench.ui.GenericNames;
 
 /**
  * A function object for {@link Geometry} functions (which return a Geometry).
@@ -204,13 +207,13 @@ public abstract class AttributePredicate
     protected boolean testCompareValue(int comp) { return comp >= 0; }
   }
   private static class ContainsPredicate extends AttributePredicate {
-    public ContainsPredicate() {  super("Contains");  }
+    public ContainsPredicate() {  super(GenericNames.CONTAINS);  }
     public boolean isTrue(Object arg1, Object arg2) {
       return arg1.toString().indexOf(arg2.toString()) >= 0;
     }
   }
   private static class StartsWithPredicate extends AttributePredicate {
-    public StartsWithPredicate() {  super("Starts with");  }
+    public StartsWithPredicate() {  super(I18N.get("ui.plugin.analysis.AttributePredicate.starts-with"));  }
     public boolean isTrue(Object arg1, Object arg2) {
       return arg1.toString().startsWith(arg2.toString());
     }

@@ -33,10 +33,11 @@
 
 package com.vividsolutions.jump.workbench.ui.plugin.analysis;
 
-import java.util.*;
-import com.vividsolutions.jts.algorithm.*;
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.simplify.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jump.workbench.ui.GenericNames;
 
 /**
  * A function object for {@link Geometry} functions (which return a Geometry).
@@ -114,57 +115,57 @@ public abstract class GeometryPredicate
   public abstract boolean isTrue(Geometry geom0, Geometry geom1, double[] param);
 
   private static class IntersectsPredicate extends GeometryPredicate {
-    public IntersectsPredicate() {  super("Intersects");  }
+    public IntersectsPredicate() {  super(GenericNames.INTERSECTS);  }
     public boolean isTrue(Geometry geom0, Geometry geom1, double[] param) {
       return geom0.intersects(geom1);   }
   }
   private static class ContainsPredicate extends GeometryPredicate {
-    public ContainsPredicate() {  super("Contains");  }
+    public ContainsPredicate() {  super(GenericNames.CONTAINS);  }
     public boolean isTrue(Geometry geom0, Geometry geom1, double[] param) {
       return geom0.contains(geom1);   }
   }
   private static class CoversPredicate extends GeometryPredicate {
-    public CoversPredicate() {  super("Covers");  }
+    public CoversPredicate() {  super(GenericNames.COVERS);  }
     public boolean isTrue(Geometry geom0, Geometry geom1, double[] param) {
       return geom0.covers(geom1);   }
   }
   private static class CoveredByPredicate extends GeometryPredicate {
-    public CoveredByPredicate() {  super("CoveredBy");  }
+    public CoveredByPredicate() {  super(GenericNames.COVEREDBY);  }
     public boolean isTrue(Geometry geom0, Geometry geom1, double[] param) {
       return geom0.coveredBy(geom1);   }
   }
   private static class CrossesPredicate extends GeometryPredicate {
-    public CrossesPredicate() {  super("Crosses");  }
+    public CrossesPredicate() {  super(GenericNames.CROSSES);  }
     public boolean isTrue(Geometry geom0, Geometry geom1, double[] param) {
       return geom0.crosses(geom1);   }
   }
   public static class DisjointPredicate extends GeometryPredicate {
-    public DisjointPredicate() {  super("Disjoint");  }
+    public DisjointPredicate() {  super(GenericNames.DISJOINT);  }
     public boolean isTrue(Geometry geom0, Geometry geom1, double[] param) {
       return geom0.disjoint(geom1);   }
   }
   private static class EqualsPredicate extends GeometryPredicate {
-    public EqualsPredicate() {  super("Equals");  }
+    public EqualsPredicate() {  super(GenericNames.EQUALS);  }
     public boolean isTrue(Geometry geom0, Geometry geom1, double[] param) {
       return geom0.equals(geom1);   }
   }
   private static class OverlapsPredicate extends GeometryPredicate {
-    public OverlapsPredicate() {  super("Overlaps");  }
+    public OverlapsPredicate() {  super(GenericNames.OVERLAPS);  }
     public boolean isTrue(Geometry geom0, Geometry geom1, double[] param) {
       return geom0.overlaps(geom1);   }
   }
   private static class TouchesPredicate extends GeometryPredicate {
-    public TouchesPredicate() {  super("Touches");  }
+    public TouchesPredicate() {  super(GenericNames.TOUCHES);  }
     public boolean isTrue(Geometry geom0, Geometry geom1, double[] param) {
       return geom0.touches(geom1);   }
   }
   private static class WithinPredicate extends GeometryPredicate {
-    public WithinPredicate() {  super("Within");  }
+    public WithinPredicate() {  super(GenericNames.WITHIN);  }
     public boolean isTrue(Geometry geom0, Geometry geom1, double[] param) {
       return geom0.within(geom1);   }
   }
   public static class WithinDistancePredicate extends GeometryPredicate {
-    public WithinDistancePredicate() {  super("Within Distance", 1);  }
+    public WithinDistancePredicate() {  super(GenericNames.WITHIN_DISTANCE, 1);  }
     public boolean isTrue(Geometry geom0, Geometry geom1, double[] param) {
       return geom0.isWithinDistance(geom1, param[0]);   }
   }

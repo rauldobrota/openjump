@@ -47,7 +47,21 @@ public interface GenericNames {
 	public static String ANGLE=I18N.get("ui.GenericNames.ANGLE");
 	public static String SOURCE_LAYER=I18N.get("ui.GenericNames.Source-Layer");
 	public static String TARGET_LAYER=I18N.get("ui.GenericNames.Target-Layer");
+	public static String MASK_LAYER=I18N.get("ui.GenericNames.Mask-Layer");
+	public static String PARAMETER=I18N.get("ui.GenericNames.Parameter");	
+	public static String FEATURES=I18N.get("ui.GenericNames.features");
 	
+	public static String INTERSECTS=I18N.get("ui.GenericNames.intersects");
+	public static String CONTAINS=I18N.get("ui.GenericNames.contains");
+	public static String COVERS=I18N.get("ui.GenericNames.covers");	
+	public static String COVEREDBY=I18N.get("ui.GenericNames.is-covered-by");
+	public static String CROSSES=I18N.get("ui.GenericNames.crosses");	
+	public static String DISJOINT=I18N.get("ui.GenericNames.disjoint");
+	public static String EQUALS=I18N.get("ui.GenericNames.equals");
+	public static String OVERLAPS=I18N.get("ui.GenericNames.overlaps");
+	public static String TOUCHES=I18N.get("ui.GenericNames.touches");	
+	public static String WITHIN=I18N.get("ui.GenericNames.within");
+	public static String WITHIN_DISTANCE=I18N.get("ui.GenericNames.is-within-distance");	
 	
 	public static String CALCULATE_IN_PROGRESS=I18N.get("ui.GenericNames.CalculateInProgress");
 	public static String GLOBAL_BOX=I18N.get("ui.GenericNames.GlobalBox");

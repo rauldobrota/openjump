@@ -2,6 +2,7 @@ package com.vividsolutions.jump.workbench.ui.plugin.analysis;
 
 import java.util.*;
 import com.vividsolutions.jump.task.*;
+import com.vividsolutions.jump.workbench.ui.GenericNames;
 
 
 import com.vividsolutions.jts.geom.*;
@@ -135,7 +136,7 @@ public class SpatialQueryExecuter
     int count = 0;
     for (Iterator iMask = maskFC.iterator(); iMask.hasNext(); ) {
 
-      monitor.report(count++, total, "features");
+      monitor.report(count++, total, GenericNames.FEATURES);
       if (monitor.isCancelRequested()) return;
 
       Feature fMask = (Feature) iMask.next();

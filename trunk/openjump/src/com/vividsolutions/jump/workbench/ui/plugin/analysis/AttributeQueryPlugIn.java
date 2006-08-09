@@ -43,6 +43,7 @@ import javax.swing.JRadioButton;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.*;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.util.StringUtil;
@@ -51,6 +52,7 @@ import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
 import com.vividsolutions.jump.workbench.plugin.*;
 import com.vividsolutions.jump.workbench.plugin.util.*;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
+import com.vividsolutions.jump.workbench.ui.GenericNames;
 import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
 import com.vividsolutions.jump.workbench.ui.SelectionManager;
 
@@ -61,14 +63,14 @@ public class AttributeQueryPlugIn
     extends AbstractPlugIn
     implements ThreadedPlugIn
 {
-  private final static String ATTR_GEOMETRY_AREA = "Geometry.Area";
-  private final static String ATTR_GEOMETRY_LENGTH = "Geometry.Length";
-  private final static String ATTR_GEOMETRY_NUMPOINTS = "Geometry.NumPoints";
-  private final static String ATTR_GEOMETRY_NUMCOMPONENTS = "Geometry.NumComponents";
-  private final static String ATTR_GEOMETRY_ISCLOSED = "Geometry.IsClosed";
-  private final static String ATTR_GEOMETRY_ISSIMPLE = "Geometry.IsSimple";
-  private final static String ATTR_GEOMETRY_ISVALID = "Geometry.IsValid";
-  private final static String ATTR_GEOMETRY_TYPE = "Geometry.Type";
+  private static String ATTR_GEOMETRY_AREA = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Geometry.Area");
+  private static String ATTR_GEOMETRY_LENGTH = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Geometry.Length");
+  private static String ATTR_GEOMETRY_NUMPOINTS = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Geometry.NumPoints");
+  private static String ATTR_GEOMETRY_NUMCOMPONENTS = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Geometry.NumComponents");
+  private static String ATTR_GEOMETRY_ISCLOSED = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Geometry.IsClosed");
+  private static String ATTR_GEOMETRY_ISSIMPLE = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Geometry.IsSimple");
+  private static String ATTR_GEOMETRY_ISVALID = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Geometry.IsValid");
+  private static String ATTR_GEOMETRY_TYPE = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Geometry.Type");
 
 
   // MD - could easily add this later
@@ -96,8 +98,21 @@ public class AttributeQueryPlugIn
     categoryName = value;
   }
 
-
+  public String getName(){
+  	return I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Attribute-Query");
+  }
+  
   public boolean execute(PlugInContext context) throws Exception {
+  	//[sstein] reset for correct language
+    ATTR_GEOMETRY_AREA = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Geometry.Area");
+    ATTR_GEOMETRY_LENGTH = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Geometry.Length");
+    ATTR_GEOMETRY_NUMPOINTS = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Geometry.NumPoints");
+    ATTR_GEOMETRY_NUMCOMPONENTS = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Geometry.NumComponents");
+    ATTR_GEOMETRY_ISCLOSED = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Geometry.IsClosed");
+    ATTR_GEOMETRY_ISSIMPLE = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Geometry.IsSimple");
+    ATTR_GEOMETRY_ISVALID = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Geometry.IsValid");
+    ATTR_GEOMETRY_TYPE = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Geometry.Type");
+
     dialog = new MultiInputDialog(context.getWorkbenchFrame(), getName(), true);
     setDialogValues(dialog, context);
     GUIUtil.centreOnWindow(dialog);
@@ -120,7 +135,7 @@ public class AttributeQueryPlugIn
       throws Exception {
     monitor.allowCancellationRequests();
 
-    monitor.report("Executing query...");
+    monitor.report(I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Executing-query")+"...");
 
     FeatureCollection sourceFC = srcLayer.getFeatureCollectionWrapper();
 
@@ -141,7 +156,7 @@ public class AttributeQueryPlugIn
     }
 
     if (exceptionThrown) {
-      context.getWorkbenchFrame().warnUser("Errors found while executing query");
+      context.getWorkbenchFrame().warnUser(I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Errors-found-while-executing-query"));
     }
   }
 
@@ -220,20 +235,29 @@ public class AttributeQueryPlugIn
     return f.getAttribute(attrName);
   }
 
-  private final static String LAYER = "Source Layer";
-  private final static String ATTRIBUTE = "Attribute";
-  private final static String PREDICATE = "Relation";
-  private final static String VALUE = "Value";
-  private final static String DIALOG_COMPLEMENT = "Complement Result";
+  private static String LAYER = GenericNames.SOURCE_LAYER;
+  private static String ATTRIBUTE = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Attribute");
+  private static String PREDICATE = I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Relation");
+  private static String VALUE = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Value");
+  private static String DIALOG_COMPLEMENT = I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Complement-Result");
 
-  private final static String UPDATE_SRC = "Select features in the source layer.";
-  private final static String CREATE_LYR = "Create a new layer for the results.";
+  private static String UPDATE_SRC = I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Select-features-in-the-source-layer");
+  private static String CREATE_LYR = I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Create-a-new-layer-for-the-results");
 
   private JComboBox attrComboBox;
 
   private void setDialogValues(MultiInputDialog dialog, PlugInContext context){
+  	//[sstein] reset for language
+    LAYER = GenericNames.SOURCE_LAYER;
+    ATTRIBUTE = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Attribute");
+    PREDICATE = I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Relation");
+    VALUE = I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Value");
+    DIALOG_COMPLEMENT = I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Complement-Result");
+    UPDATE_SRC = I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Select-features-in-the-source-layer");
+    CREATE_LYR = I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Create-a-new-layer-for-the-results");
+
     dialog.setSideBarDescription(
-        "Finds the Source features which have attribute values satisfying a given condition");
+    		I18N.get("ui.plugin.analysis.AttributeQueryPlugIn.Finds-the-Source-features-which-have-attribute-values-satisfying-a-given-condition"));
 
     //Set initial layer values to the first and second layers in the layer list.
     //In #initialize we've already checked that the number of layers >= 1. [Jon Aquino]

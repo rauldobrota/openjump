@@ -33,21 +33,28 @@
 
 package com.vividsolutions.jump.workbench.ui.plugin.analysis;
 
-import java.util.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.Collection;
 
-import java.awt.Color;
-import java.awt.event.*;
-import javax.swing.text.*;
-import javax.swing.event.*;
-import javax.swing.*;
+import javax.swing.JComboBox;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jump.feature.*;
-import com.vividsolutions.jump.task.*;
-import com.vividsolutions.jump.workbench.model.*;
-import com.vividsolutions.jump.workbench.plugin.*;
-import com.vividsolutions.jump.workbench.plugin.util.*;
-import com.vividsolutions.jump.workbench.ui.*;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jump.I18N;
+import com.vividsolutions.jump.feature.FeatureCollection;
+import com.vividsolutions.jump.task.TaskMonitor;
+import com.vividsolutions.jump.workbench.model.Layer;
+import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
+import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
+import com.vividsolutions.jump.workbench.plugin.PlugInContext;
+import com.vividsolutions.jump.workbench.plugin.ThreadedPlugIn;
+import com.vividsolutions.jump.workbench.plugin.util.LayerNameGenerator;
+import com.vividsolutions.jump.workbench.ui.GUIUtil;
+import com.vividsolutions.jump.workbench.ui.GenericNames;
+import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
+import com.vividsolutions.jump.workbench.ui.SelectionManager;
 
 /**
 * Queries a layer by a spatial predicate.
@@ -57,14 +64,14 @@ public class SpatialQueryPlugIn
     implements ThreadedPlugIn
 {
 
-  private final static String UPDATE_SRC = "Select features in the source layer.";
-  private final static String CREATE_LYR = "Create a new layer for the results.";
-  private final static String MASK_LAYER = "Mask Layer";
-  private final static String SRC_LAYER = "Source Layer";
-  private final static String PREDICATE = "Relation";
-  private final static String PARAM = "Parameter";
-  private final static String DIALOG_COMPLEMENT = "Complement Result";
-  private final static String ALLOW_DUPS = "Allow Duplicates in Result";
+  private static String UPDATE_SRC = I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Select-features-in-the-source-layer");
+  private static String CREATE_LYR = I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Create-a-new-layer-for-the-results");
+  private static String MASK_LAYER = GenericNames.MASK_LAYER;
+  private static String SRC_LAYER = GenericNames.SOURCE_LAYER;
+  private static String PREDICATE = I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Relation");
+  private static String PARAM = GenericNames.PARAMETER;
+  private static String DIALOG_COMPLEMENT = I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Complement-Result");
+  private static String ALLOW_DUPS = I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Allow-Duplicates-in-Result");
 
   private JTextField paramField;
   private Collection functionNames;
@@ -93,9 +100,21 @@ public class SpatialQueryPlugIn
     categoryName = value;
   }
 
-
+  public String getName(){
+  	return I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Spatial-Query");
+  }
 
   public boolean execute(PlugInContext context) throws Exception {
+  	//[sstein] added again for correct language setting
+    UPDATE_SRC = I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Select-features-in-the-source-layer");
+    CREATE_LYR = I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Create-a-new-layer-for-the-results");
+    MASK_LAYER = GenericNames.MASK_LAYER;
+    SRC_LAYER = GenericNames.SOURCE_LAYER;
+    PREDICATE = I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Relation");
+    PARAM = GenericNames.PARAMETER;
+    DIALOG_COMPLEMENT = I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Complement-Result");
+    ALLOW_DUPS = I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Allow-Duplicates-in-Result");
+    
     dialog = new MultiInputDialog(context.getWorkbenchFrame(), getName(), true);
     setDialogValues(dialog, context);
     GUIUtil.centreOnWindow(dialog);
@@ -114,7 +133,7 @@ public class SpatialQueryPlugIn
     if (maskLyr == null) return;
     if (srcLayer == null) return;
 
-    monitor.report("Executing query " + functionToRun.getName() + "...");
+    monitor.report(I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Executing-query")+" " + functionToRun.getName() + "...");
 
     FeatureCollection maskFC = maskLyr.getFeatureCollectionWrapper();
     FeatureCollection sourceFC = srcLayer.getFeatureCollectionWrapper();
@@ -142,7 +161,7 @@ public class SpatialQueryPlugIn
     }
 
     if (exceptionThrown) {
-      context.getWorkbenchFrame().warnUser("Errors found while executing query");
+      context.getWorkbenchFrame().warnUser(I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Errors-found-while-executing-query"));
     }
   }
 
@@ -151,8 +170,8 @@ public class SpatialQueryPlugIn
   private void setDialogValues(MultiInputDialog dialog, PlugInContext context) {
     //dialog.setSideBarImage(new ImageIcon(getClass().getResource("DiffSegments.png")));
     dialog.setSideBarDescription(
-        "Finds the Source features which have a given spatial relationship to some feature in the Mask layer"
-        + " (i.e. where Source.Relationship(Mask) = true)");
+    		I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Finds-the-Source-features-which-have-a-given-spatial-relationship-to-some-feature-in-the-Mask-layer")
+        + " (" + I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.ie-where-Source.Relationship(Mask)-is-true") + ")" );
 
     //Set initial layer values to the first and second layers in the layer list.
     //In #initialize we've already checked that the number of layers >= 1. [Jon Aquino]
