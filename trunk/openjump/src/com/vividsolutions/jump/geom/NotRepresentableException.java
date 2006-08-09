@@ -35,6 +35,8 @@
  */
 package com.vividsolutions.jump.geom;
 
+import com.vividsolutions.jump.I18N;
+
 /**
  * Indicates that a {@link HCoordinate} has been computed which is
  * not representable on the Cartesian plane.
@@ -45,7 +47,7 @@ package com.vividsolutions.jump.geom;
 public class NotRepresentableException extends Exception {
 
   public NotRepresentableException() {
-    super("Projective point not representable on the Cartesian plane.");
+    super(I18N.get("jump.geom.NotRepresentableException.Projective-point-not-representable-on-the-Cartesian-plane"));
   }
 
 }

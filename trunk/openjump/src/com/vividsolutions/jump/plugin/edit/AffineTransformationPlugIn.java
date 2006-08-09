@@ -33,21 +33,35 @@
 
 package com.vividsolutions.jump.plugin.edit;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Iterator;
 
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jump.geom.*;
-import com.vividsolutions.jump.util.ColorUtil;
-import com.vividsolutions.jump.feature.*;
-import com.vividsolutions.jump.task.*;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jump.I18N;
+import com.vividsolutions.jump.feature.Feature;
+import com.vividsolutions.jump.feature.FeatureCollection;
+import com.vividsolutions.jump.feature.FeatureDataset;
+import com.vividsolutions.jump.geom.AffineTransformation;
+import com.vividsolutions.jump.geom.Angle;
+import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
-import com.vividsolutions.jump.workbench.model.*;
-import com.vividsolutions.jump.workbench.plugin.*;
-import com.vividsolutions.jump.workbench.ui.*;
+import com.vividsolutions.jump.workbench.model.Layer;
+import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
+import com.vividsolutions.jump.workbench.plugin.EnableCheck;
+import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
+import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
+import com.vividsolutions.jump.workbench.plugin.PlugInContext;
+import com.vividsolutions.jump.workbench.plugin.ThreadedBasePlugIn;
+import com.vividsolutions.jump.workbench.ui.GUIUtil;
+import com.vividsolutions.jump.workbench.ui.GenericNames;
+import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
 
 /**
  * Applies an {@link AffineTransformation} to a layer.
@@ -72,7 +86,7 @@ public class AffineTransformationPlugIn
 
   public AffineTransformationPlugIn() { }
 
-  public String getName() { return "Affine Transformation"; }
+  public String getName() { return I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Affine-Transformation"); }
 
   public EnableCheck createEnableCheck(WorkbenchContext workbenchContext) {
       EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
@@ -148,27 +162,27 @@ public class AffineTransformationPlugIn
                             FeatureCollection transFC)
   {
     Layer lyr = context.addLayer(StandardCategoryNames.RESULT,
-                                    "Affine-" + layer.getName(), transFC);
+    		I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Affine") + layer.getName(), transFC);
     lyr.fireAppearanceChanged();
   }
 
-  private final static String LAYER = "Layer";
-  private final static String ORIGIN = "Anchor Point";
-  private final static String ORIGIN_FROM_LL = "Set to Lower Left";
-  private final static String ORIGIN_FROM_MIDPOINT = "Set to Midpoint";
+  private static String LAYER = GenericNames.LAYER;
+  private static String ORIGIN = I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Anchor-Point");
+  private static String ORIGIN_FROM_LL = I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Set-to-Lower-Left");
+  private static String ORIGIN_FROM_MIDPOINT = I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Set-to-Midpoint");
   private final static String ORIGIN_X = "X";
   private final static String ORIGIN_Y = "Y";
   private final static String TRANS_DX = "DX";
   private final static String TRANS_DY = "DY";
-  private final static String TRANS_DX_DY = "Translate by (X,Y)";
-  private final static String SCALE_X = "X Factor";
-  private final static String SCALE_Y = "Y Factor";
-  private final static String ROTATE_ANGLE = "Angle";
-  private final static String SHEAR_X = "X Shear";
-  private final static String SHEAR_Y = "Y Shear";
-  private final static String SRC_BASE_LAYER = "Source Layer";
-  private final static String DEST_BASE_LAYER = "Destination Layer";
-  private final static String BASELINE_BUTTON = "Compute Parameters";
+  private static String TRANS_DX_DY = I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Translate-by") +" (X,Y)";
+  private static String SCALE_X = I18N.get("jump.plugin.edit.AffineTransformationPlugIn.X-Factor");
+  private static String SCALE_Y = I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Y-Factor");
+  private static String ROTATE_ANGLE = GenericNames.ANGLE;
+  private static String SHEAR_X = I18N.get("jump.plugin.edit.AffineTransformationPlugIn.X-Shear");
+  private static String SHEAR_Y = I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Y-Shear");
+  private static String SRC_BASE_LAYER = GenericNames.SOURCE_LAYER;
+  private static String DEST_BASE_LAYER = GenericNames.TARGET_LAYER;
+  private static String BASELINE_BUTTON = I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Compute-Parameters");
 
 //  private JRadioButton matchSegmentsRB;
   private JTextField originXField;
@@ -182,21 +196,36 @@ public class AffineTransformationPlugIn
   private JTextField rotateAngleField;
 
   private void setDialogValues(MultiInputDialog dialog, PlugInContext context) {
+  	
+    String LAYER = GenericNames.LAYER;
+    ORIGIN = I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Anchor-Point");
+    ORIGIN_FROM_LL = I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Set-to-Lower-Left");
+    ORIGIN_FROM_MIDPOINT = I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Set-to-Midpoint");
+    TRANS_DX_DY = I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Translate-by") +" (X,Y)";
+    SCALE_X = I18N.get("jump.plugin.edit.AffineTransformationPlugIn.X-Factor");
+    SCALE_Y = I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Y-Factor");
+    ROTATE_ANGLE = GenericNames.ANGLE;
+    SHEAR_X = I18N.get("jump.plugin.edit.AffineTransformationPlugIn.X-Shear");
+    SHEAR_Y = I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Y-Shear");
+    SRC_BASE_LAYER = GenericNames.SOURCE_LAYER;
+    DEST_BASE_LAYER = GenericNames.TARGET_LAYER;
+    BASELINE_BUTTON = I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Compute-Parameters");
+
     dialog.setSideBarImage(new ImageIcon(getClass().getResource("AffineTransformation.png")));
     dialog.setSideBarDescription(
-        "Applies an Affine Transformation to all features in a layer."
-        + "  The transformation is specified by a combination of scaling, rotation, shearing and translation."
-        + "  Transformation parameters may be computed from two layers containing baseline vectors.");
+    		I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Applies-an-Affine-Transformation-to-all-features-in-a-layer")
+        + "  " + I18N.get("jump.plugin.edit.AffineTransformationPlugIn.The-transformation-is-specified-by-a-combination-of-scaling-rotation-shearing-and-translation")
+        + "  " + I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Transformation-parameters-may-be-computed-from-two-layers-containing-baseline-vectors"));
 
     dialog.addLayerComboBox(LAYER, context.getCandidateLayer(0),
         context.getLayerManager());
 
-    dialog.addLabel("<HTML><B>Anchor Point</B></HTML>");
+    dialog.addLabel("<HTML><B>"+I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Anchor-Point")+"</B></HTML>");
 
     originXField = dialog.addDoubleField(ORIGIN_X, originX, 20,
-    "Anchor Point X value");
+    		I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Anchor-Point-X-value"));
     originYField = dialog.addDoubleField(ORIGIN_Y, originY, 20,
-    "Anchor Point Y value");
+    		I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Anchor-Point-Y-value"));
 
     JButton buttonOriginLL = dialog.addButton(ORIGIN_FROM_LL);
     buttonOriginLL.addActionListener(new OriginLLListener(true));
@@ -204,30 +233,30 @@ public class AffineTransformationPlugIn
     JButton buttonOriginMid = dialog.addButton(ORIGIN_FROM_MIDPOINT);
     buttonOriginMid.addActionListener(new OriginLLListener(false));
 
-    dialog.addLabel("<HTML><B>Scaling</B></HTML>");
-    scaleXField = dialog.addDoubleField(SCALE_X, scaleX, 20, "Scale X Factor");
-    scaleYField = dialog.addDoubleField(SCALE_Y, scaleY, 20, "Scale Y Factor");
+    dialog.addLabel("<HTML><B>"+I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Scaling")+"</B></HTML>");
+    scaleXField = dialog.addDoubleField(SCALE_X, scaleX, 20, I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Scale-X-Factor"));
+    scaleYField = dialog.addDoubleField(SCALE_Y, scaleY, 20, I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Scale-Y-Factor"));
 
-    dialog.addLabel("<HTML><B>Rotation</B></HTML>");
+    dialog.addLabel("<HTML><B>"+I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Rotation")+"</B></HTML>");
     rotateAngleField = dialog.addDoubleField(ROTATE_ANGLE, rotationAngle, 20,
-        "Rotation Angle in degrees");
+    		I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Rotation-Angle-in-degrees"));
 
-    dialog.addLabel("<HTML><B>Shearing</B></HTML>");
-    shearXField = dialog.addDoubleField(SHEAR_X, shearX, 20, "Shear X Factor");
-    shearYField = dialog.addDoubleField(SHEAR_Y, shearY, 20, "Shear Y Factor");
+    dialog.addLabel("<HTML><B>"+I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Shearing")+"</B></HTML>");
+    shearXField = dialog.addDoubleField(SHEAR_X, shearX, 20, I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Shear-X-Factor"));
+    shearYField = dialog.addDoubleField(SHEAR_Y, shearY, 20, I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Shear-Y-Factor"));
 
-    dialog.addLabel("<HTML><B>Translation</B></HTML>");
+    dialog.addLabel("<HTML><B>"+I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Translation")+"</B></HTML>");
     transXField = dialog.addDoubleField(TRANS_DX, transX, 20,
-       "Translation X value");
+    		I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Translation-X-value"));
     transYField = dialog.addDoubleField(TRANS_DY, transY, 20,
-       "Translation Y value");
+    		I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Translation-Y-value"));
 
     dialog.startNewColumn();
-    JButton setIdentityButton = dialog.addButton("Set to Identity");
+    JButton setIdentityButton = dialog.addButton(I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Set-to-Identity"));
     setIdentityButton.addActionListener(new SetIdentityListener());
     dialog.addSeparator();
 
-    dialog.addLabel("<HTML><B>Baseline Vectors</B></HTML>");
+    dialog.addLabel("<HTML><B>"+I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Baseline-Vectors")+"</B></HTML>");
     dialog.addLayerComboBox(SRC_BASE_LAYER, context.getLayerManager().getLayer(0),
         context.getLayerManager());
     dialog.addLayerComboBox(DEST_BASE_LAYER, context.getLayerManager().getLayer(0),
@@ -375,7 +404,7 @@ public class AffineTransformationPlugIn
     public void actionPerformed(ActionEvent e) {
       String errMsg = updateParams();
       if (errMsg != null) {
-         JOptionPane.showMessageDialog(null, errMsg, "Control Point Error", JOptionPane.ERROR_MESSAGE);
+         JOptionPane.showMessageDialog(null, errMsg, I18N.get("jump.plugin.edit.AffineTransformationPlugIn.Control-Point-Error"), JOptionPane.ERROR_MESSAGE);
       }
     }
   }

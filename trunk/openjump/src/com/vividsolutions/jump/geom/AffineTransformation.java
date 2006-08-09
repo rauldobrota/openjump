@@ -1,6 +1,7 @@
 package com.vividsolutions.jump.geom;
 
 import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jump.I18N;
 
 /**
  * This class represents a affine transformation on the 2D Cartesian plane. 
@@ -364,7 +365,7 @@ public class AffineTransformation
   {
     double det = getDeterminant();
     if (det == 0)
-    	throw new NoninvertibleTransformationException("Transformation is non-invertible");
+    	throw new NoninvertibleTransformationException(I18N.get("jump.geom.AffineTransformation.Transformation-is-non-invertible"));
     
     double im00 = m11 / det;
     double im10 = -m10 / det;
@@ -387,7 +388,7 @@ public class AffineTransformation
   public AffineTransformation setToReflectionBasic(double x0, double y0, double x1, double y1)
   {
     if (x0 == x1 && y0 == y1) {
-      throw new IllegalArgumentException("Reflection line points must be distinct");
+      throw new IllegalArgumentException(I18N.get("jump.geom.AffineTransformation.Reflection-line-points-must-be-distinct"));
     }
     double dx = x1 - x0;
     double dy = y1 - y0;
@@ -404,7 +405,7 @@ public class AffineTransformation
   public AffineTransformation setToReflection(double x0, double y0, double x1, double y1)
   {
     if (x0 == x1 && y0 == y1) {
-      throw new IllegalArgumentException("Reflection line points must be distinct");
+      throw new IllegalArgumentException(I18N.get("jump.geom.AffineTransformation.Reflection-line-points-must-be-distinct"));
     }
     // translate line vector to origin
     setToTranslation(-x0, -y0);
@@ -445,7 +446,7 @@ public class AffineTransformation
   public AffineTransformation setToReflection(double x, double y)
   {
     if (x == 0.0 && y == 0.0) {
-      throw new IllegalArgumentException("Reflection vector must be non-zero");
+      throw new IllegalArgumentException(I18N.get("jump.geom.AffineTransformation.Reflection-vector-must-be-non-zero"));
     }
     // rotate vector to positive x axis direction
     double d = Math.sqrt(x * x + y * y);

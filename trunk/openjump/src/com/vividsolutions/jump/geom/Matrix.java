@@ -1,5 +1,7 @@
 package com.vividsolutions.jump.geom;
 
+import com.vividsolutions.jump.I18N;
+
 /**
  * Implements some 2D matrix operations 
  * (in particular, solving systems of linear equations).
@@ -44,7 +46,7 @@ public class Matrix
   {
     int n = b.length;
     if ( a.length != n || a[0].length != n )
-      throw new IllegalArgumentException("Matrix A is incorrectly sized");
+      throw new IllegalArgumentException(I18N.get("jump.geom.Matrix.Matrix-A-is-incorrectly-sized"));
     
     // Use Gaussian Elimination with partial pivoting.
     // Iterate over each row

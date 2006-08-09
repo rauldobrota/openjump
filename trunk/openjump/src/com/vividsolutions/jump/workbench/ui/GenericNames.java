@@ -44,6 +44,9 @@ public interface GenericNames {
 	public static String LAYER_B = I18N.get("ui.GenericNames.LAYER_B");
 	public static String RESULT_LAYER=I18N.get("ui.GenericNames.ResultLayer");
 	public static String LAYER_GRID=I18N.get("ui.GenericNames.LayerGrid");
+	public static String ANGLE=I18N.get("ui.GenericNames.ANGLE");
+	public static String SOURCE_LAYER=I18N.get("ui.GenericNames.Source-Layer");
+	public static String TARGET_LAYER=I18N.get("ui.GenericNames.Target-Layer");
 	
 	
 	public static String CALCULATE_IN_PROGRESS=I18N.get("ui.GenericNames.CalculateInProgress");
