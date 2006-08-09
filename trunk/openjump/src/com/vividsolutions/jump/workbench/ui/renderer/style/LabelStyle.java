@@ -42,6 +42,7 @@ import java.util.List;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 import com.vividsolutions.jts.util.Assert;
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.geom.Angle;
 import com.vividsolutions.jump.geom.CoordUtil;
@@ -52,9 +53,12 @@ import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.Viewport;
 public class LabelStyle implements Style {
     public final static int FONT_BASE_SIZE = 12;
-    public final static String ABOVE_LINE = "ABOVE_LINE";
-    public final static String ON_LINE = "ON_LINE";
-    public final static String BELOW_LINE = "BELOW_LINE";
+    //public final static String ON_LINE = "ABOVE_LINE";
+    public static String ABOVE_LINE = I18N.get("ui.renderer.style.LabelStyle.ABOVE_LINE");
+    //public final static String ON_LINE = "ON_LINE";
+    public static String ON_LINE = I18N.get("ui.renderer.style.LabelStyle.ON_LINE");
+    //public final static String BELOW_LINE = "BELOW_LINE";
+    public static String BELOW_LINE =I18N.get("ui.renderer.style.LabelStyle.BELOW_LINE");
     public static final String FID_COLUMN = "$FID";
     private GeometryFactory factory = new GeometryFactory();
     private Color originalColor;
@@ -79,6 +83,12 @@ public class LabelStyle implements Style {
         viewportRectangle = null;
         //Set the vertices' fill colour to the layer's line colour
         this.layer = layer;
+        //-- [sstein] added again to initialize correct language
+        ABOVE_LINE = I18N.get("ui.renderer.style.LabelStyle.ABOVE_LINE");
+        ON_LINE = I18N.get("ui.renderer.style.LabelStyle.ON_LINE");
+        BELOW_LINE =I18N.get("ui.renderer.style.LabelStyle.BELOW_LINE");
+        this.verticalAlignment = ABOVE_LINE;
+        //--
     }
     public void paint(Feature f, Graphics2D g, Viewport viewport)
         throws NoninvertibleTransformException {
