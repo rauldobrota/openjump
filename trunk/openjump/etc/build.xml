@@ -124,22 +124,39 @@
                         <fileset dir="${src.dir}" excludes="**/*.java,**/*.class"/>
                 </copy>
         </target>
+	    <!--  ===================================================================  -->
+    	<!--  create the manifest file  	[sstein: added 10. Aug 2006] 		   --> 
+	    <!--  ===================================================================  -->
+ 		<!-- property name="distpathprop" refid="distpath"/-->		
+	 	<property name="distpathprop" refid="build.dir"/>	
+	   	<manifest file="${build.dir}/MANIFEST.MF">
+			<attribute name="Class-Path" value="${distpathprop}" />
+     		<attribute name="Main-Class" value=" com.vividsolutions.jump.workbench.JUMPWorkbench"/>
+   		</manifest>
+	    <!-- eliminate absolute paths from manifest file -->
+    	<replaceregexp file="${build.dir}/MANIFEST.MF" match=":\\" replace="" flags="gs"/>
+	    <replaceregexp file="${build.dir}/MANIFEST.MF" match=":[^:;]*lib" replace=": lib" flags="gs"/>     
+    	<replaceregexp file="${build.dir}/MANIFEST.MF" match=";[^:;]*lib" replace=" lib" flags="gs"/>      
         <!--  ===================================================================  -->
         <!--  Creates the jar archive                                              -->
         <!--  ===================================================================  -->
         <target name="jar" depends="compile">
             <echo file="${build.dir}/info.txt">Manifest-Version: 1.0
-Sealed: false
-${Name}-Version: ${version}
-Build-Date: ${TODAY}
-Build-Time: ${TSTAMP}
-</echo>
-                <jar jarfile="${workbench.jar}" manifest="${build.dir}/info.txt">
+				Sealed: false
+				${Name}-Version: ${version}
+				Build-Date: ${TODAY}
+				Build-Time: ${TSTAMP}
+			</echo>
+	        	<!-- [sstein] use other manifest -->
+                <!-- jar jarfile="${workbench.jar}" manifest="${build.dir}/info.txt"-->
+                <jar jarfile="${workbench.jar}" manifest="${build.dir}/MANIFEST.MF">                	
                         <fileset dir="${build.classes}">
                                 <selector refid="workbench.jar.selector"/>
                         </fileset>
                 </jar>
-                <jar jarfile="${api.jar}" manifest="${build.dir}/info.txt">
+   	        	<!-- [sstein] use other manifest -->        	
+                <!-- jar jarfile="${api.jar}" manifest="${build.dir}/info.txt"-->
+                <jar jarfile="${api.jar}" manifest="${build.dir}/MANIFEST.MF">                	
                         <fileset dir="${build.classes}">
                                 <selector refid="api.jar.selector"/>
                         </fileset>
@@ -180,13 +197,22 @@ Build-Time: ${TSTAMP}
                 <copy file="${api.jar}" todir="${archive.dir}/lib"/>
                 <mkdir dir="${archive.src.dir}"/>
                 <copy todir="${archive.src.dir}/javadoc">
-                        <fileset dir="${javadoc.dir}"/>
+                        <fileset dir="${javadoc.dir}"/>                	
                 </copy>
                 <copy todir="${archive.src.dir}/src">
                         <fileset dir="${src.dir}">
                                 <selector refid="archive.src.selector"/>
                         </fileset>
                 </copy>
+        		<!-- [sstein] added begin : copy also all other stuff to src-->
+            	<copy todir="${archive.src.dir}/src">
+                        <fileset dir=".">
+                                <include name="${lib.dir}/**"/>
+                                <exclude name="**/junit.jar"/>
+                                <include name="${docs.dir}/**"/>
+                        </fileset>
+                </copy>
+    			<!-- [sstein] added end -->        	        	
         </target>
         <!--  ===================================================================  -->
         <!--  Packages the distribution with ZIP                                   -->
