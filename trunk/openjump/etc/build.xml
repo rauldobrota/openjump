@@ -42,6 +42,7 @@
                                 <filename name="**/*.xml" casesensitive="no"/>
                                 <filename name="**/*.txt" casesensitive="no"/>
                                 <filename name="**/*.jpg" casesensitive="no"/>
+	                        	<filename name="**/*.xsl" casesensitive="no"/>
                         </or>
                         <not>
                                 <filename name="**/overview.html" casesensitive="no"/>
