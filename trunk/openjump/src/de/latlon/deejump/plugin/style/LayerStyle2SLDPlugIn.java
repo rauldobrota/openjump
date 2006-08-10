@@ -262,11 +262,11 @@ public class LayerStyle2SLDPlugIn extends AbstractPlugIn {
     private void initDialog(PlugInContext context) {
         if( dialog == null ){
             
-	        dialog = new MultiInputDialog(context.getWorkbenchFrame(),I18N.get("ui.style.LayerStyle2SLDPlugIn.SLD-Parameters"), true);
+	        dialog = new MultiInputDialog(context.getWorkbenchFrame(),I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.SLD-Parameters"), true);
 	        
 	        dialog.addSeparator();
 	        
-            dialog.addTextField( GEOM_PROPERTY, geoProperty, 25, null, I18N.get("ui.style.LayerStyle2SLDPlugIn.Input-the-name-of-the-geometry-property") );
+            dialog.addTextField( GEOM_PROPERTY, geoProperty, 25, null, I18N.get("deejump.pluging.style.LayerStyle2SLDPlugIn.Input-the-name-of-the-geometry-property") );
             
             dialog.addSeparator();
             String name = context.getCandidateLayer( 0 ).getName();
@@ -377,14 +377,18 @@ public class LayerStyle2SLDPlugIn extends AbstractPlugIn {
             StreamSource streamSrc = new StreamSource( isr );
             
             transformer = transformerFactory.newTransformer( streamSrc );
-
-        } catch (TransformerConfigurationException e) {
+        } 
+ 		//-- [sstein] evtl. comment out for test reasons, because it could be, that appears a problem
+ 		//            in initializing the exceptions while starting up OJUMP on WinXP? 
+ 		//			  (see email by Johannes Metzler, on Jump-User, 10.Aug.2006] 
+         catch (TransformerConfigurationException e) {
             e.printStackTrace();
         } catch (TransformerFactoryConfigurationError e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        //-- used instead the simple form 
     }
 
     public EnableCheck createEnableCheck(final WorkbenchContext workbenchContext) {
