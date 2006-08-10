@@ -128,7 +128,7 @@
     	<!--  create the manifest file  	[sstein: added 10. Aug 2006] 		   --> 
 	    <!--  ===================================================================  -->
  		<!-- property name="distpathprop" refid="distpath"/-->		
-	 	<property name="distpathprop" refid="build.dir"/>	
+	 	<property name="distpathprop" value="build"/>	
 	   	<manifest file="${build.dir}/MANIFEST.MF">
 			<attribute name="Class-Path" value="${distpathprop}" />
      		<attribute name="Main-Class" value=" com.vividsolutions.jump.workbench.JUMPWorkbench"/>
