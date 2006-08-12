@@ -130,13 +130,13 @@
         <!--  ===================================================================  -->
         <!--  Creates the jar archive                                              -->
         <!--  ===================================================================  -->
-        <target name="jar" depends="compile">        	
+        <target name="jar" depends="compile">
             <echo file="${build.dir}/info.txt">Manifest-Version: 1.0
 Sealed: false
 ${Name}-Version: ${version}
 Build-Date: ${TODAY}
 Build-Time: ${TSTAMP}
-			</echo>
+</echo>
                 <jar jarfile="${workbench.jar}" manifest="${build.dir}/info.txt">
                         <fileset dir="${build.classes}">
                                 <selector refid="workbench.jar.selector"/>
