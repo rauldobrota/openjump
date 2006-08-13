@@ -28,6 +28,12 @@ If you have now all these folders in one, then go to the \etc\ folder and look f
 
 note: OpenJUMP can be built with Java 1.4 and 1.5 
 
+If you have Questions on OpenJUMP, please have a look first on our wiki: http://www.openjump.org
+If you want to report a bug or feature request please do (both):
+	1) write on the jpp-devel email list (note: you must register for that)
+	2) add the bug or feature request to the corresponding project lists
+for 1) and 2) see our project website: http://sourceforge.net/projects/jump-pilot/
+
 i think thats it???
 
 stefan
