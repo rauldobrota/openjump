@@ -16,7 +16,13 @@ This folder must contains the following subfolders:
 * \etc => this must contains several files including the built.xml file for ANT (take the folder from the download)
 * \lib => contains all the necessary libraries (including 2 subfolders: \Batik and \ext) (take take the folder from the download)
 * \scripts => should contain the openJUMP start-up scripts for different OS (take take the folder from the download)
-* \src => includes the Jump\OpenJUMP source files needed to built OpenJUMP. It shoudl contain at least 4 subfolders: \src\com + \src\org + \src\de + \src\language, whereby the latter constains the language files to start-up OpenJUMP in different languages. (take take the folder from the download)
+* \src => includes the Jump\OpenJUMP source files needed to built OpenJUMP. It shoudl contain at least 4 subfolders: 
+	\src\com 
+	\src\org 
+	\src\de
+	\src\language, 
+	whereby the latter constains the language files to start-up OpenJUMP in different languages. 
+	(take all the folders from the download)
 
 If you have now all these folders in one, then go to the \etc\ folder and look for the file built.xml. Start this file with ANT. In Eclipse it might work to simply click on built.xml file and then choose from the mouse-menu the option to "run" with ANT.
 
