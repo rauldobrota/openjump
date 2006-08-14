@@ -130,13 +130,23 @@
         <!--  ===================================================================  -->
         <!--  Creates the jar archive                                              -->
         <!--  ===================================================================  -->
+		<!-- [sstein] new property -->
+		<property name="distpathprop" refid="base.classpath"/>
+		<!--					   -->
         <target name="jar" depends="compile">
             <echo file="${build.dir}/info.txt">Manifest-Version: 1.0
 Sealed: false
 ${Name}-Version: ${version}
 Build-Date: ${TODAY}
 Build-Time: ${TSTAMP}
+Class-Path: ${distpathprop}
+Main-Class: com.vividsolutions.jump.workbench.JUMPWorkbench
 </echo>
+    	    <!-- [sstein] eliminate absolute paths from manifest file -->
+        	<replaceregexp file="${build.dir}/info.txt" match=":\\" replace="" flags="gs"/>
+    	    <replaceregexp file="${build.dir}/info.txt" match=":[^:;]*lib" replace=": lib" flags="gs"/>     
+        	<replaceregexp file="${build.dir}/info.txt" match=";[^:;]*lib" replace=" lib" flags="gs"/>      
+        	<!--					-->
                 <jar jarfile="${workbench.jar}" manifest="${build.dir}/info.txt">
                         <fileset dir="${build.classes}">
                                 <selector refid="workbench.jar.selector"/>
