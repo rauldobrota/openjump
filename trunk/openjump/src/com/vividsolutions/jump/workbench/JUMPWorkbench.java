@@ -72,13 +72,13 @@ public class JUMPWorkbench {
 		// Lazily initialize it, as it may not even be called (e.g. EZiLink),
 		// and we want the splash screen to appear ASAP [Jon Aquino]
 		if (splashImage == null) {
-			//splashImage = IconLoader.icon("splash.png");
-			splashImage = IconLoader.icon(I18N.get("JUMPWorkbench.splash.png"));
+			splashImage = IconLoader.icon("splash.png");
+			//splashImage = IconLoader.icon(I18N.get("splash.png"));
 		}
 		return splashImage;
 	}
 
-	private static final ImageIcon APP_ICON = IconLoader.icon(I18N.get("JUMPWorkbench.app-icon.gif"));
+	private static final ImageIcon APP_ICON = IconLoader.icon("app-icon.gif");
 	public static final String VERSION_TEXT = I18N.get("JUMPWorkbench.version.number");
 	//-- dont change the following strings 
 	public final static String PROPERTIES_OPTION = "properties";
@@ -161,7 +161,8 @@ public class JUMPWorkbench {
 				extensionsDirectory = null;
 			}
 		} else {
-			extensionsDirectory = new File(I18N.get("JUMPWorkbench.lib-ext"));
+			//extensionsDirectory = new File(I18N.get("JUMPWorkbench.lib-ext"));
+			extensionsDirectory = new File("../lib/ext");
 			if (!extensionsDirectory.exists()) {
 				extensionsDirectory = null;
 			}
