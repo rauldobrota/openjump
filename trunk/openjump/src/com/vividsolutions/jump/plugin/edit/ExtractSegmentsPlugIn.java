@@ -124,7 +124,7 @@ public class ExtractSegmentsPlugIn
 
     FeatureCollection lineStringFC = FeatureDatasetFactory.createFromGeometry(linestringList);
     context.addLayer(
-        StandardCategoryNames.RESULT_SUBJECT,
+        StandardCategoryNames.RESULT,
         layerName + " " + I18N.get("jump.plugin.edit.ExtractSegmentsPlugIn.Extracted-Segs"),
         lineStringFC);
 
