@@ -37,6 +37,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 
 import java.util.*;
+
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.workbench.*;
 import com.vividsolutions.jump.workbench.model.*;
 import com.vividsolutions.jump.workbench.plugin.*;
@@ -66,9 +68,10 @@ public class LineNoderPlugIn
   /**
    * Returns a very brief description of this task.
    * @return the name of this task
-   */
-  public String getName() { return "Node Lines"; }
-
+   */  
+  public String getName() { return I18N.get("jump.plugin.edit.LineNoderPlugIn.Node-Lines"); }
+  
+  
   public EnableCheck createEnableCheck(WorkbenchContext workbenchContext) {
       EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
       return new MultiEnableCheck()
@@ -95,7 +98,7 @@ public class LineNoderPlugIn
     Polygonizer polygonizer = new Polygonizer();
 //    polygonizer.setSplitLineStrings(splitLineStrings);
 
-    monitor.report("Noding...");
+    monitor.report(I18N.get("jump.plugin.edit.LineNoderPlugIn.Noding"));
 
     Layer layer = dialog.getLayer(SRC_LAYER);
 
@@ -103,7 +106,7 @@ public class LineNoderPlugIn
 
     Collection lines = getLines(inputFeatures);
 
-    monitor.report("Noding input lines");
+    monitor.report(I18N.get("jump.plugin.edit.LineNoderPlugIn.Noding-input-lines"));
     Geometry nodedGeom = nodeLines((List) lines);
     Collection nodedLines = toLines(nodedGeom);
 
@@ -181,17 +184,15 @@ public class LineNoderPlugIn
     FeatureCollection polyFC = FeatureDatasetFactory.createFromGeometry(nodedLines);
     context.addLayer(
         StandardCategoryNames.RESULT,
-        layerName + " Noded Lines",
+        layerName + " " +I18N.get("jump.plugin.edit.LineNoderPlugIn.Noded-Lines"),
         polyFC);
   }
 
-  private final static String SRC_LAYER = "Line Layer:";
-  private final static String SELECTED_ONLY = "Use selected features only";
-
+  private final static String SRC_LAYER = I18N.get("jump.plugin.edit.LineNoderPlugIn.Line-Layer");
+  private final static String SELECTED_ONLY = GenericNames.USE_SELECTED_FEATURES_ONLY;
   private void setDialogValues(MultiInputDialog dialog, PlugInContext context) {
     dialog.setSideBarImage(new ImageIcon(getClass().getResource("Polygonize.png")));
-    dialog.setSideBarDescription("Nodes the lines in a layer. "
-    );
+    dialog.setSideBarDescription(I18N.get("jump.plugin.edit.LineNoderPlugIn.Nodes-the-lines-in-a-layer"));
     String fieldName = SRC_LAYER;
     JComboBox addLayerComboBox = dialog.addLayerComboBox(fieldName, context.getCandidateLayer(0), null, context.getLayerManager());
     dialog.addCheckBox(SELECTED_ONLY, useSelected);

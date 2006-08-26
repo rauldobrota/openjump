@@ -258,7 +258,7 @@ public class PolygonizerPlugIn
   private final static String SRC_LAYER = I18N.get("jump.plugin.edit.PolygonizerPlugIn.Line-Layer");
   private final static String NODE_INPUT = I18N.get("jump.plugin.edit.PolygonizerPlugIn.Node-input-before-polygonizing");
 //  private final static String SPLIT_LINESTRINGS = "Split linestrings into segments";
-  private final static String SELECTED_ONLY = I18N.get("jump.plugin.edit.PolygonizerPlugIn.Use-selected-features-only");
+  private final static String SELECTED_ONLY = GenericNames.USE_SELECTED_FEATURES_ONLY;
 
   private void setDialogValues(MultiInputDialog dialog, PlugInContext context) {
     dialog.setSideBarImage(new ImageIcon(getClass().getResource("Polygonize.png")));
