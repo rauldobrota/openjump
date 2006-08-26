@@ -896,6 +896,7 @@ public class JUMPConfiguration implements Setup {
 
 
 private ExtractSegmentsPlugIn extractSegmentsPlugIn = new ExtractSegmentsPlugIn();
+private LineNoderPlugIn lineNoderPlugIn = new LineNoderPlugIn();
 private PolygonizerPlugIn polygonizerPlugIn = new PolygonizerPlugIn();    
 private PrecisionReducerPlugIn precisionReducerPlugIn = new PrecisionReducerPlugIn();
 private AffineTransformationPlugIn affineTransPlugIn = new AffineTransformationPlugIn();
@@ -913,6 +914,11 @@ private void configToolsEdit(final WorkbenchContext workbenchContext,
                 extractSegmentsPlugIn.getName() + "...", false, null,
                 extractSegmentsPlugIn.createEnableCheck(workbenchContext));
     
+    featureInstaller.addMainMenuItem(lineNoderPlugIn,
+            MENU_TOOLS_EDIT,
+                lineNoderPlugIn.getName() + "...", false, null,
+                lineNoderPlugIn.createEnableCheck(workbenchContext));
+
     featureInstaller.addMainMenuItem(polygonizerPlugIn,
             MENU_TOOLS_EDIT,
                 polygonizerPlugIn.getName() + "...", false, null,
