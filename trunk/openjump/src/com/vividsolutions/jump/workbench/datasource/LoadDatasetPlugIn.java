@@ -49,6 +49,7 @@ import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.ThreadedBasePlugIn;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.WorkbenchFrame;
+import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
 import com.vividsolutions.jump.util.Blackboard;
 
@@ -61,6 +62,8 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+
+import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.JFileChooser;
 import java.awt.event.*;
@@ -233,10 +236,16 @@ public class LoadDatasetPlugIn extends ThreadedBasePlugIn {
                  .toString();
     }
 
+    //[sstein 26.08.2006] added for toolbar
     public static MultiEnableCheck createEnableCheck(
         final WorkbenchContext workbenchContext) {
         EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
 
         return new MultiEnableCheck().add(checkFactory.createWindowWithLayerManagerMustBeActiveCheck());
+    }
+    
+    //[sstein 26.08.2006] added for toolbar
+    public static ImageIcon getIcon() {
+        return IconLoader.icon("Plus.gif");
     }
 }

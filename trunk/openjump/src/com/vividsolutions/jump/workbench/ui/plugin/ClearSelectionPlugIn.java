@@ -58,7 +58,7 @@ public class ClearSelectionPlugIn extends AbstractPlugIn {
 		    .add(checkFactory.createAtLeastNItemsMustBeSelectedCheck(1));
     }
 
-    public ImageIcon getIcon() {
+    public static ImageIcon getIcon() {
         return IconLoader.icon("deselect.gif");
     }
 }

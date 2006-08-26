@@ -33,8 +33,13 @@
 
 package com.vividsolutions.jump.workbench.ui.plugin;
 
+import javax.swing.ImageIcon;
+
+import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
+import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
+import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 
 
 public class NewTaskPlugIn extends AbstractPlugIn {
@@ -46,5 +51,15 @@ public class NewTaskPlugIn extends AbstractPlugIn {
         context.getWorkbenchFrame().addTaskFrame();
 
         return true;
+    }
+    //[sstein 26.08.2006] added for toolbar
+    public static MultiEnableCheck createEnableCheck(
+            final WorkbenchContext workbenchContext) {            
+            return new MultiEnableCheck();
+    }
+        
+    //[sstein 26.08.2006] added for toolbar
+    public static ImageIcon getIcon() {
+            return IconLoader.icon("Document.gif");
     }
 }

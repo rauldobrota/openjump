@@ -268,7 +268,7 @@ public class JUMPConfiguration implements Setup {
     	//[sstein 20.01.2006] added again after user request
         featureInstaller.addPopupMenuItem(workbenchContext.getWorkbench()
                 .getFrame().getCategoryPopupMenu(), loadDatasetPlugIn,
-                loadDatasetPlugIn.getName() + "...", false, null,
+                loadDatasetPlugIn.getName() + "...", false, LoadDatasetPlugIn.getIcon(),
                 LoadDatasetPlugIn.createEnableCheck(workbenchContext));
         //--
         featureInstaller.addPopupMenuItem(workbenchContext.getWorkbench()
@@ -508,7 +508,7 @@ public class JUMPConfiguration implements Setup {
                 saveDatasetAsFilePlugIn.getName() + "...", false, null,
                 AbstractSaveDatasetAsPlugIn.createEnableCheck(workbenchContext));
         featureInstaller.addMainMenuItemWithJava14Fix(loadDatasetPlugIn, new String[] {MenuNames.FILE},
-                loadDatasetPlugIn.getName() + "...", false, null, LoadDatasetPlugIn
+                loadDatasetPlugIn.getName() + "...", false, LoadDatasetPlugIn.getIcon(), LoadDatasetPlugIn
                         .createEnableCheck(workbenchContext));        
         featureInstaller.addMainMenuItemWithJava14Fix(saveDatasetAsPlugIn, new String[] {MenuNames.FILE},
                 saveDatasetAsPlugIn.getName() + "...", false, null,
@@ -516,7 +516,7 @@ public class JUMPConfiguration implements Setup {
         featureInstaller.addMenuSeparator(MenuNames.FILE); // ===================
         featureInstaller.addMainMenuItemWithJava14Fix(newTaskPlugIn, new String[] {MenuNames.FILE}, newTaskPlugIn
                 .getName()
-                + "...", false, null, null);
+                + "...", false, NewTaskPlugIn.getIcon(), null);
         featureInstaller.addMainMenuItemWithJava14Fix(openProjectPlugIn, new String[] {MenuNames.FILE},
                 openProjectPlugIn.getName() + "...", false, null,
                 new MultiEnableCheck());
@@ -1049,8 +1049,17 @@ public void configureDatastores(final WorkbenchContext context) throws Exception
     }
 
     private void configureToolBar(final WorkbenchContext workbenchContext,
-            EnableCheckFactory checkFactory) {
+            EnableCheckFactory checkFactory) {    	
         WorkbenchFrame frame = workbenchContext.getWorkbench().getFrame();
+        frame.getToolBar().addPlugIn(NewTaskPlugIn.getIcon(),
+        		newTaskPlugIn,
+        		NewTaskPlugIn.createEnableCheck(workbenchContext),
+				workbenchContext);                
+        frame.getToolBar().addPlugIn(LoadDatasetPlugIn.getIcon(),
+        		loadDatasetPlugIn,
+        		LoadDatasetPlugIn.createEnableCheck(workbenchContext),
+				workbenchContext);        
+        frame.getToolBar().addSeparator();        
         add(new ZoomTool(), workbenchContext);
         add(new PanTool(), workbenchContext);
         frame.getToolBar().addSeparator();
@@ -1095,7 +1104,7 @@ public void configureDatastores(final WorkbenchContext context) throws Exception
         add(new QuasimodeTool(new SelectFeaturesTool()).add(
                 new QuasimodeTool.ModifierKeySpec(true, false, false), null),
                 workbenchContext);
-        frame.getToolBar().addPlugIn(clearSelectionPlugIn.getIcon(),
+        frame.getToolBar().addPlugIn(ClearSelectionPlugIn.getIcon(),
         		clearSelectionPlugIn,
 				clearSelectionPlugIn.createEnableCheck(workbenchContext),
 				workbenchContext);
