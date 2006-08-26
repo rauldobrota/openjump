@@ -147,21 +147,42 @@ public class PolygonizerPlugIn
   }
 
   /**
-   * Node a collection of linestrings.
-   * Noding is done via union, which is reasonably effective but
+   * Nodes a collection of linestrings.
+   * Noding is done via JTS union, which is reasonably effective but
    * may exhibit robustness failures.
    *
-   * @param lines
-   * @return
+   * @param lines the linear geometries to node
+   * @return a collection of linear geometries, noded together
    */
-  private Collection nodeLines(List lines)
+  private Collection nodeLines(Collection lines)
   {
     Geometry linesGeom = fact.createMultiLineString(fact.toLineStringArray(lines));
-    Geometry empty = fact.createMultiLineString(null);
-    Geometry noded = linesGeom.union(empty);
+
+    Geometry unionInput  = fact.createMultiLineString(null);
+    // force the unionInput to be non-empty if possible, to ensure union is not optimized away
+    Geometry point = extractPoint(lines);
+    if (point != null)
+      unionInput = point;
+
+    Geometry noded = linesGeom.union(unionInput);
     List nodedList = new ArrayList();
     nodedList.add(noded);
     return nodedList;
+  }
+
+  private Geometry extractPoint(Collection lines)
+  {
+    int minPts = Integer.MAX_VALUE;
+    Geometry point = null;
+    // extract first point from first non-empty geometry
+    for (Iterator i = lines.iterator(); i.hasNext(); ) {
+      Geometry g = (Geometry) i.next();
+      if (! g.isEmpty()) {
+        Coordinate p = g.getCoordinate();
+        point = g.getFactory().createPoint(p);
+      }
+    }
+    return point;
   }
 
   private void createLayers(PlugInContext context, Polygonizer polygonizer)
