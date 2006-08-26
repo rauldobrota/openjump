@@ -71,7 +71,7 @@ import java.io.*;
  *    </tr>
 
  *    <tr>
- *      <td>CompressedFileTemplate</td>
+ *      <td>CompressedFile</td>
  *      <td>File name (.zip NOT a .gz) with a .shp and .dbf file inside</td>
  *    </tr>
  *
@@ -92,7 +92,7 @@ public class ShapefileReader implements JUMPReader {
 	public static final String FILE_PROPERTY_KEY = "File";
 	public static final String DEFAULT_VALUE_PROPERTY_KEY = "DefaultValue";
 	public static final String COMPRESSED_FILE_PROPERTY_KEY = "CompressedFile";
-	
+
     /** Creates new ShapeReader */
     public ShapefileReader() {
     }
