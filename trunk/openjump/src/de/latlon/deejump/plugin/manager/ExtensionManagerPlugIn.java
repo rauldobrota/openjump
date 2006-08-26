@@ -17,6 +17,10 @@ public class ExtensionManagerPlugIn extends ThreadedBasePlugIn {
         //nuffin to do
     }
 
+    public String getName(){
+    	return I18N.get("deejump.pluging.manager.ExtensionManagerDialog.Extension-Manager");
+    }
+    
     public boolean execute( PlugInContext context ) throws Exception {
         if ( managerDialog == null ) {
             managerDialog = new ExtensionManagerDialog(
