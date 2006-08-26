@@ -361,13 +361,26 @@ public class EnableCheckFactory {
             public String check(JComponent component) {
                 JInternalFrame iFrame = workbenchContext.getWorkbench()
                 	.getFrame().getActiveInternalFrame();
-                return (
-                                iFrame == null 
-                                || 
-                    n > ((SelectionManagerProxy) iFrame)
-                        .getSelectionManager().getSelectedItems().size())
-                    ? ("At least " + n + " item" + StringUtil.s(n) + " must be selected")
-                    : null;
+                int selected = 0;
+                try{//sstein [13. Aug. 2006]: 
+                	selected = ((SelectionManagerProxy)iFrame).getSelectionManager().getSelectedItems().size();
+                }
+                catch(Exception e){
+                	//-- sstein:
+                	//== eat exception ==
+                	System.out.println("eat exception @ EnableCheckFactory.createAtLeastNItemsMustBeSelectedCheck(i) if a non taskframe(or child) is selected");                	
+                	//necessary if iFrame is OutputFrame or something 
+                	//and i dont know how to test for alle iFrames which exist or rather i do not know
+                	//which are the ones accessible to the SelectionManager
+                }
+                String retVal = null;
+                if ((iFrame == null)  || (n > selected)){
+                	retVal = ("At least " + n + " item" + StringUtil.s(n) + " must be selected");
+                }
+                else{
+                	retVal = null;
+                }
+                return retVal;
             }
         };
     }
