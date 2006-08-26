@@ -33,35 +33,22 @@
 
 package com.vividsolutions.jump.plugin.edit;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Iterator;
+import java.util.*;
+import java.awt.*;
+import java.awt.event.*;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
+import javax.swing.*;
 import com.vividsolutions.jump.I18N;
-import com.vividsolutions.jump.feature.Feature;
-import com.vividsolutions.jump.feature.FeatureCollection;
-import com.vividsolutions.jump.feature.FeatureDataset;
-import com.vividsolutions.jump.geom.AffineTransformation;
-import com.vividsolutions.jump.geom.Angle;
-import com.vividsolutions.jump.task.TaskMonitor;
+
+import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jump.geom.*;
+import com.vividsolutions.jump.util.ColorUtil;
+import com.vividsolutions.jump.feature.*;
+import com.vividsolutions.jump.task.*;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
-import com.vividsolutions.jump.workbench.model.Layer;
-import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
-import com.vividsolutions.jump.workbench.plugin.EnableCheck;
-import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
-import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
-import com.vividsolutions.jump.workbench.plugin.PlugInContext;
-import com.vividsolutions.jump.workbench.plugin.ThreadedBasePlugIn;
-import com.vividsolutions.jump.workbench.ui.GUIUtil;
-import com.vividsolutions.jump.workbench.ui.GenericNames;
-import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
+import com.vividsolutions.jump.workbench.model.*;
+import com.vividsolutions.jump.workbench.plugin.*;
+import com.vividsolutions.jump.workbench.ui.*;
 
 /**
  * Applies an {@link AffineTransformation} to a layer.
@@ -357,35 +344,6 @@ public class AffineTransformationPlugIn
 
     rotateAngleField.setText("0.0");
   }
-
-  /**
-   * Gets the first two points from the first geometry on the layer (if any).
-   * @param lyr the layer to extract from
-   * @return a coordinate array of length 2 (the two points may be equal)
-   * @return null if points could not be determined
-   */
-  /*
-  private Coordinate[] getVector(Layer lyr)
-  {
-    FeatureCollection fc = lyr.getFeatureCollectionWrapper();
-    Iterator i = fc.iterator();
-    if (! i.hasNext())
-      return null;
-    Feature f = (Feature) i.next();
-    Geometry gFull = f.getGeometry();
-    Geometry g = gFull.getGeometryN(0);
-
-    if (g instanceof com.vividsolutions.jts.geom.Polygon)
-      g = ((com.vividsolutions.jts.geom.Polygon) g).getExteriorRing();
-    Coordinate[] pts = g.getCoordinates();
-    if (pts.length < 1)
-      return null;
-    int index2 = 1;
-    if (pts.length == 1)
-      index2 = 0;
-    return new Coordinate[] { pts[0], pts[index2] };
-  }
-*/
 
   private class OriginLLListener implements ActionListener
   {
