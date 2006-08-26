@@ -7,7 +7,7 @@ import com.vividsolutions.jump.datastore.FilterQuery;
 import com.vividsolutions.jump.datastore.SpatialReferenceSystemID;
 
 /**
- * Creates SQL query strings for an Oracle Spatial database
+ * Creates SQL query strings for a PostGIS database
  */
 public class PostgisSQLBuilder
 {
@@ -57,8 +57,8 @@ public class PostgisSQLBuilder
                + "," + env.getMaxX()
                + " " + env.getMaxY()
                );
-    buf.append(")'::box3d,-1)");
-    //buf.append(getSRID(SRID) + );
+    buf.append(")'::box3d,");
+    buf.append(getSRID(SRID) + ")");
     return buf.toString();
   }
 

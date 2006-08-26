@@ -9,11 +9,11 @@ public interface DataStoreMetadata
 {
   String[] getDatasetNames();
   String[] getGeometryAttributeNames(String datasetName);
-  
-  	/**
-	 * @param datasetName
-	 * @param attributeName
-	 * @return May be null if the extents cannot be determined
-	 */
-	Envelope getExtents(String datasetName, String attributeName);
+
+  /**
+   * @param datasetName
+   * @param attributeName
+   * @return May be null if the extents cannot be determined
+   */
+  Envelope getExtents(String datasetName, String attributeName);
 }
