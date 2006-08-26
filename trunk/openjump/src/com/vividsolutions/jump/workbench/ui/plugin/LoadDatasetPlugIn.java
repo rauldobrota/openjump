@@ -33,6 +33,8 @@
 
 package com.vividsolutions.jump.workbench.ui.plugin;
 
+import javax.swing.ImageIcon;
+
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.driver.AbstractInputDriver;
@@ -41,10 +43,13 @@ import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.ThreadedBasePlugIn;
 import com.vividsolutions.jump.workbench.ui.DriverDialog;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
+import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 
 
 //Note: this class is wrapped by AddLayerToCategoryPlugIn.
 //[Jon Aquino]
+//[sstein] the class is not used anymore, now we use the class 
+//         from plugin.datastore package
 public class LoadDatasetPlugIn extends ThreadedBasePlugIn {
     protected DriverDialog addLayerDialog;
     private String categoryName;
@@ -83,4 +88,5 @@ public class LoadDatasetPlugIn extends ThreadedBasePlugIn {
         monitor.report(I18N.get("ui.plugin.LoadDatasetPlugIn.loading"));
         inputDriver.input(context.getLayerManager(), categoryName);
     }
+    
 }
