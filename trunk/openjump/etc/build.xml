@@ -82,6 +82,7 @@
                                 <filename name="com/vividsolutions/jump/workbench/**" casesensitive="no"/>
                                 <filename name="com/vividsolutions/jump/demo/**" casesensitive="no"/>
                                 <filename name="language/**" casesensitive="no"/>
+                            	<filename name="versiondoc/**" casesensitive="no"/>                        	                        	
                         </or>
                 </and>
         </selector>
@@ -97,6 +98,7 @@
                                 <filename name="de/**" casesensitive="no"/>   
                         		<!-- [sstein] added -->
                             	<filename name="language/**" casesensitive="no"/>                        	
+                        		<filename name="versiondoc/**" casesensitive="no"/>                        	                        	                        	
                         </or>
                 </and>
         </selector>     
