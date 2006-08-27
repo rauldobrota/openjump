@@ -13,6 +13,7 @@ package org.openjump;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
+import org.openjump.core.ccordsys.srid.EnsureAllLayersHaveSRIDStylePlugIn;
 import org.openjump.core.ui.plugin.edit.ReplicateSelectedItemsPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectAllLayerItemsPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectByTypePlugIn;
@@ -300,10 +301,11 @@ public class OpenJumpConfiguration{
 		// takes care of keyboard navigation
 		new InstallKeyPanPlugIn().initialize( new PlugInContext(workbenchContext, null, null, null, null) );
 			
-		/*
+		//-- enables to store the SRID = EPSG code as style for every Layer
+		//   since it is stored as style it should be saved in the project file 
 		EnsureAllLayersHaveSRIDStylePlugIn ensureLayerSRIDPlugin = new EnsureAllLayersHaveSRIDStylePlugIn();
 		ensureLayerSRIDPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
-		*/
+		
 		
 		/***********************
 		 *  testing
