@@ -62,7 +62,7 @@ public interface MenuNames {
 	public static String SELECTION = I18N.get("ui.MenuNames.SELECTION");
 	public static String RASTER = I18N.get("ui.MenuNames.RASTER");
 	public static String STATISTICS = I18N.get("ui.MenuNames.STATISTICS");
-	public static String GEOPROCESSING = I18N.get("ui.MenuNames.GEOPROCESSING");
+	public static String GEOPROCESSING = "SIGLE-" + I18N.get("ui.MenuNames.GEOPROCESSING");
 	
 	//Submenu
 	public static String ONELAYER = I18N.get("ui.MenuNames.ONELAYER");
