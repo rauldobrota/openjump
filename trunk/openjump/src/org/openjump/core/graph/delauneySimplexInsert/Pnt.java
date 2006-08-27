@@ -1,4 +1,4 @@
-package org.openjump.core.graph;
+package org.openjump.core.graph.delauneySimplexInsert;
 /*
  * Copyright (c) 2005 by L. Paul Chew.
  * 

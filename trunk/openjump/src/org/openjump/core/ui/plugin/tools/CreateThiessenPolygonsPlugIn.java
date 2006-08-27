@@ -48,7 +48,7 @@ import java.util.Iterator;
 
 import javax.swing.JComboBox;
 
-import org.openjump.core.graph.DTriangulationForJTS;
+import org.openjump.core.graph.delauneySimplexInsert.DTriangulationForJTS;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;

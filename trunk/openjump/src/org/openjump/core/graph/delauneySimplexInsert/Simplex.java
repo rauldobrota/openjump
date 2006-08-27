@@ -18,7 +18,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-package org.openjump.core.graph;
+package org.openjump.core.graph.delauneySimplexInsert;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
