@@ -26,7 +26,7 @@ public class ExtensionManagerPlugIn extends ThreadedBasePlugIn {
             managerDialog = new ExtensionManagerDialog(
                     context.getWorkbenchFrame(), 
                     context.getWorkbenchContext(),
-                    "http://jump-pilot.sourceforge.net/downloads/"
+                    "http://jump-pilot.sourceforge.net/download/"
                     //"file:///e:/proj/openjump/plugins/"
                     );
         }
