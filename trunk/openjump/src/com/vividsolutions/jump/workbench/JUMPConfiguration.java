@@ -62,7 +62,7 @@ import com.vividsolutions.jump.workbench.ui.zoom.*;
 import com.vividsolutions.jump.plugin.qa.*;
 import com.vividsolutions.jump.plugin.edit.*;
 
-import de.latlon.deejump.plugin.style.DeeChangeStylesPlugIn;
+//import de.latlon.deejump.plugin.style.DeeChangeStylesPlugIn;
 
 import java.awt.event.*;
 import java.lang.reflect.*;
@@ -174,8 +174,9 @@ public class JUMPConfiguration implements Setup {
 
     private ZoomBarPlugIn zoomBarPlugIn = new ZoomBarPlugIn();
 
-// [sstein, 01.08.2006] commented out for test reasons with DeeChangeStylePlugIn     
-//    private ChangeStylesPlugIn changeStylesPlugIn = new ChangeStylesPlugIn();
+// [sstein, 01.08.2006] commented out for test reasons with DeeChangeStylePlugIn
+// [sstein, 27.09.2006] comment in - problem with colour theming    
+    private ChangeStylesPlugIn changeStylesPlugIn = new ChangeStylesPlugIn();
 
     private UndoPlugIn undoPlugIn = new UndoPlugIn();
 
@@ -225,7 +226,8 @@ public class JUMPConfiguration implements Setup {
     private InstallSkinsPlugIn installSkinsPlugIn = new InstallSkinsPlugIn(); 
     
     //[ssein 01.08.2006] -- added for test reasons
-  	private DeeChangeStylesPlugIn changeStylesPlugIn = new DeeChangeStylesPlugIn(); 
+    //[sstein, 27.09.2006] comment out - problem with colour theming      
+  	//private DeeChangeStylesPlugIn changeStylesPlugIn = new DeeChangeStylesPlugIn(); 
   	
     public void setup(WorkbenchContext workbenchContext) throws Exception {
         configureStyles(workbenchContext);
