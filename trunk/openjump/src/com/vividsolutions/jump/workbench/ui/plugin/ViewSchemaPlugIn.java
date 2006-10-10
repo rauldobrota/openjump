@@ -68,6 +68,7 @@ import com.vividsolutions.jump.workbench.ui.TreeLayerNamePanel;
 import com.vividsolutions.jump.workbench.ui.WorkbenchFrame;
 import com.vividsolutions.jump.workbench.ui.cursortool.editing.EditingPlugIn;
 import com.vividsolutions.jump.workbench.ui.images.IconLoader;
+import com.vividsolutions.jump.workbench.ui.renderer.style.ColorThemingStyle;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -120,10 +121,25 @@ public class ViewSchemaPlugIn extends AbstractPlugIn {
         panel.getModel().removeBlankRows();
 
         FeatureSchema newSchema = new FeatureSchema();
+        //-- [sstein 10. Oct 2006] bugfix for colortheming by Ole
+        FeatureSchema oldSchema = layer.getFeatureCollectionWrapper().getFeatureSchema();
+        String attributeName = null;
+        //-- end
 
         for (int i = 0; i < panel.getModel().getRowCount(); i++) {
-            newSchema.addAttribute(panel.getModel().get(i).getName(),
-                panel.getModel().get(i).getType());
+        	//-- [sstein 10. Oct 2006] bugfix for colortheming by Ole
+        	attributeName = panel.getModel().get(i).getName();
+        	newSchema.addAttribute(attributeName, panel.getModel().get(i).getType());
+        	if ( oldSchema.hasAttribute(attributeName) &&
+        		!newSchema.getAttributeType(attributeName).equals(oldSchema.getAttributeType(attributeName))
+        		){
+        		if (ColorThemingStyle.get(layer) != null){
+        		layer.removeStyle(ColorThemingStyle.get(layer));
+        		layer.getBasicStyle().setEnabled(true);
+        		layer.fireAppearanceChanged();
+        		}
+        	}
+        	//-- END: added/modyfied by Ole
         }
 
         List originalFeatures = layer.getFeatureCollectionWrapper().getFeatures();
