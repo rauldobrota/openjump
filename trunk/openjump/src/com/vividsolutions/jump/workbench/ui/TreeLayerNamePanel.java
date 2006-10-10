@@ -563,7 +563,7 @@ public class TreeLayerNamePanel extends JPanel
 
             // firableTreeModelWrapper.fireTreeStructureChanged(treeModelEvent);
             if ((e.getType() == LayerEventType.ADDED)
-                    && (getSelectedLayers().length == 0)
+            		&& ((selectedNodes(Layerable.class)).size() == 0)
                     && e.getLayerable() instanceof Layer) {
                 addSelectedLayer((Layer) e.getLayerable());
             }
