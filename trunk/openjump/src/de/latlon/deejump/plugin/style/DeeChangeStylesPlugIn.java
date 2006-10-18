@@ -118,20 +118,20 @@ public class DeeChangeStylesPlugIn extends AbstractPlugIn {
             
             if( "MultiPoint".equals( type ) || "Point".equals( type ) ){
             //-- [sstein 18.oct 2006] test de-activation and using original
-                //DeeColorThemingStylePanel deeColorThemingStylePanel = new DeeColorThemingStylePanel(layer,
-                //    context.getWorkbenchContext());
+//                DeeColorThemingStylePanel deeColorThemingStylePanel = new DeeColorThemingStylePanel(layer,
+//                    context.getWorkbenchContext());
                 ColorThemingStylePanel colorThemingStylePanel = new ColorThemingStylePanel(layer,
                     context.getWorkbenchContext());            	
-            //deeColorThemingStylePanel.setPreferredSize(new Dimension(400, 300));
+//             deeColorThemingStylePanel.setPreferredSize(new Dimension(400, 300));
              colorThemingStylePanel.setPreferredSize(new Dimension(400, 300));
-            //stylePanels.add(deeColorThemingStylePanel);
-             stylePanels.add(colorThemingStylePanel);
+//             stylePanels.add(deeColorThemingStylePanel);
+              stylePanels.add(colorThemingStylePanel);
             GUIUtil.sync(renderingStylePanel.getTransparencySlider(),
-            //    deeColorThemingStylePanel.getTransparencySlider());
-            	  colorThemingStylePanel.getTransparencySlider());
+//                deeColorThemingStylePanel.getTransparencySlider());
+         	    colorThemingStylePanel.getTransparencySlider());
             GUIUtil.sync(renderingStylePanel.getSynchronizeCheckBox(),
-            //    deeColorThemingStylePanel.getSynchronizeCheckBox());
-            	  colorThemingStylePanel.getSynchronizeCheckBox());
+//                deeColorThemingStylePanel.getSynchronizeCheckBox());
+          	colorThemingStylePanel.getSynchronizeCheckBox());
 
             } else {
                 ColorThemingStylePanel colorThemingStylePanel = new ColorThemingStylePanel(layer,
