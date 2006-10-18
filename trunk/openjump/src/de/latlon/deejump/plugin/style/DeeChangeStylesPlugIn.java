@@ -117,14 +117,21 @@ public class DeeChangeStylesPlugIn extends AbstractPlugIn {
             
             
             if( "MultiPoint".equals( type ) || "Point".equals( type ) ){
-                DeeColorThemingStylePanel deeColorThemingStylePanel = new DeeColorThemingStylePanel(layer,
-                    context.getWorkbenchContext());
-            deeColorThemingStylePanel.setPreferredSize(new Dimension(400, 300));
-            stylePanels.add(deeColorThemingStylePanel);
+            //-- [sstein 18.oct 2006] test de-activation and using original
+                //DeeColorThemingStylePanel deeColorThemingStylePanel = new DeeColorThemingStylePanel(layer,
+                //    context.getWorkbenchContext());
+                ColorThemingStylePanel colorThemingStylePanel = new ColorThemingStylePanel(layer,
+                    context.getWorkbenchContext());            	
+            //deeColorThemingStylePanel.setPreferredSize(new Dimension(400, 300));
+             colorThemingStylePanel.setPreferredSize(new Dimension(400, 300));
+            //stylePanels.add(deeColorThemingStylePanel);
+             stylePanels.add(colorThemingStylePanel);
             GUIUtil.sync(renderingStylePanel.getTransparencySlider(),
-                deeColorThemingStylePanel.getTransparencySlider());
+            //    deeColorThemingStylePanel.getTransparencySlider());
+            	  colorThemingStylePanel.getTransparencySlider());
             GUIUtil.sync(renderingStylePanel.getSynchronizeCheckBox(),
-                deeColorThemingStylePanel.getSynchronizeCheckBox());
+            //    deeColorThemingStylePanel.getSynchronizeCheckBox());
+            	  colorThemingStylePanel.getSynchronizeCheckBox());
 
             } else {
                 ColorThemingStylePanel colorThemingStylePanel = new ColorThemingStylePanel(layer,
@@ -239,7 +246,8 @@ public class DeeChangeStylesPlugIn extends AbstractPlugIn {
         }
 
         public String getTitle() {
-            return DeeColorThemingStylePanel.TITLE;
+            //return DeeColorThemingStylePanel.TITLE;
+        	return ColorThemingStylePanel.TITLE;
         }
 
         public void updateStyles() {
