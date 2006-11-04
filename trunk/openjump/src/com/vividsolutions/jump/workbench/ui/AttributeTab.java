@@ -54,6 +54,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.openjump.sigle.plugin.replace.ReplaceValuePlugIn;
+
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.model.CategoryEvent;
@@ -321,6 +323,21 @@ public class AttributeTab extends JPanel implements LayerNamePanel {
             GUIUtil.toSmallIcon(FeatureInfoTool.ICON),
             FeatureInfoPlugIn.toActionListener(featureInfoPlugIn, workbenchContext, null),
             FeatureInfoPlugIn.createEnableCheck(workbenchContext));
+        
+        //-- [sstein 4 nov 2006] added replace value
+        /* but is not yet activated since problems appear:
+         * either with enableCheck => nullpointer
+         * or with actionPerformed => update of window?
+         */
+        /**
+        ReplaceValuePlugIn myReplacePlugIn = new ReplaceValuePlugIn();
+        toolBar.add(
+                new JButton(),
+                myReplacePlugIn.getName(),
+                GUIUtil.toSmallIcon(ReplaceValuePlugIn.ICON),
+                ReplaceValuePlugIn.toActionListener(myReplacePlugIn, workbenchContext, null),
+                ReplaceValuePlugIn.createEnableCheck(workbenchContext));
+         **/
     }
 
     public TaskFrame getTaskFrame() {

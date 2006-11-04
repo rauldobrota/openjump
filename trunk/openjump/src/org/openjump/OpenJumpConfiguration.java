@@ -53,6 +53,7 @@ import org.openjump.core.ui.plugin.wms.ZoomToWMSPlugIn;
 import org.openjump.sigle.plugin.geoprocessing.layers.SpatialJoinPlugIn;
 import org.openjump.sigle.plugin.geoprocessing.oneLayer.topology.PlanarGraphPlugIn;
 import org.openjump.sigle.plugin.joinTable.JoinTablePlugIn;
+import org.openjump.sigle.plugin.replace.ReplaceValuePlugIn;
 
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
@@ -181,6 +182,9 @@ public class OpenJumpConfiguration{
 		
 		BlendLineStringsPlugIn myLSBlender= new BlendLineStringsPlugIn();
 		myLSBlender.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		ReplaceValuePlugIn myRepVal = new ReplaceValuePlugIn();
+		myRepVal.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
 		/**** GENERALIZATION ****/
 		ReducePointsISAPlugIn mySimplifyISA = new ReducePointsISAPlugIn();
