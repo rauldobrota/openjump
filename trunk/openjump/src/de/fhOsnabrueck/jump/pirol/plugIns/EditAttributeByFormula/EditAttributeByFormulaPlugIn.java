@@ -8,6 +8,9 @@
  *  $Rev: 2509 $
  *  $Id$
  *  $Log$
+ *  Revision 1.4  2006/11/04 19:22:42  mentaer
+ *  changed menu position
+ *
  *  Revision 1.3  2006/11/04 19:16:09  mentaer
  *  changed enable check
  *
@@ -103,7 +106,7 @@ public class EditAttributeByFormulaPlugIn extends StandardPirolPlugIn {
     
     public void initialize(PlugInContext context) throws Exception {
 	    context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this,
-		        new String[] {MenuNames.TOOLS, MenuNames.EDIT },
+		        new String[] {MenuNames.TOOLS, MenuNames.EDIT_ATTRIBUTES },
 				"Attribute Calculator", 
 				false, 
 				null, 

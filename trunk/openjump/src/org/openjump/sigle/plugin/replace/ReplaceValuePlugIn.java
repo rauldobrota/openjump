@@ -97,7 +97,7 @@ public class ReplaceValuePlugIn
   
   public void initialize(PlugInContext context) {
 		
-	  context.getFeatureInstaller().addMainMenuItem(this,new String[] { MenuNames.TOOLS, MenuNames.EDIT }, 
+	  context.getFeatureInstaller().addMainMenuItem(this,new String[] { MenuNames.TOOLS, MenuNames.EDIT_ATTRIBUTES }, 
   			this.getName(), false, null, 
   			createEnableCheck(context.getWorkbenchContext())
 				); 
