@@ -264,6 +264,7 @@ public class ReplaceValuePlugIn
   	EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
   	
   	return new MultiEnableCheck()
+		.add(checkFactory.createAtLeastNLayersMustExistCheck(1))
 		.add(checkFactory.createSelectedLayersMustBeEditableCheck());
   }
 
