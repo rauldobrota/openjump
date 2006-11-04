@@ -34,7 +34,10 @@
 
 package org.openjump.core.ui.plugin.edittoolbox.cursortools;
 
+import java.awt.Shape;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import javax.swing.Icon;
@@ -129,28 +132,32 @@ public class DrawConstrainedCircleTool extends ConstrainedMultiClickTool {
             Coordinate a = (Coordinate) points.get(0);
             Coordinate b = (Coordinate) points.get(1);
             Coordinate c = (Coordinate) points.get(2);
-            
-            double A = b.x - a.x;
-            double B = b.y - a.y;
-            double C = c.x - a.x;
-            double D = c.y - a.y;
-            double E = A * (a.x + b.x) + B * (a.y + b.y);
-            double F = C * (a.x + c.x) + D * (a.y + c.y);
-            double G = 2.0 * (A * (c.y - b.y ) - B * (c.x - b.x));
-            if (G != 0.0)
-            {
-                double px = (D * E - B * F) / G;
-                double py = (A * F - C * E) / G;
-                Coordinate center = new Coordinate(px, py);
-                double radius = Math.sqrt((a.x - px) * (a.x - px) + (a.y - py) * (a.y - py)); 
-                Circle circle = new Circle(center, radius);
-                return circle.getPoly();
-            }
-            else //points are colinear; use second for center; third for the radius
-            {
-                Circle circle = new Circle((Coordinate) points.get(1), ((Coordinate) points.get(1)).distance((Coordinate) points.get(2)));
-                return circle.getPoly();
-            }
+            return getCircle3points(a, b, c);
+        }
+    }
+    
+    private Polygon getCircle3points(Coordinate a, Coordinate b, Coordinate c){
+        
+        double A = b.x - a.x;
+        double B = b.y - a.y;
+        double C = c.x - a.x;
+        double D = c.y - a.y;
+        double E = A * (a.x + b.x) + B * (a.y + b.y);
+        double F = C * (a.x + c.x) + D * (a.y + c.y);
+        double G = 2.0 * (A * (c.y - b.y ) - B * (c.x - b.x));
+        if (G != 0.0)
+        {
+            double px = (D * E - B * F) / G;
+            double py = (A * F - C * E) / G;
+            Coordinate center = new Coordinate(px, py);
+            double radius = Math.sqrt((a.x - px) * (a.x - px) + (a.y - py) * (a.y - py)); 
+            Circle circle = new Circle(center, radius);
+            return circle.getPoly();
+        }
+        else //points are colinear; use second for center; third for the radius
+        {
+            Circle circle = new Circle(b, (b).distance(c));
+            return circle.getPoly();
         }
     }
 
@@ -174,4 +181,36 @@ public class DrawConstrainedCircleTool extends ConstrainedMultiClickTool {
 
         return true;
     }
+    
+    /*
+     * (non-Javadoc)
+     * @see com.vividsolutions.jump.workbench.ui.cursortool.AbstractCursorTool#getShape()
+     */
+    protected Shape getShape() throws NoninvertibleTransformException {
+		if (coordinates.size() > 1)
+        {
+
+			GeneralPath shape = new GeneralPath();
+			
+            Coordinate a = (Coordinate) coordinates.get(0);
+            Coordinate b = (Coordinate) coordinates.get(1);
+            Coordinate c = tentativeCoordinate;
+            
+			Polygon polygon = getCircle3points(a, b, c);
+			Coordinate[] polygonCoordinates = polygon.getCoordinates();
+			
+			Coordinate firstCoordinate = (Coordinate) polygonCoordinates[0];
+            Point2D firstPoint = getPanel().getViewport().toViewPoint(firstCoordinate);
+            shape.moveTo((float) firstPoint.getX(), (float) firstPoint.getY());
+			
+			for (int i = 1, n = polygonCoordinates.length; i < n; i++)
+			{
+				Point2D nextPoint = getPanel().getViewport().toViewPoint( polygonCoordinates[i]);
+				shape.lineTo((int) nextPoint.getX(), (int) nextPoint.getY());
+			}
+			return shape;
+        }
+		return super.getShape();
+	}
+   
 }
