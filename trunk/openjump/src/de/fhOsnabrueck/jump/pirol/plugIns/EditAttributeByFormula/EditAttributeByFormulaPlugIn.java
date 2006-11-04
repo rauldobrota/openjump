@@ -8,6 +8,9 @@
  *  $Rev: 2509 $
  *  $Id$
  *  $Log$
+ *  Revision 1.2  2006/11/04 19:11:58  mentaer
+ *  *** empty log message ***
+ *
  *  Revision 1.1  2006/11/04 19:09:34  mentaer
  *  added Pirol Plugin for Attribute Calculations for testing, which needs the baseclasses.jar
  *
@@ -98,7 +101,7 @@ public class EditAttributeByFormulaPlugIn extends StandardPirolPlugIn {
     public void initialize(PlugInContext context) throws Exception {
 	    context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this,
 		        new String[] {MenuNames.TOOLS, MenuNames.EDIT },
-				"EditAttributeByFormula", 
+				"Attribute Calculator", 
 				false, 
 				null, 
 				createEnableCheck(context.getWorkbenchContext()));
