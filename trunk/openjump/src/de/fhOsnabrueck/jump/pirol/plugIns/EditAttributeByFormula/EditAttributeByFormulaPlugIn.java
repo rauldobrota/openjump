@@ -8,6 +8,9 @@
  *  $Rev: 2509 $
  *  $Id$
  *  $Log$
+ *  Revision 1.3  2006/11/04 19:16:09  mentaer
+ *  changed enable check
+ *
  *  Revision 1.2  2006/11/04 19:11:58  mentaer
  *  *** empty log message ***
  *
@@ -111,7 +114,7 @@ public class EditAttributeByFormulaPlugIn extends StandardPirolPlugIn {
         EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
 
         return new MultiEnableCheck()
-                        .add(checkFactory.createAtLeastNItemsMustBeSelectedCheck(1));
+                        .add(checkFactory.createAtLeastNLayersMustBeSelectedCheck(1));
     }
     
     public EditAttributeByFormulaPlugIn(){
