@@ -26,9 +26,9 @@ public class ChangeSRIDPlugIn extends AbstractPlugIn {
         new FeatureInstaller(context.getWorkbenchContext())
                 .addMainMenuItemWithJava14Fix(this, new String[]{MenuNames.LAYER},
                         getName() + "...", false, null, enableCheck);
-        new FeatureInstaller(context.getWorkbenchContext()).addPopupMenuItem(
-                context.getWorkbenchFrame().getLayerNamePopupMenu(), this,
-                getName() + "...", false, null, enableCheck);
+//        new FeatureInstaller(context.getWorkbenchContext()).addPopupMenuItem(
+//                context.getWorkbenchFrame().getLayerNamePopupMenu(), this,
+//                getName() + "...", false, null, enableCheck);
     }
     
     public String getName(){
