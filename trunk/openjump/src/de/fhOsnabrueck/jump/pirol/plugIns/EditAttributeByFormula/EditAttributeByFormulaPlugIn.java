@@ -8,6 +8,9 @@
  *  $Rev: 2509 $
  *  $Id$
  *  $Log$
+ *  Revision 1.5  2006/11/05 13:47:35  mentaer
+ *  refactoring of menu positions and set OJ version to 1.1 B
+ *
  *  Revision 1.4  2006/11/04 19:22:42  mentaer
  *  changed menu position
  *
@@ -106,7 +109,7 @@ public class EditAttributeByFormulaPlugIn extends StandardPirolPlugIn {
     
     public void initialize(PlugInContext context) throws Exception {
 	    context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this,
-		        new String[] {MenuNames.TOOLS, MenuNames.EDIT_ATTRIBUTES },
+		        new String[] {MenuNames.TOOLS, MenuNames.TOOLS_EDIT_ATTRIBUTES },
 				"Attribute Calculator", 
 				false, 
 				null, 

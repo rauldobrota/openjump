@@ -197,7 +197,7 @@ public class PlanarGraphPlugIn extends ThreadedBasePlugIn {
      */
 
     public void initialize(PlugInContext context) throws Exception {
-        context.getFeatureInstaller().addMainMenuItem(this,new String[] { MenuNames.GEOPROCESSING, MenuNames.ONELAYER,MenuNames.TOPOLOGY }, 
+        context.getFeatureInstaller().addMainMenuItem(this,new String[] { MenuNames.TOOLS, MenuNames.TOOLS_ANALYSIS }, 
                 this.getName(), false, null, 
                 new MultiEnableCheck().add(new EnableCheckFactory(context.getWorkbenchContext()).createTaskWindowMustBeActiveCheck())
                 .add(new EnableCheckFactory(context.getWorkbenchContext()).createAtLeastNLayersMustExistCheck(1))

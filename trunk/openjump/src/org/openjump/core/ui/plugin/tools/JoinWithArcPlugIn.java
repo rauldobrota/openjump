@@ -78,7 +78,7 @@ public class JoinWithArcPlugIn extends AbstractPlugIn {
     public void initialize(PlugInContext context) throws Exception
     {     
         workbenchContext = context.getWorkbenchContext();
-        context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this, new String[] { MenuNames.TOOLS, MenuNames.EDIT }, getName(), false, null, this.createEnableCheck(workbenchContext));
+        context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this, new String[] { MenuNames.TOOLS, MenuNames.TOOLS_EDIT_GEOMETRY }, getName(), false, null, this.createEnableCheck(workbenchContext));
     }
     
     public String getName() {

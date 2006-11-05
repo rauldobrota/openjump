@@ -29,6 +29,7 @@ import org.openjump.core.ui.plugin.edittoolbox.RotateSelectedItemPlugIn;
 import org.openjump.core.ui.plugin.edittoolbox.SelectOneItemPlugIn;
 import org.openjump.core.ui.plugin.file.SaveImageAsSVGPlugIn;
 import org.openjump.core.ui.plugin.layer.AddSIDLayerPlugIn;
+import org.openjump.core.ui.plugin.layer.ChangeSRIDPlugIn;
 import org.openjump.core.ui.plugin.layer.ToggleVisiblityPlugIn;
 import org.openjump.core.ui.plugin.mousemenu.EditSelectedSidePlugIn;
 import org.openjump.core.ui.plugin.mousemenu.MoveAlongAnglePlugIn;
@@ -61,6 +62,7 @@ import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 
+import de.fhOsnabrueck.jump.pirol.plugIns.EditAttributeByFormula.EditAttributeByFormulaPlugIn;
 import de.latlon.deejump.plugin.SaveLegendPlugIn;
 import de.latlon.deejump.plugin.manager.ExtensionManagerPlugIn;
 import de.latlon.deejump.plugin.style.LayerStyle2SLDPlugIn;
@@ -148,10 +150,9 @@ public class OpenJumpConfiguration{
 		AddSIDLayerPlugIn myMrSIDPlugIn= new AddSIDLayerPlugIn();
 		myMrSIDPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
-		/*
 		ChangeSRIDPlugIn myChangeSRIDPlugIn= new ChangeSRIDPlugIn();
 		myChangeSRIDPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
-		*/
+
 		
 		/***********************
 		 *  menu TOOLS
@@ -160,6 +161,10 @@ public class OpenJumpConfiguration{
 		/**** ANALYSIS ****/
 		JoinAttributesSpatiallyPlugIn mySpatialJoin = new JoinAttributesSpatiallyPlugIn();
 		mySpatialJoin.initialize(new PlugInContext(workbenchContext, null, null, null, null));	
+
+		//-- SIGLE PlugIn
+		PlanarGraphPlugIn coveragePlugIn = new PlanarGraphPlugIn();
+		coveragePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
 		/**** GENERATE ****/
 		ConvexHullPlugIn myConvHullPlugIn = new ConvexHullPlugIn();
@@ -176,15 +181,22 @@ public class OpenJumpConfiguration{
 		DeleteEmptyGeometriesPlugIn myDelGeomPlugin= new DeleteEmptyGeometriesPlugIn(); 
 		myDelGeomPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 	
-		/**** EDIT ****/		
+		/**** EDIT_GEOMETRY ****/		
 		JoinWithArcPlugIn myJoinWithArcPlugIn= new JoinWithArcPlugIn();
 		myJoinWithArcPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
 		BlendLineStringsPlugIn myLSBlender= new BlendLineStringsPlugIn();
 		myLSBlender.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
+		/**** EDIT_ATTIBUTES *****/
 		ReplaceValuePlugIn myRepVal = new ReplaceValuePlugIn();
 		myRepVal.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		EditAttributeByFormulaPlugIn formulaEdit = new EditAttributeByFormulaPlugIn();
+		formulaEdit.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		SpatialJoinPlugIn spatialJoinPlugIn = new SpatialJoinPlugIn();
+		spatialJoinPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
 		/**** GENERALIZATION ****/
 		ReducePointsISAPlugIn mySimplifyISA = new ReducePointsISAPlugIn();
@@ -215,18 +227,12 @@ public class OpenJumpConfiguration{
 		 *  previously used by Projet-sigle.org   
 		 ***********************/
 				
-		//-- Two layers
-		
-		//-- TODO inlcude spatialjoin and translate		
-		SpatialJoinPlugIn spatialJoinPlugIn = new SpatialJoinPlugIn();
-		spatialJoinPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		//-- Two layers 
 				
 		//-- One Layer
 		
-		//-- TODO translate
 		//-- Topology
-		PlanarGraphPlugIn coveragePlugIn = new PlanarGraphPlugIn();
-		coveragePlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+
 
 		
 		/***********************

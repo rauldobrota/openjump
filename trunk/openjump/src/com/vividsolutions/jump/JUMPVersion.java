@@ -108,7 +108,7 @@ public class JUMPVersion {
    */
   public String toString()
   {
-    String ver = MAJOR + "." + MINOR + "." + PATCH;
+    String ver = "orig. JUMP " + MAJOR + "." + MINOR + "." + PATCH;
     if (releaseInfo != null && releaseInfo.length() > 0)
       return ver + " " + releaseInfo;
     return ver;

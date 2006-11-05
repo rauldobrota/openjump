@@ -824,7 +824,7 @@ public class JUMPConfiguration implements Setup {
 							.createAtLeastNLayersMustExistCheck(1)));
 	
 	//======================================
-	featureInstaller.addMenuSeparator(MENU_TOOLS_ANALYSIS);
+	//featureInstaller.addMenuSeparator(MENU_TOOLS_ANALYSIS);
 	featureInstaller
 	.addMainMenuItem(
 			unionPlugIn,
@@ -865,7 +865,7 @@ public class JUMPConfiguration implements Setup {
 	
 	
 	//======================================
-	featureInstaller.addMenuSeparator(MENU_TOOLS_ANALYSIS);
+	//featureInstaller.addMenuSeparator(MENU_TOOLS_ANALYSIS);
 	featureInstaller
 	.addMainMenuItem(
 			overlayPlugIn,
@@ -878,7 +878,7 @@ public class JUMPConfiguration implements Setup {
 			.add(checkFactory.createAtLeastNLayersMustExistCheck(2)));
 	
 	//======================================
-	featureInstaller.addMenuSeparator(MENU_TOOLS_ANALYSIS);
+	//featureInstaller.addMenuSeparator(MENU_TOOLS_ANALYSIS);
 	
 	featureInstaller.addMainMenuItem(calculateAreasAndLengthsPlugIn,
 			new String[] { MenuNames.TOOLS, MenuNames.TOOLS_ANALYSIS},
@@ -910,7 +910,7 @@ private void configToolsEdit(final WorkbenchContext workbenchContext,
             FeatureInstaller featureInstaller) throws Exception {
 
 	String MENU_TOOLS = MenuNames.TOOLS;
-	String MENU_EDIT = MenuNames.EDIT;
+	String MENU_EDIT = MenuNames.TOOLS_EDIT_GEOMETRY;
 	String[] MENU_TOOLS_EDIT = new String[] { MENU_TOOLS, MENU_EDIT};
 
     featureInstaller.addMainMenuItem(extractSegmentsPlugIn,
