@@ -26,8 +26,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.AttributeType;
 import com.vividsolutions.jump.feature.FeatureSchema;
+import com.vividsolutions.jump.workbench.ui.GenericNames;
 
 import de.fhOsnabrueck.jump.pirol.ui.documents.NumberInputDocument;
 import de.fhOsnabrueck.jump.pirol.ui.panels.NewAttributePanel;
@@ -39,7 +41,6 @@ import de.fhOsnabrueck.jump.pirol.utilities.apiTools.FeatureSchemaTools;
 import de.fhOsnabrueck.jump.pirol.utilities.attributes.AttributeInfo;
 import de.fhOsnabrueck.jump.pirol.utilities.debugOutput.DebugUserIds;
 import de.fhOsnabrueck.jump.pirol.utilities.debugOutput.PersonalLogger;
-import de.fhOsnabrueck.jump.pirol.utilities.i18n.PirolPlugInMessages;
 
 /**
  * Panel to help the user to create a formula that describes how the value of a new attribute will be calculated. 
@@ -93,7 +94,7 @@ public class FormulaEditingPanel extends JPanel implements ActionListener, Value
         
         JPanel loadedForms = new JPanel();
         loadedForms.setLayout(new BorderLayout());
-        loadedForms.add(new JLabel(PirolPlugInMessages.getString("load-formula")+" : "), BorderLayout.WEST); //$NON-NLS-1$
+        loadedForms.add(new JLabel(I18N.get("pirol.plugIns.FormulaEditingPanel.load-formula")+" : "), BorderLayout.WEST); //$NON-NLS-1$
         
         String[] formulaNames = (String[])this.storedFormulas.keySet().toArray(new String[0]);
         
@@ -163,7 +164,7 @@ public class FormulaEditingPanel extends JPanel implements ActionListener, Value
         this.numberInputField.setDocument(new NumberInputDocument());
         
         numberInputPanel.add(this.numberInputField, BorderLayout.CENTER);
-        numberInputPanel.add( new JButton(new AddTextFieldTextToTextAreaOnClick_Action(this.numberInputField, this.formulaField, PirolPlugInMessages.getString("copy-value-to-formula"))), BorderLayout.EAST ); //$NON-NLS-1$
+        numberInputPanel.add( new JButton(new AddTextFieldTextToTextAreaOnClick_Action(this.numberInputField, this.formulaField, I18N.get("pirol.plugIns.FormulaEditingPanel.copy-value-to-formula"))), BorderLayout.EAST ); //$NON-NLS-1$
         
         numberInputAndErrorPanel.add(numberInputPanel, BorderLayout.NORTH);
         numberInputAndErrorPanel.add(this.errorMessages, BorderLayout.SOUTH);
@@ -212,7 +213,7 @@ public class FormulaEditingPanel extends JPanel implements ActionListener, Value
             this.parsedFormula = FormulaParser.getValue(this.getFormula(), this.featureSchema);
         } catch (RuntimeException e) {
             this.parsedFormula = null;
-            this.errorMessages.setText("\n" + PirolPlugInMessages.getString("error") + ": " + e.getMessage()); //$NON-NLS-1$
+            this.errorMessages.setText("\n" + GenericNames.ERROR + ": " + e.getMessage()); //$NON-NLS-1$
             return false;
         }
         return true;

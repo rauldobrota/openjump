@@ -8,6 +8,9 @@
  *  $Rev: 2509 $
  *  $Id$
  *  $Log$
+ *  Revision 1.6  2006/11/05 14:28:05  mentaer
+ *  translated pirol attribute calculator plugin
+ *
  *  Revision 1.5  2006/11/05 13:47:35  mentaer
  *  refactoring of menu positions and set OJ version to 1.1 B
  *
@@ -72,7 +75,6 @@ import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.FeatureCollection;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.model.Layer;
-import com.vividsolutions.jump.workbench.plugin.EnableCheck;
 import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
@@ -84,7 +86,6 @@ import de.fhOsnabrueck.jump.pirol.utilities.apiTools.FeatureCollectionTools;
 import de.fhOsnabrueck.jump.pirol.utilities.attributes.AttributeInfo;
 import de.fhOsnabrueck.jump.pirol.utilities.debugOutput.DebugUserIds;
 import de.fhOsnabrueck.jump.pirol.utilities.debugOutput.PersonalLogger;
-import de.fhOsnabrueck.jump.pirol.utilities.i18n.PirolPlugInMessages;
 import de.fhOsnabrueck.jump.pirol.utilities.metaData.MetaInformationHandler;
 import de.fhOsnabrueck.jump.pirol.utilities.plugIns.StandardPirolPlugIn;
 import de.fhOsnabrueck.jump.pirol.utilities.settings.PirolPlugInSettings;
@@ -110,10 +111,14 @@ public class EditAttributeByFormulaPlugIn extends StandardPirolPlugIn {
     public void initialize(PlugInContext context) throws Exception {
 	    context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this,
 		        new String[] {MenuNames.TOOLS, MenuNames.TOOLS_EDIT_ATTRIBUTES },
-				"Attribute Calculator", 
+				this.getName(), 
 				false, 
 				null, 
 				createEnableCheck(context.getWorkbenchContext()));
+    }
+    
+    public String getName(){
+    	return I18N.get("pirol.plugIns.EditAttributeByFormulaPlugIn.Attribute-Calculator");
     }
     
     public static MultiEnableCheck createEnableCheck(WorkbenchContext workbenchContext) {
@@ -148,10 +153,10 @@ public class EditAttributeByFormulaPlugIn extends StandardPirolPlugIn {
         Layer layer = StandardPirolPlugIn.getSelectedLayer(context);
         
         if (layer==null){
-            StandardPirolPlugIn.warnUser(context,PirolPlugInMessages.getString("no-layer-selected")); //$NON-NLS-1$
+            StandardPirolPlugIn.warnUser(context,I18N.get("pirol.plugIns.EditAttributeByFormulaPlugIn.no-layer-selected")); //$NON-NLS-1$
             return this.finishExecution(context, false);
         } else if (!layer.isEditable()) {
-            StandardPirolPlugIn.warnUser(context,PirolPlugInMessages.getString("layer-not-editable")); //$NON-NLS-1$
+            StandardPirolPlugIn.warnUser(context,I18N.get("pirol.plugIns.EditAttributeByFormulaPlugIn.layer-not-editable")); //$NON-NLS-1$
             return this.finishExecution(context, false);
         }
         
@@ -165,7 +170,12 @@ public class EditAttributeByFormulaPlugIn extends StandardPirolPlugIn {
             this.logger.printWarning(e1.getMessage());
         }
         
-        EditAttributeByFormulaDialog dialog = new EditAttributeByFormulaDialog(context.getWorkbenchFrame(), PirolPlugInMessages.getString("specify-attribute-and-formular"), true, PirolPlugInMessages.getString("editByFormula-explaining-text"), layer.getFeatureCollectionWrapper().getFeatureSchema(), EditAttributeByFormulaPlugIn.storedFormulas); //$NON-NLS-1$ //$NON-NLS-2$
+        EditAttributeByFormulaDialog dialog = new EditAttributeByFormulaDialog(context.getWorkbenchFrame(), 
+        		I18N.get("pirol.plugIns.EditAttributeByFormulaPlugIn.specify-attribute-and-formula"), 
+				true, 
+				I18N.get("pirol.plugIns.EditAttributeByFormulaPlugIn.editByFormula-explaining-text"), 
+				layer.getFeatureCollectionWrapper().getFeatureSchema(), 
+				EditAttributeByFormulaPlugIn.storedFormulas); //$NON-NLS-1$ //$NON-NLS-2$
         
         dialog.setVisible(true);
         
@@ -189,11 +199,14 @@ public class EditAttributeByFormulaPlugIn extends StandardPirolPlugIn {
             layer.setFeatureCollection(newFc);
             
             MetaInformationHandler metaInfHandler = new MetaInformationHandler(layer);
-            metaInfHandler.addMetaInformation(PirolPlugInMessages.getString("formula-for") + attrInfo.getUniqueAttributeName(), formula); //$NON-NLS-1$
+            metaInfHandler.addMetaInformation(
+            		I18N.get("pirol.plugIns.EditAttributeByFormulaPlugIn.formula-for") + 
+					attrInfo.getUniqueAttributeName(), 
+					formula); //$NON-NLS-1$
 
             if (storedFormulas != null){
                 storedFormulas.setProperty(attrInfo.toString(), formula);
-                storedFormulas.store(PirolPlugInMessages.getString("editByFormula-properties-comment")); //$NON-NLS-1$
+                storedFormulas.store(I18N.get("pirol.plugIns.EditAttributeByFormulaPlugIn.editByFormula-properties-comment")); //$NON-NLS-1$
             }
             
             

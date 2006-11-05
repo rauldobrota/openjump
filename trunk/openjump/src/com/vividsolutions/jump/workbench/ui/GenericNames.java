@@ -50,6 +50,7 @@ public interface GenericNames {
 	public static String MASK_LAYER=I18N.get("ui.GenericNames.Mask-Layer");
 	public static String PARAMETER=I18N.get("ui.GenericNames.Parameter");	
 	public static String FEATURES=I18N.get("ui.GenericNames.features");
+	public static String ERROR=I18N.get("ui.GenericNames.Error");
 	
 	public static String INTERSECTS=I18N.get("ui.GenericNames.intersects");
 	public static String CONTAINS=I18N.get("ui.GenericNames.contains");
