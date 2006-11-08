@@ -56,6 +56,8 @@ import org.openjump.sigle.plugin.geoprocessing.oneLayer.topology.PlanarGraphPlug
 import org.openjump.sigle.plugin.joinTable.JoinTablePlugIn;
 import org.openjump.sigle.plugin.replace.ReplaceValuePlugIn;
 
+import org.openjump.core.ui.style.decoration.ArrowLineStringMiddlepointStyle;
+
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
@@ -316,6 +318,11 @@ public class OpenJumpConfiguration{
 		EnsureAllLayersHaveSRIDStylePlugIn ensureLayerSRIDPlugin = new EnsureAllLayersHaveSRIDStylePlugIn();
 		ensureLayerSRIDPlugin.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
+		/***********************
+		 *  Decoration
+		 ***********************/
+		
+		workbenchContext.getWorkbench().getFrame().addChoosableStyleClass(ArrowLineStringMiddlepointStyle.NarrowSolidMiddle.class);
 		
 		/***********************
 		 *  testing
