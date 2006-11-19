@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <root>
+  <element xml-name="vertexstyle" java-name="vertexStyle"/>
   <attribute xml-name="enabled" java-name="enabled"/>
   <element xml-name="fill">
     <attribute xml-name="enabled" java-name="renderingFill"/>
@@ -16,7 +17,5 @@
     </element-->
     <element xml-name="color" java-name="lineColor"/>
   </element>
-  <element xml-name="alpha" java-name="alpha"/>
-  <element xml-name="vertexstyle" java-name="vertexStyle"/>
-  
+  <element xml-name="alpha" java-name="alpha"/>  
 </root>
