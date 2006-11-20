@@ -539,6 +539,9 @@ public class AttributeTablePanel extends JPanel {
 
     public Collection getSelectedFeatures() {
         ArrayList selectedFeatures = new ArrayList();
+        if (getModel().getRowCount() == 0) {
+        	return selectedFeatures;
+        }
         int[] selectedRows = table.getSelectedRows();
         for (int i = 0; i < selectedRows.length; i++) {
             selectedFeatures.add(getModel().getFeature(selectedRows[i]));

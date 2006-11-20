@@ -231,6 +231,9 @@ public class AttributePanel
         ArrayList selectedFeatures = new ArrayList();
         for (Iterator i = layerToTablePanelMap.values().iterator(); i.hasNext();) {
             AttributeTablePanel tablePanel = (AttributeTablePanel) i.next();
+            if (tablePanel.getModel().getRowCount() == 0) {
+            	return selectedFeatures;
+            }
             int[] selectedRows = tablePanel.getTable().getSelectedRows();
             for (int j = 0; j < selectedRows.length; j++) {
                 selectedFeatures.add(tablePanel.getModel().getFeature(selectedRows[j]));

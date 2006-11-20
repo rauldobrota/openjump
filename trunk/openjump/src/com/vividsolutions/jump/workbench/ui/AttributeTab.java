@@ -366,6 +366,10 @@ public class AttributeTab extends JPanel implements LayerNamePanel {
 
     private void zoom(AttributePanel.Row row) throws NoninvertibleTransformException {
         panel.clearSelection();
+        //fixed : if the layer don't have any feature, do nothing.
+        if (row.getPanel().getTable().getModel().getRowCount() == 0) {
+        	return;
+        }
         row.getPanel().getTable().getSelectionModel().setSelectionInterval(
             row.getIndex(),
             row.getIndex());
