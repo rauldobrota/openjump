@@ -1,7 +1,7 @@
 OpenJUMP readme file
 --------------------
 Version 1.00
-June 23rd, 2006
+November 23rd, 2006
 
 Contents
 --------
@@ -78,7 +78,7 @@ OpenJUMP command lines
 ----------
 General questions regarding OpenJUMP can be found in:
 - www.jump-project.org  the original JUMP site
-- www.openjump.org the OpenJump website
+- www.openjump.org the OpenJUMP home
 - jump-pilot.sourceforge.net the old OpenJUMP developper site
 
 
@@ -117,16 +117,23 @@ OpenJUMP regular (and past) contributors are (non exaustive list!):
 - Stefan Steiniger,
 - Ugo Taddei, 
 - Steve Tanner,
-and
+Projects and Companies
 - Larry Becker and Integrated Systems Analysts, Inc.
   for providing their Jump ISA tools code.
-
+- Pirol Project from University of Applied Sciences Osnabrück
+  for providing the attribute editor
+- Lat/Lon for providing some plugins and functionality
+  developed for deeJUMP
+- VividSolutions Inc. for support and answering the never ending stream of questions, especially:
+  Martin Davis
+  David Zwiers
 
 Translation contributors are:
 - French: Basile Chandesris, Erwan Bocher, Steve Tanner
-- Spanish: Steve Tanner
+- Spanish: Steve Tanner, Fco Lavin
 - German: Florian Rengers, Stefan Steiniger
 - Portuguese (brazilian): Ezequias Rodrigues da Rocha
+- Finnish: Jukka Rahkonnen
 
 others:
 - L. Paul Chew for providing the Delauney triangulation algorithm to create the Voronoi edges
