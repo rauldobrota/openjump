@@ -64,7 +64,7 @@ import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 
-//import de.fhOsnabrueck.jump.pirol.plugIns.EditAttributeByFormula.EditAttributeByFormulaPlugIn;
+import de.fho.jump.pirol.plugins.EditAttributeByFormula.EditAttributeByFormulaPlugIn;
 import de.latlon.deejump.plugin.SaveLegendPlugIn;
 import de.latlon.deejump.plugin.manager.ExtensionManagerPlugIn;
 import de.latlon.deejump.plugin.style.LayerStyle2SLDPlugIn;
@@ -194,11 +194,8 @@ public class OpenJumpConfiguration{
 		ReplaceValuePlugIn myRepVal = new ReplaceValuePlugIn();
 		myRepVal.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
-		//TODO: 
-		//   removed temporarely because of problem with loading of baseclass package
-		//   need to ask Ole what to do, to first init the baseclass package [sstein 19.nov06]
-		//EditAttributeByFormulaPlugIn formulaEdit = new EditAttributeByFormulaPlugIn();
-		//formulaEdit.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		EditAttributeByFormulaPlugIn formulaEdit = new EditAttributeByFormulaPlugIn();
+		formulaEdit.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
 		SpatialJoinPlugIn spatialJoinPlugIn = new SpatialJoinPlugIn();
 		spatialJoinPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
