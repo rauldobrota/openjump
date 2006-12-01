@@ -33,28 +33,19 @@
 
 package com.vividsolutions.jump.workbench.ui.plugin.analysis;
 
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.Collection;
+import java.util.*;
 
-import javax.swing.JComboBox;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
+import java.awt.event.*;
+import javax.swing.*;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jump.feature.*;
+import com.vividsolutions.jump.task.*;
+import com.vividsolutions.jump.workbench.model.*;
+import com.vividsolutions.jump.workbench.plugin.*;
+import com.vividsolutions.jump.workbench.plugin.util.*;
+import com.vividsolutions.jump.workbench.ui.*;
 import com.vividsolutions.jump.I18N;
-import com.vividsolutions.jump.feature.FeatureCollection;
-import com.vividsolutions.jump.task.TaskMonitor;
-import com.vividsolutions.jump.workbench.model.Layer;
-import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
-import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
-import com.vividsolutions.jump.workbench.plugin.PlugInContext;
-import com.vividsolutions.jump.workbench.plugin.ThreadedPlugIn;
-import com.vividsolutions.jump.workbench.plugin.util.LayerNameGenerator;
-import com.vividsolutions.jump.workbench.ui.GUIUtil;
-import com.vividsolutions.jump.workbench.ui.GenericNames;
-import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
-import com.vividsolutions.jump.workbench.ui.SelectionManager;
 
 /**
 * Queries a layer by a spatial predicate.
@@ -87,7 +78,6 @@ public class SpatialQueryPlugIn
   private JRadioButton createNewLayerRB;
   private boolean createLayer = true;
 
-  private Geometry geoms[] = new Geometry[2];
   private double[] params = new double[2];
 
   public SpatialQueryPlugIn() {
@@ -103,6 +93,7 @@ public class SpatialQueryPlugIn
   public String getName(){
   	return I18N.get("ui.plugin.analysis.SpatialQueryPlugIn.Spatial-Query");
   }
+
 
   public boolean execute(PlugInContext context) throws Exception {
   	//[sstein] added again for correct language setting
