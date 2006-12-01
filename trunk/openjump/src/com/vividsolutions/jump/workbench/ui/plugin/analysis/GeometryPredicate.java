@@ -33,10 +33,11 @@
 
 package com.vividsolutions.jump.workbench.ui.plugin.analysis;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.*;
+import com.vividsolutions.jts.algorithm.*;
+import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.simplify.*;
+import com.vividsolutions.jump.qa.diff.BufferGeometryMatcher;
 import com.vividsolutions.jump.workbench.ui.GenericNames;
 
 /**
@@ -60,6 +61,7 @@ public abstract class GeometryPredicate
     new TouchesPredicate(),
     new WithinPredicate(),
     new WithinDistancePredicate(),
+    new SimilarPredicate(),
   };
 
   static List getNames()
@@ -169,4 +171,10 @@ public abstract class GeometryPredicate
     public boolean isTrue(Geometry geom0, Geometry geom1, double[] param) {
       return geom0.isWithinDistance(geom1, param[0]);   }
   }
+  public static class SimilarPredicate extends GeometryPredicate {
+	    public SimilarPredicate() {  super(GenericNames.SIMILAR, 1);  }
+	    public boolean isTrue(Geometry geom0, Geometry geom1, double[] param) {
+	    	return BufferGeometryMatcher.isMatch(geom0, geom1, param[0]);
+	    }
+	  }
 }

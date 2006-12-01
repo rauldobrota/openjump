@@ -63,6 +63,7 @@ public interface GenericNames {
 	public static String TOUCHES=I18N.get("ui.GenericNames.touches");	
 	public static String WITHIN=I18N.get("ui.GenericNames.within");
 	public static String WITHIN_DISTANCE=I18N.get("ui.GenericNames.is-within-distance");	
+	public static String SIMILAR=I18N.get("ui.GenericNames.similar");
 	
 	public static String CALCULATE_IN_PROGRESS=I18N.get("ui.GenericNames.CalculateInProgress");
 	public static String GLOBAL_BOX=I18N.get("ui.GenericNames.GlobalBox");

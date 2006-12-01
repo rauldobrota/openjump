@@ -42,6 +42,23 @@ import com.vividsolutions.jts.simplify.DouglasPeuckerSimplifier;
 public class BufferGeometryMatcher
     implements DiffGeometryMatcher
 {
+	/**
+	 * Computes whether two geometries match under
+	 * this similarity test.
+	 * This is not the most efficient way of
+	 * executing this predicate for multiple geometries. 
+	 * 
+	 * @param g1 a Geometry
+	 * @param g2 a Geometry
+	 * @return true if the geometries match under this comparison operation
+	 */
+public static boolean isMatch(Geometry g1, Geometry g2, double tolerance)
+{
+	BufferGeometryMatcher matcher = new BufferGeometryMatcher(tolerance);
+	matcher.setQueryGeometry(g1);
+	return matcher.isMatch(g2);
+}
+	
   // the percentage of the buffer distance to use as the error tolerance for perturbation
   public static final double ERROR_TOLERANCE = .1;
 
