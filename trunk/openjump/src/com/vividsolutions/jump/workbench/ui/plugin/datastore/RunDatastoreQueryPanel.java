@@ -1,35 +1,26 @@
 package com.vividsolutions.jump.workbench.ui.plugin.datastore;
 
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.GridBagConstraints;
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Hashtable;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
 
 import com.vividsolutions.jump.I18N;
-import com.vividsolutions.jump.datastore.DataStoreDriver;
-import com.vividsolutions.jump.util.Blackboard;
+
 import com.vividsolutions.jump.util.Block;
 import com.vividsolutions.jump.util.CollectionUtil;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.datastore.ConnectionDescriptor;
-import com.vividsolutions.jump.workbench.ui.ErrorHandler;
-import com.vividsolutions.jump.workbench.ui.GUIUtil;
-import com.vividsolutions.jump.workbench.ui.OKCancelDialog;
-import com.vividsolutions.jump.workbench.ui.ValidatingTextField;
 import com.vividsolutions.jump.workbench.ui.RecordPanel;
 import com.vividsolutions.jump.workbench.ui.RecordPanelModel;
+import com.vividsolutions.jump.workbench.ui.ValidatingTextField;
 
 public class RunDatastoreQueryPanel
         extends ConnectionPanel
@@ -137,7 +128,6 @@ public class RunDatastoreQueryPanel
 
 
     public void saveQuery() {
-        ConnectionDescriptor cd = getConnectionDescriptor();
         String query = getQuery();
         // maybe we should check for duplicates
         currentConnectionQueries.add(query);

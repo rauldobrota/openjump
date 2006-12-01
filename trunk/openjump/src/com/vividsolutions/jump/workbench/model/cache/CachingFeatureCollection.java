@@ -1,21 +1,20 @@
 package com.vividsolutions.jump.workbench.model.cache;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.SwingUtilities;
 
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jump.datastore.DataStoreConnection;
-import com.vividsolutions.jump.datastore.FilterQuery;
-import com.vividsolutions.jump.feature.*;
+import com.vividsolutions.jump.feature.Feature;
+import com.vividsolutions.jump.feature.FeatureCollection;
+import com.vividsolutions.jump.feature.FeatureCollectionWrapper;
+import com.vividsolutions.jump.feature.FeatureDataset;
+import com.vividsolutions.jump.feature.FeatureSchema;
 import com.vividsolutions.jump.util.Block;
 import com.vividsolutions.jump.util.LazyList;
 import com.vividsolutions.jump.util.ListWrapper;
-import com.vividsolutions.jump.workbench.datastore.ConnectionDescriptor;
-import com.vividsolutions.jump.workbench.datastore.ConnectionManager;
 import com.vividsolutions.jump.workbench.ui.plugin.AddNewLayerPlugIn;
 
 /**
@@ -108,7 +107,7 @@ public class CachingFeatureCollection extends FeatureCollectionWrapper {
                 final Iterator iterator = featureCollection.query(envelope)
                         .iterator();
                 initializeCacheIfNecessary();
-                getCachedFeatureCollection().clear();
+                emptyCache();
                 envelopeOfCompletedCache = new Envelope();
                 return new Iterator() {
                     public void remove() {
@@ -171,4 +170,9 @@ public class CachingFeatureCollection extends FeatureCollectionWrapper {
         this.cachingByEnvelope = cachingByEnvelope;
         return this;
     }
+
+	public void emptyCache() {
+		getCachedFeatureCollection().clear();
+        envelopeOfCompletedCache = new Envelope();
+	}
 }

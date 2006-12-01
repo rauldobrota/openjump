@@ -2,7 +2,6 @@ package com.vividsolutions.jump.workbench.datastore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -16,7 +15,6 @@ import com.vividsolutions.jump.util.Block;
 import com.vividsolutions.jump.util.CollectionUtil;
 import com.vividsolutions.jump.util.SimpleStringEncrypter;
 import com.vividsolutions.jump.util.StringUtil;
-import com.vividsolutions.jump.workbench.ui.plugin.datastore.ConnectionDescriptorPanel;
 
 /**
  * Contains a ParameterList and its associated DataStoreDriver.
@@ -44,7 +42,6 @@ public class ConnectionDescriptor
 
   // the display name of the connection
   private String name = null;
-  private DataStoreDriver driver;
   private ParameterList parameterList;
   private String dataStoreDriverClassName;
 
@@ -201,22 +198,6 @@ public class ConnectionDescriptor
 
     public void setParameterList(ParameterList parameterList) {
         this.parameterList = parameterList;
-    }
-
-    private DataStoreDriver getDriver() {
-        // Lazily initialize the driver, as the driver class may be
-        // missing from the classpath, and we don't want an exception
-        // during loading of the persistent blackboard.
-        // [Jon Aquino 2005-03-11]
-        if (driver == null) {
-            try {
-                driver = (DataStoreDriver) Class.forName(
-                        dataStoreDriverClassName).newInstance();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return driver;
     }
 
     public static String passwordParameterName(ParameterListSchema schema) {

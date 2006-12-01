@@ -14,10 +14,9 @@ import com.vividsolutions.jump.datastore.DataStoreException;
 import com.vividsolutions.jump.datastore.DataStoreMetadata;
 import com.vividsolutions.jump.datastore.Query;
 import com.vividsolutions.jump.io.FeatureInputStream;
-import com.vividsolutions.jump.parameter.ParameterList;
 import com.vividsolutions.jump.util.Blackboard;
-import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
+import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
 
 /**
  * Reuses existing connections where possible.

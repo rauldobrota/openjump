@@ -1,7 +1,14 @@
 package com.vividsolutions.jump.workbench.ui.plugin.datastore;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,8 +17,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.border.Border;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 import javax.swing.filechooser.FileFilter;
 
 import com.vividsolutions.jump.I18N;
@@ -26,7 +42,6 @@ import com.vividsolutions.jump.workbench.datastore.ConnectionDescriptor;
 import com.vividsolutions.jump.workbench.registry.Registry;
 import com.vividsolutions.jump.workbench.ui.ValidatingTextField;
 import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
-import com.vividsolutions.jump.datastore.postgis.PostgisDataStoreDriver;
 
 public class ConnectionDescriptorPanel extends JPanel
 {

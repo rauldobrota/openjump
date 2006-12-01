@@ -218,7 +218,7 @@ public class JUMPConfiguration implements Setup {
     private CopyStylesPlugIn copyStylesPlugIn = new CopyStylesPlugIn();
 
     private PasteStylesPlugIn pasteStylesPlugIn = new PasteStylesPlugIn();
-    
+
     private CombineSelectedFeaturesPlugIn combineSelectedFeaturesPlugIn = new CombineSelectedFeaturesPlugIn();
 
     private ExplodeSelectedFeaturesPlugIn explodeSelectedFeaturesPlugIn = new ExplodeSelectedFeaturesPlugIn();
@@ -228,6 +228,8 @@ public class JUMPConfiguration implements Setup {
     //[ssein 01.08.2006] -- added for test reasons
     //[sstein, 27.09.2006] comment out - problem with colour theming reported by Ole 
   	//private DeeChangeStylesPlugIn changeStylesPlugIn = new DeeChangeStylesPlugIn(); 
+  	
+  	private RefreshDataStoreLayerPlugin refreshDataStoreLayerPlugin = new RefreshDataStoreLayerPlugin();
   	
     public void setup(WorkbenchContext workbenchContext) throws Exception {
         configureStyles(workbenchContext);
@@ -267,6 +269,10 @@ public class JUMPConfiguration implements Setup {
 
     private void configureCategoryPopupMenu(WorkbenchContext workbenchContext,
             FeatureInstaller featureInstaller) {
+        featureInstaller.addPopupMenuItem(workbenchContext.getWorkbench()
+                .getFrame().getCategoryPopupMenu(), addNewLayerPlugIn,
+                addNewLayerPlugIn.getName(), false, null, null);  
+
     	//[sstein 20.01.2006] added again after user request
         featureInstaller.addPopupMenuItem(workbenchContext.getWorkbench()
                 .getFrame().getCategoryPopupMenu(), loadDatasetPlugIn,
@@ -278,8 +284,9 @@ public class JUMPConfiguration implements Setup {
                 loadDatasetFromFilePlugIn.getName() + "...", false, null,
                 LoadDatasetPlugIn.createEnableCheck(workbenchContext));
         featureInstaller.addPopupMenuItem(workbenchContext.getWorkbench()
-                .getFrame().getCategoryPopupMenu(), addNewLayerPlugIn,
-                addNewLayerPlugIn.getName(), false, null, null);
+                .getFrame().getCategoryPopupMenu(), addDatastoreLayerPlugIn,
+                addDatastoreLayerPlugIn.getName() + "...", false, null,
+                null);
         featureInstaller.addPopupMenuItem(workbenchContext.getWorkbench()
                 .getFrame().getCategoryPopupMenu(), addWMSQueryPlugIn,
                 addWMSQueryPlugIn.getName() + "...", false, null, null);
@@ -354,8 +361,10 @@ public class JUMPConfiguration implements Setup {
     private void configureLayerPopupMenu(
             final WorkbenchContext workbenchContext,
             FeatureInstaller featureInstaller, EnableCheckFactory checkFactory) {
+
         JPopupMenu layerNamePopupMenu = workbenchContext.getWorkbench()
                 .getFrame().getLayerNamePopupMenu();
+
         featureInstaller.addPopupMenuItem(layerNamePopupMenu, editablePlugIn,
                 editablePlugIn.getName(), true, null, editablePlugIn
                         .createEnableCheck(workbenchContext));
@@ -373,8 +382,8 @@ public class JUMPConfiguration implements Setup {
                 CopyStylesPlugIn.createEnableCheck(workbenchContext));
         featureInstaller.addPopupMenuItem(layerNamePopupMenu, pasteStylesPlugIn,
                 pasteStylesPlugIn.getName(), false, null,
-                PasteStylesPlugIn.createEnableCheck(workbenchContext)); 
-        
+                PasteStylesPlugIn.createEnableCheck(workbenchContext));
+
         featureInstaller.addPopupMenuItem(layerNamePopupMenu,
                 viewAttributesPlugIn, viewAttributesPlugIn.getName(), false,
                 GUIUtil.toSmallIcon(viewAttributesPlugIn.getIcon()),
@@ -382,6 +391,11 @@ public class JUMPConfiguration implements Setup {
         featureInstaller.addPopupMenuItem(layerNamePopupMenu, viewSchemaPlugIn,
                 viewSchemaPlugIn.getName(), false, ViewSchemaPlugIn.ICON,
                 ViewSchemaPlugIn.createEnableCheck(workbenchContext));
+
+        featureInstaller.addPopupMenuItem(layerNamePopupMenu, refreshDataStoreLayerPlugin,
+        		refreshDataStoreLayerPlugin.getName() + "...", false, null,
+                RefreshDataStoreLayerPlugin.createEnableCheck(workbenchContext));
+
 
         layerNamePopupMenu.addSeparator(); // ===================
         featureInstaller.addPopupMenuItem(layerNamePopupMenu,
@@ -729,6 +743,7 @@ public class JUMPConfiguration implements Setup {
         featureInstaller.addMainMenuItem(addNewCategoryPlugIn, MENU_LAYER,
                 addNewCategoryPlugIn.getName(), null, addNewCategoryPlugIn
                         .createEnableCheck(workbenchContext));
+
         featureInstaller.addMenuSeparator(MENU_LAYER); // ===================
         featureInstaller.addMainMenuItem(cutSelectedLayersPlugIn, MENU_LAYER,
                 cutSelectedLayersPlugIn.getNameWithMnemonic(), null,
@@ -739,6 +754,7 @@ public class JUMPConfiguration implements Setup {
         featureInstaller.addMainMenuItem(pasteLayersPlugIn, MENU_LAYER,
                 pasteLayersPlugIn.getNameWithMnemonic(), null,
                 pasteLayersPlugIn.createEnableCheck(workbenchContext));
+
         featureInstaller.addMenuSeparator(MENU_LAYER); // ===================
         featureInstaller.addMainMenuItem(removeSelectedLayersPlugIn, MENU_LAYER,
                 removeSelectedLayersPlugIn.getName(), null,
@@ -761,6 +777,7 @@ public class JUMPConfiguration implements Setup {
     // these must be defined as instance vars for initialization to be performed
 	private SpatialQueryPlugIn spatialQueryPlugIn = new SpatialQueryPlugIn();
     private AttributeQueryPlugIn attrQueryPlugIn = new AttributeQueryPlugIn();
+//	private SpatialJoinPlugIn spatialJoinPlugIn = new SpatialJoinPlugIn();
     private UnionPlugIn unionPlugIn = new UnionPlugIn();
     private GeometryFunctionPlugIn geometryFunctionPlugIn = new GeometryFunctionPlugIn();
     private OverlayPlugIn overlayPlugIn = new OverlayPlugIn();
@@ -941,7 +958,6 @@ private void configToolsEdit(final WorkbenchContext workbenchContext,
 private ValidateSelectedLayersPlugIn validateSelectedLayersPlugIn = new ValidateSelectedLayersPlugIn();
 private LayerStatisticsPlugIn layerStatisticsPlugIn = new LayerStatisticsPlugIn();
 private FeatureStatisticsPlugIn featureStatisticsPlugIn = new FeatureStatisticsPlugIn();
-
 private DiffGeometryPlugIn diffGeometryPlugIn = new DiffGeometryPlugIn();
 
 private void configToolsQA(final WorkbenchContext workbenchContext,
@@ -995,6 +1011,8 @@ public void configureDatastores(final WorkbenchContext context) throws Exception
 
 	context.getRegistry().
     createEntry(DataStoreDriver.REGISTRY_CLASSIFICATION,new PostgisDataStoreDriver());
+
+    // update exit handler
     final ApplicationExitHandler oldApplicationExitHandler = context
             .getWorkbench().getFrame().getApplicationExitHandler();
     context.getWorkbench().getFrame().setApplicationExitHandler(
@@ -1013,34 +1031,20 @@ public void configureDatastores(final WorkbenchContext context) throws Exception
 
     private void configureStyles(WorkbenchContext workbenchContext) {
         WorkbenchFrame frame = workbenchContext.getWorkbench().getFrame();
-        frame
-                .addChoosableStyleClass(VertexXYLineSegmentStyle.VertexXY.class);
-        frame
-                .addChoosableStyleClass(VertexIndexLineSegmentStyle.VertexIndex.class);
-        frame
-                .addChoosableStyleClass(MetricsLineStringSegmentStyle.LengthAngle.class);
-        frame
-                .addChoosableStyleClass(ArrowLineStringSegmentStyle.Open.class);
-        frame
-                .addChoosableStyleClass(ArrowLineStringSegmentStyle.Solid.class);
-        frame
-                .addChoosableStyleClass(ArrowLineStringSegmentStyle.NarrowSolid.class);
-        frame
-                .addChoosableStyleClass(ArrowLineStringEndpointStyle.FeathersStart.class);
-        frame
-                .addChoosableStyleClass(ArrowLineStringEndpointStyle.FeathersEnd.class);
-        frame
-                .addChoosableStyleClass(ArrowLineStringEndpointStyle.OpenStart.class);
-        frame
-                .addChoosableStyleClass(ArrowLineStringEndpointStyle.OpenEnd.class);
-        frame
-                .addChoosableStyleClass(ArrowLineStringEndpointStyle.SolidStart.class);
-        frame
-                .addChoosableStyleClass(ArrowLineStringEndpointStyle.SolidEnd.class);
-        frame
-                .addChoosableStyleClass(ArrowLineStringEndpointStyle.NarrowSolidStart.class);
-        frame
-                .addChoosableStyleClass(ArrowLineStringEndpointStyle.NarrowSolidEnd.class);
+        frame.addChoosableStyleClass(VertexXYLineSegmentStyle.VertexXY.class);
+        frame.addChoosableStyleClass(VertexIndexLineSegmentStyle.VertexIndex.class);
+        frame.addChoosableStyleClass(MetricsLineStringSegmentStyle.LengthAngle.class);
+        frame.addChoosableStyleClass(ArrowLineStringSegmentStyle.Open.class);
+        frame.addChoosableStyleClass(ArrowLineStringSegmentStyle.Solid.class);
+        frame.addChoosableStyleClass(ArrowLineStringSegmentStyle.NarrowSolid.class);
+        frame.addChoosableStyleClass(ArrowLineStringEndpointStyle.FeathersStart.class);
+        frame.addChoosableStyleClass(ArrowLineStringEndpointStyle.FeathersEnd.class);
+        frame.addChoosableStyleClass(ArrowLineStringEndpointStyle.OpenStart.class);
+        frame.addChoosableStyleClass(ArrowLineStringEndpointStyle.OpenEnd.class);
+        frame.addChoosableStyleClass(ArrowLineStringEndpointStyle.SolidStart.class);
+        frame.addChoosableStyleClass(ArrowLineStringEndpointStyle.SolidEnd.class);
+        frame.addChoosableStyleClass(ArrowLineStringEndpointStyle.NarrowSolidStart.class);
+        frame.addChoosableStyleClass(ArrowLineStringEndpointStyle.NarrowSolidEnd.class);
         frame.addChoosableStyleClass(CircleLineStringEndpointStyle.Start.class);
         frame.addChoosableStyleClass(CircleLineStringEndpointStyle.End.class);
     }

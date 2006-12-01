@@ -52,8 +52,15 @@ public class DynamicFeatureCollection implements FeatureCollection {
   public List query(Envelope envelope) {
     final Object myQueryContext = new Object();
     currentQueryContext = myQueryContext;
-    spatialQuery.setFilterGeometry(new GeometryFactory()
-                                   .toGeometry(envelope));
+    
+    Envelope layerExtents = getEnvelope();
+    if(layerExtents == null || layerExtents.isNull() || layerExtents.contains(envelope)){
+    	spatialQuery.setFilterGeometry(new GeometryFactory().toGeometry(envelope));
+    }else{
+    	// we are asking for too much data ...
+    	spatialQuery.setFilterGeometry(new GeometryFactory().toGeometry(layerExtents.intersection(envelope)));
+    }
+    
     // Q: When do we close the stream? A: When a new stream is
     // requested. Implication: You cannot have two streams active from
     // the same DynamicFeatureCollection. But JUMP does not need this
@@ -112,6 +119,7 @@ public class DynamicFeatureCollection implements FeatureCollection {
               }
               return true;
             } catch (Exception e) {
+            	e.printStackTrace();
               throw new RuntimeException(e);
             }
           }
@@ -169,22 +177,15 @@ public class DynamicFeatureCollection implements FeatureCollection {
     DataStoreConnection dsc = null;
     try {
       dsc = connectionManager.getOpenConnection(connectionDescriptor);
-//                  dsc = connectionDescriptor.createConnection();
     } catch (Exception e1) {
       // ignore
       return new Envelope();
-
     }
     Envelope e = null;
     if(dsc != null){
       DataStoreMetadata dsm = dsc.getMetadata();
       if(dsm != null && spatialQuery != null)
         e = dsm.getExtents(spatialQuery.getDatasetName(), spatialQuery.getGeometryAttributeName());
-    }
-    try {
-      dsc.close();
-    } catch (DataStoreException e1) {
-      // ignore
     }
     return e;
   }

@@ -1,12 +1,8 @@
 package com.vividsolutions.jump.workbench.ui.plugin.datastore;
 
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,25 +11,18 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import com.vividsolutions.jump.I18N;
-import com.vividsolutions.jump.datastore.DataStoreDriver;
 import com.vividsolutions.jump.task.TaskMonitor;
-import com.vividsolutions.jump.util.Blackboard;
 import com.vividsolutions.jump.util.LangUtil;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.datastore.ConnectionDescriptor;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.ThreadedBasePlugIn;
-import com.vividsolutions.jump.workbench.ui.ErrorHandler;
-import com.vividsolutions.jump.workbench.ui.GUIUtil;
-import com.vividsolutions.jump.workbench.ui.OKCancelDialog;
 import com.vividsolutions.jump.workbench.ui.task.TaskMonitorManager;
 
 
@@ -90,45 +79,6 @@ public class AddDatastoreLayerPanel extends ConnectionPanel {
         return result[0];
     }
 
-    /*
-    public static void main(String[] args) throws Exception {
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        OKCancelDialog dialog = new OKCancelDialog((Frame) null,
-                "Add Datastore Layer", true, new AddDatastoreLayerPanel(
-                        new WorkbenchContext() {
-                            {
-                                getRegistry()
-                                        .createEntry(
-                                                DataStoreDriver.REGISTRY_CLASSIFICATION,
-                                                new OracleDataStoreDriver());
-                            }
-                            private Blackboard blackboard = new Blackboard();
-                            public Blackboard getBlackboard() {
-                                return blackboard;
-                            }
-                            public ErrorHandler getErrorHandler() {
-                                return new ErrorHandler() {
-                                    public void handleThrowable(Throwable t) {
-                                        t.printStackTrace(System.err);
-                                    }
-                                };
-                            }
-                        }), new OKCancelDialog.Validator() {
-                    public String validateInput(Component component) {
-                        return ((AddDatastoreLayerPanel) component)
-                                .validateInput();
-                    }
-                });
-        dialog.addComponentListener(new ComponentAdapter() {
-            public void componentHidden(ComponentEvent e) {
-                System.exit(0);
-            }
-        });
-        dialog.pack();
-        GUIUtil.centreOnScreen(dialog);
-        dialog.setVisible(true);
-    }
-*/
     public String getDatasetName() {
         return datasetComboBox.getSelectedItem() != null ? ( ( String ) datasetComboBox.getSelectedItem() ).trim()
              : null;

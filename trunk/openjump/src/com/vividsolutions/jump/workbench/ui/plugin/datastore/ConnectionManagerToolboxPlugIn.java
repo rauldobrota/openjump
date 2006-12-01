@@ -7,7 +7,6 @@ import javax.swing.JComponent;
 
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.util.Blackboard;
-import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.datastore.ConnectionManager;
 import com.vividsolutions.jump.workbench.plugin.EnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;

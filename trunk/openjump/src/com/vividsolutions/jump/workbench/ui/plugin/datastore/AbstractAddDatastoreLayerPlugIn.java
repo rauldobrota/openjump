@@ -6,45 +6,15 @@ import java.util.Collection;
 import javax.swing.SwingUtilities;
 
 import com.vividsolutions.jump.task.TaskMonitor;
-import com.vividsolutions.jump.workbench.model.Layer;
 import com.vividsolutions.jump.workbench.model.Layerable;
 import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
-import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
-import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.ThreadedBasePlugIn;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
-import com.vividsolutions.jump.workbench.ui.MenuNames;
 import com.vividsolutions.jump.workbench.ui.OKCancelDialog;
-import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 
 public abstract class AbstractAddDatastoreLayerPlugIn extends
         ThreadedBasePlugIn {
-
-    public void XXinitialize(PlugInContext context) throws Exception {
-        createLayerMenu(1, context);
-        createCategoryPopupMenu(4, context);
-    }
-
-    protected void createCategoryPopupMenu(int categoryPopupMenuPosition,
-            PlugInContext context) {
-        new FeatureInstaller(context.getWorkbenchContext()).addPopupMenuItem(
-                context.getWorkbenchContext().getWorkbench().getFrame()
-                        .getCategoryPopupMenu(), this, getName() + "...{pos:"
-                        + categoryPopupMenuPosition + "}", false, null, null);
-    }
-
-    protected void createLayerMenu(int layerMenuPosition, PlugInContext context) {
-        new FeatureInstaller(context.getWorkbenchContext())
-                .addMainMenuItemWithJava14Fix(
-                        this,
-                        new String[] { MenuNames.LAYER },
-                        getName() + "...{pos:" + layerMenuPosition + "}",
-                        false,
-                        null,
-                        new EnableCheckFactory(context.getWorkbenchContext())
-                                .createWindowWithLayerManagerMustBeActiveCheck());
-    }
 
     public boolean execute(final PlugInContext context) throws Exception {
         // The user may have added connections using the Connection Manager
