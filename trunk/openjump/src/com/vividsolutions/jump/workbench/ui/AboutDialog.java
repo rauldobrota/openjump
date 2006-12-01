@@ -34,7 +34,6 @@
 package com.vividsolutions.jump.workbench.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -76,10 +75,6 @@ public class AboutDialog extends JDialog {
     private GridBagLayout gridBagLayout1 = new GridBagLayout();
     private JLabel jLabel3 = new JLabel();
     private JLabel jLabel4 = new JLabel();
-    private JLabel jLabel5 = new JLabel();
-    private JLabel jLabel6 = new JLabel();
-    private JLabel jLabel7 = new JLabel();
-    private JLabel jLabel8 = new JLabel();
     private JPanel logoPanel = new JPanel();
     private BorderLayout borderLayout1 = new BorderLayout();
     private JLabel jLabel9 = new JLabel();
@@ -140,16 +135,8 @@ public class AboutDialog extends JDialog {
         jLabel2.setToolTipText("");
         jLabel2.setText(I18N.get("ui.AboutDialog.development-team"));
         jPanel1.setLayout(gridBagLayout1);
-        jLabel3.setText("Jon Aquino");
+        jLabel3.setText("David Zwiers");
         jLabel4.setText("Alan Chang");
-        jLabel5.setForeground(Color.blue);
-        jLabel5.setText("Vivid Solutions Inc.");
-        jLabel6.setToolTipText("");
-        jLabel6.setText("David Blasby");
-        jLabel7.setText("Paul Ramsey");
-        jLabel8.setForeground(new Color(0, 77, 31));
-        jLabel8.setToolTipText("");
-        jLabel8.setText("Refractions Research Inc.");
         logoPanel.setLayout(borderLayout1);
         jLabel9.setFont(new java.awt.Font("Dialog", 2, 12));
         jLabel9.setText(I18N.get("ui.AboutDialog.free-memory"));
@@ -239,62 +226,6 @@ public class AboutDialog extends JDialog {
                 GridBagConstraints.WEST,
                 GridBagConstraints.NONE,
                 new Insets(0, 0, 0, 0),
-                0,
-                0));
-        jPanel1.add(
-            jLabel5,
-            new GridBagConstraints(
-                3,
-                6,
-                1,
-                1,
-                0.0,
-                0.0,
-                GridBagConstraints.SOUTHWEST,
-                GridBagConstraints.NONE,
-                new Insets(0, 10, 0, 0),
-                0,
-                0));
-        jPanel1.add(
-            jLabel6,
-            new GridBagConstraints(
-                2,
-                9,
-                1,
-                1,
-                0.0,
-                0.0,
-                GridBagConstraints.WEST,
-                GridBagConstraints.NONE,
-                new Insets(10, 0, 0, 0),
-                0,
-                0));
-        jPanel1.add(
-            jLabel7,
-            new GridBagConstraints(
-                2,
-                10,
-                1,
-                1,
-                0.0,
-                0.0,
-                GridBagConstraints.WEST,
-                GridBagConstraints.NONE,
-                new Insets(0, 0, 0, 0),
-                0,
-                0));
-        jPanel1.add(
-            jLabel8,
-            new GridBagConstraints(
-                3,
-                9,
-                1,
-                1,
-                0.0,
-                0.0,
-                GridBagConstraints.CENTER,
-                GridBagConstraints.NONE,
-                new Insets(10, 10, 0, 0),
                 0,
                 0));
         jPanel1.add(
