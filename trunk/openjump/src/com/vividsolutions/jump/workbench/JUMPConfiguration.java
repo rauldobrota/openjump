@@ -777,7 +777,7 @@ public class JUMPConfiguration implements Setup {
     // these must be defined as instance vars for initialization to be performed
 	private SpatialQueryPlugIn spatialQueryPlugIn = new SpatialQueryPlugIn();
     private AttributeQueryPlugIn attrQueryPlugIn = new AttributeQueryPlugIn();
-//	private SpatialJoinPlugIn spatialJoinPlugIn = new SpatialJoinPlugIn();
+	private SpatialJoinPlugIn spatialJoinPlugIn = new SpatialJoinPlugIn();
     private UnionPlugIn unionPlugIn = new UnionPlugIn();
     private GeometryFunctionPlugIn geometryFunctionPlugIn = new GeometryFunctionPlugIn();
     private OverlayPlugIn overlayPlugIn = new OverlayPlugIn();
@@ -822,7 +822,7 @@ public class JUMPConfiguration implements Setup {
 	                        .add(
 	                                checkFactory
 	                                        .createAtLeastNLayersMustExistCheck(1)));
-	
+    
 	featureInstaller
 	.addMainMenuItem(
 			geometryFunctionPlugIn,
@@ -837,7 +837,16 @@ public class JUMPConfiguration implements Setup {
 					.add(
 							checkFactory
 							.createAtLeastNLayersMustExistCheck(1)));
-	
+ 
+	featureInstaller.addMainMenuItem(
+            spatialJoinPlugIn,
+            MENU_TOOLS_ANALYSIS,
+            spatialJoinPlugIn.getName() + "...",
+            false,
+            null,
+            new MultiEnableCheck()
+                    .add(checkFactory.createWindowWithLayerNamePanelMustBeActiveCheck())
+                    .add(checkFactory.createAtLeastNLayersMustExistCheck(2)));
 	//======================================
 	//featureInstaller.addMenuSeparator(MENU_TOOLS_ANALYSIS);
 	featureInstaller

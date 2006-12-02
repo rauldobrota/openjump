@@ -51,6 +51,7 @@ public interface GenericNames {
 	public static String PARAMETER=I18N.get("ui.GenericNames.Parameter");	
 	public static String FEATURES=I18N.get("ui.GenericNames.features");
 	public static String ERROR=I18N.get("ui.GenericNames.Error");
+	public static String RELATION=I18N.get("ui.GenericNames.Relation");
 	
 	public static String INTERSECTS=I18N.get("ui.GenericNames.intersects");
 	public static String CONTAINS=I18N.get("ui.GenericNames.contains");
