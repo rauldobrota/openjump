@@ -25,16 +25,23 @@
  * (250)385-6040 www.vividsolutions.com
  */
 package com.vividsolutions.jump.workbench.ui.renderer.style;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
+import java.util.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import javax.swing.Icon;
 import com.vividsolutions.jts.util.Assert;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureSchema;
 import com.vividsolutions.jump.util.LangUtil;
 import com.vividsolutions.jump.workbench.model.Layer;
+import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.Viewport;
 public class ColorThemingStyle implements Style {
 	public ColorThemingStyle() {
@@ -75,6 +82,8 @@ public class ColorThemingStyle implements Style {
         this(attributeName, attributeValueToBasicStyleMap,
                 attributeValueToLabelMap(attributeValueToBasicStyleMap),
                 defaultStyle);
+        // [sstein: 2.Dec.06] i guess this constructor comes from Erwan to
+        // allow different types of classing
     }
 	public ColorThemingStyle(String attributeName,
 			Map attributeValueToBasicStyleMap, Map attributeValueToLabelMap, BasicStyle defaultStyle) {
@@ -103,11 +112,24 @@ public class ColorThemingStyle implements Style {
 		// [Jon Aquino]
 		//If we can't find an attribute with this name, just use the
 		//defaultStyle. The attribute may have been deleted. [Jon Aquino]
-		BasicStyle style = attributeName != null
-				&& feature.getSchema().hasAttribute(attributeName)
-				&& feature.getAttribute(attributeName) != null ? (BasicStyle) attributeValueToBasicStyleMap
-				.get(trimIfString(feature.getAttribute(attributeName)))
-				: defaultStyle;
+		// If the attribute data type for color theming has been changed -
+		// throws multiple exceptions and the layer dissappears due to the 
+		// fact that it can't find the style in the valuetobasicstyle map.
+		// Solved here by catching the exception and returning the default style 
+		// (just like when the attribute name has been changed). [Ed Deen]
+		BasicStyle style = null;
+		try {
+				style = attributeName != null
+					&& feature.getSchema().hasAttribute(attributeName)
+					&& feature.getAttribute(attributeName) != null ? (BasicStyle) attributeValueToBasicStyleMap
+							.get(trimIfString(feature.getAttribute(attributeName)))
+							: defaultStyle;
+		}
+		catch (ClassCastException e)
+		{
+			// Do Nothing
+		}; /*try*/
+		
 		return style == null ? defaultStyle : style;
 	}
 	public static Object trimIfString(Object object) {
@@ -115,9 +137,11 @@ public class ColorThemingStyle implements Style {
 				.trim() : object;
 	}
 	private Layer layer;
-	private Map attributeValueToBasicStyleMap;
+	private Map attributeValueToBasicStyleMap  = new HashMap(); //[sstein 2.Dec.06] added = new Hashmap
     private Map attributeValueToLabelMap;
 	private String attributeName;
+	//[sstein 2.Dec.06] note: some things here are different. I am not sure if the changes
+	// come from changes by VividSolution or preparations for different classing by Erwan  
 	public Object clone() {
 		try {
 			ColorThemingStyle clone = (ColorThemingStyle) super.clone();
