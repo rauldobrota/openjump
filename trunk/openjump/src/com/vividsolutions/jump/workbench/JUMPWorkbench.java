@@ -156,14 +156,20 @@ public class JUMPWorkbench {
 			extensionsDirectory = new File(commandLine.getOption(
 					PLUG_IN_DIRECTORY_OPTION).getArg(0));
 			if (!extensionsDirectory.exists()) {
-				System.out.println("JUMP: Warning: Extensions directory does not exist: "
+				System.out
+						.println("JUMP: Warning: Extensions directory does not exist: "
 								+ extensionsDirectory);
 				extensionsDirectory = null;
 			}
 		} else {
-			//extensionsDirectory = new File(I18N.get("JUMPWorkbench.lib-ext"));
 			extensionsDirectory = new File("../lib/ext");
 			if (!extensionsDirectory.exists()) {
+				// Added further information so that debug user will know where 
+				// it is actually looking for as the extension directory. [Ed Deen]
+				System.out
+				.println("JUMP: Warning: Extensions directory does not exist: "
+						+ extensionsDirectory 
+						+ " where homedir = [" + System.getProperty("user.dir") + "]");
 				extensionsDirectory = null;
 			}
 		}
