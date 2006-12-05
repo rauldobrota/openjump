@@ -1,0 +1,168 @@
+*********************************************
+*** SISDB datastore for OpenJUMP/JUMP ***
+*********************************************
+
+
+*************** License ****************************************
+
+ATTENTION!!! This is experimental software and is provided "AS IS".
+No garantee is provided that it will work like intended (or not intended).
+This software will be released as open-source using one of the
+available licenses. Since we have not yet decided upon which license
+will be used, please consider it only a preview and use it however you like to.
+This software uses a few libraries that are all released under some
+open-sorce license. Each library's license is available on the Web
+site of the library itself.
+The one exception is the Oracle JDBC driver that is not redistributable
+and as such is not included (see installation).
+
+
+*************** Feaures ************************************
+
+.) Support both PostGIS (version >= 1.x on PostgreSQL >= 8.x)
+	and Oracle (probably version >= 9.x ).
+	ATTENTION!!! Oracle support is not, and probably never will be,
+	as good as PostGIS one, due to lesser testing possibilities.
+	
+.) Support mixed-case table and field names. So you can safely use
+	tables like "WhatAWonderfulWorld" with fields like "thisWouldBe".
+	
+.) Support schemas. So you can access tables in whatever schema
+	you have access privileges for.
+	
+.) Supports non-geometric tables. This is something that will not work
+	with a regular OpenUMP/JUMP Layer, but a plugin may have a use for them.
+	
+.) Others... This seems all, but it also seems such a short list...
+	Maybe I forgot something...
+
+
+*************** Future feaures **********************************
+
+.) Support "Save As" to save a Layer to PostGIS or Oracle table.
+
+.) Others...
+
+
+*************** Installation ************************************
+
+.) Copy the file:
+		sisjump.jar
+	and the directory (with all its content):
+		sislib		
+	to the diretory:
+		lib/ext
+	of your OpenJUMP/JUMP installation.
+	
+.) ATTENTION!!! If you want to connect to Oracle you have to download
+	the Oracle JDBC driver yourself from:
+		http://www.oracle.com/technology/software/tech/java/sqlj_jdbc/index.html
+		
+	Any one of the Oracle 10g driver should be OK.
+	I'm currently using version 10.2.0.1.0.
+	Once you obtained the file:
+		ojdbc14.jar
+	copy it to the directory:
+		lib/ext/sislib
+	of your OpenJUMP/JUMP installation, or make it available
+	on the CLASSPATH any other way.
+	
+.) So directory:
+		lib/ext
+	of your OpenJUMP/JUMP installation should now be something like:
+		lib/ext
+						SISDB.txt 		(this file)
+						sisjump.jar		(the SISDB datastore)
+		lib/ext/sislib
+						backport-util-concurrent.jar
+								(http://dcl.mathcs.emory.edu/util/backport-util-concurrent/dist/)
+						commons-collections.jar
+						commons-dbcp.jar							
+						commons-logging.jar
+						commons-pool.jar
+								(http://jakarta.apache.org/commons/index.html)
+						jts-1.7.jar
+						jtsio-1.7.jar
+						junit.jar
+						log4j-1.2.13.jar
+								(you know this stuff...)							
+						ojdbc14.jar
+								(http://www.oracle.com/technology/software/tech/java/sqlj_jdbc/index.html)
+						postgis_1.1.0.jar
+						postgresql-8.1-404.jdbc3.jar
+								(probably redundant)
+						sis-utils.jar
+						sisdb.jar
+								(other libraries from SIS)
+						spring-beans.jar
+						spring-core.jar
+						spring-dao.jar
+						spring-jdbc.jar
+								(http://www.springframework.org/download [version 1.2.8])
+		
+.) That's it, now start your OpenJUMP/JUMP!!!
+	ATTENTION!!! If you use JUMP you will notice a yellow warning 
+	about a plugin not installed. You can ignore it, since it's
+	an experiment and it's not actually part of the SISDB datastore.
+
+	
+*************** Usage *******************************************
+
+.) To add a layer using this datastore, follow the usual menu:
+		Layer/Add Datastore Layer...
+	
+.) Enter the Connection Manager panel and Add... a new Connection.
+
+.) Choose the Name you like and select:
+		SISDB
+	from the Driver combo.
+	If SISDB does not appear as a choice, the SIS Extension was not properly loaded.
+	
+.) In the Adapter field write:
+		postgis		-> connect to a PostGIS server
+		oracle		-> connect to an Oracle server
+
+.) The Address, Port and Db fields must be filled with the relevant
+	information ("normal" ports are 5432 for PostGIS and 1521 for Oracle).
+	
+.) ATTENTION!!! The Db field is treated differently for Oracle:
+		- if it do NOT start with a "(" it will be used as a normal Db name
+			and the connection URL will be something like:
+				jdbc:oracle:thin:@address:port/db				
+		- if it DO start with a "(" it will be used as a complete Oracle
+			description and the connection URL will be something like:
+				jdbc:oracle:thin:@(DESCRIPTION =(ADDRESS_LIST =(ADDRESS =...
+			and the Address and Port field will be ignored.
+	With the Oracle server I use for testing the only way to get a connection
+	is using a complete "(DESCRIPTION..." string.
+	
+.) Fields Username and Password must be filled as it's obvious to.
+
+.) Schema field can be used to specify which schema the connection will
+	get access to:
+		- If left empty (this is impossible with the current ParameterListSchema)
+			or if filled with one or more blanks or if set to a single '-' (dash)
+			the connection will list only tables from the "current" schema 
+			(the result of SELECT current_schema() in PostgerSQL for example).
+		- If not empty it will be used to select schemas like requested by:
+				java.sql.DatabaseMetaData.getTables()
+				
+.) So if you write "some_schema" only tables from "some_schema" will
+	be listed. If you write "%" tables from all schemas will be listed.
+			
+.) Then you can use the newly created connection as usual to add a Layer.
+	ATTENTION!!! The Dataset combo will list all the tables found inside the
+	schema or schemas you specified previously and each table will have its own
+	schema name prepended. You are free to select a different table and/or schema
+	by manually write them even if they're not listed.
+
+.) You can also add a Layer using the menu:
+		"Layer/ Run datastore Query..."
+
+.) ATTENTION!!! The SISDB datastore will load a table even if it has
+	no geometric column.
+
+.) ATTENTION!!! To be usable, an Oracle table MUST have a spatial index
+	on the geometric column used, otherwise an Exception will be raised.
+		
+		

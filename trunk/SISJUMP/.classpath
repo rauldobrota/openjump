@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry output="testbin" kind="src" path="test"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SISDB"/>
+	<classpathentry sourcepath="/SISUtils" kind="lib" path="/SISlib/sis-utils.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/OpenJUMP"/>
+	<classpathentry kind="lib" path="/OpenJUMP/lib/log4j-1.2.8.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

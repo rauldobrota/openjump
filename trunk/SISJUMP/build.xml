@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<project name="SISJUMP" default="default" basedir=".">
+    <description>
+    	SISJUMP description
+    </description>
+
+	<property name="dir.sisdb" value="../../eclipse_workspace/SISDB/release/sisdb"/>
+	<property name="dir.spring" value="/Programmi/spring-framework-1.2.8/dist"/>
+	
+  <target name="buildall" description="--> description">
+  	<property name="dir.target" value="./release/${target.name}"/>
+  	<property name="dir.jump" value="/Programmi/openjump-src/lib/ext"/>
+  	
+  	<delete dir="${dir.target}" includeemptydirs="true" />
+  	<mkdir dir="${dir.target}" />
+  	<jar destfile="${dir.target}/sisjump.jar">
+  		<zipfileset dir="bin" includes="**/*.class"/>
+  	</jar>        
+  	
+  	<mkdir dir="${dir.target}/sislib" />
+  	<copy todir="${dir.target}/sislib" includeemptydirs="true">
+  		<fileset dir="${dir.sisdb}" includes="*.jar" />
+  	</copy>
+
+  	<copy todir="${dir.target}" >
+  		<fileset dir="./userdocs" />
+  	</copy>
+  	  	
+  	<copy todir="${dir.target}/sislib" >
+  		<fileset dir="${dir.spring}/../lib/log4j" includes="*.jar" />
+  	</copy>
+  	
+  	<copy todir="${dir.jump}" includeemptydirs="true">
+  		<fileset dir="${dir.target}" />
+  	</copy>
+	</target>
+	
+  <target name="default" description="--> description">
+  	<property name="target.name" value="sisjump"/>
+  	<property name="target.display-name" value="SISJUMP"/>
+  	<antcall target="buildall" />
+  </target>
+</project>
+
