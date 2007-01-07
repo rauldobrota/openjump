@@ -56,7 +56,7 @@ public class ImageCachingFeatureCollectionRenderer extends ImageCachingRenderer 
 			if (cancelled) {
 				break;
 			}
-			if (feature.getGeometry().isEmpty()) {
+			if (feature.getGeometry() == null || feature.getGeometry().isEmpty()) {
 				continue;
 			}
 			//Because image.draw is synchronized, it might be faster to do
