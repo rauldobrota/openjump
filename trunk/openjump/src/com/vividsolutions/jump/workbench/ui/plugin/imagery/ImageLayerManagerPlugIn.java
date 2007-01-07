@@ -41,7 +41,7 @@ import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 public class ImageLayerManagerPlugIn extends AbstractPlugIn {
 
     public ImageLayerManagerPlugIn() {
-        super("Image Layer Manager");
+        super("Image Layer Manager (Test)");
     }
 
 
