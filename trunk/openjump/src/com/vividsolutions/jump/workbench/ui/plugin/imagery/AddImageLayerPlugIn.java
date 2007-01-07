@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.Collection;
 
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.FeatureDataset;
 import com.vividsolutions.jump.workbench.imagery.ImageryLayerDataset;
 import com.vividsolutions.jump.workbench.imagery.ReferencedImageStyle;
@@ -18,7 +19,9 @@ import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 public class AddImageLayerPlugIn extends AbstractPlugIn {
     private static int nameCounter = 1;
 
-
+    public String getName(){
+    	return I18N.get("ui.plugin.imagery.AddImageLayerPlugIn.Add-Image-Layer");
+    }
 
     public boolean execute(PlugInContext context) throws Exception {
         LayerManager lm = context.getLayerManager();
