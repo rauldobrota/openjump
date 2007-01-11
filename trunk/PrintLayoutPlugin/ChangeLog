@@ -1,0 +1,15 @@
+2007-01-11  Ludwig Reiter <ludwig.reiter@intevation.de>
+	* README.txt:
+		A brief summary of this plugin.
+	* LICENSE.txt:
+		The license of the plugin. GPL v2.
+	* bin/run.sh:
+		Simple run script for OpenJump with PrintLayoutPlugin.
+	* bin/compile.sh:
+		Simple compile script.
+	* resources/a4.svg:
+		Default sheet layout for DIN-A4.
+	* lib/batik-all.jar, lib/js.jar, lib/pdf-transcoder.jar,
+	  lib/xml-apis-ext.jar:
+	  	Libraries to use current SVN version of Batik in the plugin.
+	  
