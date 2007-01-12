@@ -1,3 +1,11 @@
+2007-01-12  Sascha L. Teichmann <teichmann@intevation.de>
+	
+	* bin/compile.sh:
+		set CLASSPATH correctly.
+
+	* src/de/intevattion/printlayout/PrintlayoutPlugin.java:
+		added.
+
 2007-01-12  Ludwig Reiter <ludwig.reiter@intevation.de>
 	
 	* LICENSE.txt:
