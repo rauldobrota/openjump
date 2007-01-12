@@ -1,3 +1,9 @@
+2007-01-12  Ludwig Reiter <ludwig.reiter@intevation.de>
+	* etc/build.xml:
+		a simple ant script.
+	* etc/build.properties:
+		project properties.
+
 2007-01-12  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	* etc/, etc/workbench-properties.xml:
