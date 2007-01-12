@@ -1,9 +1,16 @@
+2007-01-12  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/TypoUnits.java,
+	  src/de/intevation/printlayout/PaperSizes.java,
+	  lib/xml-apis.jar:
+	  	added.
+
 2007-01-12  Sascha L. Teichmann <teichmann@intevation.de>
 	
 	* bin/compile.sh:
 		set CLASSPATH correctly.
 
-	* src/de/intevattion/printlayout/PrintlayoutPlugin.java:
+	* src/de/intevation/printlayout/PrintlayoutPlugin.java:
 		added.
 
 2007-01-12  Ludwig Reiter <ludwig.reiter@intevation.de>
