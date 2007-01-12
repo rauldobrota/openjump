@@ -1,5 +1,35 @@
 2007-01-12  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
+	* etc/, etc/workbench-properties.xml:
+		added to lauch OpenJump with plugin
+
+	* resources/*:
+		removed, wrong place
+
+	* src/de/intevation/printlayout/resources/*:
+		readded here
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		added, simple JFrame for plugin.
+
+	* src/de/intevation/printlayout/LayoutExtension.java:
+		added, simple extension
+
+	* src/de/intevation/printlayout/PrintLayoutPlugin.java:
+		added, plugin interface to OpenJump
+
+	* bin/run.sh:
+		correction of plugin path
+
+	* bin/compile.sh:
+		correction of plugin path. uses etc/workbench-properties.xml
+		to run with plugin from classes not as jar
+
+	* classes:
+		added, stores compiled classes
+
+2007-01-12  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
 	* src/de/intevation/printlayout/TypoUnits.java,
 	  src/de/intevation/printlayout/PaperSizes.java,
 	  lib/xml-apis.jar:

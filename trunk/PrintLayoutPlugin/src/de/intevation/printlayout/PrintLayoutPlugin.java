@@ -9,6 +9,8 @@ import com.vividsolutions.jump.util.Blackboard;
 
 import com.vividsolutions.jump.task.TaskMonitor;  
 
+import javax.swing.JFrame;
+
 public class PrintLayoutPlugin 
 extends      AbstractPlugIn 
 implements   ThreadedPlugIn
@@ -40,6 +42,18 @@ implements   ThreadedPlugIn
 	public void run(TaskMonitor monitor, PlugInContext context)
 	{
 		monitor.allowCancellationRequests();
+
+		JFrame frame = new JFrame("Print/Layout plugin");
+
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+		LayoutFrame viewer = new LayoutFrame();
+
+		frame.setContentPane(viewer.createComponents());
+
+		frame.setSize(210*2, 297*2);
+
+		frame.setVisible(true);
 	}
 }		
 // end of file

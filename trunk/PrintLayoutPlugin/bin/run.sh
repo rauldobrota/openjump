@@ -7,10 +7,10 @@ WHAT=${WHAT:-com.vividsolutions.jump.workbench.JUMPWorkbench}
 JUMPDIST=${JUMPDIST:-$HOME/prog/openjump/current}
 JUMPHOME=${JUMPHOME:-$HOME/prog/openjump/openjump}
 
-PRINTHOME=${PRINTHOME:-$HOME/prog/printlayout}
+PRINTHOME=${PRINTHOME:-$HOME/prog/PrintLayoutPlugin}
 
 LOG=$JUMPDIST/bin/log4j.xml
-PROP=$JUMPHOME/etc/workbench-properties.xml
+PROP=$PRINTHOME/etc/workbench-properties.xml
 
 for i in $JUMPDIST/lib/*.jar $PRINTHOME/lib/*.jar ; do 
 	CLASSPATH=$CLASSPATH:$i
