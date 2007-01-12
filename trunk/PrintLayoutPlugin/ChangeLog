@@ -1,8 +1,13 @@
+2007-01-12  Ludwig Reiter <ludwig.reiter@intevation.de>
+	
+	* LICENSE.txt:
+		Removed.
+
 2007-01-11  Ludwig Reiter <ludwig.reiter@intevation.de>
 	* README.txt:
 		A brief summary of this plugin.
 	* LICENSE.txt:
-		The license of the plugin. GPL v2.
+		The license of the plugin.
 	* bin/run.sh:
 		Simple run script for OpenJump with PrintLayoutPlugin.
 	* bin/compile.sh:
