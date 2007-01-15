@@ -5,6 +5,7 @@ import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.RepaintManager;
 
 import java.awt.Color;
 import java.awt.BorderLayout;
@@ -38,7 +39,6 @@ import org.apache.batik.dom.AbstractDocument;
 import org.apache.batik.dom.AbstractElement;
 import org.apache.batik.dom.AbstractDocumentFragment;
 import org.apache.batik.dom.AbstractNode;
-
 import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
 
 import org.apache.batik.util.XMLResourceDescriptor;
@@ -80,12 +80,27 @@ import org.apache.batik.swing.svg.SVGDocumentLoaderAdapter;
 
 import org.apache.batik.dom.svg.SVGGraphicsElement;
 
+import org.apache.batik.svggen.SVGGraphics2D;
+
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventTarget;
 
+
 // import scenegraph.boxtool.BoxInteractor;
 // import scenegraph.boxtool.BoxFactory;
+//
+import com.vividsolutions.jump.workbench.plugin.PlugInContext;
+
+import com.vividsolutions.jump.workbench.ui.renderer.RenderingManager; 
+
+import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
+
+import com.vividsolutions.jump.workbench.model.Layer;
+import com.vividsolutions.jump.workbench.ui.renderer.LayerRenderer;
+import com.vividsolutions.jump.workbench.ui.renderer.Renderer;    
+
+import com.vividsolutions.jts.geom.Envelope;
 
 public class LayoutFrame 
 //implements BoxFactory.Consumer
@@ -94,8 +109,9 @@ public class LayoutFrame
 
 	public static final int MODE_ZOOM = 0;
 
-  //protected LayoutCanvas svgCanvas;
   protected DocumentManager docManager;
+
+	protected PlugInContext   pluginContext;
 
 	// protected int transformId;
 
@@ -119,6 +135,10 @@ public class LayoutFrame
 	*/
 	
 	public LayoutFrame() {
+	}
+
+	public LayoutFrame(PlugInContext pluginContext) {
+		this.pluginContext = pluginContext;
 	}
 
 	/*
@@ -284,6 +304,7 @@ public class LayoutFrame
 		JPanel north = new JPanel();
 		JButton loadBtn = new JButton("load ...");
 		JButton saveBtn = new JButton("save ...");
+		JButton mapBtn  = new JButton("add map");
 
 		loadBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -297,14 +318,142 @@ public class LayoutFrame
 			}
 		});
 
+		mapBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				fetchMap();
+			}
+		});
+
+
 		north.add(loadBtn);
 		north.add(saveBtn);
+		north.add(mapBtn);
 
 		panel.add(north, BorderLayout.NORTH);
 
 		panel.add(scroller, BorderLayout.CENTER);
 		return panel;
 	}
+
+	public void fetchMap() {
+
+		DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
+
+		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+
+		AbstractDocument document =
+			(AbstractDocument)impl.createDocument(svgNS, "svg", null);
+
+		SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+
+		LayerViewPanel lvp = pluginContext.getLayerViewPanel();
+
+		Envelope env =  lvp.getViewport().getEnvelopeInModelCoordinates();
+
+		System.err.println(env);
+
+		RenderingManager rms = lvp.getRenderingManager();
+
+		List layers = pluginContext.getLayerManager().getVisibleLayers(false);
+
+		int N = layers.size();
+
+		int [] oldMaxFeaures = new int[N];
+
+		// prevent image caching
+		for (int i = 0; i < N; ++i) {
+			Layer    layer    = (Layer)layers.get(i);		
+			Renderer renderer = rms.getRenderer(layer);
+
+			if (renderer instanceof LayerRenderer) {
+				LayerRenderer layerRenderer = (LayerRenderer)renderer;
+				oldMaxFeaures[i] = layerRenderer.getMaxFeatures();
+				layerRenderer.setMaxFeatures(Integer.MAX_VALUE);
+			}
+		}
+
+		lvp.repaint();
+		lvp.paintComponent(svgGenerator);
+
+		for (int i = 0; i < N; ++i) {
+			Layer    layer    = (Layer)layers.get(i);		
+			Renderer renderer = rms.getRenderer(layer);
+			if (renderer instanceof LayerRenderer) {
+				LayerRenderer layerRenderer = (LayerRenderer)renderer;
+				layerRenderer.setMaxFeatures(oldMaxFeaures[i]);
+			}
+		}
+
+		//svgGenerator.dispose();
+
+		Envelope xenv = new Envelope(
+			0, lvp.getWidth(), 0, lvp.getHeight());
+
+		AffineTransform xform = fitToPaper(xenv);
+
+		AbstractElement root = (AbstractElement)document.getDocumentElement();
+		svgGenerator.getRoot(root);
+
+		docManager.appendSVG((AbstractDocument)document, xform);
+
+		/*
+
+		try {
+			java.io.FileOutputStream f = new java.io.FileOutputStream("test.svg");
+			java.io.Writer out = new java.io.OutputStreamWriter(f, "UTF-8");
+    	svgGenerator.stream(out, true);
+			f.close();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		*/
+	}
+
+	protected AffineTransform fitToPaper(Envelope env) {
+		double [] paper = new double[2];
+		docManager.getPaperSize(paper);
+
+		double maxEnvExt   = Math.max(env.getWidth(), env.getHeight());
+		double maxPaperExt = Math.max(paper[0], paper[1]);
+
+		AffineTransform trans = AffineTransform.getTranslateInstance(
+			-env.getMinX(),
+			-env.getMinY());
+
+		// scale * maxEnvExt = maxPaperExt
+		//double scale = maxPaperExt/maxEnvExt;
+		double scale = maxEnvExt/maxPaperExt;
+
+		AffineTransform scaleM = AffineTransform.getScaleInstance(scale, scale);
+
+		scaleM.concatenate(trans);
+
+		double s1 = paper[0]/ env.getWidth();
+		double s2 = paper[1]/ env.getHeight();
+
+		AffineTransform result = AffineTransform.getScaleInstance(s1, s2);
+
+		Point2D org  = new Point2D.Double(env.getMinX(), env.getMinY());
+		Point2D dest = new Point2D.Double();
+
+		result.transform(org, dest);
+		System.err.println(dest);
+
+		org = new Point2D.Double(env.getMaxX(), env.getMaxY());
+
+		result.transform(org, dest);
+		System.err.println(dest);
+
+		//return scaleM;
+		//
+		// s1 * w0 = p0
+		//
+		return result;
+	}
+
+	
 
 	/*
 	public void consume(DocumentRunnable runny) {

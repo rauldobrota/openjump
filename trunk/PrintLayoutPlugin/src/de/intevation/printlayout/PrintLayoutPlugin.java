@@ -47,7 +47,7 @@ implements   ThreadedPlugIn
 
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-		LayoutFrame viewer = new LayoutFrame();
+		LayoutFrame viewer = new LayoutFrame(context);
 
 		frame.setContentPane(viewer.createComponents());
 

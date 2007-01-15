@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.AffineTransform;
 
 public class DocumentManager
 {
@@ -59,6 +60,11 @@ public class DocumentManager
 		return svgCanvas;
 	}
 
+	public void getPaperSize(double [] size) {
+		size[0] = 210d;
+		size[1] = 297d;
+	}
+
 	public void setDocument(SVGDocument document) {
 		svgCanvas.installDocument(document);
 	}
@@ -67,7 +73,7 @@ public class DocumentManager
 		UpdateManager um = svgCanvas.getUpdateManager();
 
 		if (um == null) {
-			System.err.println(" before first rendering finbished");
+			System.err.println(" before first rendering finished");
 			return;
 		}
 
@@ -198,6 +204,23 @@ public class DocumentManager
 
 
 	public void appendSVG(File file) {
+
+		String parser = XMLResourceDescriptor.getXMLParserClassName();
+		SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
+
+		try {
+			String uri = file.toURL().toString();
+			appendSVG((AbstractDocument)factory.createDocument(uri), null);
+		}
+		catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+	}
+
+	public void appendSVG(
+		final AbstractDocument document, 
+		final AffineTransform  xform
+	) {
 		UpdateManager um = svgCanvas.getUpdateManager();
 
 		if (um == null) {
@@ -205,24 +228,11 @@ public class DocumentManager
 			return;
 		}
 
-		String parser = XMLResourceDescriptor.getXMLParserClassName();
-		SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
-
-		try {
-			String uri = file.toURL().toString();
-
-			final AbstractDocument document = 
-				(AbstractDocument)factory.createDocument(uri);
-
-			um.getUpdateRunnableQueue().invokeLater(new Runnable() {
-				public void run() {
-					appendSVGwithinUM(document);
-				}
-			});
-		}
-		catch (IOException ioe) {
-			ioe.printStackTrace();
-		}
+		um.getUpdateRunnableQueue().invokeLater(new Runnable() {
+			public void run() {
+				appendSVGwithinUM(document, xform);
+			}
+		});
 	}
 
 	protected static Rectangle2D.Double pseudoViewBox(AbstractElement svg) {
@@ -245,9 +255,11 @@ public class DocumentManager
 				px2mm, 
 				defaultVal,
 				v);
+			System.err.println(field + ": " + v[0]);
 			svg.setAttributeNS(null, field, String.valueOf(v[0]));
 		}
 		catch (NumberFormatException nfe) {
+			System.err.println(field + ": " + defaultVal);
 			svg.setAttributeNS(null, field, String.valueOf(defaultVal));
 		}
 	}
@@ -266,7 +278,7 @@ public class DocumentManager
 		}
 		else {
 			px2mm = ua.getPixelUnitToMillimeter();
-			System.err.println("px2mm: " + px2mm);
+			//System.err.println("px2mm: " + px2mm);
 		}
 
 		setAttrib(svg, "x",      px2mm, viewBox.getX());
@@ -286,8 +298,10 @@ public class DocumentManager
 		return idString;
 	}    
 
-	public void appendSVGwithinUM(AbstractDocument newDocument) {
-
+	public void appendSVGwithinUM(
+		AbstractDocument newDocument, 
+		AffineTransform  matrix
+	) {
 		AbstractDocument document = (AbstractDocument)svgCanvas.getSVGDocument();
 
 		AbstractElement root = 
@@ -302,7 +316,13 @@ public class DocumentManager
 		AbstractElement xform = 
 			(AbstractElement)document.createElementNS(svgNS, "g");
 
-		xform.setAttributeNS(null, "transform", "matrix(1 0 0 1 0 0)");
+		System.err.println(MatrixTools.toSVGString(matrix));
+
+		xform.setAttributeNS(null, 
+			"transform", matrix == null 
+				? "matrix(1 0 0 1 0 0)" 
+				: MatrixTools.toSVGString(matrix));
+
 		xform.setAttributeNS(null, "id", uniqueObjectID());
 
 		AbstractNode node = (AbstractNode)document.importNode(
@@ -312,7 +332,19 @@ public class DocumentManager
 
 		xform.appendChild(node);
 
+		/*
+		AbstractElement rect = 
+			(AbstractElement)document.createElementNS(svgNS, "rect");
+
+		rect.setAttributeNS(null, "x", "1");
+		rect.setAttributeNS(null, "y", "1");
+		rect.setAttributeNS(null, "width", "110");
+		rect.setAttributeNS(null, "height", "147");
+		rect.setAttributeNS(null, "stroke", "black");
+		*/
+
 		root.appendChild(xform);
+		//root.appendChild(rect);
 	}
 }
 // end of file
