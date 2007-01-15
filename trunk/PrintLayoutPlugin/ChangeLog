@@ -1,3 +1,17 @@
+2007-01-15  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	* etc/build.xml:
+		enable debug tag in javac task
+	
+	* src/de/intevation/printlayout/LayoutCanvas.java:
+		added. a special JSVGCanvas
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		added. Simplifies certain DOM task.
+
+	* src/de/intevation/printlayout/LayoutManager.java:
+		modified. uses LayoutCanvas and DocumentManager.
+
 2007-01-12  Ludwig Reiter <ludwig.reiter@intevation.de>
 	* etc/build.xml:
 		a simple ant script.

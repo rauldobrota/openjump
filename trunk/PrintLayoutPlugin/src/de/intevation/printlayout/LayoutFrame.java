@@ -94,11 +94,12 @@ public class LayoutFrame
 
 	public static final int MODE_ZOOM = 0;
 
-  protected MyJSVGCanvas svgCanvas;
+  //protected LayoutCanvas svgCanvas;
+  protected DocumentManager docManager;
 
-	protected int transformId;
+	// protected int transformId;
 
-	protected SVGGraphicsElement selectedElement;
+	//protected SVGGraphicsElement selectedElement;
 
 	/*
 	 protected BoxInteractor boxInteractor = new BoxInteractor();
@@ -120,6 +121,7 @@ public class LayoutFrame
 	public LayoutFrame() {
 	}
 
+	/*
 	public static class MyJSVGCanvas
 	extends             JSVGCanvas
 	{
@@ -142,7 +144,9 @@ public class LayoutFrame
 			installSVGDocument(document);
 		}
 	} // class MyJSVGCanvas
+	*/
 
+	/*
 	public static final AffineTransform toJavaTransform(SVGMatrix matrix) {
 		return new AffineTransform(
 			matrix.getA(),
@@ -152,6 +156,7 @@ public class LayoutFrame
 			matrix.getE(),
 			matrix.getF());
 	}
+	*/
 
 	/*
 	private class OnMouseClick implements EventListener {
@@ -215,8 +220,10 @@ public class LayoutFrame
 	public JComponent createComponents() {
 		JPanel panel = new JPanel(new BorderLayout());
 
-		svgCanvas = new MyJSVGCanvas(
+		LayoutCanvas svgCanvas = new LayoutCanvas(
 			new SVGUserAgentGUIAdapter(panel), true, true);
+
+		docManager = new DocumentManager(svgCanvas);
 
 		svgCanvas.setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
 
@@ -252,18 +259,6 @@ public class LayoutFrame
 		interactors.add(boxInteractor);
 		*/
 		
-		/*
-		List interactors = svgCanvas.getInteractors();
-
-		interactors.add(new AbstractZoomInteractor() {
-			public boolean startInteraction(InputEvent ie) {
-				return mode == MODE_ZOOM
-				&& ie.getID() == MouseEvent.MOUSE_PRESSED
-				&& (ie.getModifiers() & InputEvent.BUTTON1_DOWN_MASK) 
-				   == InputEvent.BUTTON1_DOWN_MASK;
-			}
-		});
-		*/
 
 		/*
 		SVGDocument doc = createSheet("DIN A4");
@@ -315,7 +310,6 @@ public class LayoutFrame
 	public void consume(DocumentRunnable runny) {
 		modify(new DocumentRunnableRunner(runny, svgCanvas.getSVGDocument()));
 	}
-	*/
 
 	protected void modify(Runnable runnable) {
 		UpdateManager um = svgCanvas.getUpdateManager();
@@ -325,19 +319,26 @@ public class LayoutFrame
 		else
 			um.getUpdateRunnableQueue().invokeLater(runnable);
 	}
+	*/
 
 
 	protected void saveDocument() {
 		JFileChooser fc = new JFileChooser(".");
 
-		if (fc.showSaveDialog(svgCanvas) != JFileChooser.APPROVE_OPTION)
+		if (fc.showSaveDialog(docManager.getCanvas()) 
+			!= JFileChooser.APPROVE_OPTION)
 			return;
 
-		final File file = fc.getSelectedFile();
+		File file = fc.getSelectedFile();
+
+		docManager.exportSVG(file);
+
+		/*
 
 		modify(new Runnable() {
 			public void run() { saveDocument(file); }
 		});
+		*/
 	}
 
 	protected static SVGDocument createSheet(String id) {
@@ -367,8 +368,14 @@ public class LayoutFrame
 
 		JFileChooser fc = new JFileChooser(".");
 
-		if (fc.showOpenDialog(svgCanvas) != JFileChooser.APPROVE_OPTION)
+		if (fc.showOpenDialog(docManager.getCanvas()) 
+			!= JFileChooser.APPROVE_OPTION)
 			return;
+
+
+		docManager.appendSVG(fc.getSelectedFile());
+
+		/*
 
 		File file = fc.getSelectedFile();
 
@@ -388,7 +395,10 @@ public class LayoutFrame
 		catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
+		*/
 	}
+
+	/*
 
 	protected static Rectangle2D.Double pseudoViewBox(AbstractElement svg) {
 		return new Rectangle2D.Double(
@@ -440,7 +450,10 @@ public class LayoutFrame
 		setAttrib(svg, "height", px2mm, viewBox.getHeight());
 	}
 
+	*/
 
+
+	/*
 	protected void saveDocument(File file) {
 		System.err.println("saveDocument");
 
@@ -512,6 +525,9 @@ public class LayoutFrame
 			e.printStackTrace();
 		}
 	}
+	*/
+
+	/*
 
 
 	protected String uniqueTransformId(AbstractDocument document) {
@@ -556,6 +572,8 @@ public class LayoutFrame
 
 		root.appendChild(xform);
 	}
+
+	*/
 		
 	/*
 	public static void main(String [] args) {
