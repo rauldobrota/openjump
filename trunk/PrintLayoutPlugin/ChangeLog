@@ -1,6 +1,16 @@
 2007-01-16  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/LayoutFrame.java:
+		set (x, y, width, height) of the generated map svg
+		manually. -> map is rendered correctly
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		add a flag in appendSVG() to ignore (x, y, width, height)
+		if given manually.
+
+2007-01-16  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
 		buttons for printing and pdf export added.
 		TODO: use menu.
 

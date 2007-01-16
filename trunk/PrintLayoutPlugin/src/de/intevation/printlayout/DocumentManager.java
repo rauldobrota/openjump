@@ -266,6 +266,14 @@ public class DocumentManager
 		final AbstractDocument document, 
 		final AffineTransform  xform
 	) {
+		appendSVG(document, xform, true);
+	}
+
+	public void appendSVG(
+		final AbstractDocument document, 
+		final AffineTransform  xform,
+		final boolean          adjustView
+	) {
 		UpdateManager um = svgCanvas.getUpdateManager();
 
 		if (um == null) {
@@ -275,7 +283,7 @@ public class DocumentManager
 
 		um.getUpdateRunnableQueue().invokeLater(new Runnable() {
 			public void run() {
-				appendSVGwithinUM(document, xform);
+				appendSVGwithinUM(document, xform, adjustView);
 			}
 		});
 	}
@@ -433,16 +441,18 @@ public class DocumentManager
 
 	public void appendSVGwithinUM(
 		AbstractDocument newDocument, 
-		AffineTransform  matrix
+		AffineTransform  matrix,
+		boolean          adjustView
 	) {
 		AbstractDocument document = (AbstractDocument)svgCanvas.getSVGDocument();
 
 		AbstractElement root = 
 			(AbstractElement)document.getElementById(DOCUMENT_SHEET);
 
-		adaptUnits(
-			(AbstractElement)newDocument.getDocumentElement(), 
-			root);
+		if (adjustView)
+			adaptUnits(
+				(AbstractElement)newDocument.getDocumentElement(), 
+				root);
 
 		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
 		

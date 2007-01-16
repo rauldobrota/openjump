@@ -414,15 +414,9 @@ public class LayoutFrame
 
 		AffineTransform xform = fitToPaper(xenv);
 
-		AbstractElement root = (AbstractElement)document.getDocumentElement();
-		svgGenerator.getRoot(root);
-
-		docManager.appendSVG((AbstractDocument)document, xform);
-
 		/*
-
 		try {
-			java.io.FileOutputStream f = new java.io.FileOutputStream("test.svg");
+			java.io.FileOutputStream f = new java.io.FileOutputStream("raw.svg");
 			java.io.Writer out = new java.io.OutputStreamWriter(f, "UTF-8");
     	svgGenerator.stream(out, true);
 			f.close();
@@ -430,8 +424,18 @@ public class LayoutFrame
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		*/
+
+		AbstractElement root = (AbstractElement)document.getDocumentElement();
+		root = (AbstractElement)svgGenerator.getRoot(root);
+
+		root.setAttributeNS(null, "width", String.valueOf(xenv.getWidth()));
+		root.setAttributeNS(null, "height", String.valueOf(xenv.getHeight()));
+
+		root.setAttributeNS(null, "x", "0");
+		root.setAttributeNS(null, "y", "0");
+
+		docManager.appendSVG((AbstractDocument)document, xform, false);
 	}
 
 	protected AffineTransform fitToPaper(Envelope env) {
