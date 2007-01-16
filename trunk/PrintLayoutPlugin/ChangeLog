@@ -1,3 +1,32 @@
+2007-01-16  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		buttons for printing and pdf export added.
+		TODO: use menu.
+
+	* src/de/intevation/printlayout/TypoUnits.java:
+		mm2in() added.
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		- get paper size out of document
+		- add pdf export and printing.
+
+2007-01-15  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/PrintLayoutPlugin.java:
+		forward plugin context to LayoutFrame
+
+	* src/de/intevation/printlayout/MatrixTools.java:
+		added. ease handling Java <-> SVG affine transform
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		simple button to add the map content to the
+		SVG document.
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		forward transform of map -> paper format.
+		TODO: remove hard wired DIN A4 stuff
+
 2007-01-15  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	* etc/build.xml:

@@ -18,6 +18,14 @@ import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.NodeList; 
 import org.w3c.dom.DOMImplementation;
 
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.TranscoderException;
+
+import org.apache.batik.transcoder.print.PrintTranscoder;
+
+import org.apache.fop.svg.PDFTranscoder;
+
 import javax.xml.transform.Transformer;
 
 import javax.xml.transform.dom.DOMSource;
@@ -31,9 +39,17 @@ import javax.xml.transform.OutputKeys;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.FileOutputStream;
+import java.io.BufferedOutputStream;
+import java.io.OutputStream;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
+
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterJob;
+import java.awt.print.PrinterException;
+import java.awt.print.Paper;   
 
 public class DocumentManager
 {
@@ -60,9 +76,38 @@ public class DocumentManager
 		return svgCanvas;
 	}
 
+	// XXX: potential sync problem?
 	public void getPaperSize(double [] size) {
-		size[0] = 210d;
-		size[1] = 297d;
+
+		UserAgent ua = svgCanvas.getUserAgent();
+		SVGDocument document = svgCanvas.getSVGDocument();
+
+		double px2mm;
+
+		if (ua == null) {
+			System.err.println("no user agent found");
+			px2mm = 1d;
+		}
+		else {
+			px2mm = ua.getPixelUnitToMillimeter();
+		}
+
+		AbstractElement sheet =
+			(AbstractElement)document.getElementById(DOCUMENT_SHEET);
+
+		if (sheet == null) {
+			System.err.println("sheet not found");
+			return;
+		}
+
+		try {
+			size[0] = Double.parseDouble(sheet.getAttributeNS(null, "width"));
+			size[1] = Double.parseDouble(sheet.getAttributeNS(null, "height"));
+		}
+		catch (NumberFormatException nfe) {
+			size[0] = 210d;
+			size[1] = 297d;
+		}
 	}
 
 	public void setDocument(SVGDocument document) {
@@ -73,7 +118,7 @@ public class DocumentManager
 		UpdateManager um = svgCanvas.getUpdateManager();
 
 		if (um == null) {
-			System.err.println(" before first rendering finished");
+			System.err.println("before first rendering finished");
 			return;
 		}
 
@@ -297,6 +342,94 @@ public class DocumentManager
 		while (document.getElementById(idString) != null);
 		return idString;
 	}    
+
+ 	public void print() {
+
+		modifyDocumentLater(new DocumentModifier() {
+			public Object run(SVGDocument document) {
+
+				PrintTranscoder transcoder = new PrintTranscoder();
+
+				TranscoderInput  input  = new TranscoderInput(
+					isolateInnerDocument());
+
+				transcoder.transcode(input, null);
+
+				PrinterJob job = PrinterJob.getPrinterJob();
+				PageFormat pageFomat = new PageFormat();
+
+				double [] size = new double[2];
+
+				getPaperSize(size);
+
+				// DIN A4: 210 mm × 297 mm 
+				Paper paper = new Paper();
+				double width  = TypoUnits.mm2in(size[0])*72d;
+				double height = TypoUnits.mm2in(size[1])*72d;
+				paper.setSize(width, height);
+
+				pageFomat.setPaper(paper);
+
+				/*
+				pageFomat.setOrientation(
+					height > width
+					?	PageFormat.LANDSCAPE
+					: PageFormat.PORTRAIT);
+				*/
+
+				job.setPrintable(transcoder, pageFomat);
+
+				if (job.printDialog()) {
+					System.err.println("printing ...");
+					try {
+						job.print();
+					}
+					catch (PrinterException pe) {
+						pe.printStackTrace();
+					}
+				}
+				else
+					System.err.println("print cancelled");
+				return null;
+			}
+		});
+	}          
+
+	public void exportPDF(final File file) {
+		modifyDocumentLater(new DocumentModifier() {
+			public Object run(SVGDocument document) {
+				TranscoderInput input = new TranscoderInput(
+					isolateInnerDocument());
+
+				OutputStream out = null;
+				try {
+					out =
+						new BufferedOutputStream(
+						new FileOutputStream(file));
+
+					PDFTranscoder pdfTrancoder = new PDFTranscoder();
+						
+					TranscoderOutput output = new TranscoderOutput(out);
+					pdfTrancoder.transcode(input, output);
+
+					out.flush();
+				}
+				catch (TranscoderException te) {
+					te.printStackTrace();
+				}
+				catch (IOException ioe) {
+					ioe.printStackTrace();
+				}
+				finally {
+					if (out != null) {
+						try { out.close(); } catch (IOException ioe) {}
+						out = null;
+					}
+				}
+				return null;
+			}
+		});
+	}
 
 	public void appendSVGwithinUM(
 		AbstractDocument newDocument, 

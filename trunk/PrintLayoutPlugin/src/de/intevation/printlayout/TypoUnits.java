@@ -20,6 +20,10 @@ public class TypoUnits
 	public static final int TYPE_EM   = 7;
 	public static final int TYPE_EX   = 8;
 
+	public static final double mm2in(double in) {
+		return in * 0.039370079d;
+	}
+
 	public static final double in2mm(double in) {
 		return in * 25.4d;
 	}

@@ -302,9 +302,23 @@ public class LayoutFrame
 		JSVGScrollPane scroller = new JSVGScrollPane(svgCanvas);
 
 		JPanel north = new JPanel();
-		JButton loadBtn = new JButton("load ...");
-		JButton saveBtn = new JButton("save ...");
-		JButton mapBtn  = new JButton("add map");
+		JButton printBtn = new JButton("print");
+		JButton pdfBtn   = new JButton("export PDF");
+		JButton loadBtn  = new JButton("import SVG ...");
+		JButton saveBtn  = new JButton("export SVG ...");
+		JButton mapBtn   = new JButton("add map");
+
+		printBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				print();
+			}
+		});
+
+		pdfBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				exportPDF();
+			}
+		});
 
 		loadBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -325,6 +339,8 @@ public class LayoutFrame
 		});
 
 
+		north.add(printBtn);
+		north.add(pdfBtn);
 		north.add(loadBtn);
 		north.add(saveBtn);
 		north.add(mapBtn);
@@ -333,6 +349,10 @@ public class LayoutFrame
 
 		panel.add(scroller, BorderLayout.CENTER);
 		return panel;
+	}
+
+	public void print() {
+		docManager.print();
 	}
 
 	public void fetchMap() {
@@ -371,6 +391,9 @@ public class LayoutFrame
 				layerRenderer.setMaxFeatures(Integer.MAX_VALUE);
 			}
 		}
+
+		//java.awt.Rectangle rect = lvp.getVisibleRect();
+		//svgGenerator.setClip(rect);
 
 		lvp.repaint();
 		lvp.paintComponent(svgGenerator);
@@ -414,6 +437,10 @@ public class LayoutFrame
 	protected AffineTransform fitToPaper(Envelope env) {
 		double [] paper = new double[2];
 		docManager.getPaperSize(paper);
+		System.err.println("paper width:" + paper[0]);
+		System.err.println("paper height:" + paper[1]);
+
+		/*
 
 		double maxEnvExt   = Math.max(env.getWidth(), env.getHeight());
 		double maxPaperExt = Math.max(paper[0], paper[1]);
@@ -429,12 +456,14 @@ public class LayoutFrame
 		AffineTransform scaleM = AffineTransform.getScaleInstance(scale, scale);
 
 		scaleM.concatenate(trans);
+		*/
 
-		double s1 = paper[0]/ env.getWidth();
-		double s2 = paper[1]/ env.getHeight();
+		double s1 = paper[0]/env.getWidth();
+		double s2 = paper[1]/env.getHeight();
 
 		AffineTransform result = AffineTransform.getScaleInstance(s1, s2);
 
+		/*
 		Point2D org  = new Point2D.Double(env.getMinX(), env.getMinY());
 		Point2D dest = new Point2D.Double();
 
@@ -446,10 +475,9 @@ public class LayoutFrame
 		result.transform(org, dest);
 		System.err.println(dest);
 
-		//return scaleM;
-		//
-		// s1 * w0 = p0
-		//
+		*/
+
+
 		return result;
 	}
 
@@ -469,6 +497,18 @@ public class LayoutFrame
 			um.getUpdateRunnableQueue().invokeLater(runnable);
 	}
 	*/
+
+	protected void exportPDF() {
+		JFileChooser fc = new JFileChooser(".");
+
+		if (fc.showSaveDialog(docManager.getCanvas()) 
+			!= JFileChooser.APPROVE_OPTION)
+			return;
+
+		File file = fc.getSelectedFile();
+
+		docManager.exportPDF(file);
+	}
 
 
 	protected void saveDocument() {
