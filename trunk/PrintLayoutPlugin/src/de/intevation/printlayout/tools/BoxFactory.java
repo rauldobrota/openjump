@@ -73,11 +73,9 @@ implements   BoxInteractor.Factory
 				setRectAttributes(box, rect);
 				
 				if (strokeColor != null && strokeColor instanceof Color) {
-					System.err.println("strokeColor=" + strokeColor);
+
 					box.setAttributeNS(null, "stroke",
 							getSVGColor((Color)strokeColor, "stroke", document));
-			    System.err.println("Farbe=" 
-						+ getSVGColor((Color)strokeColor, "stroke", document));
 					box.setAttributeNS(null, "stroke-opacity",
 							getSVGColor((Color)strokeColor, "stroke-opacity", document));
 				}

@@ -83,13 +83,20 @@ implements   Overlay
 	}
 	
 	public void setScreenPoints(float x1, float y1, float x2, float y2) {
-		screenPoints = new float[] {x1, y1, x2, y2};
+		float minX = Math.min(x1, x2);
+		float maxX = Math.max(x1, x2);
+		float minY = Math.min(y1, y2);
+		float maxY = Math.max(y1, y2);
+
+		screenPoints = new float[] { minX, minY, maxX, maxY };
 	}
 
+	/*
 	public void setScreenPoints(float[] screenPoints) {
 		if (screenPoints.length == 4)
 			this.screenPoints = screenPoints;
 	}
+	*/
 	
 	public void clear() {
 		screenPoints = null;
@@ -210,9 +217,9 @@ implements   Overlay
 
 		consume();
 
-		System.err.println("Mouse released with");
-		System.err.println("\txStart=" + xStart +" yStart=" + yStart);
-		System.err.println("\txCurrent=" + xCurrent + " yCurrent=" + yCurrent);
+		//System.err.println("Mouse released with");
+		//System.err.println("\txStart=" + xStart +" yStart=" + yStart);
+		//System.err.println("\txCurrent=" + xCurrent + " yCurrent=" + yCurrent);
 		
 		c.repaint();
 	}
@@ -244,11 +251,16 @@ implements   Overlay
 
 		SVGDocument document = documentManager.getSVGDocument();
 
+		float minX = Math.min(xStart, xCurrent);
+		float maxX = Math.max(xStart, xCurrent);
+		float minY = Math.min(yStart, yCurrent);
+		float maxY = Math.max(yStart, yCurrent);
+
 		Rectangle2D rect = new Rectangle2D.Float(
-			xStart,
-			yStart,
-			xCurrent - xStart,
-			yCurrent - yStart);
+			minX,
+			minY,
+			maxX - minX,
+			maxY - minY);
 
 		AffineTransform xform;
 
