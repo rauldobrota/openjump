@@ -168,7 +168,11 @@ Main-Class: com.vividsolutions.jump.workbench.JUMPWorkbench
                 <javadoc destdir="${javadoc.dir}" use="true">
                         <classpath refid="base.classpath"/>
                         <packageset dir="${src.dir}">
-                                <include name="com/vividsolutions/**"/>
+                                <!-- include name="com/vividsolutions/**"/-->
+                        		<!-- [sstein 16 Jan 07] new: -->
+                            	<include name="com/**"/>
+                            	<include name="org/**"/>
+                            	<include name="de/**"/> 
                         </packageset>
                 </javadoc>
         </target>
