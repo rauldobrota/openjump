@@ -55,10 +55,11 @@ implements   BoxInteractor.Factory
 	) {
 		return new DocumentManager.DocumentModifier() {
 
-			public Object run(SVGDocument document) {
-				Paint   strokeColor = attributes.getStrokeColor();
-				Stroke  stroke      = attributes.getStroke();
-				Paint   fillColor   = attributes.getFillColor();
+			public Object run(DocumentManager documentManager) {
+				SVGDocument document = documentManager.getSVGDocument();
+				Paint   strokeColor  = attributes.getStrokeColor();
+				Stroke  stroke       = attributes.getStroke();
+				Paint   fillColor    = attributes.getFillColor();
 
 				String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
 
@@ -97,10 +98,12 @@ implements   BoxInteractor.Factory
 					
 				}
 
+				group.setAttributeNS(null, "id", documentManager.uniqueObjectID());
         group.appendChild(box);
 				
-				AbstractElement parent = 
-					(AbstractElement)document.getElementById("viewer-layout-sheet-svg");
+				AbstractElement parent =
+					(AbstractElement)document.getElementById(
+						DocumentManager.DOCUMENT_SHEET);
 				parent.appendChild(group);
 				return null;
 			}

@@ -1,5 +1,19 @@
 2007-01-16  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/DocumentManager.java:
+		- DocumentModifier.run() now is called with DocumentManager
+		  instead of SVGDocument. -> fetching unique IDs is possible
+		- import of images via ImageIO added
+
+	* src/de/intevation/printlayout/tools/BoxFactory.java:
+		Uses new DocumentModifier.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		- reordered menus
+		- add menu item to import image
+
+2007-01-16  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
 	* src/de/intevation/printlayout/LayoutFrame.java,
 	  src/de/intevation/printlayout/PrintLayoutPlugin.java,
 	  src/de/intevation/printlayout/tools/BoxInteractor.java,

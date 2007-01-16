@@ -22,6 +22,10 @@ import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.TranscoderException;
 
+import org.apache.batik.svggen.ImageHandlerBase64Encoder; 
+import org.apache.batik.svggen.SVGGeneratorContext;
+import org.apache.batik.svggen.SVGGraphics2DIOException;
+
 import org.apache.batik.transcoder.print.PrintTranscoder;
 
 import org.apache.fop.svg.PDFTranscoder;
@@ -49,7 +53,12 @@ import java.awt.geom.AffineTransform;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterJob;
 import java.awt.print.PrinterException;
-import java.awt.print.Paper;   
+import java.awt.print.Paper;
+
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+
+import javax.imageio.ImageIO;
 
 public class DocumentManager
 {
@@ -62,7 +71,7 @@ public class DocumentManager
 
 
 	public interface DocumentModifier {
-		Object run(SVGDocument svgDocument);
+		Object run(DocumentManager documentManager);
 	}
 
 	public DocumentManager() {
@@ -128,7 +137,7 @@ public class DocumentManager
 
 		um.getUpdateRunnableQueue().invokeLater(new Runnable() {
 			public void run() {
-				modifier.run(svgCanvas.getSVGDocument());
+				modifier.run(DocumentManager.this);
 			}
 		});
 	}
@@ -146,7 +155,7 @@ public class DocumentManager
 		try {
 			um.getUpdateRunnableQueue().invokeAndWait(new Runnable() {
 				public void run() {
-					result[0] = modifier.run(svgCanvas.getSVGDocument());
+					result[0] = modifier.run(DocumentManager.this);
 				}
 			});
 		}
@@ -252,6 +261,84 @@ public class DocumentManager
 	}
 
 
+	public void appendImage(File file) {
+		try {
+			final BufferedImage image = ImageIO.read(file);
+
+			modifyDocumentLater(new DocumentModifier() {
+				public Object run(DocumentManager documentManager) {
+
+					SVGDocument document = documentManager.getSVGDocument();
+
+					String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+
+					AbstractElement img = 
+						(AbstractElement)document.createElementNS(svgNS, "image");
+
+					ImageHandlerBase64Encoder handler =
+						new ImageHandlerBase64Encoder();
+
+					try {
+						handler.handleHREF(
+							(RenderedImage)image,
+							img,
+							SVGGeneratorContext.createDefault(document));
+					}
+					catch (SVGGraphics2DIOException g2ioe) {
+						g2ioe.printStackTrace();
+						return null;
+					}
+
+					int width  = image.getWidth();
+					int height = image.getHeight();
+
+					double [] paper = new double[2];
+
+					getPaperSize(paper);
+
+					// scale * width = paper[0] <=> scale = paper[0]/width
+
+
+					img.setAttributeNS(null, "width",  String.valueOf(width));
+					img.setAttributeNS(null, "height", String.valueOf(height));
+
+					img.setAttributeNS(null, "x", "0");
+					img.setAttributeNS(null, "y", "0");
+       
+					AbstractElement group = 
+						(AbstractElement)document.createElementNS(svgNS, "g");
+
+					double s1 = paper[0]/(double)width;
+					double s2 = paper[1]/(double)height;
+
+					double scale = Math.min(s1, s2);
+
+					AffineTransform xfrom =
+						AffineTransform.getScaleInstance(scale, scale);
+
+					group.setAttributeNS(null, 
+						"transform", MatrixTools.toSVGString(xfrom));
+
+					group.setAttributeNS(null,
+						"id", documentManager.uniqueObjectID());
+
+					group.appendChild(img);
+
+					AbstractElement sheet =
+						(AbstractElement)document.getElementById(DOCUMENT_SHEET);
+
+					sheet.appendChild(group);
+
+					return null;
+				}
+			});
+		}
+		catch (IOException ioe) {
+			ioe.printStackTrace();
+			return;
+		}
+	}
+
 	public void appendSVG(File file) {
 
 		String parser = XMLResourceDescriptor.getXMLParserClassName();
@@ -312,11 +399,9 @@ public class DocumentManager
 				px2mm, 
 				defaultVal,
 				v);
-			System.err.println(field + ": " + v[0]);
 			svg.setAttributeNS(null, field, String.valueOf(v[0]));
 		}
 		catch (NumberFormatException nfe) {
-			System.err.println(field + ": " + defaultVal);
 			svg.setAttributeNS(null, field, String.valueOf(defaultVal));
 		}
 	}
@@ -344,7 +429,7 @@ public class DocumentManager
 		setAttrib(svg, "height", px2mm, viewBox.getHeight());
 	}     
  
-	protected String uniqueObjectID() {
+	public String uniqueObjectID() {
 		String idString;
 		AbstractDocument document = (AbstractDocument)svgCanvas.getSVGDocument();
 		do {
@@ -358,8 +443,8 @@ public class DocumentManager
  	public void print() {
 
 		modifyDocumentLater(new DocumentModifier() {
-			public Object run(SVGDocument document) {
-
+			public Object run(DocumentManager documentManager) {
+				SVGDocument document = documentManager.getSVGDocument();
 				PrintTranscoder transcoder = new PrintTranscoder();
 
 				TranscoderInput  input  = new TranscoderInput(
@@ -409,7 +494,7 @@ public class DocumentManager
 
 	public void exportPDF(final File file) {
 		modifyDocumentLater(new DocumentModifier() {
-			public Object run(SVGDocument document) {
+			public Object run(DocumentManager documentManager) {
 				TranscoderInput input = new TranscoderInput(
 					isolateInnerDocument());
 

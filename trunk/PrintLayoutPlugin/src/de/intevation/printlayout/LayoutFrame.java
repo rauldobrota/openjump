@@ -134,18 +134,21 @@ extends      JFrame
 		JMenu fileMenu = new JMenu("File");
 		JMenu editMenu = new JMenu("Edit");
 
-		PrintAction     printAction     = new PrintAction();
-		PDFAction       pdfAction       = new PDFAction();
-		ImportSVGAction svgImportAction = new ImportSVGAction();
-		ExportSVGAction svgExportAction = new ExportSVGAction();
-		AddMapAction    addMapAction    = new AddMapAction();
+		PrintAction       printAction       = new PrintAction();
+		PDFAction         pdfAction         = new PDFAction();
+		ImportImageAction imageImportAction = new ImportImageAction();
+		ImportSVGAction   svgImportAction   = new ImportSVGAction();
+		ExportSVGAction   svgExportAction   = new ExportSVGAction();
+		AddMapAction      addMapAction      = new AddMapAction();
 
-		fileMenu.add(svgImportAction);
 		fileMenu.add(svgExportAction);
+		fileMenu.add(pdfAction);
 		fileMenu.add(pdfAction);
 		fileMenu.add(printAction);
 
 		editMenu.add(addMapAction);
+		editMenu.add(svgImportAction);
+		editMenu.add(imageImportAction);
 
 		JMenuBar menubar = new JMenuBar();
 		menubar.add(fileMenu);
@@ -390,6 +393,17 @@ extends      JFrame
 		docManager.appendSVG(fc.getSelectedFile());
 	}
 
+	protected void importImage() {
+		JFileChooser fc = new JFileChooser(".");
+
+		if (fc.showOpenDialog(docManager.getCanvas()) 
+			!= JFileChooser.APPROVE_OPTION)
+			return;
+
+
+		docManager.appendImage(fc.getSelectedFile());
+	}
+
 	private class PrintAction extends AbstractAction {
 		PrintAction() {
 			super("print...");
@@ -405,6 +419,16 @@ extends      JFrame
 		}
 		public void actionPerformed(ActionEvent ae) {
 			exportPDF();
+		}
+	}
+
+	private class ImportImageAction extends AbstractAction {
+		ImportImageAction() {
+			super("import image...");
+		}
+
+		public void actionPerformed(ActionEvent ae) {
+			importImage();
 		}
 	}
 
