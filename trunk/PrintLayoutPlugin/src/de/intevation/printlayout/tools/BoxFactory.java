@@ -11,8 +11,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.Map;
 
-import java.text.NumberFormat;
-
 import org.w3c.dom.svg.SVGDocument;
 
 import org.apache.batik.dom.AbstractElement;

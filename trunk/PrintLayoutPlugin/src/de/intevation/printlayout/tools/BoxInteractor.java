@@ -4,9 +4,7 @@ import java.awt.Shape;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Color;
 import java.awt.Stroke;
-import java.awt.BasicStroke;
 
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
@@ -14,39 +12,24 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Rectangle2D;
 
-import java.util.Map;
-
-import org.apache.batik.swing.JSVGCanvas;
-
 import org.apache.batik.swing.gvt.InteractorAdapter;
 import org.apache.batik.swing.gvt.JGVTComponent;
 
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGMatrix;
-import org.w3c.dom.svg.SVGElement;
 
 import org.apache.batik.swing.gvt.Overlay;
 
 import org.apache.batik.dom.svg.SVGOMSVGElement;
-import org.apache.batik.svggen.SVGColor;
-import org.apache.batik.svggen.SVGGeneratorContext;
-import org.apache.batik.svggen.SVGPaintDescriptor;
-import org.apache.batik.svggen.SVGBasicStroke;
-import org.apache.batik.svggen.SVGStrokeDescriptor;
 
 import de.intevation.printlayout.MatrixTools;
 import de.intevation.printlayout.DocumentManager;
-
-import javax.swing.ButtonModel;
-import javax.swing.DefaultButtonModel;
 
 public class BoxInteractor 
 extends      InteractorAdapter 
 implements   Overlay
 {
 	protected boolean inUse;
-
-	protected boolean pressed;
 
 	protected boolean finished = true;
 

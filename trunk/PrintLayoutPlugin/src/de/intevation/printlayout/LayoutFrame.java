@@ -1,11 +1,8 @@
 package de.intevation.printlayout;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
-import javax.swing.RepaintManager;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -16,18 +13,10 @@ import javax.swing.JToggleButton;
 
 import java.awt.Color;
 import java.awt.BorderLayout;
-import java.awt.Shape;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.BasicStroke;
 
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
 
-import java.awt.event.InputEvent;
-import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -44,59 +33,24 @@ import org.apache.batik.swing.JSVGScrollPane;
 
 import org.apache.batik.dom.AbstractDocument;
 import org.apache.batik.dom.AbstractElement;
-import org.apache.batik.dom.AbstractDocumentFragment;
-import org.apache.batik.dom.AbstractNode;
+
 import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
 
 import org.apache.batik.util.XMLResourceDescriptor;
 
-import org.apache.batik.bridge.UpdateManager;
-
-import org.apache.batik.swing.gvt.GVTTreeRendererAdapter;
-import org.apache.batik.swing.gvt.GVTTreeRendererEvent;
-
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 
 import org.w3c.dom.svg.SVGDocument;
-import org.w3c.dom.svg.SVGRect;
-import org.w3c.dom.svg.SVGMatrix;
 
 import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.NodeList;
-
-import javax.xml.transform.Transformer;
-
-import javax.xml.transform.dom.DOMSource;
-
-import javax.xml.transform.stream.StreamResult;
-
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.OutputKeys;
-
-import org.apache.batik.swing.gvt.AbstractZoomInteractor;
-import org.apache.batik.swing.gvt.Overlay;
-
-import org.apache.batik.bridge.UserAgent;
 
 import org.apache.batik.swing.svg.SVGUserAgentGUIAdapter;
-import org.apache.batik.swing.svg.SVGUserAgent;
 import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
 import org.apache.batik.swing.svg.SVGDocumentLoaderAdapter;
 
-import org.apache.batik.dom.svg.SVGGraphicsElement;
-
 import org.apache.batik.svggen.SVGGraphics2D;
 
-import org.w3c.dom.events.EventListener;
-import org.w3c.dom.events.Event;
-import org.w3c.dom.events.EventTarget;
 
-
-// import scenegraph.boxtool.BoxInteractor;
-// import scenegraph.boxtool.BoxFactory;
-//
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 
 import com.vividsolutions.jump.workbench.ui.renderer.RenderingManager; 
@@ -115,35 +69,13 @@ import de.intevation.printlayout.tools.DrawingAttributes;
 
 public class LayoutFrame 
 extends      JFrame
-//implements BoxFactory.Consumer
 {
 	public static final String A4_SHEET = "resources/a4.svg";
-
-	public static final int MODE_ZOOM = 0;
 
   protected DocumentManager docManager;
 
 	protected PlugInContext   pluginContext;
 
-	//protected SVGGraphicsElement selectedElement;
-
-	/*
-	 protected BoxInteractor boxInteractor = new BoxInteractor();
-	
-	{
-		boxInteractor.setStrokeColor(Color.YELLOW);
-		boxInteractor.setStroke(new BasicStroke(
-						5.0f, 
-						BasicStroke.CAP_BUTT,
-						BasicStroke.JOIN_MITER,
-						1.0f,
-						new float[]{ 3f, 3f, 3f, 3f},
-						0.0f));
-		boxInteractor.setFillColor(Color.BLUE);
-	}
-
-	*/
-	
 	public LayoutFrame() {
 	}
 
@@ -153,66 +85,6 @@ extends      JFrame
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setContentPane(createComponents());
 	}
-
-
-	/*
-	private class OnMouseClick implements EventListener {
-		public void handleEvent(Event evt) {
-			//selectedElement = (SVGGraphicsElement)evt.getTarget();
-			selectedElement = (SVGGraphicsElement)evt.getCurrentTarget();
-			SVGRect bbox = selectedElement.getBBox();
-			evt.stopPropagation();
-			svgCanvas.repaint();
-		}
-	} // class OnMouseClick
-
-	*/
-
-	/*
-
-	protected class MyOverlay implements Overlay
-	{
-		public void paint(Graphics g) {
-			if (selectedElement != null) {
-				Graphics2D g2d = (Graphics2D)g;
-				SVGMatrix matrix = selectedElement.getScreenCTM();
-
-				SVGMatrix ctm = selectedElement.getCTM();
-
-				DecomposeTransform dt =
-					new DecomposeTransform(
-						ctm.getA(),
-						ctm.getB(),
-						ctm.getC(),
-						ctm.getD(),
-						ctm.getE(),
-						ctm.getF());
-
-				System.err.println(dt);
-
-				SVGRect bbox = selectedElement.getBBox();
-
-				System.err.println(bbox);
-				System.err.println(matrix);
-				AffineTransform xform = toJavaTransform(matrix);
-
-				Rectangle2D rect = new Rectangle2D.Float(
-					(float)bbox.getX(), 
-					(float)bbox.getY(),
-					(float)bbox.getWidth(),
-					(float)bbox.getHeight());
-
-				System.err.println(rect);
-
-				GeneralPath path = new GeneralPath(rect);
-
-				Shape selected = path.createTransformedShape(xform);
-
-				g2d.draw(selected);
-			}
-		}
-	}
-	*/
 
 	public JComponent createComponents() {
 		JPanel panel = new JPanel(new BorderLayout());
@@ -415,8 +287,6 @@ extends      JFrame
 			}
 		}
 
-		//svgGenerator.dispose();
-
 		Envelope xenv = new Envelope(
 			0, lvp.getWidth(), 0, lvp.getHeight());
 
@@ -518,28 +388,6 @@ extends      JFrame
 
 
 		docManager.appendSVG(fc.getSelectedFile());
-
-		/*
-
-		File file = fc.getSelectedFile();
-
-		String parser = XMLResourceDescriptor.getXMLParserClassName();
-		SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
-
-		try {
-			String uri = file.toURL().toString();
-
-			final AbstractDocument document = 
-				(AbstractDocument)factory.createDocument(uri);
-
-			modify(new Runnable() {
-				public void run() { appendDocument(document); }
-			});
-		}
-		catch (IOException ioe) {
-			ioe.printStackTrace();
-		}
-		*/
 	}
 
 	private class PrintAction extends AbstractAction {
@@ -587,6 +435,5 @@ extends      JFrame
 			addMap();
 		}
 	}
-
 }
 // end of file

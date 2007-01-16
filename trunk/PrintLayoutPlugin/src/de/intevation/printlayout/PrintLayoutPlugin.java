@@ -9,8 +9,6 @@ import com.vividsolutions.jump.util.Blackboard;
 
 import com.vividsolutions.jump.task.TaskMonitor;  
 
-import javax.swing.JFrame;
-
 public class PrintLayoutPlugin 
 extends      AbstractPlugIn 
 implements   ThreadedPlugIn
