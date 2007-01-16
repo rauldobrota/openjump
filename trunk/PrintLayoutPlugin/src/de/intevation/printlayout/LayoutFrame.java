@@ -425,8 +425,6 @@ extends      JFrame
 	protected AffineTransform fitToPaper(Envelope env) {
 		double [] paper = new double[2];
 		docManager.getPaperSize(paper);
-		System.err.println("paper width:" + paper[0]);
-		System.err.println("paper height:" + paper[1]);
 
 		/*
 
@@ -449,7 +447,9 @@ extends      JFrame
 		double s1 = paper[0]/env.getWidth();
 		double s2 = paper[1]/env.getHeight();
 
-		AffineTransform result = AffineTransform.getScaleInstance(s1, s2);
+		double s = Math.min(s1, s2);
+
+		AffineTransform result = AffineTransform.getScaleInstance(s, s);
 
 		/*
 		Point2D org  = new Point2D.Double(env.getMinX(), env.getMinY());
@@ -551,183 +551,6 @@ extends      JFrame
 		*/
 	}
 
-	/*
-
-	protected static Rectangle2D.Double pseudoViewBox(AbstractElement svg) {
-		return new Rectangle2D.Double(
-			0d, 0d,
-			Double.parseDouble(svg.getAttributeNS(null, "width")),
-			Double.parseDouble(svg.getAttributeNS(null, "height")));
-	}
-
-	protected static void setAttrib(
-		AbstractElement svg,
-		String          field,
-		double          px2mm,
-		double          defaultVal
-	) {
-		try {
-			double [] v = new double[1];
-			TypoUnits.stringToMM(
-				svg.getAttributeNS(null, field), 
-				px2mm, 
-				defaultVal,
-				v);
-			svg.setAttributeNS(null, field, String.valueOf(v[0]));
-		}
-		catch (NumberFormatException nfe) {
-			svg.setAttributeNS(null, field, String.valueOf(defaultVal));
-		}
-	}
-
-	protected void adaptUnits(AbstractElement svg, AbstractElement master) {
-
-		Rectangle2D viewBox = pseudoViewBox(master);
-
-		UserAgent ua = svgCanvas.getUserAgent();
-
-		double px2mm;
-
-		if (ua == null) {
-			System.err.println("no user agent found");
-			px2mm = 1d;
-		}
-		else {
-			px2mm = ua.getPixelUnitToMillimeter();
-			System.err.println("px2mm: " + px2mm);
-		}
-
-		setAttrib(svg, "x",      px2mm, viewBox.getX());
-		setAttrib(svg, "y",      px2mm, viewBox.getY());
-		setAttrib(svg, "width",  px2mm, viewBox.getWidth());
-		setAttrib(svg, "height", px2mm, viewBox.getHeight());
-	}
-
-	*/
-
-
-	/*
-	protected void saveDocument(File file) {
-		System.err.println("saveDocument");
-
-		AbstractDocument document = (AbstractDocument)svgCanvas.getSVGDocument();
-
-		AbstractElement root = (AbstractElement)document.getDocumentElement();
-
-		AbstractElement sheet =
-			(AbstractElement)document.getElementById("viewer-layout-sheet-svg");
-
-		if (sheet == null) {
-			System.err.println("sheet not found");
-			return;
-		}
-
-		DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
-
-    String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
-
-		AbstractDocument newDocument = (AbstractDocument)
-			impl.createDocument(svgNS, "svg", null);
-
-		NodeList children = sheet.getChildNodes();
-		
-		AbstractElement newRoot = 
-			(AbstractElement)newDocument.getDocumentElement();
-		
-		AbstractDocumentFragment fragment = 
-			(AbstractDocumentFragment)newDocument.createDocumentFragment(); 
-
-		for (int i = 0, N = children.getLength(); i < N; ++i) {
-			AbstractNode child = (AbstractNode)children.item(i);
-			fragment.appendChild(newDocument.importNode(child, true));
-		}
-
-		newRoot.appendChild(fragment);
-
-		newRoot.setAttributeNS(
-			null, "width", sheet.getAttributeNS(null, "width") + "mm");
-
-		newRoot.setAttributeNS(
-			null, "height", sheet.getAttributeNS(null, "height") + "mm");
-
-		newRoot.setAttributeNS(
-			null, 
-			"viewBox",
-			"0 0 " + sheet.getAttributeNS(null, "width") + 
-			" "    + sheet.getAttributeNS(null, "height"));
-
-		try {
-			TransformerFactory factory     = TransformerFactory.newInstance();
-			Transformer        transformer = factory.newTransformer();
-
-			StreamResult outputTarget = new StreamResult(file);
-			DOMSource    xmlSource    = new DOMSource(newDocument);
-
-			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-			transformer.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, "");
-			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			transformer.setOutputProperty(
-				"{http://xml.apache.org/xslt}indent-amount", "2");
-			transformer.transform(xmlSource, outputTarget);
-		} 
-		catch (TransformerConfigurationException e) {
-			e.printStackTrace();
-		}
-		catch (TransformerException e) {
-			e.printStackTrace();
-		}
-	}
-	*/
-
-	/*
-
-
-	protected String uniqueTransformId(AbstractDocument document) {
-		String idString;
-		do {
-			idString = "layout-transform-id-" + transformId;
-			++transformId;
-		}
-		while (document.getElementById(idString) != null);
-		return idString;
-	}
-
-
-	protected void appendDocument(AbstractDocument newDocument) {
-
-		AbstractDocument document = (AbstractDocument)svgCanvas.getSVGDocument();
-
-		AbstractElement root = 
-			(AbstractElement)document.getElementById("viewer-layout-sheet-svg");
-
-		adaptUnits(
-			(AbstractElement)newDocument.getDocumentElement(), 
-			root);
-
-		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
-		
-		AbstractElement xform = 
-			(AbstractElement)document.createElementNS(svgNS, "g");
-
-		xform.setAttributeNS(null, "transform", "matrix(1 0 0 1 0 0)");
-		xform.setAttributeNS(null, "id", uniqueTransformId(document));
-
-		AbstractNode node = (AbstractNode)document.importNode(
-			newDocument.getDocumentElement(), 
-			true,
-			false);
-
-		xform.appendChild(node);
-		EventTarget target = (EventTarget)xform;
-		//target.addEventListener("click", new OnMouseClick(), true);
-
-
-		root.appendChild(xform);
-	}
-
-	*/
-		
 	private class PrintAction extends AbstractAction {
 		PrintAction() {
 			super("print...");
