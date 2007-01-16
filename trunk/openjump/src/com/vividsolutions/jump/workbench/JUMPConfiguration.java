@@ -49,6 +49,9 @@ import com.vividsolutions.jump.workbench.ui.plugin.*;
 import com.vividsolutions.jump.workbench.ui.plugin.analysis.*;
 import com.vividsolutions.jump.workbench.ui.plugin.clipboard.*;
 import com.vividsolutions.jump.workbench.ui.plugin.datastore.*;
+import com.vividsolutions.jump.workbench.ui.plugin.imagery.AddImageLayerPlugIn;
+import com.vividsolutions.jump.workbench.ui.plugin.imagery.ImageLayerManagerPlugIn;
+import com.vividsolutions.jump.workbench.ui.plugin.imagery.InstallReferencedImageFactoriesPlugin;
 import com.vividsolutions.jump.workbench.ui.plugin.scalebar.*;
 import com.vividsolutions.jump.workbench.ui.plugin.skin.InstallSkinsPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.test.*;
@@ -229,6 +232,10 @@ public class JUMPConfiguration implements Setup {
     //[sstein, 27.09.2006] comment out - problem with colour theming reported by Ole 
   	//private DeeChangeStylesPlugIn changeStylesPlugIn = new DeeChangeStylesPlugIn(); 
   	
+    private InstallReferencedImageFactoriesPlugin installReferencedImageFactoriesPlugin = new InstallReferencedImageFactoriesPlugin();
+
+    private ImageLayerManagerPlugIn imageLayerManagerPlugIn = new ImageLayerManagerPlugIn();
+
   	private RefreshDataStoreLayerPlugin refreshDataStoreLayerPlugin = new RefreshDataStoreLayerPlugin();
   	
     public void setup(WorkbenchContext workbenchContext) throws Exception {
@@ -290,6 +297,9 @@ public class JUMPConfiguration implements Setup {
         featureInstaller.addPopupMenuItem(workbenchContext.getWorkbench()
                 .getFrame().getCategoryPopupMenu(), addWMSQueryPlugIn,
                 addWMSQueryPlugIn.getName() + "...", false, null, null);
+        featureInstaller.addPopupMenuItem(workbenchContext.getWorkbench()
+                .getFrame().getCategoryPopupMenu(), addImageLayerPlugIn,
+                addImageLayerPlugIn.getName() + "...", false, null, null);
         featureInstaller.addPopupMenuItem(workbenchContext.getWorkbench()
                 .getFrame().getCategoryPopupMenu(), pasteLayersPlugIn,
                 pasteLayersPlugIn.getNameWithMnemonic(), false, null,
@@ -392,6 +402,10 @@ public class JUMPConfiguration implements Setup {
                 viewSchemaPlugIn.getName(), false, ViewSchemaPlugIn.ICON,
                 ViewSchemaPlugIn.createEnableCheck(workbenchContext));
 
+        featureInstaller.addPopupMenuItem(layerNamePopupMenu, imageLayerManagerPlugIn,
+                imageLayerManagerPlugIn.getName() + "...", false, null,
+                ImageLayerManagerPlugIn.createEnableCheck(workbenchContext));
+        
         featureInstaller.addPopupMenuItem(layerNamePopupMenu, refreshDataStoreLayerPlugin,
         		refreshDataStoreLayerPlugin.getName() + "...", false, null,
                 RefreshDataStoreLayerPlugin.createEnableCheck(workbenchContext));
@@ -725,7 +739,8 @@ public class JUMPConfiguration implements Setup {
         private AddDatastoreLayerPlugIn addDatastoreLayerPlugIn = new AddDatastoreLayerPlugIn();
         private RunDatastoreQueryPlugIn runDatastoreQueryPlugIn = new RunDatastoreQueryPlugIn();
         private InstallDatastoreLayerRendererHintsPlugIn installDatastoreLayerRendererHintsPlugIn = new InstallDatastoreLayerRendererHintsPlugIn();
-
+        private AddImageLayerPlugIn addImageLayerPlugIn = new AddImageLayerPlugIn();
+        
     private void configLayer(final WorkbenchContext workbenchContext,
                 final EnableCheckFactory checkFactory,
                 FeatureInstaller featureInstaller) throws Exception {
@@ -740,6 +755,10 @@ public class JUMPConfiguration implements Setup {
 
         featureInstaller.addLayerViewMenuItem(addWMSQueryPlugIn, MENU_LAYER,
                 addWMSQueryPlugIn.getName() + "...");
+        
+        featureInstaller.addLayerViewMenuItem(addImageLayerPlugIn, MENU_LAYER,
+                addImageLayerPlugIn.getName() + "...");
+        
         featureInstaller.addMainMenuItem(addNewCategoryPlugIn, MENU_LAYER,
                 addNewCategoryPlugIn.getName(), null, addNewCategoryPlugIn
                         .createEnableCheck(workbenchContext));
