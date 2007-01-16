@@ -1,6 +1,20 @@
 2007-01-16  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/LayoutFrame.java:
+		support for tools
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		getSVGDocument() add
+
+	* src/de/intevation/printlayout/tools/DrawingAttributes.java:
+		stores different attributes for drawing, color, stroke etc.
+
+	* src/de/intevation/printlayout/tools/BoxInteractor.java:
+		tool to draw filled boxes.
+
+2007-01-16  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
 		scale map proportional.
 
 2007-01-16  Sascha L. Teichmann <sascha.teichmann@intevation.de>

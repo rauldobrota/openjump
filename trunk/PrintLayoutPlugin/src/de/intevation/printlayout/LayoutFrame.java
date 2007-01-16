@@ -10,6 +10,9 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.AbstractAction;
+import javax.swing.JToolBar;
+import javax.swing.ButtonGroup;
+import javax.swing.JToggleButton;
 
 import java.awt.Color;
 import java.awt.BorderLayout;
@@ -106,6 +109,10 @@ import com.vividsolutions.jump.workbench.ui.renderer.Renderer;
 
 import com.vividsolutions.jts.geom.Envelope;
 
+import de.intevation.printlayout.tools.BoxInteractor;
+import de.intevation.printlayout.tools.BoxFactory;
+import de.intevation.printlayout.tools.DrawingAttributes;
+
 public class LayoutFrame 
 extends      JFrame
 //implements BoxFactory.Consumer
@@ -117,8 +124,6 @@ extends      JFrame
   protected DocumentManager docManager;
 
 	protected PlugInContext   pluginContext;
-
-	// protected int transformId;
 
 	//protected SVGGraphicsElement selectedElement;
 
@@ -149,42 +154,6 @@ extends      JFrame
 		setContentPane(createComponents());
 	}
 
-	/*
-	public static class MyJSVGCanvas
-	extends             JSVGCanvas
-	{
-		public MyJSVGCanvas(
-			SVGUserAgent agent,  
-			boolean      eventsEnabled, 
-			boolean      selectableText
-		) {
-			super(agent, eventsEnabled, selectableText);
-		}
-		
-		public MyJSVGCanvas() {
-		}
-
-		public UserAgent getUserAgent() {
-			return userAgent;
-		}
-
-		public void installDocument(SVGDocument document) {
-			installSVGDocument(document);
-		}
-	} // class MyJSVGCanvas
-	*/
-
-	/*
-	public static final AffineTransform toJavaTransform(SVGMatrix matrix) {
-		return new AffineTransform(
-			matrix.getA(),
-			matrix.getB(),
-			matrix.getC(),
-			matrix.getD(),
-			matrix.getE(),
-			matrix.getF());
-	}
-	*/
 
 	/*
 	private class OnMouseClick implements EventListener {
@@ -266,27 +235,8 @@ extends      JFrame
 				System.err.println("completed");
 				SVGDocument document = e.getSVGDocument();
 				AbstractElement svgRoot = (AbstractElement)document.getRootElement();
-				
-				//boxInteractor.setDocument(svgCanvas.getSVGDocument());
-				/*
-				EventTarget target = (EventTarget)svgRoot;
-				target.addEventListener("click", new OnMouseClick(), false);
-				*/
 			}
 		});
-
-		/*
-		BoxFactory factory = new BoxFactory(this);
-		boxInteractor.setConsumer(factory);
-
-		List overlays = svgCanvas.getOverlays();
-		//overlays.add(new MyOverlay());
-		overlays.add(boxInteractor.getOverlay());
-
-		List interactors = svgCanvas.getInteractors();
-		interactors.add(boxInteractor);
-		*/
-		
 
 		/*
 		SVGDocument doc = createSheet("DIN A4");
@@ -332,7 +282,81 @@ extends      JFrame
 		setJMenuBar(menubar);
 
 		panel.add(scroller, BorderLayout.CENTER);
+
+		createTools(svgCanvas, panel);
+
 		return panel;
+	}
+
+	protected void createTools(JSVGCanvas svgCanvas, JPanel panel) {
+
+		DrawingAttributes attributes = new DrawingAttributes();
+
+		attributes.setStrokeColor(Color.blue);
+		attributes.setFillColor(Color.cyan);
+		attributes.setStroke(
+			new BasicStroke(
+				5.0f, 
+				BasicStroke.CAP_BUTT,
+				BasicStroke.JOIN_MITER,
+				1.0f,
+				new float[]{ 3f, 3f, 3f, 3f},
+				0.0f));
+
+
+		BoxFactory boxFactory = new BoxFactory();
+		boxFactory.setDrawingAttributes(attributes);
+
+		final BoxInteractor boxInteractor = new BoxInteractor();
+
+		boxInteractor.setFactory(boxFactory);
+		boxInteractor.setDocumentManager(docManager);
+
+
+		List overlays = svgCanvas.getOverlays();
+		overlays.add(boxInteractor);
+
+		List interactors = svgCanvas.getInteractors();
+		interactors.add(boxInteractor);
+
+		JToolBar toolBar = new JToolBar();
+
+		JToggleButton boxBnt = new JToggleButton("box");
+
+		boxBnt.setActionCommand("box");
+
+		JToggleButton dummyBnt = new JToggleButton("dummy");
+
+		dummyBnt.setActionCommand("dummy");
+
+		ActionListener listener = new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				if ("box".equals(ae.getActionCommand())) {
+					boxInteractor.setInUse(true);
+				}
+				else {
+					boxInteractor.setInUse(false);
+				}
+			}
+		};
+
+		boxBnt.addActionListener(listener);
+		dummyBnt.addActionListener(listener);
+
+		ButtonGroup group = new ButtonGroup();
+		group.add(boxBnt);
+		group.add(dummyBnt);
+
+		dummyBnt.setSelected(true);
+
+		toolBar.add(boxBnt);
+		toolBar.add(dummyBnt);
+
+		JPanel north = new JPanel();
+
+		north.add(toolBar);
+
+		panel.add(north, BorderLayout.NORTH);
 	}
 
 	public void print() {
@@ -426,45 +450,12 @@ extends      JFrame
 		double [] paper = new double[2];
 		docManager.getPaperSize(paper);
 
-		/*
-
-		double maxEnvExt   = Math.max(env.getWidth(), env.getHeight());
-		double maxPaperExt = Math.max(paper[0], paper[1]);
-
-		AffineTransform trans = AffineTransform.getTranslateInstance(
-			-env.getMinX(),
-			-env.getMinY());
-
-		// scale * maxEnvExt = maxPaperExt
-		//double scale = maxPaperExt/maxEnvExt;
-		double scale = maxEnvExt/maxPaperExt;
-
-		AffineTransform scaleM = AffineTransform.getScaleInstance(scale, scale);
-
-		scaleM.concatenate(trans);
-		*/
-
 		double s1 = paper[0]/env.getWidth();
 		double s2 = paper[1]/env.getHeight();
 
 		double s = Math.min(s1, s2);
 
 		AffineTransform result = AffineTransform.getScaleInstance(s, s);
-
-		/*
-		Point2D org  = new Point2D.Double(env.getMinX(), env.getMinY());
-		Point2D dest = new Point2D.Double();
-
-		result.transform(org, dest);
-		System.err.println(dest);
-
-		org = new Point2D.Double(env.getMaxX(), env.getMaxY());
-
-		result.transform(org, dest);
-		System.err.println(dest);
-
-		*/
-
 
 		return result;
 	}

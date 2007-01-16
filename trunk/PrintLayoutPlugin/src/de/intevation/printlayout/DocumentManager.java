@@ -76,6 +76,10 @@ public class DocumentManager
 		return svgCanvas;
 	}
 
+	public SVGDocument getSVGDocument() {
+		return svgCanvas.getSVGDocument();
+	}
+
 	// XXX: potential sync problem?
 	public void getPaperSize(double [] size) {
 
@@ -475,19 +479,7 @@ public class DocumentManager
 
 		xform.appendChild(node);
 
-		/*
-		AbstractElement rect = 
-			(AbstractElement)document.createElementNS(svgNS, "rect");
-
-		rect.setAttributeNS(null, "x", "1");
-		rect.setAttributeNS(null, "y", "1");
-		rect.setAttributeNS(null, "width", "110");
-		rect.setAttributeNS(null, "height", "147");
-		rect.setAttributeNS(null, "stroke", "black");
-		*/
-
 		root.appendChild(xform);
-		//root.appendChild(rect);
 	}
 }
 // end of file
