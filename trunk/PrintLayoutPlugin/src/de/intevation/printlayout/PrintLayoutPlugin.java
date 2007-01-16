@@ -43,17 +43,11 @@ implements   ThreadedPlugIn
 	{
 		monitor.allowCancellationRequests();
 
-		JFrame frame = new JFrame("Print/Layout plugin");
-
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
 		LayoutFrame viewer = new LayoutFrame(context);
 
-		frame.setContentPane(viewer.createComponents());
+		viewer.setSize(210*2, 297*2);
 
-		frame.setSize(210*2, 297*2);
-
-		frame.setVisible(true);
+		viewer.setVisible(true);
 	}
 }		
 // end of file

@@ -1,6 +1,14 @@
 2007-01-16  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/LayoutFrame.java:
+		using menus instead of buttons. make LayoutFrame a JFrame
+
+	* src/de/intevation/printlayout/PrintLayoutPlugin.java:
+		using LayoutFrame as a JFrame
+
+2007-01-16  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
 		set (x, y, width, height) of the generated map svg
 		manually. -> map is rendered correctly
 

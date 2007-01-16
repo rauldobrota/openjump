@@ -6,6 +6,10 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.RepaintManager;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.AbstractAction;
 
 import java.awt.Color;
 import java.awt.BorderLayout;
@@ -103,6 +107,7 @@ import com.vividsolutions.jump.workbench.ui.renderer.Renderer;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class LayoutFrame 
+extends      JFrame
 //implements BoxFactory.Consumer
 {
 	public static final String A4_SHEET = "resources/a4.svg";
@@ -138,7 +143,10 @@ public class LayoutFrame
 	}
 
 	public LayoutFrame(PlugInContext pluginContext) {
+		super("Print/Layout plugin");
 		this.pluginContext = pluginContext;
+    setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setContentPane(createComponents());
 	}
 
 	/*
@@ -301,51 +309,27 @@ public class LayoutFrame
 
 		JSVGScrollPane scroller = new JSVGScrollPane(svgCanvas);
 
-		JPanel north = new JPanel();
-		JButton printBtn = new JButton("print");
-		JButton pdfBtn   = new JButton("export PDF");
-		JButton loadBtn  = new JButton("import SVG ...");
-		JButton saveBtn  = new JButton("export SVG ...");
-		JButton mapBtn   = new JButton("add map");
+		JMenu fileMenu = new JMenu("File");
+		JMenu editMenu = new JMenu("Edit");
 
-		printBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-				print();
-			}
-		});
+		PrintAction     printAction     = new PrintAction();
+		PDFAction       pdfAction       = new PDFAction();
+		ImportSVGAction svgImportAction = new ImportSVGAction();
+		ExportSVGAction svgExportAction = new ExportSVGAction();
+		AddMapAction    addMapAction    = new AddMapAction();
 
-		pdfBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-				exportPDF();
-			}
-		});
+		fileMenu.add(svgImportAction);
+		fileMenu.add(svgExportAction);
+		fileMenu.add(pdfAction);
+		fileMenu.add(printAction);
 
-		loadBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-				appendDocument();
-			}
-		});
+		editMenu.add(addMapAction);
 
-		saveBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-				saveDocument();
-			}
-		});
+		JMenuBar menubar = new JMenuBar();
+		menubar.add(fileMenu);
+		menubar.add(editMenu);
 
-		mapBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-				fetchMap();
-			}
-		});
-
-
-		north.add(printBtn);
-		north.add(pdfBtn);
-		north.add(loadBtn);
-		north.add(saveBtn);
-		north.add(mapBtn);
-
-		panel.add(north, BorderLayout.NORTH);
+		setJMenuBar(menubar);
 
 		panel.add(scroller, BorderLayout.CENTER);
 		return panel;
@@ -355,7 +339,7 @@ public class LayoutFrame
 		docManager.print();
 	}
 
-	public void fetchMap() {
+	public void addMap() {
 
 		DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
 
@@ -485,23 +469,6 @@ public class LayoutFrame
 		return result;
 	}
 
-	
-
-	/*
-	public void consume(DocumentRunnable runny) {
-		modify(new DocumentRunnableRunner(runny, svgCanvas.getSVGDocument()));
-	}
-
-	protected void modify(Runnable runnable) {
-		UpdateManager um = svgCanvas.getUpdateManager();
-
-		if (um == null)
-			System.err.println("saved before first rendering finbished");
-		else
-			um.getUpdateRunnableQueue().invokeLater(runnable);
-	}
-	*/
-
 	protected void exportPDF() {
 		JFileChooser fc = new JFileChooser(".");
 
@@ -515,7 +482,7 @@ public class LayoutFrame
 	}
 
 
-	protected void saveDocument() {
+	protected void exportSVG() {
 		JFileChooser fc = new JFileChooser(".");
 
 		if (fc.showSaveDialog(docManager.getCanvas()) 
@@ -525,13 +492,6 @@ public class LayoutFrame
 		File file = fc.getSelectedFile();
 
 		docManager.exportSVG(file);
-
-		/*
-
-		modify(new Runnable() {
-			public void run() { saveDocument(file); }
-		});
-		*/
 	}
 
 	protected static SVGDocument createSheet(String id) {
@@ -557,7 +517,7 @@ public class LayoutFrame
 		}
 	}
 
-	protected void appendDocument() {
+	protected void importSVG() {
 
 		JFileChooser fc = new JFileChooser(".");
 
@@ -768,20 +728,51 @@ public class LayoutFrame
 
 	*/
 		
-	/*
-	public static void main(String [] args) {
-
-		JFrame frame = new JFrame("Simple Batik viewer");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		LayoutFrame viewer = new LayoutFrame();
-
-		frame.setContentPane(viewer.createComponents());
-
-		frame.setSize(210*2, 297*2);
-
-		frame.setVisible(true);
+	private class PrintAction extends AbstractAction {
+		PrintAction() {
+			super("print...");
+		}
+		public void actionPerformed(ActionEvent ae) {
+			print();
+		}
 	}
-	*/
+
+	private class PDFAction extends AbstractAction {
+		PDFAction() {
+			super("export PDF...");
+		}
+		public void actionPerformed(ActionEvent ae) {
+			exportPDF();
+		}
+	}
+
+	private class ImportSVGAction extends AbstractAction {
+		ImportSVGAction() {
+			super("import SVG...");
+		}
+
+		public void actionPerformed(ActionEvent ae) {
+			importSVG();
+		}
+	}
+
+	private class ExportSVGAction extends AbstractAction {
+		ExportSVGAction() {
+			super("export SVG...");
+		}
+		public void actionPerformed(ActionEvent ae) {
+			exportSVG();
+		}
+	}
+
+	private class AddMapAction extends AbstractAction {
+		AddMapAction() {
+			super("add map");
+		}
+		public void actionPerformed(ActionEvent ae) {
+			addMap();
+		}
+	}
+
 }
 // end of file
