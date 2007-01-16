@@ -10,6 +10,7 @@ import javax.swing.filechooser.FileFilter;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.util.Assert;
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.BasicFeature;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.util.Block;
@@ -23,6 +24,7 @@ import com.vividsolutions.jump.workbench.imagery.ReferencedImageStyle;
 import com.vividsolutions.jump.workbench.model.Layer;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
+import com.vividsolutions.jump.workbench.ui.GenericNames;
 import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
 import com.vividsolutions.jump.util.Blackboard;
 
@@ -80,8 +82,8 @@ public class ImageFeatureCreator {
 	                        getImageryLayerDataset( layer ) );
             	}else{
             		Object[] options = { "OK" };
-            		JOptionPane.showOptionDialog(null, "The driver for "+rif.getTypeName()+" is not available.\nPlease check your configuration.", 
-            				"Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,null, options, options[0]);
+            		JOptionPane.showOptionDialog(null, I18N.get("ui.plugin.imagery.ImageFeatureCreator.The-driver-for")+" "+rif.getTypeName()+" "+ I18N.get("ui.plugin.imagery.ImageFeatureCreator.is-not-available-Please-check-your-configuration"), 
+            				I18N.get("ui.plugin.imagery.ImageFeatureCreator.Warning"), JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,null, options, options[0]);
             	}
             }
         }
@@ -221,7 +223,7 @@ public class ImageFeatureCreator {
         }
 
         public String getTypeName() {
-            return "All Formats";
+            return I18N.get("ui.plugin.imagery.ImageFeatureCreator.All-Formats");
         }
 
         public boolean isEditableImage( String location ) {

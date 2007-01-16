@@ -51,7 +51,7 @@ public class AddImageLayerPlugIn extends AbstractPlugIn {
 
 
     private Layer createLayer(LayerManager lm) {
-        String newLayerName = "Imagery_"+nameCounter++;
+        String newLayerName = I18N.get("ui.plugin.imagery.AddImageLayerPlugIn.Image")+"_"+nameCounter++;
         Layer layer = new Layer(newLayerName,
                         Color.black,
                         new FeatureDataset(ImageryLayerDataset.getSchema()),
