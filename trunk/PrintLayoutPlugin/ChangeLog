@@ -1,3 +1,22 @@
+2007-01-17  Ludwig Reiter  <ludwig.reiter@intevation.de>
+	
+	* LICENSE.txt:
+	  added. The license is LGPL (>=v2.1).
+	  
+	* src/de/intevation/printlayout/DocumentManager.java,
+		src/de/intevation/printlayout/LayoutCanvas.java,
+		src/de/intevation/printlayout/LayoutExtension.java,
+		src/de/intevation/printlayout/LayoutFrame.java,
+		src/de/intevation/printlayout/MatrixTools.java,
+		src/de/intevation/printlayout/PaperSizes.java,
+		src/de/intevation/printlayout/PrintLayoutPlugin.java,
+		src/de/intevation/printlayout/TypoUnits.java,
+		src/de/intevation/printlayout/tools/BoxFactory.java,
+		src/de/intevation/printlayout/tools/BoxInteractor.java,
+		src/de/intevation/printlayout/tools/DrawingAttributes.java:
+		Added license header.
+	
+
 2007-01-17  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/DocumentManager.java,
