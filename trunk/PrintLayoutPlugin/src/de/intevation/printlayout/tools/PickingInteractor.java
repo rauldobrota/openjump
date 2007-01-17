@@ -12,25 +12,32 @@
 package de.intevation.printlayout.tools;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.Component;
+import java.awt.Color;
 
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.GeneralPath;
 
 import org.apache.batik.swing.gvt.InteractorAdapter;
 import org.apache.batik.swing.gvt.Overlay;
 
 import org.apache.batik.dom.AbstractElement;
-import org.apache.batik.dom.AbstractNode;
+
+import org.apache.batik.dom.svg.SVGGraphicsElement;
 
 import de.intevation.printlayout.MatrixTools;
 import de.intevation.printlayout.DocumentManager;
 
 import org.w3c.dom.svg.SVGSVGElement;
 import org.w3c.dom.svg.SVGMatrix;
+import org.w3c.dom.svg.SVGException;
 import org.w3c.dom.svg.SVGRect;
 import org.w3c.dom.svg.SVGDocument;
 
@@ -49,6 +56,8 @@ implements   Overlay, Tool
 	protected boolean finished;
 	
 	protected DocumentManager documentManager;
+
+	protected ArrayList       selected;
 
 	public PickingInteractor() {
 	}
@@ -78,15 +87,15 @@ implements   Overlay, Tool
 	}
 
 	public boolean startInteraction(InputEvent ie) {
-		finished = false;
-		//return inUse;
+		if (!inUse) return false;
 		int mods = ie.getModifiers();
-		return
-			inUse
-			 // && ie.getID() == MouseEvent.MOUSE_PRESSED 
-			 && (mods & InputEvent.BUTTON1_MASK) != 0; 
-		/*
-		*/
+
+		boolean start = (mods & InputEvent.BUTTON1_MASK) != 0;
+
+		if (start)
+			finished = false;
+
+		return start;
 	}
 	
 	public boolean endInteraction() {
@@ -107,10 +116,11 @@ implements   Overlay, Tool
 		
 		AffineTransform xform;
 		try {
-			xform	= getScreenXForm(documentManager.getSVGDocument()).createInverse();
+			xform	= MatrixTools.toJavaTransform(
+				element.getScreenCTM().inverse());
 		}
-		catch(NoninvertibleTransformException nte) {
-			nte.printStackTrace();
+		catch (SVGException se) {
+			se.printStackTrace();
 			return;
 		}
 
@@ -155,28 +165,50 @@ implements   Overlay, Tool
 		N = ordered.size();
 
 		if (N > 0) {
+			selected = ordered;
+			/*
 			System.out.println("found items:");
 			for (int i = 0; i < N; ++i) {
 				AbstractElement obj = (AbstractElement)ordered.get(i);
 				System.out.println("\t'" +  obj.getAttributeNS(null, "id")+ "'");
 			}
+			*/
 		}
+		else
+			selected = null;
 
-		//System.err.println(screenPoint + " -> " + documentPoint);
+		((Component)me.getSource()).repaint();
 	}
   
-	protected static AffineTransform getScreenXForm(SVGDocument document) {
-		SVGSVGElement element = 
-			(SVGSVGElement)document.getElementById(DocumentManager.DOCUMENT_SHEET);
-
-		SVGMatrix matrix = element.getScreenCTM();
-	
-		return MatrixTools.toJavaTransform(matrix);
-	}
-
 	public void paint(Graphics g) {
-		if (!inUse)
+		if (!inUse || selected == null)
 			return;
+
+		Graphics2D g2d = (Graphics2D)g;
+
+		for (int N = selected.size(), i = 0; i < N; ++i) {
+			SVGGraphicsElement element =
+				(SVGGraphicsElement)selected.get(i);
+
+			SVGRect bbox = element.getBBox();
+      SVGMatrix matrix = element.getScreenCTM();
+
+			AffineTransform xform = MatrixTools.toJavaTransform(matrix);
+
+			Rectangle2D rect = new Rectangle2D.Float(
+				(float)bbox.getX(), 
+				(float)bbox.getY(),
+				(float)bbox.getWidth(),
+				(float)bbox.getHeight());
+
+			GeneralPath path = new GeneralPath(rect);
+
+			Shape xpath = path.createTransformedShape(xform);
+
+			g2d.setPaint(Color.red);
+
+			g2d.draw(xpath);
+		}
 	}
 }
 // end of file

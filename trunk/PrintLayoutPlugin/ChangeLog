@@ -1,5 +1,13 @@
 2007-01-17  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		rename tool buttons
+
+	* src/de/intevation/printlayout/tools/PickingInteractor.java:
+		add overlay to select tool
+
+2007-01-17  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
 	* src/de/intevation/printlayout/tools/Tool.java:
 		added. interface to be implemented by all tools
 

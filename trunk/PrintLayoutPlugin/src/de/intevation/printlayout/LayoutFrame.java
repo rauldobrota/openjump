@@ -161,7 +161,6 @@ extends      JFrame
 
 		fileMenu.add(svgExportAction);
 		fileMenu.add(pdfAction);
-		fileMenu.add(pdfAction);
 		fileMenu.add(printAction);
 
 		editMenu.add(addMapAction);
@@ -196,7 +195,6 @@ extends      JFrame
 				new float[]{ 3f, 3f, 3f, 3f},
 				0.0f));
 
-
 		BoxFactory boxFactory = new BoxFactory();
 		boxFactory.setDrawingAttributes(attributes);
 
@@ -212,18 +210,18 @@ extends      JFrame
 
 		JToolBar toolBar = new JToolBar();
 
-		JToggleButton boxBnt  = new JToggleButton("box");
-		JToggleButton pickBtn = new JToggleButton("pick");
-		JToggleButton nopBnt  = new JToggleButton("no tool");
+		JToggleButton boxBnt  = new JToggleButton("draw");
+		JToggleButton pickBtn = new JToggleButton("select");
+		JToggleButton nopBnt  = new JToggleButton("pan");
 
 		boxBnt .setActionCommand(boxInteractor.getToolIdentifier());
-		nopBnt .setActionCommand("no tool");
+		nopBnt .setActionCommand("pan");
 		pickBtn.setActionCommand(pickingInteractor.getToolIdentifier());
 
 
 		ActionListener listener = new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				activateTool( ae.getActionCommand());
+				activateTool(ae.getActionCommand());
 			}
 		};
 
