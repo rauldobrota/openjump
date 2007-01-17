@@ -1,6 +1,11 @@
 2007-01-17  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	* README.txt:
+		Add missing 'cvs login' in I/a
+
+2007-01-17  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	* README.txt:
 		Add a paragraph how to build and install the plugin
 
 	* bin/run.sh:

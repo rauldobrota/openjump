@@ -12,6 +12,8 @@ I - Install
   a - get the sources
 
       anonymous CVS access:
+
+				 cvs -d:pserver:anonymous@jump-pilot.cvs.sourceforge.net:/cvsroot/jump-pilot login
       
         cvs -z3 -d:pserver:anonymous@jump-pilot.cvs.sourceforge.net:/cvsroot/jump-pilot co -P PrintLayoutLayoutPlugin
 
