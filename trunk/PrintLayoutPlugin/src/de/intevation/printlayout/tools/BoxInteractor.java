@@ -1,3 +1,11 @@
+/*
+ * BoxInteractor.java
+ * ------------------
+ * (c) 2007 by Intevation GmbH
+ *
+ * @author Sascha L. Teichmann (teichmann@intevation.de)
+ * @author Ludwig Reiter       (ludwig@intevation.de)
+ */
 package de.intevation.printlayout.tools;
 
 import java.awt.Shape;
@@ -111,7 +119,6 @@ implements   Overlay
 	}
 
 	public void setInUse(boolean inUse) {
-		System.err.println("setInUse: " + inUse);
 		this.inUse = inUse;
 	}
 

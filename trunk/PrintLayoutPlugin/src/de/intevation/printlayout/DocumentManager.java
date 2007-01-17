@@ -1,3 +1,11 @@
+/*
+ * DocumentManager.java
+ * --------------------
+ * (c) 2007 by Intevation GmbH
+ *
+ * @author Sascha L. Teichmann (teichmann@intevation.de)
+ * @author Ludwig Reiter       (ludwig@intevation.de)
+ */
 package de.intevation.printlayout;
 
 import org.apache.batik.dom.AbstractDocument;
@@ -92,18 +100,7 @@ public class DocumentManager
 	// XXX: potential sync problem?
 	public void getPaperSize(double [] size) {
 
-		UserAgent ua = svgCanvas.getUserAgent();
 		SVGDocument document = svgCanvas.getSVGDocument();
-
-		double px2mm;
-
-		if (ua == null) {
-			System.err.println("no user agent found");
-			px2mm = 1d;
-		}
-		else {
-			px2mm = ua.getPixelUnitToMillimeter();
-		}
 
 		AbstractElement sheet =
 			(AbstractElement)document.getElementById(DOCUMENT_SHEET);
@@ -295,9 +292,6 @@ public class DocumentManager
 					double [] paper = new double[2];
 
 					getPaperSize(paper);
-
-					// scale * width = paper[0] <=> scale = paper[0]/width
-
 
 					img.setAttributeNS(null, "width",  String.valueOf(width));
 					img.setAttributeNS(null, "height", String.valueOf(height));
