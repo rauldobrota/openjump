@@ -5,7 +5,6 @@ WHAT="$1"
 WHAT=${WHAT:-com.vividsolutions.jump.workbench.JUMPWorkbench}
 
 JUMPDIST=${JUMPDIST:-$HOME/prog/openjump/current}
-JUMPHOME=${JUMPHOME:-$HOME/prog/openjump/openjump}
 
 PRINTHOME=${PRINTHOME:-$HOME/prog/PrintLayoutPlugin}
 
