@@ -38,6 +38,7 @@ import java.io.StringReader;
 import java.net.URL;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.JSVGScrollPane;
@@ -75,8 +76,10 @@ import com.vividsolutions.jump.workbench.ui.renderer.Renderer;
 import com.vividsolutions.jts.geom.Envelope;
 
 import de.intevation.printlayout.tools.BoxInteractor;
+import de.intevation.printlayout.tools.PickingInteractor;
 import de.intevation.printlayout.tools.BoxFactory;
 import de.intevation.printlayout.tools.DrawingAttributes;
+import de.intevation.printlayout.tools.Tool;
 
 public class LayoutFrame 
 extends      JFrame
@@ -85,7 +88,11 @@ extends      JFrame
 
   protected DocumentManager docManager;
 
+  protected LayoutCanvas    svgCanvas;
+
 	protected PlugInContext   pluginContext;
+
+	protected ArrayList       tools;
 
 	public LayoutFrame() {
 	}
@@ -100,7 +107,7 @@ extends      JFrame
 	public JComponent createComponents() {
 		JPanel panel = new JPanel(new BorderLayout());
 
-		LayoutCanvas svgCanvas = new LayoutCanvas(
+		svgCanvas = new LayoutCanvas(
 			new SVGUserAgentGUIAdapter(panel), true, true);
 
 		docManager = new DocumentManager(svgCanvas);
@@ -169,12 +176,12 @@ extends      JFrame
 
 		panel.add(scroller, BorderLayout.CENTER);
 
-		createTools(svgCanvas, panel);
+		createTools(panel);
 
 		return panel;
 	}
 
-	protected void createTools(JSVGCanvas svgCanvas, JPanel panel) {
+	protected void createTools(JPanel panel) {
 
 		DrawingAttributes attributes = new DrawingAttributes();
 
@@ -193,56 +200,76 @@ extends      JFrame
 		BoxFactory boxFactory = new BoxFactory();
 		boxFactory.setDrawingAttributes(attributes);
 
-		final BoxInteractor boxInteractor = new BoxInteractor();
+		BoxInteractor     boxInteractor     = new BoxInteractor();
+		PickingInteractor pickingInteractor = new PickingInteractor();
 
 		boxInteractor.setFactory(boxFactory);
 		boxInteractor.setDocumentManager(docManager);
+		pickingInteractor.setDocumentManager(docManager);
 
-
-		List overlays = svgCanvas.getOverlays();
-		overlays.add(boxInteractor);
-
-		List interactors = svgCanvas.getInteractors();
-		interactors.add(boxInteractor);
+		addTool(boxInteractor);
+		addTool(pickingInteractor);
 
 		JToolBar toolBar = new JToolBar();
 
-		JToggleButton boxBnt = new JToggleButton("box");
+		JToggleButton boxBnt  = new JToggleButton("box");
+		JToggleButton pickBtn = new JToggleButton("pick");
+		JToggleButton nopBnt  = new JToggleButton("no tool");
 
-		boxBnt.setActionCommand("box");
+		boxBnt .setActionCommand(boxInteractor.getToolIdentifier());
+		nopBnt .setActionCommand("no tool");
+		pickBtn.setActionCommand(pickingInteractor.getToolIdentifier());
 
-		JToggleButton dummyBnt = new JToggleButton("dummy");
-
-		dummyBnt.setActionCommand("dummy");
 
 		ActionListener listener = new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				if ("box".equals(ae.getActionCommand())) {
-					boxInteractor.setInUse(true);
-				}
-				else {
-					boxInteractor.setInUse(false);
-				}
+				activateTool( ae.getActionCommand());
 			}
 		};
 
-		boxBnt.addActionListener(listener);
-		dummyBnt.addActionListener(listener);
+		boxBnt .addActionListener(listener);
+		nopBnt .addActionListener(listener);
+		pickBtn.addActionListener(listener);
 
 		ButtonGroup group = new ButtonGroup();
-		group.add(boxBnt);
-		group.add(dummyBnt);
 
-		dummyBnt.setSelected(true);
+		group.add(boxBnt);
+		group.add(pickBtn);
+		group.add(nopBnt);
+
+		nopBnt.setSelected(true);
 
 		toolBar.add(boxBnt);
-		toolBar.add(dummyBnt);
+		toolBar.add(pickBtn);
+		toolBar.add(nopBnt);
 
 		JPanel north = new JPanel();
 
 		north.add(toolBar);
 
 		panel.add(north, BorderLayout.NORTH);
+	}
+
+	public void addTool(Tool tool) {
+		if (tools == null)
+			tools = new ArrayList();
+
+		tools.add(tool);
+
+		List overlays = svgCanvas.getOverlays();
+		overlays.add(tool);
+
+		List interactors = svgCanvas.getInteractors();
+		interactors.add(tool);
+	}
+
+	public void activateTool(String identifier) {
+		if (tools == null || identifier == null)
+			return;
+		for (int i = tools.size()-1; i >= 0; --i) {
+			Tool tool = (Tool)tools.get(i);
+			tool.setInUse(identifier.equals(tool.getToolIdentifier()));
+		}
 	}
 
 	public void print() {

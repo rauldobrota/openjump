@@ -1,5 +1,19 @@
 2007-01-17  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/tools/Tool.java:
+		added. interface to be implemented by all tools
+
+	* src/de/intevation/printlayout/tools/BoxInteractor.java:
+		implements Tool interface
+
+	* src/de/intevation/printlayout/tools/PickingInteractor.java:
+		added, simple picking tool
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		uses new picking tool and new Tool infrastructure.
+		
+2007-01-17  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
 	* README.txt:
 		Add missing 'cvs login' in I/a
 

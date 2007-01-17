@@ -19,17 +19,18 @@ import java.awt.Stroke;
 
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
+
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Rectangle2D;
 
 import org.apache.batik.swing.gvt.InteractorAdapter;
 import org.apache.batik.swing.gvt.JGVTComponent;
+import org.apache.batik.swing.gvt.Overlay;
 
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGMatrix;
 
-import org.apache.batik.swing.gvt.Overlay;
 
 import org.apache.batik.dom.svg.SVGOMSVGElement;
 
@@ -38,8 +39,10 @@ import de.intevation.printlayout.DocumentManager;
 
 public class BoxInteractor 
 extends      InteractorAdapter 
-implements   Overlay
+implements   Overlay, Tool
 {
+	public static final String IDENTIFIER = "box-tool";
+
 	protected boolean inUse;
 
 	protected boolean finished = true;
@@ -82,6 +85,10 @@ implements   Overlay
 			AffineTransform xform);
 
 		DrawingAttributes getDrawingAttributes();
+	}
+
+	public String getToolIdentifier() {
+		return IDENTIFIER;
 	}
 
 
