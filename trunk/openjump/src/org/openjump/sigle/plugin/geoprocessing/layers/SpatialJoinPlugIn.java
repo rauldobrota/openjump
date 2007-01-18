@@ -170,7 +170,7 @@ public class SpatialJoinPlugIn extends ThreadedBasePlugIn {
         	    	if (aFeature.getGeometry().within(bFeature.getGeometry())) {
 		        	nbFeatureWithin++;
 		        	nbFeature++;
-					fEqual = bFeature;
+					fWithin = bFeature;
         	    	}
         	}
         	    
