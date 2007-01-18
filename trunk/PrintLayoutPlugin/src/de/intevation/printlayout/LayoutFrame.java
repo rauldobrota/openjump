@@ -149,27 +149,34 @@ extends      JFrame
 
 		JSVGScrollPane scroller = new JSVGScrollPane(svgCanvas);
 
-		JMenu fileMenu = new JMenu("File");
-		JMenu editMenu = new JMenu("Edit");
+		JMenu fileMenu   = new JMenu("File");
+		JMenu editMenu   = new JMenu("Edit");
+		JMenu insertMenu = new JMenu("Insert");
 
-		PrintAction       printAction       = new PrintAction();
+		ExportSVGAction   svgExportAction   = new ExportSVGAction();
 		PDFAction         pdfAction         = new PDFAction();
+		PrintAction       printAction       = new PrintAction();
+		QuitAction        quitAction        = new QuitAction();
+
 		ImportImageAction imageImportAction = new ImportImageAction();
 		ImportSVGAction   svgImportAction   = new ImportSVGAction();
-		ExportSVGAction   svgExportAction   = new ExportSVGAction();
 		AddMapAction      addMapAction      = new AddMapAction();
 
 		fileMenu.add(svgExportAction);
 		fileMenu.add(pdfAction);
 		fileMenu.add(printAction);
+		fileMenu.addSeparator();
+		fileMenu.add(quitAction);
 
-		editMenu.add(addMapAction);
-		editMenu.add(svgImportAction);
-		editMenu.add(imageImportAction);
+		insertMenu.add(addMapAction);
+		insertMenu.add(svgImportAction);
+		insertMenu.add(imageImportAction);
 
 		JMenuBar menubar = new JMenuBar();
+
 		menubar.add(fileMenu);
 		menubar.add(editMenu);
+		menubar.add(insertMenu);
 
 		setJMenuBar(menubar);
 
@@ -444,7 +451,7 @@ extends      JFrame
 
 	private class PrintAction extends AbstractAction {
 		PrintAction() {
-			super("print...");
+			super("Print...");
 		}
 		public void actionPerformed(ActionEvent ae) {
 			print();
@@ -453,7 +460,7 @@ extends      JFrame
 
 	private class PDFAction extends AbstractAction {
 		PDFAction() {
-			super("export PDF...");
+			super("Export PDF...");
 		}
 		public void actionPerformed(ActionEvent ae) {
 			exportPDF();
@@ -462,7 +469,7 @@ extends      JFrame
 
 	private class ImportImageAction extends AbstractAction {
 		ImportImageAction() {
-			super("import image...");
+			super("Import Image...");
 		}
 
 		public void actionPerformed(ActionEvent ae) {
@@ -472,7 +479,7 @@ extends      JFrame
 
 	private class ImportSVGAction extends AbstractAction {
 		ImportSVGAction() {
-			super("import SVG...");
+			super("Import SVG...");
 		}
 
 		public void actionPerformed(ActionEvent ae) {
@@ -482,7 +489,7 @@ extends      JFrame
 
 	private class ExportSVGAction extends AbstractAction {
 		ExportSVGAction() {
-			super("export SVG...");
+			super("Export SVG...");
 		}
 		public void actionPerformed(ActionEvent ae) {
 			exportSVG();
@@ -491,10 +498,19 @@ extends      JFrame
 
 	private class AddMapAction extends AbstractAction {
 		AddMapAction() {
-			super("add map");
+			super("Add Map");
 		}
 		public void actionPerformed(ActionEvent ae) {
 			addMap();
+		}
+	}
+
+	private class QuitAction extends AbstractAction {
+		QuitAction() {
+			super("Close");
+		}
+		public void actionPerformed(ActionEvent ae) {
+			LayoutFrame.this.dispose();
 		}
 	}
 }

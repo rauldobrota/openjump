@@ -1,6 +1,12 @@
 2007-01-18  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/LayoutFrame.java:
+		- reordered menus once again. "File", "Edit", "Insert"
+		- added Close entry to File menu
+	
+2007-01-18  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
 		default color/stroke/fill for box drawing is now 
 		black/continues/unfilled.
 
