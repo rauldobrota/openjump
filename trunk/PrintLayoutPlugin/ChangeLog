@@ -1,5 +1,13 @@
 2007-01-18  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/DocumentManager.java:
+		added a method to ungroup a group
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		add menu entry to ungroup groups
+
+2007-01-18  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
 	* src/de/intevation/printlayout/tools/PickingInteractor.java:
 		- add a flag to indicate in point query only to result objects
 		  which are directly embedded in the drawing sheet.

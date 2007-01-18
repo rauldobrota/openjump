@@ -97,6 +97,7 @@ implements   PickingInteractor.PickingListener
 
 	protected RemoveAction       removeAction;
 	protected GroupAction        groupAction;
+	protected UngroupAction      ungroupAction;
 
 	protected PickingInteractor  pickingInteractor;
 
@@ -164,6 +165,7 @@ implements   PickingInteractor.PickingListener
 
 		                  removeAction      = new RemoveAction();
 											groupAction       = new GroupAction();
+											ungroupAction     = new UngroupAction();
 
 		ImportImageAction imageImportAction = new ImportImageAction();
 		ImportSVGAction   svgImportAction   = new ImportSVGAction();
@@ -177,8 +179,11 @@ implements   PickingInteractor.PickingListener
 
 		editMenu.add(removeAction);
 		editMenu.add(groupAction);
-		removeAction.setEnabled(false);
-		groupAction .setEnabled(false);
+		editMenu.add(ungroupAction);
+
+		removeAction  .setEnabled(false);
+		groupAction   .setEnabled(false);
+		ungroupAction .setEnabled(false);
 
 		insertMenu.add(addMapAction);
 		insertMenu.add(svgImportAction);
@@ -479,6 +484,14 @@ implements   PickingInteractor.PickingListener
 		}
 	}
 
+	protected void ungroup() {
+		String [] ids = pickingInteractor.getSelectedIDs();
+		if (ids != null) {
+			pickingInteractor.clearSelection();
+			docManager.ungroupIDs(ids);
+		}
+	}
+
 	/** PickingInteractor.PickingListener */
 	public void selectionChanged(PickingInteractor.PickingEvent evt) {
 		PickingInteractor pi = (PickingInteractor)evt.getSource();
@@ -489,6 +502,9 @@ implements   PickingInteractor.PickingListener
 
 		if (groupAction != null)
 			groupAction.setEnabled(N > 1);
+
+		if (ungroupAction != null)
+			ungroupAction.setEnabled(N > 0);
 	}
 
 	private class PrintAction extends AbstractAction {
@@ -571,6 +587,15 @@ implements   PickingInteractor.PickingListener
 		}
 		public void actionPerformed(ActionEvent ae) {
 			group();
+		}
+	}
+
+	private class UngroupAction extends AbstractAction {
+		UngroupAction() {
+			super("Ungroup");
+		}
+		public void actionPerformed(ActionEvent ae) {
+			ungroup();
 		}
 	}
 }

@@ -25,6 +25,7 @@ import org.apache.batik.bridge.UpdateManager;
 import org.apache.batik.bridge.UserAgent;
 
 import org.w3c.dom.svg.SVGDocument;
+import org.w3c.dom.svg.SVGGElement;
 
 import org.w3c.dom.NodeList; 
 import org.w3c.dom.DOMImplementation;
@@ -634,6 +635,89 @@ public class DocumentManager
 					group.appendChild((AbstractElement)children.get(i));
 
 				sheet.appendChild(group);
+
+				return null;
+			}
+		});
+	}
+
+	public void ungroupIDs(final String [] ids) {
+
+
+		modifyDocumentLater(new DocumentModifier() {
+			public Object run(DocumentManager documentManager) {
+
+				IDS: for (int j = 0; j < ids.length; ++j) {
+					String id = ids[j];
+
+					if (id == null || !id.startsWith(OBJECT_ID)) // only split our groups
+						continue;
+
+					SVGDocument document = documentManager.getSVGDocument();
+
+					AbstractElement element =
+						(AbstractElement)document.getElementById(id);
+
+					// found?
+					if (element == null || !(element instanceof SVGGElement))
+						continue;
+
+					AbstractElement parent =
+						(AbstractElement)element.getParentNode();
+
+					// split only if directly in sheet
+					if (parent == null 
+					|| !parent.getAttributeNS(null, "id").equals(DOCUMENT_SHEET))
+						continue;
+
+					NodeList children = element.getChildNodes();
+
+					int N = children.getLength();
+
+					if (N < 2) // not really a group
+						continue;
+
+					ArrayList list = new ArrayList(N); // copy to
+
+					// only split if the group consists of self created elements
+					for (int i = 0; i < N; ++i) {
+						AbstractElement child = (AbstractElement)children.item(i);
+						if (!(child instanceof SVGGElement))
+							continue IDS;
+						String idx = child.getAttributeNS(null, "id");
+						if (idx == null || !idx.startsWith(OBJECT_ID))
+							continue IDS;
+						list.add(child);
+					}
+
+					parent.removeChild(element);
+
+					// save matrix
+					String xformS = element.getAttributeNS(null, "transform");
+
+					AffineTransform xform = xformS != null
+						? MatrixTools.toJavaTransform(xformS)
+						: new AffineTransform();
+
+					for (int i = 0; i < N; ++i) {
+						AbstractElement child = (AbstractElement)list.get(i);
+						element.removeChild(child);
+
+						xformS = child.getAttributeNS(null, "transform");
+
+						if (xformS == null)
+							child.setAttributeNS(
+								null, "transform", MatrixTools.toSVGString(xform));
+						else {
+							AffineTransform yform = MatrixTools.toJavaTransform(xformS);
+							yform.concatenate(xform);
+							child.setAttributeNS(
+								null, "transform", MatrixTools.toSVGString(yform));
+						}
+
+						parent.appendChild(child);
+					}
+				} // for all ids
 
 				return null;
 			}
