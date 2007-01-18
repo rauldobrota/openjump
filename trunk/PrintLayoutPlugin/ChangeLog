@@ -1,3 +1,8 @@
+2007-01-18  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/tools/Arrows.java:
+		added. vector shapes for arrows needed in translation tool.
+
 2007-01-17  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/LayoutFrame.java:
