@@ -1,5 +1,14 @@
 2007-01-18  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		title of the plugin frame is now "Print/Layout"
+
+	* src/de/intevation/printlayout/PrintLayoutPlugin.java:
+		the plugin is now activated over OJ's "File" menu
+		in german called "Datei" over entry "Print/Layout"
+
+2007-01-18  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
 	* src/de/intevation/printlayout/tools/Arrows.java:
 		added. vector shapes for arrows needed in translation tool.
 

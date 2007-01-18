@@ -98,7 +98,7 @@ extends      JFrame
 	}
 
 	public LayoutFrame(PlugInContext pluginContext) {
-		super("Print/Layout plugin");
+		super("Print/Layout");
 		this.pluginContext = pluginContext;
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setContentPane(createComponents());

@@ -11,6 +11,8 @@
  */
 package de.intevation.printlayout;
 
+import com.vividsolutions.jump.workbench.ui.MenuNames;
+
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.ThreadedPlugIn;
@@ -35,10 +37,14 @@ implements   ThreadedPlugIn
 		context
 			.getFeatureInstaller()
 			.addMainMenuItem(
-				this, new String[] { "File" }, getName(),
+				this, new String[] { MenuNames.FILE }, getName(),
 				false, null, check.createAtLeastNLayersMustExistCheck(1));
 
 		 blackboard = new Blackboard();
+	}
+
+	public String getName() {
+		return "Print/Layout";
 	}
    
 
