@@ -44,7 +44,7 @@ import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.EventObject;
 
 public class PickingInteractor
 extends      InteractorAdapter
@@ -52,12 +52,29 @@ implements   Overlay, Tool
 {
 	public static final String IDENTIFIER = "picking-tool";
 
+	public static class PickingEvent
+	extends             EventObject
+	{
+		public PickingEvent(Object source) {
+			super(source);
+		}
+	} // class PickingEvent
+
+	public interface PickingListener {
+
+		void selectionChanged(PickingEvent evt);
+
+	} // interface PickingListener
+
 	protected boolean inUse;
 	protected boolean finished;
 	
 	protected DocumentManager documentManager;
 
 	protected ArrayList       selected;
+
+	protected ArrayList       listeners;
+
 
 	public PickingInteractor() {
 	}
@@ -72,6 +89,25 @@ implements   Overlay, Tool
 
 	public DocumentManager getDocumentManager() {
 		return documentManager;
+	}
+
+	public void addPickingListener(PickingListener listener) {
+		if (listener != null) {
+			if (listeners == null) {
+				listeners = new ArrayList(5);
+				listeners.add(listener);
+			}
+			else if (!listeners.contains(listeners))
+				listeners.add(listener);
+		}
+	}
+
+	public void removePickingListener(PickingListener listener) {
+		if (listener  != null
+		&&  listeners != null
+		&&  listeners.remove(listener) 
+		&&  listeners.isEmpty());
+			listeners = null;
 	}
 
 	public String getToolIdentifier() {
@@ -127,56 +163,59 @@ implements   Overlay, Tool
 
 		int N = result.size();
 
+		boolean changed = false;
+
 		if (isCtrlDown(modifiers)) { // add to selected
 			if (N > 0) {
-				AbstractElement last = (AbstractElement)result.get(N-1);
-				if (selected == null) {
+				String last = (String)result.get(N-1);
+				if (selected == null) { // empty list
 					selected = new ArrayList();
 					selected.add(last);
+					changed = true;
 				}
 				else {
-					String id = last.getAttributeNS(null, "id");
-					boolean alreadySelected = false;
-					for (int i = selected.size()-1; i >= 0; --i) {
-						AbstractElement sel = (AbstractElement)selected.get(i);
-						if (sel.getAttributeNS(null, "id").equals(id)) {
-							alreadySelected = true;
-							break;
-						}
-					} // for all already selected
-					if (!alreadySelected)
+					if (!selected.contains(last)) {
 						selected.add(last);
+						changed = true;
+					}
 				}
 			}
 		}
 		else if (isShiftDown(modifiers)) { // remove from selection
 			if (N > 0 && selected != null) {
-				AbstractElement last = (AbstractElement)result.get(N-1);
+				String last = (String)result.get(N-1);
 
-				String id = last.getAttributeNS(null, "id");
-				for (int i = selected.size()-1; i >= 0; --i) {
-					AbstractElement sel = (AbstractElement)selected.get(i);
-					if (sel.getAttributeNS(null, "id").equals(id)) {
-						selected.remove(i);
-						break;
-					}
-				} // for all selected
-
-				if (selected.isEmpty())
-					selected = null;
+				if (selected.remove(last)) {
+					changed = true;
+					if (selected.isEmpty())
+						selected = null;
+				}
 			}
 		}
 		else { // select only one. if missed target deselect all
-			if (selected != null)
-				selected.clear();
+			if (N > 0) {
+				if (selected != null) selected.clear();
+				else                  selected = new ArrayList();
+				selected.add(result.get(N-1));
+			}
 			else
-				selected = new ArrayList();
+				selected = null;
 
-			AbstractElement last = (AbstractElement)result.get(N-1);
-			selected.add(last);
+			changed = true;
 		}
 
 		((Component)me.getSource()).repaint();
+
+		if (changed)
+			fireSelectionChanged();
+	}
+
+	protected void fireSelectionChanged() {
+		if (listeners != null) {
+			PickingEvent evt = new PickingEvent(this);
+			for (int i = listeners.size()-1; i >= 0; --i)
+				((PickingListener)listeners.get(i)).selectionChanged(evt);
+		}
 	}
 
 	/** spatial query all for all objects around (x, y) in screen coordinate */
@@ -215,24 +254,22 @@ implements   Overlay, Tool
 
 		int N = result.getLength();
 
-		HashSet alreadyFound = new HashSet();
-
 		for (int i = 0; i < N; ++i) {
 			AbstractElement obj = (AbstractElement)result.item(i);
-			AbstractElement last = null;
+			String last = null;
 			do {
 				AbstractElement parent = (AbstractElement)obj.getParentNode();
 				if (parent == null)
 					break;
 				String id = parent.getAttributeNS(null, "id");
 				if (id != null && id.startsWith(DocumentManager.OBJECT_ID)) {
-					last = parent;
+					last = id;
 				}
 				obj = parent;
 			}
 			while (obj != null && obj != element);
 
-			if (last != null && alreadyFound.add(last.getAttributeNS(null, "id")))
+			if (last != null && !ordered.contains(last))
 				ordered.add(last);
 		}
 
@@ -247,9 +284,21 @@ implements   Overlay, Tool
 
 		g2d.setPaint(Color.red);
 
-		for (int N = selected.size(), i = 0; i < N; ++i) {
+		SVGDocument document = documentManager.getSVGDocument();
+
+		for (int i = 0; i < selected.size();) {
+
+			String id = (String)selected.get(i);
+
 			SVGGraphicsElement element =
-				(SVGGraphicsElement)selected.get(i);
+				(SVGGraphicsElement)document.getElementById(id);
+
+			if (element == null) { // no available any longer
+				selected.remove(i);
+				continue;
+			}
+
+			++i;
 
 			SVGRect bbox = element.getBBox();
 			SVGMatrix matrix = element.getScreenCTM();
@@ -268,6 +317,9 @@ implements   Overlay, Tool
 
 			g2d.draw(xpath);
 		}
+		
+		if (selected.isEmpty())
+			selected = null;
 	}
 
 	public void mouseDragged(MouseEvent e) {
@@ -292,6 +344,16 @@ implements   Overlay, Tool
 
 	public void mouseReleased(MouseEvent e) {
 		finished = true;
+	}
+
+	public boolean hasSelection() {
+		return selected != null && !selected.isEmpty();
+	}
+
+	public String [] getSelectedIDs() {
+		if (!hasSelection())
+			return null;
+		return (String [])selected.toArray(new String[selected.size()]);
 	}
 }
 // end of file

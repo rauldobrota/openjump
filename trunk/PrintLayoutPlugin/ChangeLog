@@ -1,5 +1,14 @@
 2007-01-18  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/tools/PickingInteractor.java:
+		offers now a PickingListener interface. implementation
+		can use it to get informed if selection changes.
+		
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		implements PickingListener interface.
+
+2007-01-18  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
 	* src/de/intevation/printlayout/LayoutFrame.java:
 		query our interactors before other if they want to start.
 

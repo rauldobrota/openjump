@@ -83,6 +83,7 @@ import de.intevation.printlayout.tools.Tool;
 
 public class LayoutFrame 
 extends      JFrame
+implements   PickingInteractor.PickingListener
 {
 	public static final String A4_SHEET = "resources/a4.svg";
 
@@ -209,6 +210,8 @@ extends      JFrame
 
 		BoxInteractor     boxInteractor     = new BoxInteractor();
 		PickingInteractor pickingInteractor = new PickingInteractor();
+
+		pickingInteractor.addPickingListener(this);
 
 		boxInteractor.setFactory(boxFactory);
 		boxInteractor.setDocumentManager(docManager);
@@ -447,6 +450,18 @@ extends      JFrame
 
 
 		docManager.appendImage(fc.getSelectedFile());
+	}
+
+	/** PickingInteractor.PickingListener */
+	public void selectionChanged(PickingInteractor.PickingEvent evt) {
+		PickingInteractor pi = (PickingInteractor)evt.getSource();
+		String [] ids = pi.getSelectedIDs();
+
+		if (ids != null) {
+			System.err.println("selected ids");
+			for (int i = 0; i < ids.length; ++i)
+				System.err.println(ids[i]);
+		}
 	}
 
 	private class PrintAction extends AbstractAction {
