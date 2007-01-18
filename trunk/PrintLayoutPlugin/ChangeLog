@@ -1,5 +1,18 @@
 2007-01-18  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/DocumentManager.java:
+		has now a method to remove a set set of ids from DOM.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		added a menu item to remove selected items
+		
+	* src/de/intevation/printlayout/tools/PickingInteractor.java:
+		inform listeners if during paint() of the overlay it is
+		recognized that the selection is no longer valid.
+		
+
+2007-01-18  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
 	* src/de/intevation/printlayout/tools/PickingInteractor.java:
 		offers now a PickingListener interface. implementation
 		can use it to get informed if selection changes.

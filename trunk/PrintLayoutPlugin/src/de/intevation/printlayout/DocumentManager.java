@@ -545,8 +545,6 @@ public class DocumentManager
 		AbstractElement xform = 
 			(AbstractElement)document.createElementNS(svgNS, "g");
 
-		System.err.println(MatrixTools.toSVGString(matrix));
-
 		xform.setAttributeNS(null, 
 			"transform", matrix == null 
 				? "matrix(1 0 0 1 0 0)" 
@@ -562,6 +560,29 @@ public class DocumentManager
 		xform.appendChild(node);
 
 		root.appendChild(xform);
+	}
+
+	public void removeIDs(final String [] ids) {
+		modifyDocumentLater(new DocumentModifier() {
+			public Object run(DocumentManager documentManager) {
+
+				SVGDocument document = documentManager.getSVGDocument();
+
+				for (int i = 0; i < ids.length; ++i) {
+					AbstractElement element =
+						(AbstractElement)document.getElementById(ids[i]);
+
+					if (element != null) { // child found?
+						AbstractElement parent =
+							(AbstractElement)element.getParentNode();
+						if (parent != null)
+							parent.removeChild(element);
+					}
+				} // for all ids
+
+				return null;
+			}
+		});
 	}
 }
 // end of file

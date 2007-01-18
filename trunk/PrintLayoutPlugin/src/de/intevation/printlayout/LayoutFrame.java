@@ -87,13 +87,17 @@ implements   PickingInteractor.PickingListener
 {
 	public static final String A4_SHEET = "resources/a4.svg";
 
-  protected DocumentManager docManager;
+  protected DocumentManager    docManager;
 
-  protected LayoutCanvas    svgCanvas;
+  protected LayoutCanvas       svgCanvas;
 
-	protected PlugInContext   pluginContext;
+	protected PlugInContext      pluginContext;
 
-	protected ArrayList       tools;
+	protected ArrayList          tools;
+
+	protected RemoveAction       removeAction;
+
+	protected PickingInteractor  pickingInteractor;
 
 	public LayoutFrame() {
 	}
@@ -124,8 +128,6 @@ implements   PickingInteractor.PickingListener
 
 			public void documentLoadingCompleted(SVGDocumentLoaderEvent e) {
 				System.err.println("completed");
-				SVGDocument document = e.getSVGDocument();
-				AbstractElement svgRoot = (AbstractElement)document.getRootElement();
 			}
 		});
 
@@ -159,6 +161,8 @@ implements   PickingInteractor.PickingListener
 		PrintAction       printAction       = new PrintAction();
 		QuitAction        quitAction        = new QuitAction();
 
+		                  removeAction      = new RemoveAction();
+
 		ImportImageAction imageImportAction = new ImportImageAction();
 		ImportSVGAction   svgImportAction   = new ImportSVGAction();
 		AddMapAction      addMapAction      = new AddMapAction();
@@ -168,6 +172,9 @@ implements   PickingInteractor.PickingListener
 		fileMenu.add(printAction);
 		fileMenu.addSeparator();
 		fileMenu.add(quitAction);
+
+		editMenu.add(removeAction);
+		removeAction.setEnabled(false);
 
 		insertMenu.add(addMapAction);
 		insertMenu.add(svgImportAction);
@@ -209,7 +216,7 @@ implements   PickingInteractor.PickingListener
 		boxFactory.setDrawingAttributes(attributes);
 
 		BoxInteractor     boxInteractor     = new BoxInteractor();
-		PickingInteractor pickingInteractor = new PickingInteractor();
+		                  pickingInteractor = new PickingInteractor();
 
 		pickingInteractor.addPickingListener(this);
 
@@ -452,8 +459,19 @@ implements   PickingInteractor.PickingListener
 		docManager.appendImage(fc.getSelectedFile());
 	}
 
+	protected void removeSelected() {
+		String [] ids = pickingInteractor.getSelectedIDs();
+		if (ids != null)
+			docManager.removeIDs(ids);
+	}
+
 	/** PickingInteractor.PickingListener */
 	public void selectionChanged(PickingInteractor.PickingEvent evt) {
+		if (removeAction != null) {
+			PickingInteractor pi = (PickingInteractor)evt.getSource();
+			removeAction.setEnabled(pi.hasSelection());
+		}
+		/*
 		PickingInteractor pi = (PickingInteractor)evt.getSource();
 		String [] ids = pi.getSelectedIDs();
 
@@ -462,6 +480,7 @@ implements   PickingInteractor.PickingListener
 			for (int i = 0; i < ids.length; ++i)
 				System.err.println(ids[i]);
 		}
+		*/
 	}
 
 	private class PrintAction extends AbstractAction {
@@ -526,6 +545,15 @@ implements   PickingInteractor.PickingListener
 		}
 		public void actionPerformed(ActionEvent ae) {
 			LayoutFrame.this.dispose();
+		}
+	}
+
+	private class RemoveAction extends AbstractAction {
+		RemoveAction() {
+			super("Remove");
+		}
+		public void actionPerformed(ActionEvent ae) {
+			removeSelected();
 		}
 	}
 }

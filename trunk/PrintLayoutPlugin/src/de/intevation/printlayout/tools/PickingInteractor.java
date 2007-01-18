@@ -25,6 +25,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.GeneralPath;
 
+import javax.swing.SwingUtilities;
+
 import org.apache.batik.swing.gvt.InteractorAdapter;
 import org.apache.batik.swing.gvt.Overlay;
 
@@ -154,8 +156,6 @@ implements   Overlay, Tool
 		if ((modifiers & InputEvent.BUTTON1_MASK) != InputEvent.BUTTON1_MASK)
 			return;
 
-		System.err.println(Integer.toHexString(modifiers));
-		
 		int x = me.getX();
 		int y = me.getY();
 
@@ -318,8 +318,16 @@ implements   Overlay, Tool
 			g2d.draw(xpath);
 		}
 		
-		if (selected.isEmpty())
+		// some one has removed the objects from DOM
+		// inform listeners that selection is no longer valid
+		if (selected.isEmpty()) {
 			selected = null;
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					fireSelectionChanged();
+				}
+			});
+		}
 	}
 
 	public void mouseDragged(MouseEvent e) {
@@ -351,9 +359,9 @@ implements   Overlay, Tool
 	}
 
 	public String [] getSelectedIDs() {
-		if (!hasSelection())
-			return null;
-		return (String [])selected.toArray(new String[selected.size()]);
+		return hasSelection()
+			? (String [])selected.toArray(new String[selected.size()])
+			: null;
 	}
 }
 // end of file
