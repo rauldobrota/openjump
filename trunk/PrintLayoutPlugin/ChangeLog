@@ -1,6 +1,16 @@
 2007-01-18  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/LayoutFrame.java:
+		query our interactors before other if they want to start.
+
+	* src/de/intevation/printlayout/tools/PickingInteractor.java:
+		enhance selection. unmodified clicks select only one object.
+		click + <crtl> elongates current selection with object under
+		Mouse. click + <shift> removes object under mouse from selection.
+
+2007-01-18  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
 		- reordered menus once again. "File", "Edit", "Insert"
 		- added Close entry to File menu
 	

@@ -264,10 +264,10 @@ extends      JFrame
 		tools.add(tool);
 
 		List overlays = svgCanvas.getOverlays();
-		overlays.add(tool);
+		overlays.add(0, tool);
 
 		List interactors = svgCanvas.getInteractors();
-		interactors.add(tool);
+		interactors.add(0, tool);
 	}
 
 	public void activateTool(String identifier) {

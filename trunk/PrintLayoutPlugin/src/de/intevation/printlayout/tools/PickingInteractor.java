@@ -88,9 +88,8 @@ implements   Overlay, Tool
 
 	public boolean startInteraction(InputEvent ie) {
 		if (!inUse) return false;
-		int mods = ie.getModifiers();
 
-		boolean start = (mods & InputEvent.BUTTON1_MASK) != 0;
+		boolean start = ie instanceof MouseEvent;
 
 		if (start)
 			finished = false;
@@ -101,13 +100,89 @@ implements   Overlay, Tool
 	public boolean endInteraction() {
 		return finished;
 	}
+
+	protected static final boolean isShiftDown(int modifiers) {
+		return (modifiers & InputEvent.SHIFT_MASK) != 0;
+	}
+
+	protected static final boolean isCtrlDown(int modifiers) {
+		return (modifiers & InputEvent.CTRL_MASK) != 0;
+	}
 	
 	public void mouseClicked(MouseEvent me) {
 
 		finished = true;
+
+		int modifiers = me.getModifiers();
+
+		if ((modifiers & InputEvent.BUTTON1_MASK) != InputEvent.BUTTON1_MASK)
+			return;
+
+		System.err.println(Integer.toHexString(modifiers));
 		
 		int x = me.getX();
 		int y = me.getY();
+
+		ArrayList result = query(x, y);
+
+		int N = result.size();
+
+		if (isCtrlDown(modifiers)) { // add to selected
+			if (N > 0) {
+				AbstractElement last = (AbstractElement)result.get(N-1);
+				if (selected == null) {
+					selected = new ArrayList();
+					selected.add(last);
+				}
+				else {
+					String id = last.getAttributeNS(null, "id");
+					boolean alreadySelected = false;
+					for (int i = selected.size()-1; i >= 0; --i) {
+						AbstractElement sel = (AbstractElement)selected.get(i);
+						if (sel.getAttributeNS(null, "id").equals(id)) {
+							alreadySelected = true;
+							break;
+						}
+					} // for all already selected
+					if (!alreadySelected)
+						selected.add(last);
+				}
+			}
+		}
+		else if (isShiftDown(modifiers)) { // remove from selection
+			if (N > 0 && selected != null) {
+				AbstractElement last = (AbstractElement)result.get(N-1);
+
+				String id = last.getAttributeNS(null, "id");
+				for (int i = selected.size()-1; i >= 0; --i) {
+					AbstractElement sel = (AbstractElement)selected.get(i);
+					if (sel.getAttributeNS(null, "id").equals(id)) {
+						selected.remove(i);
+						break;
+					}
+				} // for all selected
+
+				if (selected.isEmpty())
+					selected = null;
+			}
+		}
+		else { // select only one. if missed target deselect all
+			if (selected != null)
+				selected.clear();
+			else
+				selected = new ArrayList();
+
+			AbstractElement last = (AbstractElement)result.get(N-1);
+			selected.add(last);
+		}
+
+		((Component)me.getSource()).repaint();
+	}
+
+	/** spatial query all for all objects around (x, y) in screen coordinate */
+	protected ArrayList query(int x, int y) {
+
+		ArrayList ordered = new ArrayList();
 
 		SVGDocument document = documentManager.getSVGDocument();
 
@@ -121,7 +196,7 @@ implements   Overlay, Tool
 		}
 		catch (SVGException se) {
 			se.printStackTrace();
-			return;
+			return ordered;
 		}
 
 		Point2D screenPoint   = new Point2D.Double(x, y);
@@ -130,8 +205,8 @@ implements   Overlay, Tool
 		xform.transform(screenPoint, documentPoint);
 
 		SVGRect query = element.createSVGRect();
-		query.setX((float)documentPoint.getX());
-		query.setY((float)documentPoint.getY());
+		query.setX((float)documentPoint.getX() - 0.25f);
+		query.setY((float)documentPoint.getY() - 0.25f);
 
 		query.setWidth(0.5f); // half mm
 		query.setHeight(0.5f);
@@ -140,8 +215,7 @@ implements   Overlay, Tool
 
 		int N = result.getLength();
 
-		HashSet   alreadyFound = new HashSet();
-		ArrayList ordered      = new ArrayList();
+		HashSet alreadyFound = new HashSet();
 
 		for (int i = 0; i < N; ++i) {
 			AbstractElement obj = (AbstractElement)result.item(i);
@@ -162,22 +236,7 @@ implements   Overlay, Tool
 				ordered.add(last);
 		}
 
-		N = ordered.size();
-
-		if (N > 0) {
-			selected = ordered;
-			/*
-			System.out.println("found items:");
-			for (int i = 0; i < N; ++i) {
-				AbstractElement obj = (AbstractElement)ordered.get(i);
-				System.out.println("\t'" +  obj.getAttributeNS(null, "id")+ "'");
-			}
-			*/
-		}
-		else
-			selected = null;
-
-		((Component)me.getSource()).repaint();
+		return ordered;
 	}
   
 	public void paint(Graphics g) {
@@ -186,12 +245,14 @@ implements   Overlay, Tool
 
 		Graphics2D g2d = (Graphics2D)g;
 
+		g2d.setPaint(Color.red);
+
 		for (int N = selected.size(), i = 0; i < N; ++i) {
 			SVGGraphicsElement element =
 				(SVGGraphicsElement)selected.get(i);
 
 			SVGRect bbox = element.getBBox();
-      SVGMatrix matrix = element.getScreenCTM();
+			SVGMatrix matrix = element.getScreenCTM();
 
 			AffineTransform xform = MatrixTools.toJavaTransform(matrix);
 
@@ -205,10 +266,32 @@ implements   Overlay, Tool
 
 			Shape xpath = path.createTransformedShape(xform);
 
-			g2d.setPaint(Color.red);
-
 			g2d.draw(xpath);
 		}
+	}
+
+	public void mouseDragged(MouseEvent e) {
+		finished = true;
+	}
+
+	public void mouseEntered(MouseEvent e) {
+		finished = true;
+	}
+
+	public void mouseExited(MouseEvent e) {
+		finished = true;
+	}
+
+	public void mouseMoved(MouseEvent e) {
+		finished = true;
+	}
+
+	public void mousePressed(MouseEvent e) {
+		finished = true;
+	}
+
+	public void mouseReleased(MouseEvent e) {
+		finished = true;
 	}
 }
 // end of file
