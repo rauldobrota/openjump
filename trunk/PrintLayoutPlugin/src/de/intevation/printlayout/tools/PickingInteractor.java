@@ -220,18 +220,22 @@ implements   Overlay, Tool
 
 	/** spatial query all for all objects around (x, y) in screen coordinate */
 	protected ArrayList query(int x, int y) {
+		return query(x, y, true);
+	}
+
+	protected ArrayList query(int x, int y, boolean directlyInSheet) {
 
 		ArrayList ordered = new ArrayList();
 
 		SVGDocument document = documentManager.getSVGDocument();
 
-		SVGSVGElement element =
+		SVGSVGElement sheet =
 			(SVGSVGElement)document.getElementById(DocumentManager.DOCUMENT_SHEET);
 		
 		AffineTransform xform;
 		try {
 			xform	= MatrixTools.toJavaTransform(
-				element.getScreenCTM().inverse());
+				sheet.getScreenCTM().inverse());
 		}
 		catch (SVGException se) {
 			se.printStackTrace();
@@ -243,20 +247,21 @@ implements   Overlay, Tool
 
 		xform.transform(screenPoint, documentPoint);
 
-		SVGRect query = element.createSVGRect();
+		SVGRect query = sheet.createSVGRect();
 		query.setX((float)documentPoint.getX() - 0.25f);
 		query.setY((float)documentPoint.getY() - 0.25f);
 
 		query.setWidth(0.5f); // half mm
 		query.setHeight(0.5f);
 
-		NodeList result = element.getIntersectionList(query, null);
+		NodeList result = sheet.getIntersectionList(query, null);
 
 		int N = result.getLength();
 
 		for (int i = 0; i < N; ++i) {
 			AbstractElement obj = (AbstractElement)result.item(i);
 			String last = null;
+			AbstractElement lastElement = null;
 			do {
 				AbstractElement parent = (AbstractElement)obj.getParentNode();
 				if (parent == null)
@@ -264,13 +269,19 @@ implements   Overlay, Tool
 				String id = parent.getAttributeNS(null, "id");
 				if (id != null && id.startsWith(DocumentManager.OBJECT_ID)) {
 					last = id;
+					lastElement = parent;
 				}
 				obj = parent;
 			}
-			while (obj != null && obj != element);
+			while (obj != null && obj != sheet);
 
 			if (last != null && !ordered.contains(last))
-				ordered.add(last);
+				if (directlyInSheet) {
+					if (lastElement != null && lastElement.getParentNode() == sheet)
+						ordered.add(last);
+				}
+				else
+					ordered.add(last);
 		}
 
 		return ordered;
@@ -354,6 +365,10 @@ implements   Overlay, Tool
 		finished = true;
 	}
 
+	public int numSelections() {
+		return selected == null ? 0 : selected.size();
+	}
+
 	public boolean hasSelection() {
 		return selected != null && !selected.isEmpty();
 	}
@@ -362,6 +377,13 @@ implements   Overlay, Tool
 		return hasSelection()
 			? (String [])selected.toArray(new String[selected.size()])
 			: null;
+	}
+
+	public void clearSelection() {
+		if (selected != null) {
+			selected = null;
+			fireSelectionChanged();
+		}
 	}
 }
 // end of file

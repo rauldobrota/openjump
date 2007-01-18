@@ -1,5 +1,19 @@
 2007-01-18  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/tools/PickingInteractor.java:
+		- add a flag to indicate in point query only to result objects
+		  which are directly embedded in the drawing sheet.
+		- method to clear selection.
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		add method to build a group from a set of ids.
+		the objects needs to be embedded directly in the drawing sheet-
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		add a menu item to group selected items.
+
+2007-01-18  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
 	* src/de/intevation/printlayout/DocumentManager.java:
 		has now a method to remove a set set of ids from DOM.
 

@@ -58,6 +58,8 @@ import java.io.FileOutputStream;
 import java.io.BufferedOutputStream;
 import java.io.OutputStream;
 
+import java.util.ArrayList;
+
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
 
@@ -579,6 +581,59 @@ public class DocumentManager
 							parent.removeChild(element);
 					}
 				} // for all ids
+
+				return null;
+			}
+		});
+	}
+
+	public void groupIDs(final String [] ids) {
+		if (ids == null || ids.length < 2)
+			return;
+
+		modifyDocumentLater(new DocumentModifier() {
+			public Object run(DocumentManager documentManager) {
+
+				SVGDocument document = documentManager.getSVGDocument();
+
+				AbstractElement sheet = 
+					(AbstractElement)document.getElementById(DOCUMENT_SHEET);
+
+				ArrayList children = new ArrayList();
+
+				for (int i = 0; i < ids.length; ++i) {
+					AbstractElement element =
+						(AbstractElement)document.getElementById(ids[i]);
+
+					if (element != null) { // child found?
+						AbstractElement parent =
+							(AbstractElement)element.getParentNode();
+
+						if (parent == sheet) {
+							parent.removeChild(element);
+							children.add(element);
+						}
+					}
+				} // for all ids
+
+				int N = children.size();
+
+				if (N == 0)
+					return null;
+
+				String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+
+				AbstractElement group = 
+					(AbstractElement)document.createElementNS(svgNS, "g");
+
+				group.setAttributeNS(null, "transform", "matrix(1 0 0 1 0 0)");
+
+				group.setAttributeNS(null, "id", uniqueObjectID());
+
+				for (int i = 0; i < N; ++i)
+					group.appendChild((AbstractElement)children.get(i));
+
+				sheet.appendChild(group);
 
 				return null;
 			}

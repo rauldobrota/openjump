@@ -96,6 +96,7 @@ implements   PickingInteractor.PickingListener
 	protected ArrayList          tools;
 
 	protected RemoveAction       removeAction;
+	protected GroupAction        groupAction;
 
 	protected PickingInteractor  pickingInteractor;
 
@@ -162,6 +163,7 @@ implements   PickingInteractor.PickingListener
 		QuitAction        quitAction        = new QuitAction();
 
 		                  removeAction      = new RemoveAction();
+											groupAction       = new GroupAction();
 
 		ImportImageAction imageImportAction = new ImportImageAction();
 		ImportSVGAction   svgImportAction   = new ImportSVGAction();
@@ -174,7 +176,9 @@ implements   PickingInteractor.PickingListener
 		fileMenu.add(quitAction);
 
 		editMenu.add(removeAction);
+		editMenu.add(groupAction);
 		removeAction.setEnabled(false);
+		groupAction .setEnabled(false);
 
 		insertMenu.add(addMapAction);
 		insertMenu.add(svgImportAction);
@@ -461,26 +465,30 @@ implements   PickingInteractor.PickingListener
 
 	protected void removeSelected() {
 		String [] ids = pickingInteractor.getSelectedIDs();
-		if (ids != null)
+		if (ids != null) {
+			pickingInteractor.clearSelection();
 			docManager.removeIDs(ids);
+		}
+	}
+
+	protected void group() {
+		String [] ids = pickingInteractor.getSelectedIDs();
+		if (ids != null) {
+			pickingInteractor.clearSelection();
+			docManager.groupIDs(ids);
+		}
 	}
 
 	/** PickingInteractor.PickingListener */
 	public void selectionChanged(PickingInteractor.PickingEvent evt) {
-		if (removeAction != null) {
-			PickingInteractor pi = (PickingInteractor)evt.getSource();
-			removeAction.setEnabled(pi.hasSelection());
-		}
-		/*
 		PickingInteractor pi = (PickingInteractor)evt.getSource();
-		String [] ids = pi.getSelectedIDs();
+		int N = pi.numSelections();
 
-		if (ids != null) {
-			System.err.println("selected ids");
-			for (int i = 0; i < ids.length; ++i)
-				System.err.println(ids[i]);
-		}
-		*/
+		if (removeAction != null)
+			removeAction.setEnabled(N > 0);
+
+		if (groupAction != null)
+			groupAction.setEnabled(N > 1);
 	}
 
 	private class PrintAction extends AbstractAction {
@@ -554,6 +562,15 @@ implements   PickingInteractor.PickingListener
 		}
 		public void actionPerformed(ActionEvent ae) {
 			removeSelected();
+		}
+	}
+
+	private class GroupAction extends AbstractAction {
+		GroupAction() {
+			super("Group");
+		}
+		public void actionPerformed(ActionEvent ae) {
+			group();
 		}
 	}
 }
