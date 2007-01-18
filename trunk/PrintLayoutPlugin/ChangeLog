@@ -1,6 +1,17 @@
 2007-01-18  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/LayoutFrame.java:
+		default color/stroke/fill for box drawing is now 
+		black/continues/unfilled.
+
+	* src/de/intevation/printlayout/tools/BoxFactory.java:
+		set "fill" property to "none" if no fill is given.
+		set "pointer-events" to "all" to make it selectable
+		even in unfilled state.
+
+2007-01-18  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
 		title of the plugin frame is now "Print/Layout"
 
 	* src/de/intevation/printlayout/PrintLayoutPlugin.java:

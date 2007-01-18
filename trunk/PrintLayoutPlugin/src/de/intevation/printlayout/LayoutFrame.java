@@ -184,9 +184,10 @@ extends      JFrame
 
 		DrawingAttributes attributes = new DrawingAttributes();
 
-		attributes.setStrokeColor(Color.blue);
-		attributes.setFillColor(Color.cyan);
-		attributes.setStroke(
+		attributes.setStrokeColor(Color.black);
+		attributes.setFillColor(null);
+		attributes.setStroke(new BasicStroke());
+		/*
 			new BasicStroke(
 				5.0f, 
 				BasicStroke.CAP_BUTT,
@@ -194,6 +195,7 @@ extends      JFrame
 				1.0f,
 				new float[]{ 3f, 3f, 3f, 3f},
 				0.0f));
+		*/
 
 		BoxFactory boxFactory = new BoxFactory();
 		boxFactory.setDrawingAttributes(attributes);

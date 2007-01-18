@@ -96,6 +96,8 @@ implements   BoxInteractor.Factory
 					box.setAttributeNS(null, "fill-opacity", 
 							getSVGColor((Color)fillColor, "fill-opacity", document));
 				}
+				else
+					box.setAttributeNS(null, "fill", "none");
 			
 				if (stroke != null && stroke instanceof BasicStroke) {
 					Map attributeMap = getStrokeAttrMap((BasicStroke) stroke, document);
@@ -106,6 +108,8 @@ implements   BoxInteractor.Factory
 					}
 					
 				}
+
+				box.setAttributeNS(null, "pointer-events", "all");
 
 				group.setAttributeNS(null, "id", documentManager.uniqueObjectID());
         group.appendChild(box);
