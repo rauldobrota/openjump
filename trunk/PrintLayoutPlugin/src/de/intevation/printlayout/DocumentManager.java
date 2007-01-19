@@ -26,6 +26,8 @@ import org.apache.batik.bridge.UserAgent;
 
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGGElement;
+import org.w3c.dom.svg.SVGLocatable;
+import org.w3c.dom.svg.SVGException;
 
 import org.w3c.dom.NodeList; 
 import org.w3c.dom.DOMImplementation;
@@ -62,6 +64,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
 
 import java.awt.print.PageFormat;
@@ -718,6 +721,58 @@ public class DocumentManager
 						parent.appendChild(child);
 					}
 				} // for all ids
+
+				return null;
+			}
+		});
+	}
+
+	public void translateIDs(final String [] ids, final Point2D screenDelta) {
+		if (ids == null || ids.length == 0)
+			return;
+
+		modifyDocumentLater(new DocumentModifier() {
+			public Object run(DocumentManager documentManager) {
+
+				SVGDocument document = documentManager.getSVGDocument();
+
+				AffineTransform xform, trans;
+
+				Point2D delta = new Point2D.Double();
+
+				for (int i = 0; i < ids.length; ++i) {
+					String id = ids[i];
+
+					AbstractElement element =
+						(AbstractElement)document.getElementById(id);
+
+					if (element == null)
+						return null;
+
+					try {
+						xform	= MatrixTools.toJavaTransform(
+							((SVGLocatable)element).getScreenCTM().inverse());
+					}
+					catch (SVGException se) {
+						continue;
+					} 
+
+					xform.deltaTransform(screenDelta, delta);
+
+					trans =
+						AffineTransform.getTranslateInstance(delta.getX(), delta.getY());
+
+					String xformS = element.getAttributeNS(null, "transform");
+
+					xform = xformS == null
+						? new AffineTransform()
+						: MatrixTools.toJavaTransform(xformS);
+
+					xform.concatenate(trans);
+
+					element.setAttributeNS(
+						null, "transform", MatrixTools.toSVGString(xform));
+				}
 
 				return null;
 			}

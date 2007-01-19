@@ -1,3 +1,14 @@
+2007-01-19  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		add a method to translate objects with a delta given in
+		screen coordinates.
+
+	* src/de/intevation/printlayout/tools/PickingInteractor.java:
+		stores the shapes of bounding box of the selected objects
+		and looks if dragging occurs in one of them -> move
+		objects around.
+
 2007-01-18  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/DocumentManager.java:

@@ -68,6 +68,32 @@ implements   Overlay, Tool
 
 	} // interface PickingListener
 
+
+	protected static class OnScreenBox
+	{
+		String id;
+		Shape  shape;
+
+		OnScreenBox() {
+		}
+
+		OnScreenBox(String id) {
+			this.id = id;
+		}
+
+		boolean inside(int x, int y) {
+			return shape != null && shape.contains(x, y);
+		}
+
+		public boolean equals(Object other) {
+			return id.equals(((OnScreenBox)other).id);
+		}
+
+		public String toString() {
+			return id;
+		}
+	} // class OnScreenBox
+
 	protected boolean inUse;
 	protected boolean finished;
 	
@@ -76,6 +102,10 @@ implements   Overlay, Tool
 	protected ArrayList       selected;
 
 	protected ArrayList       listeners;
+
+	// used for dragging selected items
+	protected int startX = Integer.MIN_VALUE;
+	protected int startY = Integer.MIN_VALUE;
 
 
 	public PickingInteractor() {
@@ -167,7 +197,7 @@ implements   Overlay, Tool
 
 		if (isCtrlDown(modifiers)) { // add to selected
 			if (N > 0) {
-				String last = (String)result.get(N-1);
+				Object last = result.get(N-1);
 				if (selected == null) { // empty list
 					selected = new ArrayList();
 					selected.add(last);
@@ -183,7 +213,7 @@ implements   Overlay, Tool
 		}
 		else if (isShiftDown(modifiers)) { // remove from selection
 			if (N > 0 && selected != null) {
-				String last = (String)result.get(N-1);
+				Object last = result.get(N-1);
 
 				if (selected.remove(last)) {
 					changed = true;
@@ -275,13 +305,16 @@ implements   Overlay, Tool
 			}
 			while (obj != null && obj != sheet);
 
-			if (last != null && !ordered.contains(last))
-				if (directlyInSheet) {
-					if (lastElement != null && lastElement.getParentNode() == sheet)
-						ordered.add(last);
-				}
-				else
-					ordered.add(last);
+			if (last != null) { 
+				if (directlyInSheet 
+				&& (lastElement == null || lastElement.getParentNode() != sheet))
+					continue;
+
+				OnScreenBox box = new OnScreenBox(last);
+
+				if (!ordered.contains(box))
+					ordered.add(box);
+			}
 		}
 
 		return ordered;
@@ -299,10 +332,10 @@ implements   Overlay, Tool
 
 		for (int i = 0; i < selected.size();) {
 
-			String id = (String)selected.get(i);
+			OnScreenBox box = (OnScreenBox)selected.get(i);
 
 			SVGGraphicsElement element =
-				(SVGGraphicsElement)document.getElementById(id);
+				(SVGGraphicsElement)document.getElementById(box.id);
 
 			if (element == null) { // no available any longer
 				selected.remove(i);
@@ -324,9 +357,8 @@ implements   Overlay, Tool
 
 			GeneralPath path = new GeneralPath(rect);
 
-			Shape xpath = path.createTransformedShape(xform);
-
-			g2d.draw(xpath);
+			// cache and draw
+			g2d.draw(box.shape = path.createTransformedShape(xform));
 		}
 		
 		// some one has removed the objects from DOM
@@ -342,7 +374,29 @@ implements   Overlay, Tool
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		finished = true;
+		if (startX != Integer.MIN_VALUE) {
+			int x = e.getX();
+			int y = e.getY();
+
+			boolean found = false;
+
+			for (int i = numSelections()-1; i >= 0; --i)
+				if (((OnScreenBox)selected.get(i)).inside(x, y)) {
+					found = true;
+					break;
+				}
+
+			int dx = x - startX;
+			int dy = y - startY;
+			startX = x;
+			startY = y;
+
+			if (found)
+				documentManager.translateIDs(
+					getSelectedIDs(), new Point2D.Double(dx, dy));
+		}
+		else
+			finished = true;
 	}
 
 	public void mouseEntered(MouseEvent e) {
@@ -350,6 +404,8 @@ implements   Overlay, Tool
 	}
 
 	public void mouseExited(MouseEvent e) {
+		startX = Integer.MIN_VALUE;
+		startY = Integer.MIN_VALUE;
 		finished = true;
 	}
 
@@ -358,11 +414,14 @@ implements   Overlay, Tool
 	}
 
 	public void mousePressed(MouseEvent e) {
+		startX = e.getX();
+		startY = e.getY();
 		finished = true;
 	}
 
 	public void mouseReleased(MouseEvent e) {
-		finished = true;
+		mouseExited(e);
+		//finished = true;
 	}
 
 	public int numSelections() {
@@ -374,9 +433,15 @@ implements   Overlay, Tool
 	}
 
 	public String [] getSelectedIDs() {
-		return hasSelection()
-			? (String [])selected.toArray(new String[selected.size()])
-			: null;
+		if (!hasSelection())
+			return null;
+
+		String [] ids = new String[selected.size()];
+
+		for (int i = 0; i < ids.length; ++i)
+			ids[i] = ((OnScreenBox)selected.get(i)).id;
+
+		return ids;
 	}
 
 	public void clearSelection() {
