@@ -74,6 +74,8 @@ implements   Overlay, Tool
 		String id;
 		Shape  shape;
 
+		Point2D [] points;
+
 		OnScreenBox() {
 		}
 
@@ -82,7 +84,29 @@ implements   Overlay, Tool
 		}
 
 		boolean inside(int x, int y) {
-			return shape != null && shape.contains(x, y);
+			if (points == null)
+				return false;
+
+			for (int i = 0; i < points.length; ++i) {
+				int j = (i + 1) % points.length;
+
+				Point2D p1 = points[i];
+				Point2D p2 = points[j];
+
+				double dx = p1.getX() - p2.getX();
+				double dy = p1.getY() - p2.getY();
+
+				double nx = dy;
+				double ny = -dx;
+
+				// nx*p1.x + ny*p1.y + b = 0
+				double b = -(nx*p1.getX() + ny*p1.getY());
+
+				if (x*nx + y*ny + b > 0d)
+					return false;
+			}
+
+			return true;
 		}
 
 		public boolean equals(Object other) {
@@ -91,6 +115,43 @@ implements   Overlay, Tool
 
 		public String toString() {
 			return id;
+		}
+
+		public void bbox2shape(SVGRect bbox, AffineTransform xform) {
+
+			if (points == null)
+				points = new Point2D[4];
+
+			double x1 = bbox.getX();
+			double y1 = bbox.getY();
+
+			double x2 = x1 + bbox.getWidth();
+			double y2 = y1 + bbox.getHeight();
+
+			Point2D.Double src = new Point2D.Double(x1, y1);
+			xform.transform(src, points[0] = new Point2D.Double());
+
+			/* src.x = x1; */ src.y = y2;
+			xform.transform(src, points[1] = new Point2D.Double());
+
+			src.x = x2;  /* src.y = y2; */
+			xform.transform(src, points[2] = new Point2D.Double());
+
+			/* src.x = x2; */  src.y = y1;
+			xform.transform(src, points[3] = new Point2D.Double());
+		}
+
+		public void draw(Graphics2D g2d) {
+			if (points != null)
+				for (int i = 0; i < points.length; ++i) {
+					int j = (i + 1) % points.length;
+
+					Point2D p1 = points[i];
+					Point2D p2 = points[j];
+					g2d.drawLine(
+						(int)Math.round(p1.getX()), (int)Math.round(p1.getY()), 
+						(int)Math.round(p2.getX()), (int)Math.round(p2.getY()));
+				}
 		}
 	} // class OnScreenBox
 
@@ -332,6 +393,8 @@ implements   Overlay, Tool
 
 		SVGDocument document = documentManager.getSVGDocument();
 
+		int BEFORE = selected.size();
+
 		for (int i = 0; i < selected.size();) {
 
 			OnScreenBox box = (OnScreenBox)selected.get(i);
@@ -351,22 +414,18 @@ implements   Overlay, Tool
 
 			AffineTransform xform = MatrixTools.toJavaTransform(matrix);
 
-			Rectangle2D rect = new Rectangle2D.Float(
-				(float)bbox.getX(), 
-				(float)bbox.getY(),
-				(float)bbox.getWidth(),
-				(float)bbox.getHeight());
-
-			GeneralPath path = new GeneralPath(rect);
-
-			// cache and draw
-			g2d.draw(box.shape = path.createTransformedShape(xform));
+			box.bbox2shape(bbox, xform);
+			box.draw(g2d);
 		}
+
+		int NOW = selected.size();
 		
-		// some one has removed the objects from DOM
+		// some one has removed selected objects from DOM
 		// inform listeners that selection is no longer valid
-		if (selected.isEmpty()) {
-			selected = null;
+		if (BEFORE != NOW) {
+
+			if (NOW == 0) selected = null;
+
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					fireSelectionChanged();
