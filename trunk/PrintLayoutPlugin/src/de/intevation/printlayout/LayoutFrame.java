@@ -154,9 +154,9 @@ implements   PickingInteractor.PickingListener
 
 		JSVGScrollPane scroller = new JSVGScrollPane(svgCanvas);
 
-		JMenu fileMenu   = new JMenu("File");
-		JMenu editMenu   = new JMenu("Edit");
-		JMenu insertMenu = new JMenu("Insert");
+		JMenu fileMenu   = new JMenu(I18N.getString("LayoutFrame.File", "File"));
+		JMenu editMenu   = new JMenu(I18N.getString("LayoutFrame.Edit", "Edit"));
+		JMenu insertMenu = new JMenu(I18N.getString("LayoutFrame.Insert", "Insert"));
 
 		ExportSVGAction   svgExportAction   = new ExportSVGAction();
 		PDFAction         pdfAction         = new PDFAction();
@@ -238,9 +238,12 @@ implements   PickingInteractor.PickingListener
 
 		JToolBar toolBar = new JToolBar();
 
-		JToggleButton boxBnt  = new JToggleButton("draw");
-		JToggleButton pickBtn = new JToggleButton("select");
-		JToggleButton nopBnt  = new JToggleButton("pan");
+		JToggleButton boxBnt  = new JToggleButton(
+			I18N.getString("LayoutFrame.Draw", "draw"));
+		JToggleButton pickBtn = new JToggleButton(
+			I18N.getString("LayoutFrame.Select", "select"));
+		JToggleButton nopBnt  = new JToggleButton(
+			I18N.getString("LayoutFrame.Pan", "pan"));
 
 		boxBnt .setActionCommand(boxInteractor.getToolIdentifier());
 		nopBnt .setActionCommand("pan");
@@ -509,7 +512,7 @@ implements   PickingInteractor.PickingListener
 
 	private class PrintAction extends AbstractAction {
 		PrintAction() {
-			super("Print...");
+			super(I18N.getString("LayoutFrame.Print", "Print..."));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			print();
@@ -518,7 +521,7 @@ implements   PickingInteractor.PickingListener
 
 	private class PDFAction extends AbstractAction {
 		PDFAction() {
-			super("Export PDF...");
+			super(I18N.getString("LayoutFrame.ExportPDF", "Export PDF..."));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			exportPDF();
@@ -527,7 +530,7 @@ implements   PickingInteractor.PickingListener
 
 	private class ImportImageAction extends AbstractAction {
 		ImportImageAction() {
-			super("Import Image...");
+			super(I18N.getString("LayoutFrame.ImportImage", "Import Image..."));
 		}
 
 		public void actionPerformed(ActionEvent ae) {
@@ -537,7 +540,7 @@ implements   PickingInteractor.PickingListener
 
 	private class ImportSVGAction extends AbstractAction {
 		ImportSVGAction() {
-			super("Import SVG...");
+			super(I18N.getString("LayoutFrame.ImportSVG", "Import SVG..."));
 		}
 
 		public void actionPerformed(ActionEvent ae) {
@@ -547,7 +550,7 @@ implements   PickingInteractor.PickingListener
 
 	private class ExportSVGAction extends AbstractAction {
 		ExportSVGAction() {
-			super("Export SVG...");
+			super(I18N.getString("LayoutFrame.ExportSVG", "Export SVG..."));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			exportSVG();
@@ -556,7 +559,7 @@ implements   PickingInteractor.PickingListener
 
 	private class AddMapAction extends AbstractAction {
 		AddMapAction() {
-			super("Add Map");
+			super(I18N.getString("LayoutFrame.AddMap", "Add Map"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			addMap();
@@ -565,7 +568,7 @@ implements   PickingInteractor.PickingListener
 
 	private class QuitAction extends AbstractAction {
 		QuitAction() {
-			super("Close");
+			super(I18N.getString("LayoutFrame.Close", "Close"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			LayoutFrame.this.dispose();
@@ -574,7 +577,7 @@ implements   PickingInteractor.PickingListener
 
 	private class RemoveAction extends AbstractAction {
 		RemoveAction() {
-			super("Remove");
+			super(I18N.getString("LayoutFrame.Remove", "Remove"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			removeSelected();
@@ -583,7 +586,7 @@ implements   PickingInteractor.PickingListener
 
 	private class GroupAction extends AbstractAction {
 		GroupAction() {
-			super("Group");
+			super(I18N.getString("LayoutFrame.Group", "Group"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			group();
@@ -592,7 +595,7 @@ implements   PickingInteractor.PickingListener
 
 	private class UngroupAction extends AbstractAction {
 		UngroupAction() {
-			super("Ungroup");
+			super(I18N.getString("LayoutFrame.Ungroup", "Ungroup"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			ungroup();

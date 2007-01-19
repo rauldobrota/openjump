@@ -1,5 +1,17 @@
 2007-01-19  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/I18N.java:
+		added. wrapper around java.util.ResourceBundle
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		uses I18N now
+
+	* src/de/intevation/printlayout/i18n/messages.properties,
+		src/de/intevation/printlayout/i18n/messages_de.properties:
+		added. i18n messages, english and german
+
+2007-01-19  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
 	* src/de/intevation/printlayout/DocumentManager.java:
 		add a method to translate objects with a delta given in
 		screen coordinates.
