@@ -1,5 +1,11 @@
 2007-01-19  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/tools/PickingInteractor.java:
+		don't check if mouse is inside of bounding boxes. only check
+		in on mouse pressed.
+
+2007-01-19  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
 	* src/de/intevation/printlayout/I18N.java:
 		added. wrapper around java.util.ResourceBundle
 

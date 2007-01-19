@@ -157,7 +157,9 @@ implements   Overlay, Tool
 	public boolean startInteraction(InputEvent ie) {
 		if (!inUse) return false;
 
-		boolean start = ie instanceof MouseEvent;
+		boolean start = ie instanceof MouseEvent
+			&& (ie.getModifiers() & InputEvent.BUTTON1_MASK)
+				== InputEvent.BUTTON1_MASK;
 
 		if (start)
 			finished = false;
@@ -378,22 +380,13 @@ implements   Overlay, Tool
 			int x = e.getX();
 			int y = e.getY();
 
-			boolean found = false;
-
-			for (int i = numSelections()-1; i >= 0; --i)
-				if (((OnScreenBox)selected.get(i)).inside(x, y)) {
-					found = true;
-					break;
-				}
-
 			int dx = x - startX;
 			int dy = y - startY;
 			startX = x;
 			startY = y;
 
-			if (found)
-				documentManager.translateIDs(
-					getSelectedIDs(), new Point2D.Double(dx, dy));
+			documentManager.translateIDs(
+				getSelectedIDs(), new Point2D.Double(dx, dy));
 		}
 		else
 			finished = true;
@@ -414,9 +407,24 @@ implements   Overlay, Tool
 	}
 
 	public void mousePressed(MouseEvent e) {
-		startX = e.getX();
-		startY = e.getY();
-		finished = true;
+
+		boolean found = false;
+
+		int x = e.getX();
+		int y = e.getY();
+
+		for (int i = numSelections()-1; i >= 0; --i)
+			if (((OnScreenBox)selected.get(i)).inside(x, y)) {
+				found = true;
+				break;
+			}
+
+		if (found) {
+			startX = e.getX();
+			startY = e.getY();
+		}
+		else
+			finished = true;
 	}
 
 	public void mouseReleased(MouseEvent e) {
