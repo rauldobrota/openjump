@@ -1,11 +1,18 @@
 2007-01-19  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/DocumentManager.java:
+		fix a bug in ungroup: swaped order of matrix multiplication
+		displaced new children.
+
+2007-01-19  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
 	* src/de/intevation/printlayout/tools/PickingInteractor.java:
-		- don't store the transformed shapes of the overlays any more 
+		- don't store the transformed shape for overlays any more 
 		  only the tranformed vertex points -> needed for scale/rotate handles
 
 2007-01-19  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/tools/PickingInteractor.java:
 		don't check if mouse is inside of bounding boxes. only check
 		in on mouse pressed.
 

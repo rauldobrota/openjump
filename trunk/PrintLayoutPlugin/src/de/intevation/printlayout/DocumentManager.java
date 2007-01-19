@@ -713,7 +713,7 @@ public class DocumentManager
 								null, "transform", MatrixTools.toSVGString(xform));
 						else {
 							AffineTransform yform = MatrixTools.toJavaTransform(xformS);
-							yform.concatenate(xform);
+							yform.preConcatenate(xform);
 							child.setAttributeNS(
 								null, "transform", MatrixTools.toSVGString(yform));
 						}
