@@ -750,8 +750,6 @@ public class DocumentManager
 
 				SVGDocument document = documentManager.getSVGDocument();
 
-				AffineTransform xform, trans;
-
 				Point2D delta = new Point2D.Double();
 
 				for (int i = 0; i < ids.length; ++i) {
@@ -763,6 +761,8 @@ public class DocumentManager
 					if (element == null)
 						return null;
 
+					AffineTransform xform;
+
 					try {
 						xform	= MatrixTools.toJavaTransform(
 							((SVGLocatable)element).getScreenCTM().inverse());
@@ -773,7 +773,7 @@ public class DocumentManager
 
 					xform.deltaTransform(screenDelta, delta);
 
-					trans =
+					AffineTransform trans =
 						AffineTransform.getTranslateInstance(delta.getX(), delta.getY());
 
 					String xformS = element.getAttributeNS(null, "transform");
@@ -892,6 +892,97 @@ public class DocumentManager
 						null, "transform", MatrixTools.toSVGString(xform));
 				}
 				
+
+				if (afterward != null)
+					afterward.run(DocumentManager.this, null);
+
+				return null;
+			}
+		});
+	}
+	public void rotateIDs(String [] ids, Point2D screenDelta, Point2D screenPos) {
+		rotateIDs(ids, screenDelta, screenPos, null);
+	}
+
+	public void rotateIDs(
+		final String []                 ids, 
+		final Point2D                   screenDelta,
+		final Point2D                   screenPos,
+		final AfterDocumentModification afterward
+	) {
+		if (ids == null || ids.length == 0)
+			return;
+
+		modifyDocumentLater(new DocumentModifier() {
+			public Object run(DocumentManager documentManager) {
+
+				SVGDocument document = documentManager.getSVGDocument();
+
+				Point2D delta = new Point2D.Double();
+
+				for (int i = 0; i < ids.length; ++i) {
+					String id = ids[i];
+
+					AbstractElement element =
+						(AbstractElement)document.getElementById(id);
+
+					if (element == null)
+						return null;
+
+					SVGLocatable locatable = (SVGLocatable)element;
+
+					AffineTransform CTM =
+						MatrixTools.toJavaTransform(locatable.getScreenCTM());
+
+					AffineTransform invCTM;
+					try {
+						invCTM = CTM.createInverse();
+					}
+					catch (NoninvertibleTransformException nite) {
+						continue;
+					}
+
+					SVGRect bbox = locatable.getBBox();
+
+					Point2D center = new Point2D.Double(
+						bbox.getX() + 0.5d * bbox.getWidth(),
+						bbox.getY() + 0.5d * bbox.getHeight());
+
+					Point2D screenPosInCTM = new Point2D.Double();
+
+					invCTM.transform(screenPos, screenPosInCTM);
+
+					Point2D deltaInCTM = new Point2D.Double();
+
+					invCTM.deltaTransform(screenDelta, deltaInCTM);
+
+					double alpha = GeometricMath.angleBetween(
+						center, screenPosInCTM);
+
+					screenPosInCTM.setLocation(
+						screenPosInCTM.getX() + deltaInCTM.getX(),
+						screenPosInCTM.getY() + deltaInCTM.getY());
+
+					double beta = GeometricMath.angleBetween(
+						center, screenPosInCTM);
+
+					double gamma = beta - alpha;
+
+					AffineTransform rotate =
+						AffineTransform.getRotateInstance(
+							gamma, center.getX(), center.getY());
+
+					String xformS = element.getAttributeNS(null, "transform");
+
+					AffineTransform xform = xformS == null
+						? new AffineTransform()
+						: MatrixTools.toJavaTransform(xformS);
+
+					xform.concatenate(rotate);
+
+					element.setAttributeNS(
+						null, "transform", MatrixTools.toSVGString(xform));
+				}
 
 				if (afterward != null)
 					afterward.run(DocumentManager.this, null);

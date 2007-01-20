@@ -21,29 +21,29 @@ import java.awt.geom.Point2D;
 
 import org.w3c.dom.svg.SVGRect;
 
+import de.intevation.printlayout.GeometricMath;
+
 public class OnScreenBox
 {
+	public static final int OUTSIDE           = 0;
+	public static final int INSIDE            = 1;
+	public static final int INSIDE_DECORATION = 2;
+
 	protected String     id;
 	protected Shape      shape;
 
 	protected Point2D [] points;
 
-	protected int        decorationMode;
 	protected Shape []   decoration;
 
-	protected PickingInteractor.TransformOperation operation;
-
 	public OnScreenBox() {
-		decorationMode = 1;
-		operation      = PickingInteractor.SCALE;
 	}
 
 	public OnScreenBox(String id) {
-		this();
 		this.id = id;
 	}
 
-	protected boolean insideRect(int x, int y) {
+	protected int insideRect(int x, int y) {
 
 		for (int i = 0; i < points.length; ++i) {
 			int j = (i + 1) % points.length;
@@ -61,24 +61,22 @@ public class OnScreenBox
 			double b = -(nx*p1.getX() + ny*p1.getY());
 
 			if (x*nx + y*ny + b > 0d)
-				return false;
+				return OUTSIDE;
 		}
 
-		return true;
+		return INSIDE;
 	}
 
-	public PickingInteractor.TransformOperation chooseOperation(int x, int y) {
+	public int inside(int x, int y) {
 		if (points == null)
-			return null;
+			return OUTSIDE;
 
 		if (decoration != null)
 			for (int i = 0; i < decoration.length; ++i)
 				if (decoration[i].contains(x, y))
-					return operation;
+					return INSIDE_DECORATION;
 
-		return insideRect(x, y)
-			? PickingInteractor.TRANSLATE 
-			: null;
+		return insideRect(x, y);
 	}
 
 	public boolean equals(Object other) {
@@ -119,57 +117,88 @@ public class OnScreenBox
 		xform.transform(src, points[3] = new Point2D.Double());
 	}
 
-	public void buildDecoration() {
+	protected void buildDecoration(int type) {
 
-		switch (decorationMode) {
-			case 1:
-				buildScale();
+		switch (type) {
+			case PickingInteractor.SCALE_DECORATION:
+				buildScaleDecoration();
+				break;
+			case PickingInteractor.ROTATE_DECORATION:
+				buildRotateDecoration();
 				break;
 			default:
 				decoration = null;
 		}
 	}
 
-	private static final double angleBetween(Point2D p1, Point2D p2) {
-		double dx = p1.getX() - p2.getX();
-		double dy = p1.getY() - p2.getY();
-		double a = Math.atan2(dy, dx);
-		if (a < 0d) a += 2d*Math.PI;
-		return a;
+	protected void buildScaleDecoration() {
+		double ang1 = GeometricMath.angleBetween(points[0], points[2]);
+		double ang2 = GeometricMath.angleBetween(points[1], points[3]);
+
+		Shape s1 = Arrows.createArrow(
+			0f, -11f,
+			ang1 - Math.PI*0.5d,
+			1f,
+			points[0].getX(),
+			points[0].getY());
+
+		Shape s2 = Arrows.createArrow(
+			0f, -11f,
+			ang2 - Math.PI*0.5d,
+			1f,
+			points[1].getX(),
+			points[1].getY());
+
+		Shape s3 = Arrows.createArrow(
+			0f, -11f,
+			ang1 + Math.PI*0.5d,
+			1f,
+			points[2].getX(),
+			points[2].getY());
+
+		Shape s4 = Arrows.createArrow(
+			0f, -11f,
+			ang2 + Math.PI*0.5d,
+			1f,
+			points[3].getX(),
+			points[3].getY());
+
+		decoration = new Shape [] { s1, s2, s3, s4 };
 	}
 
-	protected void buildScale() {
-		double ang1 = angleBetween(points[0], points[2]);
-		double ang2 = angleBetween(points[1], points[3]);
+	protected void buildRotateDecoration() {
+		double ang1 = GeometricMath.angleBetween(points[0], points[2]);
+		double ang2 = GeometricMath.angleBetween(points[1], points[3]);
 
-		AffineTransform rot1 = AffineTransform.getRotateInstance(ang1 - Math.PI);
-		AffineTransform rot2 = AffineTransform.getRotateInstance(ang2 - Math.PI);
-		AffineTransform rot3 = AffineTransform.getRotateInstance(ang1);
-		AffineTransform rot4 = AffineTransform.getRotateInstance(ang2);
+		Shape s1 = Arrows.createArrow(
+			-10f, 0f,
+			ang1,
+			1f,
+			points[0].getX(),
+			points[0].getY());
 
-		AffineTransform trans1 = AffineTransform.getTranslateInstance(
-			points[0].getX(), points[0].getY());
+		Shape s2 = Arrows.createArrow(
+			-10f, 0f,
+			ang2,
+			1f,
+			points[1].getX(),
+			points[1].getY());
 
-		AffineTransform trans2 = AffineTransform.getTranslateInstance(
-			points[1].getX(), points[1].getY());
+		Shape s3 = Arrows.createArrow(
+			-10f, 0f,
+			ang1 - Math.PI,
+			1f,
+			points[2].getX(),
+			points[2].getY());
 
-		AffineTransform trans3 = AffineTransform.getTranslateInstance(
-			points[2].getX(), points[2].getY());
+		Shape s4 = Arrows.createArrow(
+			-10f, 0f,
+			ang2 - Math.PI,
+			1f,
+			points[3].getX(),
+			points[3].getY());
 
-		AffineTransform trans4 = AffineTransform.getTranslateInstance(
-			points[3].getX(), points[3].getY());
-
-		trans1.concatenate(rot1);
-		trans2.concatenate(rot2);
-		trans3.concatenate(rot3);
-		trans4.concatenate(rot4);
-
-		decoration = new Shape [] {
-			Arrows.L_R.createTransformedShape(trans1),
-			Arrows.L_R.createTransformedShape(trans2),
-			Arrows.L_R.createTransformedShape(trans3),
-			Arrows.L_R.createTransformedShape(trans4)
-		};
+		decoration = new Shape [] { s1, s2, s3, s4 };
 	}
 
 	public void draw(Graphics2D g2d) {
@@ -188,10 +217,9 @@ public class OnScreenBox
 
 	public static final BasicStroke STROKE = new BasicStroke(2f);
 
-	public void drawDecoration(Graphics2D g2d) {
+	public void drawDecoration(Graphics2D g2d, int type) {
 
-		if (decoration == null)
-			buildDecoration();
+		buildDecoration(type);
 
 		for (int i = 0; i < decoration.length; ++i) {
 			Shape deco = decoration[i];

@@ -98,6 +98,25 @@ implements   Overlay, Tool
 			}
 		}; // SCALE
 
+	public static final TransformOperation ROTATE =
+		new TransformOperation() {
+			public void transform(
+				String []       ids,
+				DocumentManager documentManager,
+				Point2D         delta,
+				Point2D         orginal
+			) {
+				documentManager.rotateIDs(ids, delta, orginal);
+			}
+		}; // ROTATE
+
+	public static final int NO_DECORATION     = 0;
+	public static final int SCALE_DECORATION  = 1;
+	public static final int ROTATE_DECORATION = 2;
+
+	public static final int MIN_DECORATION    = 1;
+	public static final int MAX_DECORATION    = 2;
+
 	protected boolean inUse;
 	protected boolean finished;
 	
@@ -113,6 +132,7 @@ implements   Overlay, Tool
 
 	protected TransformOperation transformOperation;
 
+	protected int decoration = SCALE_DECORATION;
 
 	public PickingInteractor() {
 	}
@@ -197,6 +217,11 @@ implements   Overlay, Tool
 		int x = me.getX();
 		int y = me.getY();
 
+		// remember id if only one was selected before
+		String singleSelection = selected != null && selected.size() == 1
+			? ((OnScreenBox)selected.get(0)).getID()
+			: null;
+
 		ArrayList result = query(x, y);
 
 		int N = result.size();
@@ -226,7 +251,7 @@ implements   Overlay, Tool
 				if (selected.remove(last)) {
 					changed = true;
 					if (selected.isEmpty())
-						selected = null;
+						resetSelection();
 				}
 			}
 		}
@@ -237,10 +262,17 @@ implements   Overlay, Tool
 				selected.add(result.get(N-1));
 			}
 			else
-				selected = null;
+				resetSelection();
 
 			changed = true;
 		}
+
+		// clicked on a already select object changes decoration
+		if (singleSelection != null 
+		&& selected != null
+		&& selected.size() == 1
+		&& ((OnScreenBox)selected.get(0)).getID().equals(singleSelection))
+			advanceDecoration();
 
 		((Component)me.getSource()).repaint();
 
@@ -367,8 +399,9 @@ implements   Overlay, Tool
 
 		int NOW = selected.size();
 
+		// if only one is selected draw decoration
 		if (NOW == 1)
-			((OnScreenBox)selected.get(0)).drawDecoration(g2d);
+			((OnScreenBox)selected.get(0)).drawDecoration(g2d, decoration);
 
 		//documentManager.getCanvas().damageRegions(regions);
 		
@@ -376,7 +409,7 @@ implements   Overlay, Tool
 		// inform listeners that selection is no longer valid
 		if (BEFORE != NOW) {
 
-			if (NOW == 0) selected = null;
+			if (NOW == 0) resetSelection();
 
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
@@ -421,18 +454,23 @@ implements   Overlay, Tool
 
 	public void mousePressed(MouseEvent e) {
 
-		TransformOperation operation = null;
+		int inside = OnScreenBox.OUTSIDE;
 
 		int x = e.getX();
 		int y = e.getY();
 
-		for (int i = numSelections()-1; i >= 0; --i)
-			if ((operation =
-				((OnScreenBox)selected.get(i)).chooseOperation(x, y)) != null)
+		for (int i = numSelections()-1; i >= 0; --i) {
+			OnScreenBox box = (OnScreenBox)selected.get(i);
+			if ((inside = box.inside(x, y)) != OnScreenBox.OUTSIDE)
 				break;
+		}
 
-		if (operation != null) {
-			transformOperation = operation;
+		if (inside != OnScreenBox.OUTSIDE) {
+
+			transformOperation = inside == OnScreenBox.INSIDE
+				? TRANSLATE
+				: getTransformOperation();
+
 			startX = e.getX();
 			startY = e.getY();
 		}
@@ -440,9 +478,22 @@ implements   Overlay, Tool
 			finished = true;
 	}
 
+	// map decoration -> operation
+	protected TransformOperation getTransformOperation() {
+		switch (decoration) {
+			case SCALE_DECORATION: return SCALE;
+			default:               return ROTATE;
+		}
+	}
+
+	// cycle thru decorations 
+	protected void advanceDecoration() {
+		if (++decoration > MAX_DECORATION)
+			decoration = MIN_DECORATION;
+	}
+
 	public void mouseReleased(MouseEvent e) {
 		mouseExited(e);
-		//finished = true;
 	}
 
 	public int numSelections() {
@@ -465,9 +516,14 @@ implements   Overlay, Tool
 		return ids;
 	}
 
+	protected void resetSelection() {
+		selected = null;
+		decoration = SCALE_DECORATION;
+	}
+
 	public void clearSelection() {
 		if (selected != null) {
-			selected = null;
+			resetSelection();
 			fireSelectionChanged();
 		}
 	}

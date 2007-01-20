@@ -17,43 +17,50 @@ import java.awt.geom.AffineTransform;
 public final class Arrows
 {
 	public static final float [] COORDS = {
-		-3f,  -15f,
-		-6f,  -15f,
-		 0f, -21f,
-		 6f,  -15f,
-		 3f,  -15f,
-		 3f,   -7f,
-		 6f,   -7f,
-		 0f,  -1f,
-		-6f,   -7f,
-		-3f,   -7f,
-		-3f,  -15f,
+		-3f, -4f,
+		-6f, -4f,
+		 0f, -10f,
+		 6f, -4f,
+		 3f, -4f,
+		 3f,  4f,
+		 6f,  4f,
+		 0f,  10f,
+		-6f,  4f,
+		-3f,  4f,
+		-3f, -4f,
 	};
 
-	public static final GeneralPath U_D = createArrow();
+	public static final GeneralPath createArrow(
+		double zx, double zy,
+		double angle,
+		double scale,
+		double dx, double dy
+	) {
+		AffineTransform transZero =
+			AffineTransform.getTranslateInstance(zx, zy);
 
-	public static final GeneralPath L_R =
-		new GeneralPath(
-			U_D.createTransformedShape(
-				AffineTransform.getRotateInstance(Math.PI*0.5d)));
+		AffineTransform rot =
+			AffineTransform.getRotateInstance(angle);
 
-	public static final GeneralPath UL_LR =
-		new GeneralPath(
-			U_D.createTransformedShape(
-				AffineTransform.getRotateInstance(Math.PI*(3d/4d))));
+		AffineTransform s =
+			AffineTransform.getScaleInstance(scale, scale);
 
-	public static final GeneralPath UR_LL =
-		new GeneralPath(
-			U_D.createTransformedShape(
-				AffineTransform.getRotateInstance(Math.PI*0.25d)));
+		AffineTransform trans = 
+			AffineTransform.getTranslateInstance(dx, dy);
 
-	public static final GeneralPath createArrow() {
+		rot.concatenate(transZero);
+		s.concatenate(rot);
+		trans.concatenate(s);
+
+		float [] dst = new float[COORDS.length];
+
+		trans.transform(COORDS, 0, dst, 0, dst.length >> 1);
+
 		GeneralPath arrow = new GeneralPath();
+		arrow.moveTo(dst[0], dst[1]);
 
-		arrow.moveTo(COORDS[0], COORDS[1]);
-
-		for (int i = 2; i < COORDS.length-2; i += 2)
-			arrow.lineTo(COORDS[i], COORDS[i+1]);
+		for (int i = 2; i < dst.length-2; i += 2)
+			arrow.lineTo(dst[i], dst[i+1]);
 
 		arrow.closePath();
 

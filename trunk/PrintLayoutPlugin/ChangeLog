@@ -1,3 +1,20 @@
+2007-01-21  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		add method to rotate objects around the center of
+		there bounding boxes.
+
+	* src/de/intevation/printlayout/tools/Arrows.java:
+		dont create any precalculated arrows any longer.
+		if needed they are carve on the fly. ;-)
+
+	* src/de/intevation/printlayout/GeometricMath.java:
+		added. intended to store simple geometrical functions
+
+	* src/de/intevation/printlayout/tools/OnScreenBox.java,
+		src/de/intevation/printlayout/tools/PickingInteractor.java:
+		GUI support for rotation.
+
 2007-01-20  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/DocumentManager.java:
@@ -7,7 +24,7 @@
 
 	* src/de/intevation/printlayout/LayoutCanvas.java:
 		add damageRegions() to hint the RenderingManager that
-		a list of regions need to be a repaint. This is to slow!
+		a list of regions need to be a repaint. This is too slow!
 
 	* src/de/intevation/printlayout/tools/Arrows.java:
 		shifted the arrow y coordinates all to negative.
