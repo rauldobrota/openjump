@@ -1,3 +1,26 @@
+2007-01-20  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		- added interface AfterDocumentModification. potentially useful
+		  if one wants to update the selection after group/ungroup.
+		- added scaleIDs() to scale selected elements proportional.
+
+	* src/de/intevation/printlayout/LayoutCanvas.java:
+		add damageRegions() to hint the RenderingManager that
+		a list of regions need to be a repaint. This is to slow!
+
+	* src/de/intevation/printlayout/tools/Arrows.java:
+		shifted the arrow y coordinates all to negative.
+
+	* src/de/intevation/printlayout/tools/OnScreenBox.java:
+		on screen overlay element used by PickingInteractor.
+		offers decoration (arrows).
+
+	* src/de/intevation/printlayout/tools/PickingInteractor.java:
+		- uses now the external OnScreenBox 
+		- scale and translate are modeled with the 
+	    new TransformOperation interface.
+
 2007-01-19  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/DocumentManager.java:

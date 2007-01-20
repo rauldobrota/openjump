@@ -28,6 +28,7 @@ import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGGElement;
 import org.w3c.dom.svg.SVGLocatable;
 import org.w3c.dom.svg.SVGException;
+import org.w3c.dom.svg.SVGRect;
 
 import org.w3c.dom.NodeList; 
 import org.w3c.dom.DOMImplementation;
@@ -66,6 +67,7 @@ import java.util.ArrayList;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterJob;
@@ -89,6 +91,10 @@ public class DocumentManager
 
 	public interface DocumentModifier {
 		Object run(DocumentManager documentManager);
+	}
+
+	public interface AfterDocumentModification {
+		void run(DocumentManager documentManager, Object result);
 	}
 
 	public DocumentManager() {
@@ -727,7 +733,15 @@ public class DocumentManager
 		});
 	}
 
-	public void translateIDs(final String [] ids, final Point2D screenDelta) {
+	public void translateIDs(String [] ids, Point2D screenDelta) {
+		translateIDs(ids, screenDelta, null);
+	}
+
+	public void translateIDs(
+		final String []                 ids, 
+		final Point2D                   screenDelta,
+		final AfterDocumentModification afterward
+	) {
 		if (ids == null || ids.length == 0)
 			return;
 
@@ -773,6 +787,114 @@ public class DocumentManager
 					element.setAttributeNS(
 						null, "transform", MatrixTools.toSVGString(xform));
 				}
+
+				if (afterward != null)
+					afterward.run(DocumentManager.this, null);
+
+				return null;
+			}
+		});
+	}
+
+	public void scaleIDs(String [] ids, Point2D screenDelta, Point2D screenPos) {
+		scaleIDs(ids, screenDelta, screenPos, null);
+	}
+
+	public void scaleIDs(
+		final String []                 ids, 
+		final Point2D                   screenDelta,
+		final Point2D                   screenPos,
+		final AfterDocumentModification afterward
+	) {
+		if (ids == null || ids.length == 0)
+			return;
+
+		modifyDocumentLater(new DocumentModifier() {
+			public Object run(DocumentManager documentManager) {
+
+				SVGDocument document = documentManager.getSVGDocument();
+
+				AffineTransform xform, trans;
+
+				Point2D delta = new Point2D.Double();
+
+				for (int i = 0; i < ids.length; ++i) {
+					String id = ids[i];
+
+					AbstractElement element =
+						(AbstractElement)document.getElementById(id);
+
+					if (element == null)
+						return null;
+
+					SVGLocatable locatable = (SVGLocatable)element;
+
+					AffineTransform matrix =
+						MatrixTools.toJavaTransform(locatable.getScreenCTM());
+
+					SVGRect bbox = locatable.getBBox();
+
+					Point2D center = new Point2D.Double(
+						bbox.getX() + 0.5d * bbox.getWidth(),
+						bbox.getY() + 0.5d * bbox.getHeight());
+
+					Point2D centerOnScreen = new Point2D.Double();
+					matrix.transform(center, centerOnScreen);
+
+					double distanceOrg = centerOnScreen.distance(screenPos);
+
+					screenPos.setLocation(
+						screenPos.getX() + screenDelta.getX(),
+						screenPos.getY() + screenDelta.getY());
+
+					double distanceDelta = centerOnScreen.distance(screenPos);
+
+					double scale = distanceDelta/distanceOrg;
+
+					trans =
+						AffineTransform.getScaleInstance(scale, scale);
+
+					AffineTransform hypo = new AffineTransform(matrix);
+
+					hypo.concatenate(trans);
+
+					Point2D hypoScreenCenter = new Point2D.Double();
+
+					hypo.transform(center, hypoScreenCenter);
+
+					Point2D hypoScreenDelta = new Point2D.Double(
+						centerOnScreen.getX() - hypoScreenCenter.getX(),
+						centerOnScreen.getY() - hypoScreenCenter.getY());
+
+					AffineTransform hypoInv;
+
+					try { hypoInv = hypo.createInverse(); }
+					catch (NoninvertibleTransformException e) { continue; }
+
+					Point2D deltaCompensate = new Point2D.Double();
+					hypoInv.deltaTransform(hypoScreenDelta, deltaCompensate);
+
+					AffineTransform compensateTrans =
+						AffineTransform.getTranslateInstance(
+							deltaCompensate.getX(),
+							deltaCompensate.getY());
+
+					String xformS = element.getAttributeNS(null, "transform");
+
+					xform = xformS == null
+						? new AffineTransform()
+						: MatrixTools.toJavaTransform(xformS);
+
+					xform.concatenate(trans);
+					xform.concatenate(compensateTrans);
+
+					element.setAttributeNS(
+						null, "transform", MatrixTools.toSVGString(xform));
+				}
+				
+
+				if (afterward != null)
+					afterward.run(DocumentManager.this, null);
 
 				return null;
 			}

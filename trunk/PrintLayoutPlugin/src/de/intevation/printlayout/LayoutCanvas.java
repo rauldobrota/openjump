@@ -19,6 +19,12 @@ import org.apache.batik.bridge.UserAgent;
 
 import org.w3c.dom.svg.SVGDocument;
 
+import java.awt.Rectangle;
+
+import javax.swing.RepaintManager;
+
+import java.util.ArrayList;
+
 public class LayoutCanvas
 extends      JSVGCanvas
 {
@@ -39,6 +45,19 @@ extends      JSVGCanvas
 
 	public void installDocument(SVGDocument document) {
 		installSVGDocument(document);
+	}
+
+	public void damageRegions(ArrayList regions) {
+		RepaintManager manager = RepaintManager.currentManager(this);
+		for (int i = regions.size()-1; i >= 0; --i) {
+			Rectangle rect = (Rectangle)regions.get(i);
+			if (!rect.isEmpty()) {
+				manager.addDirtyRegion(
+					this, 
+					rect.x, rect.y,
+					rect.width, rect.height);
+			}
+		}
 	}
 }
 // end of file

@@ -1,6 +1,6 @@
 /*
  * PickingInteractor.java
- * ------------------
+ * ----------------------
  * (c) 2007 by Intevation GmbH
  *
  * @author Sascha L. Teichmann (teichmann@intevation.de)
@@ -13,7 +13,6 @@ package de.intevation.printlayout.tools;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Shape;
 import java.awt.Component;
 import java.awt.Color;
 
@@ -22,8 +21,6 @@ import java.awt.event.MouseEvent;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.GeneralPath;
 
 import javax.swing.SwingUtilities;
 
@@ -54,6 +51,7 @@ implements   Overlay, Tool
 {
 	public static final String IDENTIFIER = "picking-tool";
 
+
 	public static class PickingEvent
 	extends             EventObject
 	{
@@ -68,92 +66,37 @@ implements   Overlay, Tool
 
 	} // interface PickingListener
 
+	public interface TransformOperation {
+		void transform(
+			String []       ids, 
+			DocumentManager documentManager, 
+			Point2D         delta,
+			Point2D         orginal);
+	} // interface TransformOperation
 
-	protected static class OnScreenBox
-	{
-		String id;
-		Shape  shape;
-
-		Point2D [] points;
-
-		OnScreenBox() {
-		}
-
-		OnScreenBox(String id) {
-			this.id = id;
-		}
-
-		boolean inside(int x, int y) {
-			if (points == null)
-				return false;
-
-			for (int i = 0; i < points.length; ++i) {
-				int j = (i + 1) % points.length;
-
-				Point2D p1 = points[i];
-				Point2D p2 = points[j];
-
-				double dx = p1.getX() - p2.getX();
-				double dy = p1.getY() - p2.getY();
-
-				double nx = dy;
-				double ny = -dx;
-
-				// nx*p1.x + ny*p1.y + b = 0
-				double b = -(nx*p1.getX() + ny*p1.getY());
-
-				if (x*nx + y*ny + b > 0d)
-					return false;
+	public static final TransformOperation TRANSLATE =
+		new TransformOperation() {
+			public void transform(
+				String []       ids,
+				DocumentManager documentManager,
+				Point2D         delta,
+				Point2D         orginal
+			) {
+				documentManager.translateIDs(ids, delta);
 			}
+		}; // TRANSLATE
 
-			return true;
-		}
-
-		public boolean equals(Object other) {
-			return id.equals(((OnScreenBox)other).id);
-		}
-
-		public String toString() {
-			return id;
-		}
-
-		public void bbox2shape(SVGRect bbox, AffineTransform xform) {
-
-			if (points == null)
-				points = new Point2D[4];
-
-			double x1 = bbox.getX();
-			double y1 = bbox.getY();
-
-			double x2 = x1 + bbox.getWidth();
-			double y2 = y1 + bbox.getHeight();
-
-			Point2D.Double src = new Point2D.Double(x1, y1);
-			xform.transform(src, points[0] = new Point2D.Double());
-
-			/* src.x = x1; */ src.y = y2;
-			xform.transform(src, points[1] = new Point2D.Double());
-
-			src.x = x2;  /* src.y = y2; */
-			xform.transform(src, points[2] = new Point2D.Double());
-
-			/* src.x = x2; */  src.y = y1;
-			xform.transform(src, points[3] = new Point2D.Double());
-		}
-
-		public void draw(Graphics2D g2d) {
-			if (points != null)
-				for (int i = 0; i < points.length; ++i) {
-					int j = (i + 1) % points.length;
-
-					Point2D p1 = points[i];
-					Point2D p2 = points[j];
-					g2d.drawLine(
-						(int)Math.round(p1.getX()), (int)Math.round(p1.getY()), 
-						(int)Math.round(p2.getX()), (int)Math.round(p2.getY()));
-				}
-		}
-	} // class OnScreenBox
+	public static final TransformOperation SCALE =
+		new TransformOperation() {
+			public void transform(
+				String []       ids,
+				DocumentManager documentManager,
+				Point2D         delta,
+				Point2D         orginal
+			) {
+				documentManager.scaleIDs(ids, delta, orginal);
+			}
+		}; // SCALE
 
 	protected boolean inUse;
 	protected boolean finished;
@@ -165,8 +108,10 @@ implements   Overlay, Tool
 	protected ArrayList       listeners;
 
 	// used for dragging selected items
-	protected int startX = Integer.MIN_VALUE;
-	protected int startY = Integer.MIN_VALUE;
+	protected int startX;
+	protected int startY;
+
+	protected TransformOperation transformOperation;
 
 
 	public PickingInteractor() {
@@ -395,12 +340,14 @@ implements   Overlay, Tool
 
 		int BEFORE = selected.size();
 
+		//ArrayList regions = new ArrayList();
+
 		for (int i = 0; i < selected.size();) {
 
 			OnScreenBox box = (OnScreenBox)selected.get(i);
 
 			SVGGraphicsElement element =
-				(SVGGraphicsElement)document.getElementById(box.id);
+				(SVGGraphicsElement)document.getElementById(box.getID());
 
 			if (element == null) { // no available any longer
 				selected.remove(i);
@@ -419,6 +366,11 @@ implements   Overlay, Tool
 		}
 
 		int NOW = selected.size();
+
+		if (NOW == 1)
+			((OnScreenBox)selected.get(0)).drawDecoration(g2d);
+
+		//documentManager.getCanvas().damageRegions(regions);
 		
 		// some one has removed selected objects from DOM
 		// inform listeners that selection is no longer valid
@@ -435,7 +387,7 @@ implements   Overlay, Tool
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		if (startX != Integer.MIN_VALUE) {
+		if (transformOperation != null) {
 			int x = e.getX();
 			int y = e.getY();
 
@@ -444,8 +396,11 @@ implements   Overlay, Tool
 			startX = x;
 			startY = y;
 
-			documentManager.translateIDs(
-				getSelectedIDs(), new Point2D.Double(dx, dy));
+			transformOperation.transform(
+				getSelectedIDs(),
+				documentManager,
+				new Point2D.Double(dx, dy),
+				new Point2D.Double(x, y));
 		}
 		else
 			finished = true;
@@ -456,8 +411,7 @@ implements   Overlay, Tool
 	}
 
 	public void mouseExited(MouseEvent e) {
-		startX = Integer.MIN_VALUE;
-		startY = Integer.MIN_VALUE;
+		transformOperation = null;
 		finished = true;
 	}
 
@@ -467,18 +421,18 @@ implements   Overlay, Tool
 
 	public void mousePressed(MouseEvent e) {
 
-		boolean found = false;
+		TransformOperation operation = null;
 
 		int x = e.getX();
 		int y = e.getY();
 
 		for (int i = numSelections()-1; i >= 0; --i)
-			if (((OnScreenBox)selected.get(i)).inside(x, y)) {
-				found = true;
+			if ((operation =
+				((OnScreenBox)selected.get(i)).chooseOperation(x, y)) != null)
 				break;
-			}
 
-		if (found) {
+		if (operation != null) {
+			transformOperation = operation;
 			startX = e.getX();
 			startY = e.getY();
 		}

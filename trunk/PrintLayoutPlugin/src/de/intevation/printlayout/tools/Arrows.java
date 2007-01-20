@@ -17,17 +17,17 @@ import java.awt.geom.AffineTransform;
 public final class Arrows
 {
 	public static final float [] COORDS = {
-		-3f,  -4f,
-		-6f,  -4f,
-		 0f, -10f,
-		 6f,  -4f,
-		 3f,  -4f,
-		 3f,   4f,
-		 6f,   4f,
-		 0f,  10f,
-		-6f,   4f,
-		-3f,   4f,
-		-3f,  -4f,
+		-3f,  -15f,
+		-6f,  -15f,
+		 0f, -21f,
+		 6f,  -15f,
+		 3f,  -15f,
+		 3f,   -7f,
+		 6f,   -7f,
+		 0f,  -1f,
+		-6f,   -7f,
+		-3f,   -7f,
+		-3f,  -15f,
 	};
 
 	public static final GeneralPath U_D = createArrow();
