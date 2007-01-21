@@ -814,10 +814,6 @@ public class DocumentManager
 
 				SVGDocument document = documentManager.getSVGDocument();
 
-				AffineTransform xform, trans;
-
-				Point2D delta = new Point2D.Double();
-
 				for (int i = 0; i < ids.length; ++i) {
 					String id = ids[i];
 
@@ -829,7 +825,7 @@ public class DocumentManager
 
 					SVGLocatable locatable = (SVGLocatable)element;
 
-					AffineTransform matrix =
+					AffineTransform CTM =
 						MatrixTools.toJavaTransform(locatable.getScreenCTM());
 
 					SVGRect bbox = locatable.getBBox();
@@ -839,7 +835,7 @@ public class DocumentManager
 						bbox.getY() + 0.5d * bbox.getHeight());
 
 					Point2D centerOnScreen = new Point2D.Double();
-					matrix.transform(center, centerOnScreen);
+					CTM.transform(center, centerOnScreen);
 
 					double distanceOrg = centerOnScreen.distance(screenPos);
 
@@ -851,47 +847,33 @@ public class DocumentManager
 
 					double scale = distanceDelta/distanceOrg;
 
-					trans =
+					AffineTransform trans1 =
+						AffineTransform.getTranslateInstance(
+							-center.getX(),
+							-center.getY());
+
+					AffineTransform scaleTrans =
 						AffineTransform.getScaleInstance(scale, scale);
 
-					AffineTransform hypo = new AffineTransform(matrix);
-
-					hypo.concatenate(trans);
-
-					Point2D hypoScreenCenter = new Point2D.Double();
-
-					hypo.transform(center, hypoScreenCenter);
-
-					Point2D hypoScreenDelta = new Point2D.Double(
-						centerOnScreen.getX() - hypoScreenCenter.getX(),
-						centerOnScreen.getY() - hypoScreenCenter.getY());
-
-					AffineTransform hypoInv;
-
-					try { hypoInv = hypo.createInverse(); }
-					catch (NoninvertibleTransformException e) { continue; }
-
-					Point2D deltaCompensate = new Point2D.Double();
-					hypoInv.deltaTransform(hypoScreenDelta, deltaCompensate);
-
-					AffineTransform compensateTrans =
+					AffineTransform trans2 =
 						AffineTransform.getTranslateInstance(
-							deltaCompensate.getX(),
-							deltaCompensate.getY());
+							center.getX(),
+							center.getY());
+
+					scaleTrans.concatenate(trans1);
+					trans2.concatenate(scaleTrans);
 
 					String xformS = element.getAttributeNS(null, "transform");
 
-					xform = xformS == null
+					AffineTransform xform = xformS == null
 						? new AffineTransform()
 						: MatrixTools.toJavaTransform(xformS);
 
-					xform.concatenate(trans);
-					xform.concatenate(compensateTrans);
+					xform.concatenate(trans2);
 
 					element.setAttributeNS(
 						null, "transform", MatrixTools.toSVGString(xform));
 				}
-				
 
 				if (afterward != null)
 					afterward.run(DocumentManager.this, null);
@@ -917,8 +899,6 @@ public class DocumentManager
 			public Object run(DocumentManager documentManager) {
 
 				SVGDocument document = documentManager.getSVGDocument();
-
-				Point2D delta = new Point2D.Double();
 
 				for (int i = 0; i < ids.length; ++i) {
 					String id = ids[i];

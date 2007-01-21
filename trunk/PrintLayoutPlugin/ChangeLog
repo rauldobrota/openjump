@@ -1,6 +1,11 @@
 2007-01-21  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/DocumentManager.java:
+		simplification of object scaling code.
+
+2007-01-21  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/DocumentManager.java:
 		add method to rotate objects around the center of
 		there bounding boxes.
 
