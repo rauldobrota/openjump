@@ -1,3 +1,16 @@
+2007-01-22  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/LayoutCanvas.java:
+		if a damaged region is set enlarge in repaint(...)-request
+		the region to repaint.
+
+	* src/de/intevation/printlayout/tools/PickingInteractor.java:
+		track damaged region of the overlay and set in LayoutCanvas
+
+	* src/de/intevation/printlayout/tools/OnScreenBox.java:
+		- enlarge damaged region
+		- arrows are now drawn outside the selection box
+
 2007-01-21  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/DocumentManager.java:

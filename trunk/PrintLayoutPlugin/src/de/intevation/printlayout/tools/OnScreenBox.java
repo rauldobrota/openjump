@@ -15,9 +15,11 @@ import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.Color;
 import java.awt.BasicStroke;
+import java.awt.Rectangle;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import org.w3c.dom.svg.SVGRect;
 
@@ -137,28 +139,28 @@ public class OnScreenBox
 
 		Shape s1 = Arrows.createArrow(
 			0f, -11f,
-			ang1 - Math.PI*0.5d,
+			ang1 + Math.PI*0.5d,
 			1f,
 			points[0].getX(),
 			points[0].getY());
 
 		Shape s2 = Arrows.createArrow(
 			0f, -11f,
-			ang2 - Math.PI*0.5d,
+			ang2 + Math.PI*0.5d,
 			1f,
 			points[1].getX(),
 			points[1].getY());
 
 		Shape s3 = Arrows.createArrow(
 			0f, -11f,
-			ang1 + Math.PI*0.5d,
+			ang1 + Math.PI*1.5d,
 			1f,
 			points[2].getX(),
 			points[2].getY());
 
 		Shape s4 = Arrows.createArrow(
 			0f, -11f,
-			ang2 + Math.PI*0.5d,
+			ang2 + Math.PI*1.5d,
 			1f,
 			points[3].getX(),
 			points[3].getY());
@@ -171,28 +173,28 @@ public class OnScreenBox
 		double ang2 = GeometricMath.angleBetween(points[1], points[3]);
 
 		Shape s1 = Arrows.createArrow(
-			-10f, 0f,
+			+10f, 0f,
 			ang1,
 			1f,
 			points[0].getX(),
 			points[0].getY());
 
 		Shape s2 = Arrows.createArrow(
-			-10f, 0f,
+			+10f, 0f,
 			ang2,
 			1f,
 			points[1].getX(),
 			points[1].getY());
 
 		Shape s3 = Arrows.createArrow(
-			-10f, 0f,
+			+10f, 0f,
 			ang1 - Math.PI,
 			1f,
 			points[2].getX(),
 			points[2].getY());
 
 		Shape s4 = Arrows.createArrow(
-			-10f, 0f,
+			+10f, 0f,
 			ang2 - Math.PI,
 			1f,
 			points[3].getX(),
@@ -201,23 +203,41 @@ public class OnScreenBox
 		decoration = new Shape [] { s1, s2, s3, s4 };
 	}
 
-	public void draw(Graphics2D g2d) {
+	public void draw(Graphics2D g2d, Rectangle damaged) {
 		if (points == null)
 			return;
+
+		int minX = Integer.MAX_VALUE;
+		int minY = Integer.MAX_VALUE;
+		int maxX = Integer.MIN_VALUE;
+		int maxY = Integer.MIN_VALUE;
+
 		for (int i = 0; i < points.length; ++i) {
 			int j = (i + 1) % points.length;
 
 			Point2D p1 = points[i];
 			Point2D p2 = points[j];
+
+			int p2x = (int)Math.round(p2.getX());
+			int p2y = (int)Math.round(p2.getY());
+
+			if (p2x < minX) minX = p2x;
+			if (p2x > maxY) maxX = p2x;
+			if (p2y < minY) minY = p2y;
+			if (p2y > maxY) maxY = p2y;
+
 			g2d.drawLine(
 				(int)Math.round(p1.getX()), (int)Math.round(p1.getY()), 
-				(int)Math.round(p2.getX()), (int)Math.round(p2.getY()));
+				p2x, p2y);
 		}
+
+		damaged.add(new Rectangle(
+			minX, minY, maxX-minX+1, maxY-minY+1));
 	}
 
 	public static final BasicStroke STROKE = new BasicStroke(2f);
 
-	public void drawDecoration(Graphics2D g2d, int type) {
+	public void drawDecoration(Graphics2D g2d, int type, Rectangle damaged) {
 
 		buildDecoration(type);
 
@@ -228,6 +248,7 @@ public class OnScreenBox
 			g2d.setPaint(Color.black);
 			g2d.setStroke(STROKE);
 			g2d.draw(deco);
+			damaged.add(deco.getBounds());
 		}
 	}
 }

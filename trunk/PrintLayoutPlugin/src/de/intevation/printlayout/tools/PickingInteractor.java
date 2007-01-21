@@ -15,6 +15,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Component;
 import java.awt.Color;
+import java.awt.Rectangle;
 
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
@@ -372,7 +373,7 @@ implements   Overlay, Tool
 
 		int BEFORE = selected.size();
 
-		//ArrayList regions = new ArrayList();
+		Rectangle damaged = new Rectangle();
 
 		for (int i = 0; i < selected.size();) {
 
@@ -394,16 +395,17 @@ implements   Overlay, Tool
 			AffineTransform xform = MatrixTools.toJavaTransform(matrix);
 
 			box.bbox2shape(bbox, xform);
-			box.draw(g2d);
+			box.draw(g2d, damaged);
 		}
 
 		int NOW = selected.size();
 
 		// if only one is selected draw decoration
 		if (NOW == 1)
-			((OnScreenBox)selected.get(0)).drawDecoration(g2d, decoration);
+			((OnScreenBox)selected.get(0))
+				.drawDecoration(g2d, decoration, damaged);
 
-		//documentManager.getCanvas().damageRegions(regions);
+		documentManager.getCanvas().damagedRegion(damaged);
 		
 		// some one has removed selected objects from DOM
 		// inform listeners that selection is no longer valid

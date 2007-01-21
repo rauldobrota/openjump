@@ -21,13 +21,11 @@ import org.w3c.dom.svg.SVGDocument;
 
 import java.awt.Rectangle;
 
-import javax.swing.RepaintManager;
-
-import java.util.ArrayList;
-
 public class LayoutCanvas
 extends      JSVGCanvas
 {
+	protected Rectangle damagedRegion;
+
 	public LayoutCanvas() {
 	}
 
@@ -47,16 +45,35 @@ extends      JSVGCanvas
 		installSVGDocument(document);
 	}
 
-	public void damageRegions(ArrayList regions) {
-		RepaintManager manager = RepaintManager.currentManager(this);
-		for (int i = regions.size()-1; i >= 0; --i) {
-			Rectangle rect = (Rectangle)regions.get(i);
-			if (!rect.isEmpty()) {
-				manager.addDirtyRegion(
-					this, 
-					rect.x, rect.y,
-					rect.width, rect.height);
-			}
+	public void paintImmediately(Rectangle rect) {
+		if (damagedRegion != null)
+			rect.add(damagedRegion);
+		super.paintImmediately(rect);
+	}
+
+	public void repaint(Rectangle rect) {
+		if (damagedRegion != null)
+			rect.add(damagedRegion);
+		super.repaint(rect);
+	}
+
+	public void repaint(int x, int y, int width, int height) {
+		Rectangle rect = new Rectangle(x, y, width, height);
+		if (damagedRegion != null)
+			rect.add(damagedRegion);
+		super.repaint(rect.x, rect.y, rect.width, rect.height);
+	}
+
+	public void damagedRegion(Rectangle region) {
+
+		if (region == null || region.isEmpty())
+			damagedRegion = null;
+		else {
+			// enlarge a bit to avoid rendering artifacts
+			region = new Rectangle(
+				region.x-2, region.y-2,
+				region.width+4, region.height+4);
+			damagedRegion = region;
 		}
 	}
 }
