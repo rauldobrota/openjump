@@ -1,5 +1,19 @@
 2007-01-22  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/DocumentManager.java:
+		The Batik PrintTranscoder scales and translates the
+		whole document down to the printable area of the
+		selected printer. To compensate this effect an
+		inverse affine transform is concatenated to the
+		printers Graphics2D context before it is handed
+		over to the PrintTranscoder.
+
+	* src/de/intevation/printlayout/LayoutFrame.java,
+	  src/de/intevation/printlayout/tools/OnScreenBox.java:
+		removed needless imports.
+
+2007-01-22  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
 	* src/de/intevation/printlayout/LayoutFrame.java:
 		- add full extend, zoom step in/out buttons to toolbar
 		- store last directory used in file choosers.

@@ -64,11 +64,15 @@ import java.io.OutputStream;
 
 import java.util.ArrayList;
 
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 
+import java.awt.print.Printable;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterJob;
 import java.awt.print.PrinterException;
@@ -454,7 +458,7 @@ public class DocumentManager
 		modifyDocumentLater(new DocumentModifier() {
 			public Object run(DocumentManager documentManager) {
 				SVGDocument document = documentManager.getSVGDocument();
-				PrintTranscoder transcoder = new PrintTranscoder();
+				final PrintTranscoder transcoder = new PrintTranscoder();
 
 				TranscoderInput  input  = new TranscoderInput(
 					isolateInnerDocument());
@@ -483,7 +487,31 @@ public class DocumentManager
 					: PageFormat.PORTRAIT);
 				*/
 
-				job.setPrintable(transcoder, pageFomat);
+				job.setPrintable(new Printable() {
+					public int print(Graphics g, PageFormat pf, int page) {
+
+						Graphics2D g2d = (Graphics2D)g;
+
+						AffineTransform trans =
+							AffineTransform.getTranslateInstance(
+								-pf.getImageableX(),
+								-pf.getImageableY());
+
+						double sw = pf.getWidth()/pf.getImageableWidth();
+						double sh = pf.getHeight()/pf.getImageableHeight();
+
+						AffineTransform scale =
+							AffineTransform.getScaleInstance(sw, sh);
+
+						trans.concatenate(scale);
+
+						AffineTransform old = g2d.getTransform();
+						old.concatenate(trans);
+						g2d.setTransform(old);
+
+						return transcoder.print(g2d, pf, page);
+					}
+				});
 
 				if (job.printDialog()) {
 					System.err.println("printing ...");
