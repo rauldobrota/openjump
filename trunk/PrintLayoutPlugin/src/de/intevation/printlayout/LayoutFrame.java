@@ -18,6 +18,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JToolBar;
 import javax.swing.ButtonGroup;
 import javax.swing.JToggleButton;
@@ -30,6 +31,7 @@ import java.awt.geom.AffineTransform;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,7 +88,7 @@ extends      JFrame
 implements   PickingInteractor.PickingListener
 {
 	public static final String A4_SHEET = "resources/a4.svg";
-
+	
   protected DocumentManager    docManager;
 
   protected LayoutCanvas       svgCanvas;
@@ -154,9 +156,9 @@ implements   PickingInteractor.PickingListener
 
 		JSVGScrollPane scroller = new JSVGScrollPane(svgCanvas);
 
-		JMenu fileMenu   = new JMenu(I18N.getString("LayoutFrame.File", "File"));
-		JMenu editMenu   = new JMenu(I18N.getString("LayoutFrame.Edit", "Edit"));
-		JMenu insertMenu = new JMenu(I18N.getString("LayoutFrame.Insert", "Insert"));
+		JMenu fileMenu   = createMenu("LayoutFrame.File", "File");
+		JMenu editMenu   = createMenu("LayoutFrame.Edit", "Edit");
+		JMenu insertMenu = createMenu("LayoutFrame.Insert", "Insert");
 
 		ExportSVGAction   svgExportAction   = new ExportSVGAction();
 		PDFAction         pdfAction         = new PDFAction();
@@ -202,6 +204,15 @@ implements   PickingInteractor.PickingListener
 		createTools(panel);
 
 		return panel;
+	}
+	
+	protected JMenu createMenu(String key, String def) {
+		String label = I18N.getString(key, def);
+		
+		JMenu menu = new JMenu(I18N.getName(label));
+		menu.setMnemonic(I18N.getMnemonic(label));
+
+		return menu;
 	}
 
 	protected void createTools(JPanel panel) {
@@ -512,7 +523,10 @@ implements   PickingInteractor.PickingListener
 
 	private class PrintAction extends AbstractAction {
 		PrintAction() {
-			super(I18N.getString("LayoutFrame.Print", "Print..."));
+			super(I18N.getName(
+					I18N.getString("LayoutFrame.Print", "Print...")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.Print", "Print...")));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			print();
@@ -521,7 +535,10 @@ implements   PickingInteractor.PickingListener
 
 	private class PDFAction extends AbstractAction {
 		PDFAction() {
-			super(I18N.getString("LayoutFrame.ExportPDF", "Export PDF..."));
+			super(I18N.getName(
+					I18N.getString("LayoutFrame.ExportPDF", "Export PDF...")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.ExportPDF", "Export PDF...")));	
 		}
 		public void actionPerformed(ActionEvent ae) {
 			exportPDF();
@@ -530,7 +547,10 @@ implements   PickingInteractor.PickingListener
 
 	private class ImportImageAction extends AbstractAction {
 		ImportImageAction() {
-			super(I18N.getString("LayoutFrame.ImportImage", "Import Image..."));
+			super(I18N.getName(
+					I18N.getString("LayoutFrame.ImportImage", "Import Image...")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.ImportImage", "Import Image...")));
 		}
 
 		public void actionPerformed(ActionEvent ae) {
@@ -540,7 +560,10 @@ implements   PickingInteractor.PickingListener
 
 	private class ImportSVGAction extends AbstractAction {
 		ImportSVGAction() {
-			super(I18N.getString("LayoutFrame.ImportSVG", "Import SVG..."));
+			super(I18N.getName(
+					I18N.getString("LayoutFrame.ImportSVG", "Import SVG...")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.ImportSVG", "Import SVG...")));
 		}
 
 		public void actionPerformed(ActionEvent ae) {
@@ -550,7 +573,10 @@ implements   PickingInteractor.PickingListener
 
 	private class ExportSVGAction extends AbstractAction {
 		ExportSVGAction() {
-			super(I18N.getString("LayoutFrame.ExportSVG", "Export SVG..."));
+			super(I18N.getName(
+				I18N.getString("LayoutFrame.ExportSVG", "Export SVG...")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+				I18N.getString("LayoutFrame.ExportSVG", "Export SVG...")));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			exportSVG();
@@ -559,7 +585,10 @@ implements   PickingInteractor.PickingListener
 
 	private class AddMapAction extends AbstractAction {
 		AddMapAction() {
-			super(I18N.getString("LayoutFrame.AddMap", "Add Map"));
+			super(I18N.getName(
+					I18N.getString("LayoutFrame.AddMap", "Add Map")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.AddMap", "Add Map")));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			addMap();
@@ -568,7 +597,10 @@ implements   PickingInteractor.PickingListener
 
 	private class QuitAction extends AbstractAction {
 		QuitAction() {
-			super(I18N.getString("LayoutFrame.Close", "Close"));
+			super(I18N.getName(
+					I18N.getString("LayoutFrame.Close", "Close")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.Close", "Close")));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			LayoutFrame.this.dispose();
@@ -577,7 +609,10 @@ implements   PickingInteractor.PickingListener
 
 	private class RemoveAction extends AbstractAction {
 		RemoveAction() {
-			super(I18N.getString("LayoutFrame.Remove", "Remove"));
+			super(I18N.getName(
+				I18N.getString("LayoutFrame.Remove", "Remove")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+				I18N.getString("LayoutFrame.Remove", "Remove")));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			removeSelected();
@@ -586,7 +621,10 @@ implements   PickingInteractor.PickingListener
 
 	private class GroupAction extends AbstractAction {
 		GroupAction() {
-			super(I18N.getString("LayoutFrame.Group", "Group"));
+			super(I18N.getName(
+					I18N.getString("LayoutFrame.Group", "Group")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.Group", "Group")));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			group();
@@ -595,7 +633,10 @@ implements   PickingInteractor.PickingListener
 
 	private class UngroupAction extends AbstractAction {
 		UngroupAction() {
-			super(I18N.getString("LayoutFrame.Ungroup", "Ungroup"));
+			super(I18N.getName(
+					I18N.getString("LayoutFrame.Ungroup", "Ungroup")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.Ungroup", "Ungroup")));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			ungroup();

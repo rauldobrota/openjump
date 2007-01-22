@@ -34,5 +34,50 @@ public class I18N
 			return def;
 		}
 	}
+
+	public static String getName(String label) {
+		StringBuffer sb = new StringBuffer();
+
+		boolean lastWasQuoteAmp = false;
+		for(int i = 0, N = label.length(); i < N; i++) {
+			if(label.charAt(i) == '&' && lastWasQuoteAmp) {
+				lastWasQuoteAmp = false;
+				sb.append('&');
+			}
+			else if(label.charAt(i) == '&') {
+				lastWasQuoteAmp = true;
+			}
+			else {
+				lastWasQuoteAmp = false;
+				sb.append(label.charAt(i));
+			}
+		}
+		return sb.toString();
+	}
+	public static Integer getMnemonic(String label) {
+		Character c = null;
+		boolean lastWasQuoteAmp = false;
+
+		for (int i = 0, N = label.length(); i < N; i++) {
+			if (lastWasQuoteAmp && label.charAt(i) == '&') {
+				lastWasQuoteAmp = false;
+			}
+			else if (lastWasQuoteAmp && Character.isLetter(label.charAt(i))) {
+				c = new Character(Character.toUpperCase(label.charAt(i)));
+				break;
+			}
+			else if(lastWasQuoteAmp) {
+				lastWasQuoteAmp = false;
+			}
+			else if (label.charAt(i) == '&') {
+				lastWasQuoteAmp = true;
+			}
+		}
+		
+		if(c != null)
+			return new Integer((int) c.charValue());
+		return null;
+	}
+
 }
 // end of file

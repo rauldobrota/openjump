@@ -1,3 +1,15 @@
+2007-01-22  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	* src/de/intevation/printlayout/I18N.java:
+		added two methods to get a label and a mnemonic key
+		from a bundle string.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		added hotkeys to the menu of this frame.
+	
+	* src/de/intevation/printlayout/i18n/messages_de.properties:
+		added '&'s to the messages to mark the hotkeys.
+
 2007-01-22  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/LayoutCanvas.java:
