@@ -1,3 +1,9 @@
+2007-01-22  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		- add full extend, zoom step in/out buttons to toolbar
+		- store last directory used in file choosers.
+
 2007-01-22  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	* src/de/intevation/printlayout/I18N.java:

@@ -20,12 +20,15 @@ import javax.swing.JMenu;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JToolBar;
+import javax.swing.JButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JToggleButton;
+import javax.swing.ActionMap;
 
 import java.awt.Color;
 import java.awt.BorderLayout;
 import java.awt.BasicStroke;
+import java.awt.FlowLayout;
 
 import java.awt.geom.AffineTransform;
 
@@ -102,6 +105,8 @@ implements   PickingInteractor.PickingListener
 	protected UngroupAction      ungroupAction;
 
 	protected PickingInteractor  pickingInteractor;
+
+	protected File               lastDirectory;
 
 	public LayoutFrame() {
 	}
@@ -206,7 +211,7 @@ implements   PickingInteractor.PickingListener
 		return panel;
 	}
 	
-	protected JMenu createMenu(String key, String def) {
+	protected static JMenu createMenu(String key, String def) {
 		String label = I18N.getString(key, def);
 		
 		JMenu menu = new JMenu(I18N.getName(label));
@@ -249,6 +254,9 @@ implements   PickingInteractor.PickingListener
 
 		JToolBar toolBar = new JToolBar();
 
+		toolBar.setRollover(true);
+		toolBar.setFloatable(false);
+
 		JToggleButton boxBnt  = new JToggleButton(
 			I18N.getString("LayoutFrame.Draw", "draw"));
 		JToggleButton pickBtn = new JToggleButton(
@@ -273,9 +281,9 @@ implements   PickingInteractor.PickingListener
 
 		ButtonGroup group = new ButtonGroup();
 
-		group.add(boxBnt);
-		group.add(pickBtn);
 		group.add(nopBnt);
+		group.add(pickBtn);
+		group.add(boxBnt);
 
 		nopBnt.setSelected(true);
 
@@ -283,7 +291,33 @@ implements   PickingInteractor.PickingListener
 		toolBar.add(pickBtn);
 		toolBar.add(nopBnt);
 
-		JPanel north = new JPanel();
+		ActionMap actionMap = svgCanvas.getActionMap();
+
+		Action fullExtendAction =
+			actionMap.get(LayoutCanvas.RESET_TRANSFORM_ACTION);
+
+		Action zoomInAction =
+			actionMap.get(LayoutCanvas.ZOOM_IN_ACTION);
+
+		Action zoomOutAction =
+			actionMap.get(LayoutCanvas.ZOOM_OUT_ACTION);
+
+		// TODO: store icon here
+		fullExtendAction.putValue(Action.NAME, "1:1");
+		zoomInAction.putValue(Action.NAME, "+");
+		zoomOutAction.putValue(Action.NAME, "-");
+
+		JButton fullExtend = new JButton(fullExtendAction);
+		JButton zoomIn     = new JButton(zoomInAction);
+		JButton zoomOut    = new JButton(zoomOutAction);
+
+		toolBar.addSeparator();
+		toolBar.add(fullExtend);
+		toolBar.add(zoomIn);
+		toolBar.add(zoomOut);
+
+		JPanel north = new JPanel(
+			new FlowLayout(FlowLayout.LEADING));
 
 		north.add(toolBar);
 
@@ -412,10 +446,13 @@ implements   PickingInteractor.PickingListener
 	}
 
 	protected void exportPDF() {
-		JFileChooser fc = new JFileChooser(".");
+		JFileChooser fc = new JFileChooser(lastDirectory);
 
-		if (fc.showSaveDialog(docManager.getCanvas()) 
-			!= JFileChooser.APPROVE_OPTION)
+		int result = fc.showSaveDialog(docManager.getCanvas());
+
+		lastDirectory = fc.getCurrentDirectory();
+
+		if (result != JFileChooser.APPROVE_OPTION)
 			return;
 
 		File file = fc.getSelectedFile();
@@ -425,10 +462,13 @@ implements   PickingInteractor.PickingListener
 
 
 	protected void exportSVG() {
-		JFileChooser fc = new JFileChooser(".");
+		JFileChooser fc = new JFileChooser(lastDirectory);
 
-		if (fc.showSaveDialog(docManager.getCanvas()) 
-			!= JFileChooser.APPROVE_OPTION)
+		int result = fc.showSaveDialog(docManager.getCanvas());
+
+		lastDirectory = fc.getCurrentDirectory();
+
+		if (result != JFileChooser.APPROVE_OPTION)
 			return;
 
 		File file = fc.getSelectedFile();
@@ -461,23 +501,28 @@ implements   PickingInteractor.PickingListener
 
 	protected void importSVG() {
 
-		JFileChooser fc = new JFileChooser(".");
+		JFileChooser fc = new JFileChooser(lastDirectory);
 
-		if (fc.showOpenDialog(docManager.getCanvas()) 
-			!= JFileChooser.APPROVE_OPTION)
+		int result = fc.showOpenDialog(docManager.getCanvas());
+
+		lastDirectory = fc.getCurrentDirectory();
+
+		if (result != JFileChooser.APPROVE_OPTION)
 			return;
-
 
 		docManager.appendSVG(fc.getSelectedFile());
 	}
 
 	protected void importImage() {
-		JFileChooser fc = new JFileChooser(".");
 
-		if (fc.showOpenDialog(docManager.getCanvas()) 
-			!= JFileChooser.APPROVE_OPTION)
+		JFileChooser fc = new JFileChooser(lastDirectory);
+
+		int result = fc.showOpenDialog(docManager.getCanvas());
+
+		lastDirectory = fc.getCurrentDirectory();
+
+		if (result != JFileChooser.APPROVE_OPTION)
 			return;
-
 
 		docManager.appendImage(fc.getSelectedFile());
 	}
