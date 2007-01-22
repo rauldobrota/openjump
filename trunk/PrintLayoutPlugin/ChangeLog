@@ -1,3 +1,13 @@
+2007-01-23  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		added dummy menu entries for scale bar and text. triggers
+		"not implemented yet" warnings.
+
+	* src/de/intevation/printlayout/i18n/messages.properties,
+	  src/de/intevation/printlayout/i18n/messages_de.properties:
+		added messages for menu entries and warning
+
 2007-01-22  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/DocumentManager.java:

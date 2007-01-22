@@ -24,6 +24,7 @@ import javax.swing.JButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JToggleButton;
 import javax.swing.ActionMap;
+import javax.swing.JOptionPane;
 
 import java.awt.Color;
 import java.awt.BorderLayout;
@@ -102,6 +103,8 @@ implements   PickingInteractor.PickingListener
 	protected RemoveAction       removeAction;
 	protected GroupAction        groupAction;
 	protected UngroupAction      ungroupAction;
+	protected	AddScalebarAction  addScalebarAction;
+	protected	AddScaletextAction addScaletextAction;
 
 	protected PickingInteractor  pickingInteractor;
 
@@ -164,18 +167,20 @@ implements   PickingInteractor.PickingListener
 		JMenu editMenu   = createMenu("LayoutFrame.Edit", "Edit");
 		JMenu insertMenu = createMenu("LayoutFrame.Insert", "Insert");
 
-		ExportSVGAction   svgExportAction   = new ExportSVGAction();
-		PDFAction         pdfAction         = new PDFAction();
-		PrintAction       printAction       = new PrintAction();
-		QuitAction        quitAction        = new QuitAction();
+		ExportSVGAction    svgExportAction    = new ExportSVGAction();
+		PDFAction          pdfAction          = new PDFAction();
+		PrintAction        printAction        = new PrintAction();
+		QuitAction         quitAction         = new QuitAction();
 
-		                  removeAction      = new RemoveAction();
-											groupAction       = new GroupAction();
-											ungroupAction     = new UngroupAction();
+		                   removeAction       = new RemoveAction();
+										   groupAction        = new GroupAction();
+										   ungroupAction      = new UngroupAction();
 
-		ImportImageAction imageImportAction = new ImportImageAction();
-		ImportSVGAction   svgImportAction   = new ImportSVGAction();
-		AddMapAction      addMapAction      = new AddMapAction();
+		ImportImageAction  imageImportAction  = new ImportImageAction();
+		ImportSVGAction    svgImportAction    = new ImportSVGAction();
+		AddMapAction       addMapAction       = new AddMapAction();
+		                   addScalebarAction  = new AddScalebarAction();
+		                   addScaletextAction = new AddScaletextAction();
 
 		fileMenu.add(svgExportAction);
 		fileMenu.add(pdfAction);
@@ -194,6 +199,11 @@ implements   PickingInteractor.PickingListener
 		insertMenu.add(addMapAction);
 		insertMenu.add(svgImportAction);
 		insertMenu.add(imageImportAction);
+		insertMenu.add(addScalebarAction);
+		insertMenu.add(addScaletextAction);
+
+		addScalebarAction .setEnabled(false);
+		addScaletextAction.setEnabled(false);
 
 		JMenuBar menubar = new JMenuBar();
 
@@ -563,6 +573,20 @@ implements   PickingInteractor.PickingListener
 
 		if (ungroupAction != null)
 			ungroupAction.setEnabled(N > 0);
+
+		if (addScalebarAction != null)
+			addScalebarAction.setEnabled(N == 1);
+
+		if (addScaletextAction != null)
+			addScaletextAction.setEnabled(N == 1);
+	}
+
+	protected void notImplementedYet() {
+		JOptionPane.showMessageDialog(
+			this,
+			I18N.getString("LayoutFrame.NotImplementedYet", "Not implemented, yet!"),
+			I18N.getString("LayoutFrame.Warning", "Warning"),
+			JOptionPane.WARNING_MESSAGE);
 	}
 
 	private class PrintAction extends AbstractAction {
@@ -684,6 +708,30 @@ implements   PickingInteractor.PickingListener
 		}
 		public void actionPerformed(ActionEvent ae) {
 			ungroup();
+		}
+	}
+
+	private class AddScalebarAction extends AbstractAction {
+		AddScalebarAction() {
+			super(I18N.getName(
+					I18N.getString("LayoutFrame.AddScaleBar", "Add Scale&bar")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.AddScaleBar", "Add Scale&bar")));
+		}
+		public void actionPerformed(ActionEvent ae) {
+			notImplementedYet();
+		}
+	}
+
+	private class AddScaletextAction extends AbstractAction {
+		AddScaletextAction() {
+			super(I18N.getName(
+					I18N.getString("LayoutFrame.AddScaleText", "Add S&caletext")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.AddScaleText", "Add S&caletext")));
+		}
+		public void actionPerformed(ActionEvent ae) {
+			notImplementedYet();
 		}
 	}
 }
