@@ -1,5 +1,13 @@
 2007-01-23  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
+	* etc/build.xml,
+	  etc/build.properties:
+	  	added a "javadoc" target to the ant script.
+		This target uses javadoc to create a documentation
+		for the whole plugin to the "doc" directory.
+
+2007-01-23  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
 	* src/de/intevation/printlayout/LayoutFrame.java:
 		included a text toggle button.
 
@@ -11,10 +19,10 @@
 
 2007-01-23  Ludwig Reiter  <ludwig.reiter@intevation.de>
 	
-	* lib/batik-all.jar
-	  lib/js.jar
-	  lib/pdf-transcoder.jar
-	  lib/xml-apis-ext.jar
+	* lib/batik-all.jar,
+	  lib/js.jar,
+	  lib/pdf-transcoder.jar,
+	  lib/xml-apis-ext.jar,
 	  lib/xml-apis.jar:
 	  	switch to the new batik svn version, because of
 		some changes in the pdf-transcoder.jar.
