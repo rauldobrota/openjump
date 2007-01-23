@@ -276,11 +276,14 @@ implements   PickingInteractor.PickingListener
 		JToggleButton nopBnt  = new JToggleButton(
 			IconLoader.icon("BigHand.gif"));
 		nopBnt.setToolTipText(I18N.getString("LayoutFrame.Pan", "pan"));
-
+		JToggleButton textBnt = new JToggleButton(
+			IconLoader.icon("LabelOn.gif"));
+		textBnt.setToolTipText(I18N.getString("LayoutFrame.Text", "text"));
+		textBnt.setEnabled(false);
+		
 		boxBnt .setActionCommand(boxInteractor.getToolIdentifier());
 		nopBnt .setActionCommand("pan");
 		pickBtn.setActionCommand(pickingInteractor.getToolIdentifier());
-
 
 		ActionListener listener = new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -297,12 +300,14 @@ implements   PickingInteractor.PickingListener
 		group.add(nopBnt);
 		group.add(pickBtn);
 		group.add(boxBnt);
+		group.add(textBnt);
 
 		nopBnt.setSelected(true);
 
 		toolBar.add(boxBnt);
 		toolBar.add(pickBtn);
 		toolBar.add(nopBnt);
+		toolBar.add(textBnt);
 
 		ActionMap actionMap = svgCanvas.getActionMap();
 

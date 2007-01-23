@@ -1,4 +1,9 @@
 2007-01-23  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		included a text toggle button.
+
+2007-01-23  Ludwig Reiter  <ludwig.reiter@intevation.de>
 	
 	* src/de/intevation/printlayout/LayoutFrame.java:
 		changed the text of the toogle buttons
