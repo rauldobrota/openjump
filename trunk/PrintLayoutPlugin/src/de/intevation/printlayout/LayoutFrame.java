@@ -76,7 +76,8 @@ import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 
 import com.vividsolutions.jump.workbench.model.Layer;
 import com.vividsolutions.jump.workbench.ui.renderer.LayerRenderer;
-import com.vividsolutions.jump.workbench.ui.renderer.Renderer;    
+import com.vividsolutions.jump.workbench.ui.renderer.Renderer;   
+import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -267,11 +268,14 @@ implements   PickingInteractor.PickingListener
 		toolBar.setFloatable(false);
 
 		JToggleButton boxBnt  = new JToggleButton(
-			I18N.getString("LayoutFrame.Draw", "draw"));
+			I18N.getString("LayoutFrame.Draw", "draw"),
+			IconLoader.icon("DrawRectangle.gif"));
 		JToggleButton pickBtn = new JToggleButton(
-			I18N.getString("LayoutFrame.Select", "select"));
+			I18N.getString("LayoutFrame.Select", "select"),
+			IconLoader.icon("Select.gif"));
 		JToggleButton nopBnt  = new JToggleButton(
-			I18N.getString("LayoutFrame.Pan", "pan"));
+			I18N.getString("LayoutFrame.Pan", "pan"),
+			IconLoader.icon("BigHand.gif"));
 
 		boxBnt .setActionCommand(boxInteractor.getToolIdentifier());
 		nopBnt .setActionCommand("pan");
