@@ -1,5 +1,15 @@
 2007-01-23  Ludwig Reiter  <ludwig.reiter@intevation.de>
 	
+	* lib/batik-all.jar
+	  lib/js.jar
+	  lib/pdf-transcoder.jar
+	  lib/xml-apis-ext.jar
+	  lib/xml-apis.jar:
+	  	switch to the new batik svn version, because of
+		some changes in the pdf-transcoder.jar.
+
+2007-01-23  Ludwig Reiter  <ludwig.reiter@intevation.de>
+	
 	* src/de/intevation/printlayout/LayoutFrame.java:
 		added icons for the toggle buttons.
 
