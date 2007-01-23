@@ -268,14 +268,14 @@ implements   PickingInteractor.PickingListener
 		toolBar.setFloatable(false);
 
 		JToggleButton boxBnt  = new JToggleButton(
-			I18N.getString("LayoutFrame.Draw", "draw"),
 			IconLoader.icon("DrawRectangle.gif"));
+		boxBnt.setToolTipText(I18N.getString("LayoutFrame.Draw", "draw"));
 		JToggleButton pickBtn = new JToggleButton(
-			I18N.getString("LayoutFrame.Select", "select"),
 			IconLoader.icon("Select.gif"));
+		pickBtn.setToolTipText(I18N.getString("LayoutFrame.Select", "select"));
 		JToggleButton nopBnt  = new JToggleButton(
-			I18N.getString("LayoutFrame.Pan", "pan"),
 			IconLoader.icon("BigHand.gif"));
+		nopBnt.setToolTipText(I18N.getString("LayoutFrame.Pan", "pan"));
 
 		boxBnt .setActionCommand(boxInteractor.getToolIdentifier());
 		nopBnt .setActionCommand("pan");
