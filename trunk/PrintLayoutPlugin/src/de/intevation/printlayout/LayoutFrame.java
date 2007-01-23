@@ -66,7 +66,7 @@ import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
 import org.apache.batik.swing.svg.SVGDocumentLoaderAdapter;
 
 import org.apache.batik.svggen.SVGGraphics2D;
-
+import org.apache.batik.svggen.SVGGeneratorContext;
 
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 
@@ -377,7 +377,11 @@ implements   PickingInteractor.PickingListener
 		AbstractDocument document =
 			(AbstractDocument)impl.createDocument(svgNS, "svg", null);
 
-		SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+		SVGGeneratorContext ctx = SVGGeneratorContext.createDefault(document);
+
+		ctx.setExtensionHandler(new PatternExt());
+
+		SVGGraphics2D svgGenerator = new SVGGraphics2D(ctx, false);
 
 		LayerViewPanel lvp = pluginContext.getLayerViewPanel();
 
@@ -402,6 +406,9 @@ implements   PickingInteractor.PickingListener
 				LayerRenderer layerRenderer = (LayerRenderer)renderer;
 				oldMaxFeaures[i] = layerRenderer.getMaxFeatures();
 				layerRenderer.setMaxFeatures(Integer.MAX_VALUE);
+			}
+			else {
+				System.err.println("unknown renderer type: " + renderer.getClass());
 			}
 		}
 

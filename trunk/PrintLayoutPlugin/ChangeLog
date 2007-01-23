@@ -1,3 +1,15 @@
+2007-01-23  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/PatternExt.java:
+		added. A simple Batik ExtensionHandler which catches 
+		com.vividsolutions.jump.workbench.ui.renderer.style.WKTFillPattern
+		Paint objects and replaces it with color "red".
+		TODO: Figure out how to generate an adequate 
+		SVG fill pattern.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		uses the ExtensionHandler
+
 2007-01-23  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	* etc/build.xml,
