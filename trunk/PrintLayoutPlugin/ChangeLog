@@ -1,6 +1,12 @@
 2007-01-23  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/PatternExt.java:
+	  render WKTFillPattern (BasicFillPattern) to a texture
+		and use this as fill pattern.
+		
+2007-01-23  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/PatternExt.java:
 		added. A simple Batik ExtensionHandler which catches 
 		com.vividsolutions.jump.workbench.ui.renderer.style.WKTFillPattern
 		Paint objects and replaces it with color "red".

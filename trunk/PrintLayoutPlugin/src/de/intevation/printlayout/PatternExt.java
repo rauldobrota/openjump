@@ -16,19 +16,44 @@ import java.awt.Paint;
 import org.apache.batik.svggen.DefaultExtensionHandler;
 import org.apache.batik.svggen.SVGGeneratorContext;
 import org.apache.batik.svggen.SVGPaintDescriptor;
+import org.apache.batik.svggen.SVGTexturePaint;
 
-import com.vividsolutions.jump.workbench.ui.renderer.style.WKTFillPattern;
+import java.awt.image.BufferedImage;
+
+import java.awt.geom.Rectangle2D;
+
+import java.awt.TexturePaint;
+
+import com.vividsolutions.jump.workbench.ui.renderer.style.BasicFillPattern;
+
+import com.vividsolutions.jump.util.Blackboard;
 
 public class PatternExt
 extends      DefaultExtensionHandler
 {
+	public PatternExt() {
+	}
+
 	public SVGPaintDescriptor handlePaint(
 		Paint paint,
     SVGGeneratorContext generatorContext
 	) {
-		if (paint instanceof WKTFillPattern) {
-			// TODO: Generate an adequate SVG fill pattern
-			return new SVGPaintDescriptor("red", "1");
+		if (paint instanceof BasicFillPattern) {
+
+			BasicFillPattern pattern = (BasicFillPattern)paint;
+
+			Blackboard properties = pattern.getProperties();
+
+			BufferedImage image = pattern.createImage(properties);
+
+			TexturePaint texture = new TexturePaint(
+				image,
+				new Rectangle2D.Double(0, 0, image.getWidth(),
+				image.getHeight()));
+
+			SVGTexturePaint stp = new SVGTexturePaint(generatorContext);
+
+			return stp.toSVG(texture);
 		}
 		return super.handlePaint(paint, generatorContext);
 	}
