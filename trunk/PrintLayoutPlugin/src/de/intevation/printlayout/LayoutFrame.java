@@ -171,6 +171,7 @@ implements   PickingInteractor.PickingListener
 		JMenu fileMenu   = createMenu("LayoutFrame.File", "File");
 		JMenu editMenu   = createMenu("LayoutFrame.Edit", "Edit");
 		JMenu insertMenu = createMenu("LayoutFrame.Insert", "Insert");
+		JMenu infoMenu   = createMenu("LayoutFrame.Help", "Help");
 
 		ExportSVGAction    svgExportAction    = new ExportSVGAction();
 		PDFAction          pdfAction          = new PDFAction();
@@ -186,7 +187,8 @@ implements   PickingInteractor.PickingListener
 		AddMapAction       addMapAction       = new AddMapAction();
 		                   addScalebarAction  = new AddScalebarAction();
 		                   addScaletextAction = new AddScaletextAction();
-
+		InfoDialogAction   infoDialogAction   = new InfoDialogAction();	
+											 
 		fileMenu.add(svgExportAction);
 		fileMenu.add(pdfAction);
 		fileMenu.add(printAction);
@@ -210,11 +212,14 @@ implements   PickingInteractor.PickingListener
 		addScalebarAction .setEnabled(false);
 		addScaletextAction.setEnabled(false);
 
+		infoMenu.add(infoDialogAction);
+
 		JMenuBar menubar = new JMenuBar();
 
 		menubar.add(fileMenu);
 		menubar.add(editMenu);
 		menubar.add(insertMenu);
+		menubar.add(infoMenu);
 
 		setJMenuBar(menubar);
 
@@ -332,11 +337,12 @@ implements   PickingInteractor.PickingListener
 		JButton fullExtend = new JButton(fullExtendAction);
 		JButton zoomIn     = new JButton(zoomInAction);
 		JButton zoomOut    = new JButton(zoomOutAction);
-
+		
 		toolBar.addSeparator();
 		toolBar.add(fullExtend);
 		toolBar.add(zoomIn);
 		toolBar.add(zoomOut);
+		toolBar.addSeparator();
 
 		JPanel north = new JPanel(
 			new FlowLayout(FlowLayout.LEADING));
@@ -800,6 +806,23 @@ implements   PickingInteractor.PickingListener
 		public void actionPerformed(ActionEvent ae) {
 			addScaleText();
 		}
+	}
+
+	private class InfoDialogAction extends AbstractAction {
+		InfoDialogAction() {
+		super(I18N.getName(
+					I18N.getString("LayoutFrame.ShowAboutDialog", "&About...")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.ShowAboutDialog", "&About...")));
+			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl A"));
+			//putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+			//		I18N.getString("LayoutFrame.AddScaleText", "Add S&caletext")));
+			//putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl T"));
+		}
+		public void actionPerformed(ActionEvent ae) {
+			InfoDialog.showDialog(LayoutFrame.this);
+		}
+	
 	}
 }
 // end of file

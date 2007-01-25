@@ -1,3 +1,20 @@
+2007-01-25  Ludwig Reiter  <ludwig.reiter@intevation.de>
+	
+	added a about dialog.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		added InfoDialogAction and a help menu.
+
+	* src/de/intevation/printlayout/InfoDialog.java:
+		a about dialog. This dialog shows resources/info.html.
+	
+	* src/de/intevation/printlayout/i18n/messages.properties,
+	  src/de/intevation/printlayout/i18n/messages_de.properties:
+	  	Two new entries for the help dialog.
+	
+	* src/de/intevation/printlayout/resources/info.html:
+		the about dialog message.
+
 2007-01-25  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/DocumentManager.java:
