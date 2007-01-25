@@ -13,13 +13,13 @@ I - Install
 
       anonymous CVS access:
 
-				 cvs -d:pserver:anonymous@jump-pilot.cvs.sourceforge.net:/cvsroot/jump-pilot login
-      
+        cvs -d:pserver:anonymous@jump-pilot.cvs.sourceforge.net:/cvsroot/jump-pilot login
+
         cvs -z3 -d:pserver:anonymous@jump-pilot.cvs.sourceforge.net:/cvsroot/jump-pilot co -P PrintLayoutLayoutPlugin
 
 
       developer CVS access:
-    
+
         export CVS_RSH=ssh
 
         cvs -z3 -d:ext:developername@jump-pilot.cvs.sourceforge.net:/cvsroot/jump-pilot co -P PrintLayoutLayoutPlugin
@@ -75,9 +75,9 @@ I - Install
           * !!! LIBARY DEPENDENCIES !!!
 
             Because there are bugs in the last release version
-            of Batik [1], the plugin comes with is own SVN version
-            of the libraries. 
-            
+            of Batik [1], the plugin comes with its own SVN version
+            of the libraries.
+
             You have to remove the batik libraries coming with 
             OpenJump and replace them.
 
@@ -90,23 +90,3 @@ I - Install
 References:
 
 [1] http://xmlgraphics.apache.org/batik/
-
-
-
-
-
-
-
-
-
-
-
-      
-
-  
-
-  
-
-
-
-
