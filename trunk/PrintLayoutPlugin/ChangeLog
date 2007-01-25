@@ -1,6 +1,11 @@
 2007-01-25  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	* src/de/intevation/printlayout/LayoutFrame.java:
+		added accelerators to the menu items.
+
+2007-01-25  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
 		changed toolbar button order. 
 
 2007-01-25  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
