@@ -625,8 +625,9 @@ implements   PickingInteractor.PickingListener
 						return;
 						
 					String id = el.getAttributeNS(null, "id");
-					ScaleUpdater updater = new ScaleUpdater(id);
+					ScaleUpdater updater = new ScaleUpdater(id, ids[0]);
 					manager.addChangeListener(ids[0], updater);
+					manager.addRemoveListener(id, updater);
 
 					updater.elementTransformed(loc, manager);
 				}

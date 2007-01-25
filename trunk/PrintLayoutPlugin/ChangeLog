@@ -1,3 +1,21 @@
+2007-01-25  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/ExtraData.java:
+		fix a bug preventing maps from being removed.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		add ScaleUpdater as RemoveListener of scale text.
+
+	* src/de/intevation/printlayout/ScaleUpdater.java:
+		implements RemoveListener as well.
+		remove ScaleUpdater as Listener from ChangeListener
+		list of watched map.
+
+2007-01-25  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		added markings to rulers.
+
 2007-01-25  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	* src/de/intevation/printlayout/DocumentManager.java:

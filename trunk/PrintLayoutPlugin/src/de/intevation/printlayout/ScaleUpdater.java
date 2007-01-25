@@ -26,9 +26,10 @@ import org.apache.batik.dom.AbstractElement;
 import java.text.NumberFormat;
 
 public class ScaleUpdater
-implements   Serializable, ExtraData.ChangeListener
+implements   Serializable, ExtraData.ChangeListener, ExtraData.RemoveListener
 {
 	protected String scaleID;
+	protected String transformID;
 
 	protected NumberFormat format;
 
@@ -38,17 +39,31 @@ implements   Serializable, ExtraData.ChangeListener
 		format.setGroupingUsed(false);
 	}
 
-	public ScaleUpdater(String id) {
+	public ScaleUpdater(String scaleID, String transformID) {
 		this();
-		scaleID = id;
+		this.scaleID     = scaleID;
+		this.transformID = transformID;
+	}
+
+	public String getTransformID() {
+		return transformID;
+	}
+
+	public void setTransformID(String id) {
+		transformID = id;
 	}
 
 	public String getScaleID() {
 		return scaleID;
 	}
 
-	public void setScaleId(String id) {
+	public void setScaleID(String id) {
 		scaleID = id;
+	}
+
+	public void elementRemoved(ExtraData.Event evt) {
+		DocumentManager manager = (DocumentManager)evt.getSource();
+		manager.removeChangeListener(transformID, this);
 	}
 
 	public void elementTransformed(ExtraData.Event evt) {

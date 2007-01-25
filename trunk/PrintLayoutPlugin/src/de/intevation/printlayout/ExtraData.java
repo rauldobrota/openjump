@@ -140,6 +140,10 @@ implements   Serializable
 			}
 		}
 
+		public boolean hasChangeListeners() {
+			return changeListeners != null && !changeListeners.isEmpty();
+		}
+
 		public void clear() {
 			if (removeListeners != null) {
 				ArrayList rl = removeListeners;
@@ -247,7 +251,8 @@ implements   Serializable
 	}
 
 	public boolean hasChangeListeners(String id) {
-		return id2entry.containsKey(id);
+		Entry entry = (Entry)id2entry.get(id);
+		return entry != null && entry.hasChangeListeners();
 	}
 }
 // end of file
