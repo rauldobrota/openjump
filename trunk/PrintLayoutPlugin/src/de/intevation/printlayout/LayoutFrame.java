@@ -59,6 +59,7 @@ import org.apache.batik.util.XMLResourceDescriptor;
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 
 import org.w3c.dom.svg.SVGDocument;
+import org.w3c.dom.svg.SVGLocatable;
 
 import org.w3c.dom.DOMImplementation;
 
@@ -68,6 +69,7 @@ import org.apache.batik.swing.svg.SVGDocumentLoaderAdapter;
 
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.svggen.SVGGeneratorContext;
+import org.apache.batik.svggen.CachedImageHandlerBase64Encoder;
 
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 
@@ -76,6 +78,7 @@ import com.vividsolutions.jump.workbench.ui.renderer.RenderingManager;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 
 import com.vividsolutions.jump.workbench.model.Layer;
+
 import com.vividsolutions.jump.workbench.ui.renderer.LayerRenderer;
 import com.vividsolutions.jump.workbench.ui.renderer.Renderer;   
 import com.vividsolutions.jump.workbench.ui.images.IconLoader;
@@ -380,6 +383,8 @@ implements   PickingInteractor.PickingListener
 
 		SVGGeneratorContext ctx = SVGGeneratorContext.createDefault(document);
 
+		ctx.setGenericImageHandler(new CachedImageHandlerBase64Encoder());
+
 		ctx.setExtensionHandler(new PatternExt());
 
 		SVGGraphics2D svgGenerator = new SVGGraphics2D(ctx, false);
@@ -431,19 +436,15 @@ implements   PickingInteractor.PickingListener
 		Envelope xenv = new Envelope(
 			0, lvp.getWidth(), 0, lvp.getHeight());
 
-		AffineTransform xform = fitToPaper(xenv);
+		double geo2screen = env2env(env, xenv);
 
-		/*
-		try {
-			java.io.FileOutputStream f = new java.io.FileOutputStream("raw.svg");
-			java.io.Writer out = new java.io.OutputStreamWriter(f, "UTF-8");
-    	svgGenerator.stream(out, true);
-			f.close();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		*/
+		double scale2paper = fitToPaper(xenv);
+
+		AffineTransform xform = AffineTransform.getScaleInstance(
+			scale2paper, scale2paper);
+
+		final MapData mapData = new MapData(geo2screen);
+
 
 		AbstractElement root = (AbstractElement)document.getDocumentElement();
 		root = (AbstractElement)svgGenerator.getRoot(root);
@@ -454,21 +455,29 @@ implements   PickingInteractor.PickingListener
 		root.setAttributeNS(null, "x", "0");
 		root.setAttributeNS(null, "y", "0");
 
-		docManager.appendSVG((AbstractDocument)document, xform, false);
+		docManager.appendSVG((AbstractDocument)document, xform, false,
+			new DocumentManager.ModificationCallback() {
+				public void run(DocumentManager manager, AbstractElement element) {
+					String id = element.getAttributeNS(null, "id");
+					manager.setData(id, mapData);
+				}
+			});
 	}
 
-	protected AffineTransform fitToPaper(Envelope env) {
+	protected double fitToPaper(Envelope env) {
 		double [] paper = new double[2];
 		docManager.getPaperSize(paper);
 
 		double s1 = paper[0]/env.getWidth();
 		double s2 = paper[1]/env.getHeight();
 
-		double s = Math.min(s1, s2);
+		return Math.min(s1, s2);
+	}
 
-		AffineTransform result = AffineTransform.getScaleInstance(s, s);
-
-		return result;
+	protected static double env2env(Envelope env1, Envelope env2) {
+		double s1 = env2.getWidth()/env1.getWidth();
+		double s2 = env2.getHeight()/env1.getHeight();
+		return Math.max(s1, s2);
 	}
 
 	protected void exportPDF() {
@@ -577,13 +586,40 @@ implements   PickingInteractor.PickingListener
 		}
 	}
 
+	protected void addScaleText() {
+		final String [] ids = pickingInteractor.getSelectedIDs();
+
+		if (ids == null || ids.length < 1)
+			return;
+
+		docManager.addText("",
+			new DocumentManager.ModificationCallback() {
+				public void run(DocumentManager manager, AbstractElement el) {
+
+					SVGDocument doc = manager.getSVGDocument();
+					SVGLocatable loc = (SVGLocatable)doc.getElementById(ids[0]);
+
+					if (loc == null)
+						return;
+						
+					String id = el.getAttributeNS(null, "id");
+					ScaleUpdater updater = new ScaleUpdater(id);
+					manager.addChangeListener(ids[0], updater);
+
+					updater.elementTransformed(loc, manager);
+				}
+			});
+	}
+
 	/** PickingInteractor.PickingListener */
 	public void selectionChanged(PickingInteractor.PickingEvent evt) {
 		PickingInteractor pi = (PickingInteractor)evt.getSource();
+		String [] ids = pi.getSelectedIDs();
 		int N = pi.numSelections();
 
 		if (removeAction != null)
-			removeAction.setEnabled(N > 0);
+			removeAction.setEnabled(N > 0 
+			&& !docManager.hasRecursiveChangeListeners(ids));
 
 		if (groupAction != null)
 			groupAction.setEnabled(N > 1);
@@ -591,11 +627,13 @@ implements   PickingInteractor.PickingListener
 		if (ungroupAction != null)
 			ungroupAction.setEnabled(N > 0);
 
+		if (addScaletextAction != null)
+			addScaletextAction.setEnabled(
+				N == 1 
+				&& docManager.getData(ids[0]) instanceof MapData);
+
 		if (addScalebarAction != null)
 			addScalebarAction.setEnabled(N == 1);
-
-		if (addScaletextAction != null)
-			addScaletextAction.setEnabled(N == 1);
 	}
 
 	protected void notImplementedYet() {
@@ -760,7 +798,7 @@ implements   PickingInteractor.PickingListener
 			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl T"));
 		}
 		public void actionPerformed(ActionEvent ae) {
-			notImplementedYet();
+			addScaleText();
 		}
 	}
 }

@@ -20,7 +20,69 @@ import java.awt.geom.AffineTransform;
 
 public class MatrixTools
 {
+	public static final class Decomposition 
+	{
+		public double tx; // translate x
+		public double ty; // translate y
+
+		public double ro; // rotation
+
+		public double scx; // scale x
+		public double scy; // scale y
+
+		public double skx; // skew x
+		public double sky; // skew y
+		
+		public Decomposition(SVGMatrix matrix) {
+			this(
+				matrix.getA(),
+				matrix.getB(),
+				matrix.getC(),
+				matrix.getD(),
+				matrix.getE(),
+				matrix.getF());
+		}
+
+		public Decomposition(
+			double a, double b,
+			double c, double d,
+			double e, double f
+		) {
+			double const1 = a*a + b*b;
+			double const2 = Math.sqrt(1d/const1);
+
+			if (a < 0d || b < 0d) const2 = -const2;
+
+			double tanskx = (a*c + b*d)/const1;
+
+			skx = Math.toDegrees(Math.atan(tanskx));
+			sky = 0d;
+
+			scx = const1*const2;
+			scy = (a*d - b*c)*const2;
+
+			tx = e;
+			ty = f;
+
+			ro = Math.acos(a*const2);
+		}
+
+		public String toString() {
+			StringBuffer sb = new StringBuffer();
+			sb.append("skewY(").append(sky)
+				.append(") translate(").append(tx).append(",")
+				.append(ty).append(") rotate(").append(ro)
+				.append(") scale(").append(scx).append(",")
+				.append(scy).append(") skewX(").append(skx).append(")");
+			return sb.toString();
+		}
+	} // class Decomposition
+
 	private MatrixTools() {
+	}
+
+	public static Decomposition decompose(SVGMatrix matrix) {
+		return new Decomposition(matrix);
 	}
 
 	public static final AffineTransform toJavaTransform(SVGMatrix matrix) {

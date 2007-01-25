@@ -1,3 +1,24 @@
+2007-01-25  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		new event system for not SVG data
+
+	* src/de/intevation/printlayout/ExtraData.java:
+		manages extra (not SVG data) and broadcasts events
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		uses scale text.
+
+	* src/de/intevation/printlayout/MapData.java:
+		stores the not SVG data of GIS maps.
+
+	* src/de/intevation/printlayout/MatrixTools.java:
+		added a class to decompose a matrix.
+
+	* src/de/intevation/printlayout/ScaleUpdater.java:
+		event listener updating scale text.
+		TODO: add remove listener if scale text is removed.
+
 2007-01-25  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	* src/de/intevation/printlayout/LayoutFrame.java:

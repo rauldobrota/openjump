@@ -31,6 +31,7 @@ import org.w3c.dom.svg.SVGException;
 import org.w3c.dom.svg.SVGRect;
 
 import org.w3c.dom.NodeList; 
+import org.w3c.dom.Node; 
 import org.w3c.dom.DOMImplementation;
 
 import org.apache.batik.transcoder.TranscoderInput;
@@ -63,6 +64,7 @@ import java.io.BufferedOutputStream;
 import java.io.OutputStream;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -87,25 +89,81 @@ public class DocumentManager
 {
 	public static final String DOCUMENT_SHEET = "viewer-layout-sheet-svg";
 	public static final String OBJECT_ID      = "viewer-layout-id";
+	public static final String OBJECT_ID_LEAF = "viewer-layout-id-leaf";
 
 	protected LayoutCanvas svgCanvas;
 
 	protected int          objectID;
+
+	protected ExtraData    extraData;
 
 
 	public interface DocumentModifier {
 		Object run(DocumentManager documentManager);
 	}
 
-	public interface AfterDocumentModification {
-		void run(DocumentManager documentManager, Object result);
+	public interface ModificationCallback {
+		void run(DocumentManager documentManager, AbstractElement element);
 	}
 
 	public DocumentManager() {
+		extraData = new ExtraData();
 	}
 
 	public DocumentManager(LayoutCanvas svgCanvas) {
+		this();
 		this.svgCanvas = svgCanvas;
+	}
+
+	public void addChangeListener(
+		String                   id,
+		ExtraData.ChangeListener listener
+	) {
+		extraData.addChangeListener(id, listener);
+	}
+
+	public void removeChangeListener(
+		String                   id,
+		ExtraData.ChangeListener listener
+	) {
+		extraData.removeChangeListener(id, listener);
+	}
+
+	public void addRemoveListener(
+		String                   id,
+		ExtraData.RemoveListener listener
+	) {
+		extraData.addRemoveListener(id, listener);
+	}
+
+	public void removeRemoveListener(
+		String                   id,
+		ExtraData.RemoveListener listener
+	) {
+		extraData.removeRemoveListener(id, listener);
+	}
+
+	public ExtraData.Entry getOrCreateEntry(String id) {
+		return extraData.getOrCreateEntry(id);
+	}
+
+	public void setData(String id, Object data) {
+		extraData.setData(id, data);
+	}
+
+	public Object getData(String id) {
+		return extraData.getData(id);
+	}
+
+	public boolean hasChangeListeners(String [] ids) {
+		for (int i = 0; i < ids.length; ++i)
+			if (extraData.hasChangeListeners(ids[i]))
+				return true;
+		return false;
+	}
+
+	public boolean hasChangeListeners(String id) {
+		return extraData.hasChangeListeners(id);
 	}
 
 	public LayoutCanvas getCanvas() {
@@ -181,6 +239,45 @@ public class DocumentManager
 		}
 
 		return result[0];
+	}
+
+	public void addText(String text) {
+		addText(text, null);
+	}
+
+	public void addText(final String text, final ModificationCallback callback) {
+		modifyDocumentLater(new DocumentModifier() {
+			public Object run(DocumentManager documentManager) {
+
+				SVGDocument document = documentManager.getSVGDocument();
+
+				String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+
+				AbstractElement textElement = 
+					(AbstractElement)document.createElementNS(svgNS, "text");
+
+				textElement.setTextContent(text);
+
+				AbstractElement xform =
+					(AbstractElement)document.createElementNS(svgNS, "g");
+
+				xform.setAttributeNS(null, "id", uniqueObjectID());
+				xform.setAttributeNS(null, "transform", "matrix(1 0 0 1 0 0)");
+
+				xform.appendChild(textElement);
+
+				AbstractElement sheet =
+					(AbstractElement)document.getElementById(DOCUMENT_SHEET);
+
+				sheet.appendChild(xform);
+
+				if (callback != null)
+					callback.run(documentManager, xform);
+
+
+				return null;
+			}
+		});
 	}
 
 	public void exportSVG(final File file) {
@@ -367,16 +464,25 @@ public class DocumentManager
 	}
 
 	public void appendSVG(
-		final AbstractDocument document, 
-		final AffineTransform  xform
+		AbstractDocument document, 
+		AffineTransform  xform
 	) {
-		appendSVG(document, xform, true);
+		appendSVG(document, xform, true, null);
 	}
 
 	public void appendSVG(
-		final AbstractDocument document, 
-		final AffineTransform  xform,
-		final boolean          adjustView
+		AbstractDocument document, 
+		AffineTransform  xform,
+		boolean          adjustView
+	) {
+		appendSVG(document, xform, adjustView);
+	}
+
+	public void appendSVG(
+		final AbstractDocument     document, 
+		final AffineTransform      xform,
+		final boolean              adjustView,
+		final ModificationCallback callback
 	) {
 		UpdateManager um = svgCanvas.getUpdateManager();
 
@@ -387,7 +493,7 @@ public class DocumentManager
 
 		um.getUpdateRunnableQueue().invokeLater(new Runnable() {
 			public void run() {
-				appendSVGwithinUM(document, xform, adjustView);
+				appendSVGwithinUM(document, xform, adjustView, callback);
 			}
 		});
 	}
@@ -443,10 +549,16 @@ public class DocumentManager
 	}     
  
 	public String uniqueObjectID() {
+		return uniqueObjectID(true);
+	}
+
+	public String uniqueObjectID(boolean leaf) {
 		String idString;
+		String prefix = leaf ? OBJECT_ID_LEAF : OBJECT_ID;
+
 		AbstractDocument document = (AbstractDocument)svgCanvas.getSVGDocument();
 		do {
-			idString = OBJECT_ID + objectID;
+			idString = prefix + objectID;
 			++objectID;
 		}
 		while (document.getElementById(idString) != null);
@@ -566,9 +678,10 @@ public class DocumentManager
 	}
 
 	public void appendSVGwithinUM(
-		AbstractDocument newDocument, 
-		AffineTransform  matrix,
-		boolean          adjustView
+		AbstractDocument     newDocument, 
+		AffineTransform      matrix,
+		boolean              adjustView,
+		ModificationCallback modificationCallback
 	) {
 		AbstractDocument document = (AbstractDocument)svgCanvas.getSVGDocument();
 
@@ -600,6 +713,94 @@ public class DocumentManager
 		xform.appendChild(node);
 
 		root.appendChild(xform);
+
+		if (modificationCallback != null)
+			modificationCallback.run(this, xform);
+	}
+
+	protected interface ElementVisitor {
+		boolean visit(AbstractElement element);
+	}
+
+	protected static boolean visit(
+		AbstractElement element,
+		ElementVisitor  visitor
+	) {
+		Stack stack = new Stack();
+
+		stack.push(element);
+
+		while (!stack.empty()) {
+			element = (AbstractElement)stack.pop();
+			String id = element.getAttributeNS(null, "id");
+			if (id != null && id.startsWith(OBJECT_ID)) { 
+				if (!visitor.visit(element))
+					return false;
+				if (id.startsWith(OBJECT_ID_LEAF))
+					continue;
+			}
+			if (element.hasChildNodes()) {
+				NodeList children = element.getChildNodes();
+				for (int i = children.getLength()-1; i >= 0; --i) {
+					Node node = children.item(i); 
+					if (node instanceof AbstractElement)
+						stack.push(node);
+				}
+			}
+		}
+
+		return true;
+	}
+
+	public boolean hasRecursiveChangeListeners(String [] ids) {
+
+		if (ids == null)
+			return false;
+
+		SVGDocument document = getSVGDocument();
+
+		for (int i = 0; i < ids.length; ++i) {
+			AbstractElement element =
+				(AbstractElement)document.getElementById(ids[i]);
+			if (element != null && hasRecursiveChangeListeners(element))
+				return true;
+		}
+		return false;
+	}
+
+	public boolean hasRecursiveChangeListeners(AbstractElement element) {
+
+		final boolean [] has = new boolean[1];
+
+		visit(element, new ElementVisitor() {
+			public boolean visit(AbstractElement element) {
+				String id = element.getAttributeNS(null, "id");
+				if (id != null && hasChangeListeners(id)) {
+					has[0] = true;
+					return false;
+				}
+				return true;
+			}
+		});
+		return has[0];
+	}
+
+	protected void recursiveRemove(AbstractElement element) {
+		visit(element, new ElementVisitor() {
+			public boolean visit(AbstractElement element) {
+				extraData.remove(DocumentManager.this, element);
+				return true;
+			}
+		});
+	}
+
+	protected void recursiveTransform(AbstractElement element) {
+		visit(element, new ElementVisitor() {
+			public boolean visit(AbstractElement element) {
+				extraData.fireElementTransformed(DocumentManager.this, element);
+				return true;
+			}
+		});
 	}
 
 	public void removeIDs(final String [] ids) {
@@ -609,15 +810,20 @@ public class DocumentManager
 				SVGDocument document = documentManager.getSVGDocument();
 
 				for (int i = 0; i < ids.length; ++i) {
+
 					AbstractElement element =
 						(AbstractElement)document.getElementById(ids[i]);
 
-					if (element != null) { // child found?
-						AbstractElement parent =
-							(AbstractElement)element.getParentNode();
-						if (parent != null)
-							parent.removeChild(element);
-					}
+					if (element == null || hasRecursiveChangeListeners(element)) 
+						continue;
+
+					AbstractElement parent =
+						(AbstractElement)element.getParentNode();
+					if (parent != null)
+						parent.removeChild(element);
+
+					recursiveRemove(element);
+
 				} // for all ids
 
 				return null;
@@ -666,7 +872,7 @@ public class DocumentManager
 
 				group.setAttributeNS(null, "transform", "matrix(1 0 0 1 0 0)");
 
-				group.setAttributeNS(null, "id", uniqueObjectID());
+				group.setAttributeNS(null, "id", uniqueObjectID(false));
 
 				for (int i = 0; i < N; ++i)
 					group.appendChild((AbstractElement)children.get(i));
@@ -761,15 +967,9 @@ public class DocumentManager
 		});
 	}
 
-	public void translateIDs(String [] ids, Point2D screenDelta) {
-		translateIDs(ids, screenDelta, null);
-	}
 
-	public void translateIDs(
-		final String []                 ids, 
-		final Point2D                   screenDelta,
-		final AfterDocumentModification afterward
-	) {
+	public void translateIDs(final String [] ids, final Point2D screenDelta) {
+
 		if (ids == null || ids.length == 0)
 			return;
 
@@ -814,25 +1014,19 @@ public class DocumentManager
 
 					element.setAttributeNS(
 						null, "transform", MatrixTools.toSVGString(xform));
-				}
 
-				if (afterward != null)
-					afterward.run(DocumentManager.this, null);
+					recursiveTransform(element);
+				}
 
 				return null;
 			}
 		});
 	}
 
-	public void scaleIDs(String [] ids, Point2D screenDelta, Point2D screenPos) {
-		scaleIDs(ids, screenDelta, screenPos, null);
-	}
-
 	public void scaleIDs(
-		final String []                 ids, 
-		final Point2D                   screenDelta,
-		final Point2D                   screenPos,
-		final AfterDocumentModification afterward
+		final String [] ids, 
+		final Point2D   screenDelta,
+		final Point2D   screenPos
 	) {
 		if (ids == null || ids.length == 0)
 			return;
@@ -901,24 +1095,19 @@ public class DocumentManager
 
 					element.setAttributeNS(
 						null, "transform", MatrixTools.toSVGString(xform));
-				}
 
-				if (afterward != null)
-					afterward.run(DocumentManager.this, null);
+					recursiveTransform(element);
+				}
 
 				return null;
 			}
 		});
 	}
-	public void rotateIDs(String [] ids, Point2D screenDelta, Point2D screenPos) {
-		rotateIDs(ids, screenDelta, screenPos, null);
-	}
 
 	public void rotateIDs(
-		final String []                 ids, 
-		final Point2D                   screenDelta,
-		final Point2D                   screenPos,
-		final AfterDocumentModification afterward
+		final String [] ids, 
+		final Point2D   screenDelta,
+		final Point2D   screenPos
 	) {
 		if (ids == null || ids.length == 0)
 			return;
@@ -990,10 +1179,9 @@ public class DocumentManager
 
 					element.setAttributeNS(
 						null, "transform", MatrixTools.toSVGString(xform));
-				}
 
-				if (afterward != null)
-					afterward.run(DocumentManager.this, null);
+					recursiveTransform(element);
+				}
 
 				return null;
 			}
