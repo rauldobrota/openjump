@@ -66,6 +66,9 @@ import org.w3c.dom.DOMImplementation;
 import org.apache.batik.swing.svg.SVGUserAgentGUIAdapter;
 import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
 import org.apache.batik.swing.svg.SVGDocumentLoaderAdapter;
+import org.apache.batik.swing.gvt.GVTTreeRendererAdapter;
+import org.apache.batik.swing.gvt.GVTTreeRendererEvent;
+
 
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.svggen.SVGGeneratorContext;
@@ -147,24 +150,37 @@ implements   PickingInteractor.PickingListener
 			}
 		});
 
-		/*
-		SVGDocument doc = createSheet("DIN A4");
+		GVTTreeRendererAdapter r = new GVTTreeRendererAdapter() {
+			boolean done;
 
-		if (doc == null) {
-		*/
-			System.err.println("cannot create DIN A4");
+			public void gvtRenderingPrepare(GVTTreeRendererEvent e) {
+			}
+
+			public void gvtRenderingCompleted(GVTTreeRendererEvent e) {
+				if (!done) {
+					done = true;
+					docManager.generateRulers();
+					svgCanvas.removeGVTTreeRendererListener(this);
+				}
+			}
+		};
+
+    svgCanvas.addGVTTreeRendererListener(r);
+
+		//SVGDocument doc = createSheet("DIN A0");
+
+		//if (doc == null) {
+		//	System.err.println("cannot create DIN A4");
 			URL url = getClass().getResource(A4_SHEET);
 			if (url == null) {
 				System.err.println("sheet not found");
 				return null;
 			}
 			svgCanvas.setURI(url.toString());
-		/*
-		}
-		else {
-			svgCanvas.installDocument(doc);
-		}
-		*/
+		//}
+		//else {
+		//	svgCanvas.installDocument(doc);
+		//}
 
 		JSVGScrollPane scroller = new JSVGScrollPane(svgCanvas);
 

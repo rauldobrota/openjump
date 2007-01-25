@@ -88,6 +88,7 @@ import javax.imageio.ImageIO;
 public class DocumentManager
 {
 	public static final String DOCUMENT_SHEET = "viewer-layout-sheet-svg";
+	public static final String DOCUMENT_BELOW = "viewer-layout-below";
 	public static final String OBJECT_ID      = "viewer-layout-id";
 	public static final String OBJECT_ID_LEAF = "viewer-layout-id-leaf";
 
@@ -1189,27 +1190,60 @@ public class DocumentManager
 	}
 
 	public void generateRulers() {
-		modifyDocumentNow(new DocumentModifier() {
+		modifyDocumentLater(new DocumentModifier() {
 			public Object run(DocumentManager documentManager) {
 				double[] sizes = new double[2];
-				getPaperSize(sizes);
+				documentManager.getPaperSize(sizes);
 				SVGDocument document = documentManager.getSVGDocument();
 				
-				AbstractElement root = (AbstractElement)document.getDocumentElement();
-				String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+				AbstractElement root =
+					(AbstractElement)document.getElementById(DOCUMENT_BELOW);
 
-        root.appendChild(line(document, -2.0, -2.0, -2.0, sizes[1]));
-				root.appendChild(line(document, -2.0, -2.0, sizes[0], -2.0));
+				// down
+        root.appendChild(line(document, 17d, 20d, 17d, sizes[1] + 20d));
+				// right
+				root.appendChild(line(document, 20d, 17d, sizes[0]+ 20d, 17d));
+
+				int count = 0;
+
+				// markings x
+				for (double x = 0d; x <= sizes[0]; ++x) {
+
+					double length;
+					     if (count == 0) length = 7d;
+					else if (count == 5) length = 3.5d;
+					else                 length = 2d;
+
+					if (++count > 9) count = 0;
+
+					root.appendChild(
+						line(document, 20d+x, 17d, 20d+x, 17d-length));
+				}
+
+				count = 0;
+
+				// markings y
+				for (double y = 0d; y <= sizes[1]; ++y) {
+
+					double length;
+					     if (count == 0) length = 7d;
+					else if (count == 5) length = 3.5d;
+					else                 length = 2d;
+
+					if (++count > 9) count = 0;
+
+					root.appendChild(
+						line(document, 17d, 20d+y, 17d-length, 20d+y));
+				}
 				
 				return null;
 			}
 
-			protected AbstractElement line(
+			private AbstractElement line(
 				SVGDocument doc,
-				double x1,
-				double y1,
-				double x2,
-				double y2) 
+				double x1, double y1,
+				double x2, double y2
+			) 
 			{
 				String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
 
@@ -1220,6 +1254,8 @@ public class DocumentManager
 				l.setAttributeNS(null, "y1", String.valueOf(y1));
 				l.setAttributeNS(null, "x2", String.valueOf(x2));
 				l.setAttributeNS(null, "y2", String.valueOf(y2));
+				l.setAttributeNS(null, "stroke", "black");
+				l.setAttributeNS(null, "stroke-width", "0.5"); 
 			
 				return l;
 			}

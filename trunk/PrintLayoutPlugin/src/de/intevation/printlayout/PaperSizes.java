@@ -45,7 +45,11 @@ public class PaperSizes
 	}
 
 	static {
-		SIZES.put("DIN A4", new double [] { 210d, 297d });
+		SIZES.put("DIN A4", new double [] { 210d,  297d });
+		SIZES.put("DIN A0", new double [] { 841d, 1189d });
+		SIZES.put("DIN A1", new double [] { 594d,  841d });
+		SIZES.put("DIN A2", new double [] { 420d,  594d });
+		SIZES.put("DIN A3", new double [] { 297d,  420d });
 	}
 
 	public static void putPageSize(String id, double width, double height) {
