@@ -1187,5 +1187,43 @@ public class DocumentManager
 			}
 		});
 	}
+
+	public void generateRulers() {
+		modifyDocumentNow(new DocumentModifier() {
+			public Object run(DocumentManager documentManager) {
+				double[] sizes = new double[2];
+				getPaperSize(sizes);
+				SVGDocument document = documentManager.getSVGDocument();
+				
+				AbstractElement root = (AbstractElement)document.getDocumentElement();
+				String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+
+        root.appendChild(line(document, -2.0, -2.0, -2.0, sizes[1]));
+				root.appendChild(line(document, -2.0, -2.0, sizes[0], -2.0));
+				
+				return null;
+			}
+
+			protected AbstractElement line(
+				SVGDocument doc,
+				double x1,
+				double y1,
+				double x2,
+				double y2) 
+			{
+				String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+
+				AbstractElement l = 
+					(AbstractElement)doc.createElementNS(svgNS, "line");
+        
+				l.setAttributeNS(null, "x1", String.valueOf(x1));
+				l.setAttributeNS(null, "y1", String.valueOf(y1));
+				l.setAttributeNS(null, "x2", String.valueOf(x2));
+				l.setAttributeNS(null, "y2", String.valueOf(y2));
+			
+				return l;
+			}
+		});		
+	}
 }
 // end of file

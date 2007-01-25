@@ -1,4 +1,9 @@
 2007-01-25  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		added method generateRulers().TODO: add markings.
+
+2007-01-25  Ludwig Reiter  <ludwig.reiter@intevation.de>
 	
 	added a about dialog.
 
