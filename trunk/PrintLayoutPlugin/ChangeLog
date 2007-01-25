@@ -14,6 +14,11 @@
 2007-01-25  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/DocumentManager.java:
+		set scale text position initially to screen center.
+
+2007-01-25  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/DocumentManager.java:
 		added markings to rulers.
 
 2007-01-25  Ludwig Reiter  <ludwig.reiter@intevation.de>

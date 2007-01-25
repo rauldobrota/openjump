@@ -67,6 +67,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.Graphics2D;
 
 import java.awt.geom.Rectangle2D;
@@ -263,12 +264,30 @@ public class DocumentManager
 					(AbstractElement)document.createElementNS(svgNS, "g");
 
 				xform.setAttributeNS(null, "id", uniqueObjectID());
-				xform.setAttributeNS(null, "transform", "matrix(1 0 0 1 0 0)");
 
-				xform.appendChild(textElement);
+				Rectangle rect = documentManager.getCanvas().getBounds();
 
 				AbstractElement sheet =
 					(AbstractElement)document.getElementById(DOCUMENT_SHEET);
+
+				Point2D centerScreen = new Point2D.Double(
+					rect.x + 0.5d * rect.width,
+					rect.y + 0.5d * rect.height);
+
+				AffineTransform trans =
+					MatrixTools.toJavaTransform(
+						((SVGLocatable)sheet).getScreenCTM().inverse());
+
+				Point2D center = new Point2D.Double();
+				trans.transform(centerScreen, center);
+
+				trans = AffineTransform
+					.getTranslateInstance(center.getX(), center.getY());
+
+				xform.setAttributeNS(
+					null, "transform", MatrixTools.toSVGString(trans));
+
+				xform.appendChild(textElement);
 
 				sheet.appendChild(xform);
 
