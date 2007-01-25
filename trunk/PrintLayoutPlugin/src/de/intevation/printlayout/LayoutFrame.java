@@ -304,9 +304,9 @@ implements   PickingInteractor.PickingListener
 
 		nopBnt.setSelected(true);
 
-		toolBar.add(boxBnt);
-		toolBar.add(pickBtn);
 		toolBar.add(nopBnt);
+		toolBar.add(pickBtn);
+		toolBar.add(boxBnt);
 		toolBar.add(textBnt);
 
 		ActionMap actionMap = svgCanvas.getActionMap();
