@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.AbstractAction;
@@ -28,14 +29,19 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.BorderLayout;
 import java.awt.BasicStroke;
 import java.awt.FlowLayout;
 
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +51,8 @@ import java.net.URL;
 
 import java.util.List;
 import java.util.ArrayList;
+
+import java.text.NumberFormat;
 
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.JSVGScrollPane;
@@ -118,11 +126,19 @@ implements   PickingInteractor.PickingListener
 
 	protected File               lastDirectory;
 
+	protected JLabel             mousePosition;
+	protected NumberFormat       mouseFormat;
+
 	public LayoutFrame() {
 	}
 
 	public LayoutFrame(PlugInContext pluginContext) {
 		super("Print/Layout");
+
+		mouseFormat = NumberFormat.getInstance();
+		mouseFormat.setGroupingUsed(false);
+		mouseFormat.setMaximumFractionDigits(2);
+
 		this.pluginContext = pluginContext;
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setContentPane(createComponents());
@@ -242,6 +258,46 @@ implements   PickingInteractor.PickingListener
 		panel.add(scroller, BorderLayout.CENTER);
 
 		createTools(panel);
+
+		JPanel south = new JPanel(new BorderLayout());
+
+		mousePosition = new JLabel("(0; 0)");
+		mousePosition.setFont(new Font("Monospaced", Font.PLAIN, 11));
+
+		south.add(mousePosition, BorderLayout.WEST);
+
+		panel.add(south, BorderLayout.SOUTH);
+
+		// track mouse coordinates
+		svgCanvas.addMouseMotionListener(
+			new MouseMotionAdapter() {
+				public void mouseMoved(MouseEvent e) {
+					SVGDocument doc = svgCanvas.getSVGDocument();
+					if (doc == null) {
+						mousePosition.setText("(" + e.getX() + "; " + e.getY() + ")");
+						return;
+					}
+
+					SVGLocatable sheet =
+						(SVGLocatable)doc.getElementById(
+							DocumentManager.DOCUMENT_SHEET);
+
+					if (sheet != null)
+						try {
+							AffineTransform at =
+								MatrixTools.toJavaTransform(sheet.getScreenCTM()).createInverse();
+
+							Point2D src = new Point2D.Double(e.getX(), e.getY());
+							Point2D dst = new Point2D.Double();
+							at.transform(src, dst);
+							setMousePostion(dst);
+							return;
+						} 
+						catch (NoninvertibleTransformException ex) {
+						}
+					mousePosition.setText("(0; 0)");
+				}
+		});
 
 		return panel;
 	}
@@ -388,6 +444,12 @@ implements   PickingInteractor.PickingListener
 			Tool tool = (Tool)tools.get(i);
 			tool.setInUse(identifier.equals(tool.getToolIdentifier()));
 		}
+	}
+
+	public void setMousePostion(Point2D p) {
+		mousePosition.setText(
+			"(" + mouseFormat.format(p.getX()) + 
+			"; " + mouseFormat.format(p.getY()) + ") [mm]");
 	}
 
 	public void print() {

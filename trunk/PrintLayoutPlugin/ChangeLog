@@ -1,3 +1,9 @@
+2007-01-26  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		add a label in the south west with mouse coordinates in paper
+		coordinate system.
+
 2007-01-25  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/ExtraData.java:
