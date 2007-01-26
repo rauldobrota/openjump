@@ -298,7 +298,7 @@ implements   PickingInteractor.PickingListener
 								return;
 							}
 						} 
-						catch (NoninvertibleTransformException ex) {
+						catch (Exception ex) {
 						}
 					mousePosition.setText("(0; 0)");
 				}

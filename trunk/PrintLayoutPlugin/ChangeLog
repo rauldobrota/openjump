@@ -1,4 +1,10 @@
 2007-01-26  Ludwig Reiter  <ludwig.reiter@intevation.de>
+	
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		workaround: SVGMatrix.getA() throws NullPointerException.
+		We catch this exception.
+
+2007-01-26  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	* src/de/intevation/printlayout/LayoutFrame.java:
 		removed about dialog shortcut.
