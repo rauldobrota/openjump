@@ -200,7 +200,7 @@ public class DocumentManager
 	}
 
 	public void setDocument(SVGDocument document) {
-		svgCanvas.installDocument(document);
+		svgCanvas.setSVGDocument(document);
 	}
 
 	public void modifyDocumentLater(final DocumentModifier modifier) {
@@ -222,7 +222,7 @@ public class DocumentManager
 		UpdateManager um = svgCanvas.getUpdateManager();
 
 		if (um == null) {
-			System.err.println("before first rendering finbished");
+			System.err.println("before first rendering finished");
 			return null;
 		}
 

@@ -13,35 +13,61 @@ package de.intevation.printlayout;
 
 import java.util.TreeMap;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 public class PaperSizes
 {
+	public  static final String PAPER_RESOURCE = 
+		"resources/paper-tmpl.svg";
+
 	private static final TreeMap SIZES = new TreeMap();
 
+	private static String paperTemplate;
+
+	public static synchronized String getPaperTemplate() {
+		if (paperTemplate == null) {
+
+			InputStream is = PaperSizes.class.getResourceAsStream(
+				PAPER_RESOURCE);
+			
+			if (is == null) return null;
+
+			try {
+				byte [] buf = new byte[512];
+				int r;
+				ByteArrayOutputStream out = new ByteArrayOutputStream();
+				while ((r = is.read(buf)) > 0)
+					out.write(buf, 0, r);
+				paperTemplate = out.toString("UTF-8");
+			}
+			catch (IOException ioe) {
+				return null;
+			}
+			finally {
+				try { is.close(); } catch (IOException ioe) {}
+			}
+		}
+		return paperTemplate;
+	}
+
 	public static String getSheet(double width, double height) {
-		StringBuffer sb = new StringBuffer(512);
-		sb.append("<?xml version=\"1.0\" standalone=\"no\"?>\n")
-			.append("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" ")
-			.append("\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">")
-			.append("<svg width=\"")
-			.append(width + 40).append("mm\" height=\"")
-			.append(height + 40).append("mm\"")
-			.append(" version=\"1.1\"")
-			.append(" viewBox=\"0 0 250 337\"")
-		  .append(" xmlns=\"http://www.w3.org/2000/svg\">")
-			.append("	<rect x=\"20\" y=\"20\"")
-			.append(" width=\"")
-			.append(width).append("\" height=\"")
-			.append(height).append("\"")
-			.append(" style=\"fill:white\"/>")
-			.append(" <svg width=\"")
-			.append(width).append("\" height=\"")
-			.append(height).append("\"")
-			.append(" x=\"20\" y=\"20\"")
-			.append(" id=\"viewer-layout-sheet-svg\"")
-			.append(" overflow=\"visible\">")
-			.append("</svg>")
-			.append("</svg>");
-		return sb.toString();
+		String src = getPaperTemplate();
+		if (src == null)
+			return null;
+
+		Template tmpl = new Template();
+
+		double boxWidth  = width  + 40d;
+		double boxHeight = height + 40d;
+
+		tmpl.setVariable("WIDTH",     String.valueOf(width));
+		tmpl.setVariable("HEIGHT",    String.valueOf(height));
+		tmpl.setVariable("BOXWIDTH",  String.valueOf(boxWidth));
+		tmpl.setVariable("BOXHEIGHT", String.valueOf(boxHeight));
+
+		return tmpl.toString(src);
 	}
 
 	static {

@@ -41,10 +41,6 @@ extends      JSVGCanvas
 		return userAgent;
 	}
 
-	public void installDocument(SVGDocument document) {
-		installSVGDocument(document);
-	}
-
 	public void paintImmediately(Rectangle rect) {
 		if (damagedRegion != null)
 			rect.add(damagedRegion);

@@ -184,22 +184,22 @@ implements   PickingInteractor.PickingListener
 
     svgCanvas.addGVTTreeRendererListener(r);
 
-		//SVGDocument doc = createSheet("DIN A0");
+		SVGDocument doc = createSheet("DIN A4");
 
-		//if (doc == null) {
-		//	System.err.println("cannot create DIN A4");
+		JSVGScrollPane scroller = new JSVGScrollPane(svgCanvas);
+
+		if (doc == null) {
+			System.err.println("cannot create DIN A4");
 			URL url = getClass().getResource(A4_SHEET);
 			if (url == null) {
 				System.err.println("sheet not found");
 				return null;
 			}
 			svgCanvas.setURI(url.toString());
-		//}
-		//else {
-		//	svgCanvas.installDocument(doc);
-		//}
-
-		JSVGScrollPane scroller = new JSVGScrollPane(svgCanvas);
+		}
+		else {
+			svgCanvas.setSVGDocument(doc);
+		}
 
 		JMenu fileMenu   = createMenu("LayoutFrame.File", "File");
 		JMenu editMenu   = createMenu("LayoutFrame.Edit", "Edit");

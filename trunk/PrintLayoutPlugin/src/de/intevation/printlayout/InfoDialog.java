@@ -51,7 +51,7 @@ public class InfoDialog extends JDialog {
 		south.add(dismissBtn);
 		add(south, BorderLayout.SOUTH);
 
-		setTitle("test");
+		setTitle("Print/Layout v0.8");
 		InputStream is = InfoDialog.class.getResourceAsStream(resource);
     String text;
 		
