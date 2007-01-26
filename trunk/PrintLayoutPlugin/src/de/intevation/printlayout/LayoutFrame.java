@@ -68,6 +68,7 @@ import org.apache.batik.dom.svg.SVGDOMImplementation;
 
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGLocatable;
+import org.w3c.dom.svg.SVGMatrix;
 
 import org.w3c.dom.DOMImplementation;
 
@@ -284,14 +285,18 @@ implements   PickingInteractor.PickingListener
 
 					if (sheet != null)
 						try {
-							AffineTransform at =
-								MatrixTools.toJavaTransform(sheet.getScreenCTM()).createInverse();
+							SVGMatrix matrix = sheet.getScreenCTM();
 
-							Point2D src = new Point2D.Double(e.getX(), e.getY());
-							Point2D dst = new Point2D.Double();
-							at.transform(src, dst);
-							setMousePostion(dst);
-							return;
+							if (matrix != null) {
+								AffineTransform at =
+									MatrixTools.toJavaTransform(matrix).createInverse();
+
+								Point2D src = new Point2D.Double(e.getX(), e.getY());
+								Point2D dst = new Point2D.Double();
+								at.transform(src, dst);
+								setMousePostion(dst);
+								return;
+							}
 						} 
 						catch (NoninvertibleTransformException ex) {
 						}

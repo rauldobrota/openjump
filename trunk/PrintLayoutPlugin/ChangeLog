@@ -1,6 +1,14 @@
 2007-01-26  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/LayoutFrame.java:
+		add a null pointer check in coordinate mouse listener
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		set preserveAspectRatio in printing to "none".
+
+2007-01-26  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
 		add a label in the south west with mouse coordinates in paper
 		coordinate system.
 

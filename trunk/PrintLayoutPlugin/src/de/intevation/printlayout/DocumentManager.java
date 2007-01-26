@@ -344,6 +344,11 @@ public class DocumentManager
 
 	/** run in synced context, please! */
 	public AbstractDocument isolateInnerDocument() {
+		return isolateInnerDocument(null);
+	}
+
+	public AbstractDocument isolateInnerDocument(String aspectRatio) {
+
 		AbstractDocument document = (AbstractDocument)svgCanvas.getSVGDocument();
 
 		AbstractElement root = (AbstractElement)document.getDocumentElement();
@@ -363,10 +368,14 @@ public class DocumentManager
 		AbstractDocument newDocument = (AbstractDocument)
 			impl.createDocument(svgNS, "svg", null);
 
+
 		NodeList children = sheet.getChildNodes();
 		
 		AbstractElement newRoot = 
 			(AbstractElement)newDocument.getDocumentElement();
+
+		if (aspectRatio != null)
+			newRoot.setAttributeNS(null, "preserveAspectRatio", aspectRatio);
 		
 		AbstractDocumentFragment fragment = 
 			(AbstractDocumentFragment)newDocument.createDocumentFragment(); 
@@ -593,7 +602,7 @@ public class DocumentManager
 				final PrintTranscoder transcoder = new PrintTranscoder();
 
 				TranscoderInput  input  = new TranscoderInput(
-					isolateInnerDocument());
+					isolateInnerDocument("none"));
 
 				transcoder.transcode(input, null);
 
