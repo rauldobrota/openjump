@@ -220,7 +220,7 @@ implements   PickingInteractor.PickingListener
 		AddMapAction       addMapAction       = new AddMapAction();
 		                   addScalebarAction  = new AddScalebarAction();
 		                   addScaletextAction = new AddScaletextAction();
-		InfoDialogAction   infoDialogAction   = new InfoDialogAction();	
+		AboutDialogAction   infoDialogAction   = new AboutDialogAction();	
 											 
 		fileMenu.add(svgExportAction);
 		fileMenu.add(pdfAction);
@@ -892,16 +892,12 @@ implements   PickingInteractor.PickingListener
 		}
 	}
 
-	private class InfoDialogAction extends AbstractAction {
-		InfoDialogAction() {
+	private class AboutDialogAction extends AbstractAction {
+		AboutDialogAction() {
 		super(I18N.getName(
 					I18N.getString("LayoutFrame.ShowAboutDialog", "&About...")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.ShowAboutDialog", "&About...")));
-			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl A"));
-			//putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
-			//		I18N.getString("LayoutFrame.AddScaleText", "Add S&caletext")));
-			//putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl T"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			InfoDialog.showDialog(LayoutFrame.this);

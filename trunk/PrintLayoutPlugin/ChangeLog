@@ -1,3 +1,8 @@
+2007-01-26  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		removed about dialog shortcut.
+
 2007-01-26  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/LayoutFrame.java:
