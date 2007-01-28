@@ -22,6 +22,8 @@ import com.vividsolutions.jump.util.Blackboard;
 
 import com.vividsolutions.jump.task.TaskMonitor;  
 
+import org.w3c.dom.svg.SVGDocument;
+
 public class PrintLayoutPlugin 
 extends      AbstractPlugIn 
 implements   ThreadedPlugIn
@@ -58,10 +60,21 @@ implements   ThreadedPlugIn
 	{
 		monitor.allowCancellationRequests();
 
+		SVGDocument document = PaperSizes.createSheet("A4");
+
+		if (document == null)
+			return;
+
+		DocumentManager.decorateWithRulers(document);
+
 		LayoutFrame viewer = new LayoutFrame(context);
 
-		viewer.setSize(210*2, 297*2);
+		DocumentManager documentManger =
+			viewer.getDocumentManager();
 
+		documentManger.setDocument(document);
+
+		viewer.setSize(210*2, 297*2);
 		viewer.setVisible(true);
 	}
 }		

@@ -65,10 +65,6 @@ import org.w3c.dom.svg.SVGMatrix;
 import org.w3c.dom.DOMImplementation;
 
 import org.apache.batik.swing.svg.SVGUserAgentGUIAdapter;
-import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
-import org.apache.batik.swing.svg.SVGDocumentLoaderAdapter;
-import org.apache.batik.swing.gvt.GVTTreeRendererAdapter;
-import org.apache.batik.swing.gvt.GVTTreeRendererEvent;
 
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.svggen.SVGGeneratorContext;
@@ -136,49 +132,17 @@ implements   PickingInteractor.PickingListener
 		JPanel panel = new JPanel(new BorderLayout());
 
 		LayoutCanvas svgCanvas = new LayoutCanvas(
-			new SVGUserAgentGUIAdapter(panel), true, true);
-
-		docManager = new DocumentManager(svgCanvas);
+			new SVGUserAgentGUIAdapter(panel), true, false);
 
 		svgCanvas.setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
 
+		docManager = new DocumentManager(svgCanvas);
+
 		svgCanvas.setBackground(Color.gray);
-
-		svgCanvas.addSVGDocumentLoaderListener(new SVGDocumentLoaderAdapter() {
-			public void documentLoadingStarted(SVGDocumentLoaderEvent e) {
-				System.err.println("started");
-			}
-
-			public void documentLoadingCompleted(SVGDocumentLoaderEvent e) {
-				System.err.println("completed");
-			}
-		});
-
-		GVTTreeRendererAdapter r = new GVTTreeRendererAdapter() {
-			boolean done;
-
-			public void gvtRenderingPrepare(GVTTreeRendererEvent e) {
-			}
-
-			public void gvtRenderingCompleted(GVTTreeRendererEvent e) {
-				if (!done) {
-					done = true;
-					docManager.generateRulers();
-					docManager.getCanvas().removeGVTTreeRendererListener(this);
-				}
-			}
-		};
-
-    svgCanvas.addGVTTreeRendererListener(r);
-
-		SVGDocument doc = PaperSizes.createSheet("A4");
-
-		if (doc == null)
-			return null;
 
 		JSVGScrollPane scroller = new JSVGScrollPane(svgCanvas);
 
-		svgCanvas.setSVGDocument(doc);
+		panel.add(scroller, BorderLayout.CENTER);
 
 		JMenu fileMenu   = createMenu("LayoutFrame.File", "File");
 		JMenu editMenu   = createMenu("LayoutFrame.Edit", "Edit");
@@ -235,7 +199,6 @@ implements   PickingInteractor.PickingListener
 
 		setJMenuBar(menubar);
 
-		panel.add(scroller, BorderLayout.CENTER);
 
 		createTools(panel);
 
@@ -415,6 +378,10 @@ implements   PickingInteractor.PickingListener
 
 		List interactors = svgCanvas.getInteractors();
 		interactors.add(0, tool);
+	}
+
+	public DocumentManager getDocumentManager() {
+		return docManager;
 	}
 
 	public void activateTool(String identifier) {

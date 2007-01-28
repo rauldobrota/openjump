@@ -108,7 +108,7 @@ public class DocumentManager
 		void run(DocumentManager documentManager, AbstractElement element);
 	}
 
-	public DocumentManager() {
+	protected DocumentManager() {
 		extraData = new ExtraData();
 	}
 
@@ -176,10 +176,13 @@ public class DocumentManager
 		return svgCanvas.getSVGDocument();
 	}
 
-	// XXX: potential sync problem?
 	public void getPaperSize(double [] size) {
-
 		SVGDocument document = svgCanvas.getSVGDocument();
+		if (document != null)
+			getPaperSize(document, size);
+	}
+
+	public static void getPaperSize(SVGDocument document, double [] size) {
 
 		AbstractElement sheet =
 			(AbstractElement)document.getElementById(DOCUMENT_SHEET);
@@ -1217,77 +1220,80 @@ public class DocumentManager
 		});
 	}
 
-	public void generateRulers() {
-		modifyDocumentLater(new DocumentModifier() {
-			public Object run(DocumentManager documentManager) {
-				double[] sizes = new double[2];
-				documentManager.getPaperSize(sizes);
-				SVGDocument document = documentManager.getSVGDocument();
-				
-				AbstractElement root =
-					(AbstractElement)document.getElementById(DOCUMENT_BELOW);
+	public static void decorateWithRulers(SVGDocument document) {
+		if (document == null)
+			return;
 
-				// down
-        root.appendChild(line(document, 17d, 20d, 17d, sizes[1] + 20d));
-				// right
-				root.appendChild(line(document, 20d, 17d, sizes[0]+ 20d, 17d));
+		AbstractElement root =
+			(AbstractElement)document.getElementById(DOCUMENT_BELOW);
 
-				int count = 0;
+		if (root == null) {
+			System.err.println("'" + DOCUMENT_BELOW + "' no found");
+			return;
+		}
 
-				// markings x
-				for (double x = 0d; x <= sizes[0]; ++x) {
+		double [] sizes = new double[2];
+		getPaperSize(document, sizes);
 
-					double length;
-					     if (count == 0) length = 7d;
-					else if (count == 5) length = 3.5d;
-					else                 length = 2d;
+		// down
+		root.appendChild(line(document, 17d, 20d, 17d, sizes[1] + 20d));
+		// right
+		root.appendChild(line(document, 20d, 17d, sizes[0]+ 20d, 17d));
 
-					if (++count > 9) count = 0;
+		int count = 0;
 
-					root.appendChild(
-						line(document, 20d+x, 17d, 20d+x, 17d-length));
-				}
+		// markings x
+		double end = sizes[0];
+		for (double x = 0d; x <= end; ++x) {
 
-				count = 0;
+			double length;
+					 if (count == 0) length = 7d;
+			else if (count == 5) length = 3.5d;
+			else                 length = 2d;
 
-				// markings y
-				for (double y = 0d; y <= sizes[1]; ++y) {
+			if (++count > 9) count = 0;
 
-					double length;
-					     if (count == 0) length = 7d;
-					else if (count == 5) length = 3.5d;
-					else                 length = 2d;
+			root.appendChild(
+				line(document, 20d+x, 17d, 20d+x, 17d-length));
+		}
 
-					if (++count > 9) count = 0;
+		count = 0;
 
-					root.appendChild(
-						line(document, 17d, 20d+y, 17d-length, 20d+y));
-				}
-				
-				return null;
-			}
+		// markings y
+		end = sizes[1];
+		for (double y = 0d; y <= end; ++y) {
 
-			private AbstractElement line(
-				SVGDocument doc,
-				double x1, double y1,
-				double x2, double y2
-			) 
-			{
-				String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+			double length;
+					 if (count == 0) length = 7d;
+			else if (count == 5) length = 3.5d;
+			else                 length = 2d;
 
-				AbstractElement l = 
-					(AbstractElement)doc.createElementNS(svgNS, "line");
-        
-				l.setAttributeNS(null, "x1", String.valueOf(x1));
-				l.setAttributeNS(null, "y1", String.valueOf(y1));
-				l.setAttributeNS(null, "x2", String.valueOf(x2));
-				l.setAttributeNS(null, "y2", String.valueOf(y2));
-				l.setAttributeNS(null, "stroke", "black");
-				l.setAttributeNS(null, "stroke-width", "0.5"); 
-			
-				return l;
-			}
-		});		
+			if (++count > 9) count = 0;
+
+			root.appendChild(
+				line(document, 17d, 20d+y, 17d-length, 20d+y));
+		}
+	}
+
+	protected static AbstractElement line(
+		SVGDocument document,
+		double x1, double y1,
+		double x2, double y2
+	) 
+	{
+		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+
+		AbstractElement l = 
+			(AbstractElement)document.createElementNS(svgNS, "line");
+		
+		l.setAttributeNS(null, "x1", String.valueOf(x1));
+		l.setAttributeNS(null, "y1", String.valueOf(y1));
+		l.setAttributeNS(null, "x2", String.valueOf(x2));
+		l.setAttributeNS(null, "y2", String.valueOf(y2));
+		l.setAttributeNS(null, "stroke", "black");
+		l.setAttributeNS(null, "stroke-width", "0.5"); 
+	
+		return l;
 	}
 }
 // end of file

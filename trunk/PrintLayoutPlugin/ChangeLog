@@ -1,5 +1,17 @@
 2007-01-28  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		don't create documents in construction any longer.
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		decorateWithRulers() is now a static method applicable
+		to SVG documents.
+
+	* src/de/intevation/printlayout/PrintLayoutPlugin.java:
+		constructs a LayoutFrame and adds a document afterwards.
+
+2007-01-28  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
 	* src/de/intevation/printlayout/LayoutCanvas.java:
 		removed needless import
 
