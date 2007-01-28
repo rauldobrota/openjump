@@ -1,5 +1,24 @@
 2007-01-28  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/DocumentManager.java:
+		added method switchToDocument() to allow paper size changes.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		add menu entries to change paper size.
+
+	* src/de/intevation/printlayout/i18n/messages.properties,
+	  src/de/intevation/printlayout/i18n/messages_de.properties:
+		messages for new menu
+
+	* src/de/intevation/printlayout/PaperSizes.java:
+		add guessPaperSize() to allow reverse lookup
+		key if sizes are given.
+
+	* src/de/intevation/printlayout/resources/paper-sizes.properties:
+		added Letter (US)
+
+2007-01-28  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
 	* src/de/intevation/printlayout/LayoutFrame.java:
 		don't create documents in construction any longer.
 

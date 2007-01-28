@@ -371,7 +371,6 @@ public class DocumentManager
 		AbstractDocument newDocument = (AbstractDocument)
 			impl.createDocument(svgNS, "svg", null);
 
-
 		NodeList children = sheet.getChildNodes();
 		
 		AbstractElement newRoot = 
@@ -403,6 +402,42 @@ public class DocumentManager
 			" "    + sheet.getAttributeNS(null, "height"));   
 
 		return newDocument;
+	}
+
+	public void switchToDocument(final SVGDocument newDocument) {
+		modifyDocumentLater(new DocumentModifier() {
+			public Object run(DocumentManager manager) {
+				manager.switchToDocumentWithinUM(newDocument);
+				return null;
+			}
+		});
+	}
+
+	protected void switchToDocumentWithinUM(SVGDocument newDocument) {
+
+		AbstractDocument document =
+			(AbstractDocument)svgCanvas.getSVGDocument();
+
+		AbstractElement oldSheet =
+			(AbstractElement)document.getElementById(DOCUMENT_SHEET);
+
+		if (oldSheet == null)
+			return;
+
+		AbstractElement newSheet =
+			(AbstractElement)newDocument.getElementById(DOCUMENT_SHEET);
+
+		if (newSheet == null)
+			return;
+
+		NodeList children = oldSheet.getChildNodes();
+
+		for (int i = 0, N = children.getLength(); i < N; ++i) {
+			AbstractNode child = (AbstractNode)children.item(i);
+			newSheet.appendChild(newDocument.importNode(child, true));
+		}
+
+		setDocument(newDocument);
 	}
 
 

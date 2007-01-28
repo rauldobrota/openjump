@@ -44,6 +44,7 @@ import java.awt.event.MouseEvent;
 
 import java.io.File;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -169,6 +170,8 @@ implements   PickingInteractor.PickingListener
 		fileMenu.add(pdfAction);
 		fileMenu.add(printAction);
 		fileMenu.addSeparator();
+		fileMenu.add(createPaperSizeMenu());
+		fileMenu.addSeparator();
 		fileMenu.add(quitAction);
 
 		editMenu.add(removeAction);
@@ -256,6 +259,17 @@ implements   PickingInteractor.PickingListener
 		JMenu menu = new JMenu(I18N.getName(label));
 		menu.setMnemonic(I18N.getMnemonic(label));
 
+		return menu;
+	}
+
+	protected JMenu createPaperSizeMenu() {
+		JMenu menu = createMenu("LayoutFrame.PaperSize", "&Paper Size");
+		for (Iterator i = PaperSizes.knownPaperSizeKeys(); i.hasNext();) {
+			String size = (String)i.next();
+			SwitchPaperSizeAction action = new
+				SwitchPaperSizeAction(size, size);
+			menu.add(action);
+		}
 		return menu;
 	}
 
@@ -618,6 +632,19 @@ implements   PickingInteractor.PickingListener
 			});
 	}
 
+	protected void switchToPaperSize(String key) {
+		double [] current = new double[2];
+		docManager.getPaperSize(current);
+		String guess = PaperSizes.guessPaperSize(current);
+		if (guess == null || !guess.equals(key)) {
+			SVGDocument document = PaperSizes.createSheet(key, null);
+			if (document != null) {
+				DocumentManager.decorateWithRulers(document);
+				docManager.switchToDocument(document);
+			}
+		}
+	}
+
 	/** PickingInteractor.PickingListener */
 	public void selectionChanged(PickingInteractor.PickingEvent evt) {
 		PickingInteractor pi = (PickingInteractor)evt.getSource();
@@ -813,7 +840,7 @@ implements   PickingInteractor.PickingListener
 
 	private class AboutDialogAction extends AbstractAction {
 		AboutDialogAction() {
-		super(I18N.getName(
+			super(I18N.getName(
 					I18N.getString("LayoutFrame.ShowAboutDialog", "&About...")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.ShowAboutDialog", "&About...")));
@@ -821,7 +848,16 @@ implements   PickingInteractor.PickingListener
 		public void actionPerformed(ActionEvent ae) {
 			InfoDialog.showDialog(LayoutFrame.this);
 		}
-	
+	}
+
+	private class SwitchPaperSizeAction extends AbstractAction {
+		SwitchPaperSizeAction(String text, String actionCmd) {
+			super(text);
+			putValue(ACTION_COMMAND_KEY, actionCmd);
+		}
+		public void actionPerformed(ActionEvent ae) {
+			switchToPaperSize((String)getValue(ACTION_COMMAND_KEY));
+		}
 	}
 }
 // end of file

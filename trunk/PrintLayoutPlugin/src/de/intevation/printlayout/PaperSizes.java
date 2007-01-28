@@ -136,6 +136,10 @@ public class PaperSizes
 		return true;
 	}
 
+	public static Iterator knownPaperSizeKeys() {
+		return SIZES.keySet().iterator();
+	}
+
 	public static String sheetForPaperSize(String id) {
 		return sheetForPaperSize(id, "A4", false);
 	}
@@ -150,10 +154,8 @@ public class PaperSizes
 	) {
 		double [] dim = (double [])SIZES.get(id);
 
-		if (dim == null)
-			dim = (double [])SIZES.get(def);
-
-		if (dim == null)
+		if (dim == null
+		&& ((def == null || (dim = (double [])SIZES.get(def)) == null)))
 			return null;
 
 		return landscape
@@ -161,8 +163,27 @@ public class PaperSizes
 			: getSheet(dim[0], dim[1]);
 	}
 
+	public static String guessPaperSize(double [] size) {
+		if (size == null)
+			return null;
+
+		for (Iterator i = SIZES.entrySet().iterator(); i.hasNext();) {
+			Map.Entry entry = (Map.Entry)i.next();
+			double [] current = (double [])entry.getValue();
+			if (Math.abs(current[0] - size[0]) < 0.00001d
+			&&  Math.abs(current[1] - size[1]) < 0.00001d)
+				return (String)entry.getKey();
+		}
+
+		return null;
+	}
+
 	public static SVGDocument createSheet(String id) {
 		return createSheet(id, "A4", false);
+	}
+
+	public static SVGDocument createSheet(String id, String def) {
+		return createSheet(id, def, false);
 	}
 
 	public static SVGDocument createSheet(
