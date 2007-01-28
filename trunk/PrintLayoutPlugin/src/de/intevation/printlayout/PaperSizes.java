@@ -12,6 +12,10 @@
 package de.intevation.printlayout;
 
 import java.util.TreeMap;
+import java.util.Properties;
+import java.util.Iterator;
+import java.util.StringTokenizer;
+import java.util.Map;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -19,8 +23,11 @@ import java.io.InputStream;
 
 public class PaperSizes
 {
-	public  static final String PAPER_RESOURCE = 
+	public static final String PAPER_RESOURCE = 
 		"resources/paper-tmpl.svg";
+
+	public static final String PAPER_SIZES_RESOURCE = 
+		"resources/paper-sizes.properties";
 
 	private static final TreeMap SIZES = new TreeMap();
 
@@ -71,11 +78,41 @@ public class PaperSizes
 	}
 
 	static {
-		SIZES.put("DIN A4", new double [] { 210d,  297d });
-		SIZES.put("DIN A0", new double [] { 841d, 1189d });
-		SIZES.put("DIN A1", new double [] { 594d,  841d });
-		SIZES.put("DIN A2", new double [] { 420d,  594d });
-		SIZES.put("DIN A3", new double [] { 297d,  420d });
+		SIZES.put("A4", new double [] { 210d,  297d });
+		loadDefaultPaperSizes();
+	}
+
+	private static void loadDefaultPaperSizes() {
+
+		InputStream is =
+			PaperSizes.class.getResourceAsStream(PAPER_SIZES_RESOURCE);
+
+		if (is == null)
+			return;
+
+		Properties props = new Properties();
+		try { props.load(is); }
+		catch (IOException ioe) { return; }
+		finally {
+			try { is.close(); }
+			catch (IOException ioe) {}
+			is = null;
+		}
+
+		for (Iterator i = props.entrySet().iterator(); i.hasNext();) {
+			Map.Entry entry = (Map.Entry)i.next();
+			StringTokenizer st = new StringTokenizer((String)entry.getValue());
+			if (st.countTokens() < 2)
+				continue;
+      try {
+				double width  = Double.parseDouble(st.nextToken());
+				double height = Double.parseDouble(st.nextToken());
+				putPageSize((String)entry.getKey(), width, height);
+			}
+			catch (NumberFormatException nfe) {
+				nfe.printStackTrace();
+			}
+		}
 	}
 
 	public static void putPageSize(String id, double width, double height) {
@@ -94,12 +131,21 @@ public class PaperSizes
 	}
 
 	public static String sheetForPaperSize(String id) {
-		return sheetForPaperSize(id, false);
+		return sheetForPaperSize(id, "A4", false);
 	}
 
-	public static String sheetForPaperSize(String id, boolean landscape) {
+	public static String sheetForPaperSize(String id, String def) {
+		return sheetForPaperSize(id, def, false);
+	}
 
+	public static String sheetForPaperSize(
+		String id, String def, 
+		boolean landscape
+	) {
 		double [] dim = (double [])SIZES.get(id);
+
+		if (dim == null)
+			dim = (double [])SIZES.get(def);
 
 		if (dim == null)
 			return null;

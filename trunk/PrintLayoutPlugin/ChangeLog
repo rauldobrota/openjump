@@ -1,3 +1,20 @@
+2007-01-28  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/PaperSizes.java:
+		load paper sizes from paper-sizes.properties instead
+		of beeing hard coded in this class
+
+	* src/de/intevation/printlayout/resources/paper-sizes.properties:
+		added. list of paper sizes
+
+	* src/de/intevation/printlayout/resources/a4.svg:
+		removed. no need for A4 fallback any longer
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		- don't uses the A4 fallback any longer.
+		- enable menu entry to add scale bar only if selected
+		  object is a map.
+
 2007-01-26  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/DocumentManager.java:

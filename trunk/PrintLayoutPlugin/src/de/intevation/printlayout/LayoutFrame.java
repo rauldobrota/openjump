@@ -107,8 +107,6 @@ public class LayoutFrame
 extends      JFrame
 implements   PickingInteractor.PickingListener
 {
-	public static final String A4_SHEET = "resources/a4.svg";
-	
   protected DocumentManager    docManager;
 
   protected LayoutCanvas       svgCanvas;
@@ -184,22 +182,14 @@ implements   PickingInteractor.PickingListener
 
     svgCanvas.addGVTTreeRendererListener(r);
 
-		SVGDocument doc = createSheet("DIN A4");
+		SVGDocument doc = createSheet("A4");
+
+		if (doc == null)
+			return null;
 
 		JSVGScrollPane scroller = new JSVGScrollPane(svgCanvas);
 
-		if (doc == null) {
-			System.err.println("cannot create DIN A4");
-			URL url = getClass().getResource(A4_SHEET);
-			if (url == null) {
-				System.err.println("sheet not found");
-				return null;
-			}
-			svgCanvas.setURI(url.toString());
-		}
-		else {
-			svgCanvas.setSVGDocument(doc);
-		}
+		svgCanvas.setSVGDocument(doc);
 
 		JMenu fileMenu   = createMenu("LayoutFrame.File", "File");
 		JMenu editMenu   = createMenu("LayoutFrame.Edit", "Edit");
@@ -507,9 +497,6 @@ implements   PickingInteractor.PickingListener
 			}
 		}
 
-		//java.awt.Rectangle rect = lvp.getVisibleRect();
-		//svgGenerator.setClip(rect);
-
 		lvp.repaint();
 		lvp.paintComponent(svgGenerator);
 
@@ -601,11 +588,14 @@ implements   PickingInteractor.PickingListener
 	}
 
 	protected static SVGDocument createSheet(String id) {
-		return createSheet(id, false);
+		return createSheet(id, "A4", false);
 	}
 
-	protected static SVGDocument createSheet(String id, boolean landscape) {
-		String text = PaperSizes.sheetForPaperSize(id, landscape);
+	protected static SVGDocument createSheet(
+		String id, String def,
+		boolean landscape
+	) {
+		String text = PaperSizes.sheetForPaperSize(id, def, landscape);
 		if (text == null)
 			return null;
 
@@ -723,7 +713,9 @@ implements   PickingInteractor.PickingListener
 				&& docManager.getData(ids[0]) instanceof MapData);
 
 		if (addScalebarAction != null)
-			addScalebarAction.setEnabled(N == 1);
+			addScalebarAction.setEnabled(
+				N == 1 
+				&& docManager.getData(ids[0]) instanceof MapData);
 	}
 
 	protected void notImplementedYet() {
