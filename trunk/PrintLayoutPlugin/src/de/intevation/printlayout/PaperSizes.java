@@ -20,6 +20,13 @@ import java.util.Map;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+
+import org.w3c.dom.svg.SVGDocument;
+
+import org.apache.batik.util.XMLResourceDescriptor;
+
+import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
 
 public class PaperSizes
 {
@@ -102,16 +109,15 @@ public class PaperSizes
 		for (Iterator i = props.entrySet().iterator(); i.hasNext();) {
 			Map.Entry entry = (Map.Entry)i.next();
 			StringTokenizer st = new StringTokenizer((String)entry.getValue());
-			if (st.countTokens() < 2)
-				continue;
-      try {
-				double width  = Double.parseDouble(st.nextToken());
-				double height = Double.parseDouble(st.nextToken());
-				putPageSize((String)entry.getKey(), width, height);
-			}
-			catch (NumberFormatException nfe) {
-				nfe.printStackTrace();
-			}
+			if (st.countTokens() > 1)
+				try {
+					double width  = Double.parseDouble(st.nextToken());
+					double height = Double.parseDouble(st.nextToken());
+					putPageSize((String)entry.getKey(), width, height);
+				}
+				catch (NumberFormatException nfe) {
+					nfe.printStackTrace();
+				}
 		}
 	}
 
@@ -153,6 +159,32 @@ public class PaperSizes
 		return landscape
 			? getSheet(dim[1], dim[0])
 			: getSheet(dim[0], dim[1]);
+	}
+
+	public static SVGDocument createSheet(String id) {
+		return createSheet(id, "A4", false);
+	}
+
+	public static SVGDocument createSheet(
+		String id, String def,
+		boolean landscape
+	) {
+		String text = sheetForPaperSize(id, def, landscape);
+		if (text == null)
+			return null;
+
+		String parser = XMLResourceDescriptor.getXMLParserClassName();
+		SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
+
+		try {
+			return (SVGDocument)factory.createDocument(
+				null,
+				new StringReader(text));
+		}
+		catch (IOException ioe) {
+			ioe.printStackTrace();
+			return null;
+		}
 	}
 }
 // end of file

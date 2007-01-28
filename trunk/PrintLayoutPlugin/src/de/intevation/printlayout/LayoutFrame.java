@@ -35,7 +35,6 @@ import java.awt.BasicStroke;
 import java.awt.FlowLayout;
 
 import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 
 import java.awt.event.ActionListener;
@@ -44,10 +43,6 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseEvent;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-
-import java.net.URL;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -60,9 +55,6 @@ import org.apache.batik.swing.JSVGScrollPane;
 import org.apache.batik.dom.AbstractDocument;
 import org.apache.batik.dom.AbstractElement;
 
-import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
-
-import org.apache.batik.util.XMLResourceDescriptor;
 
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 
@@ -78,21 +70,20 @@ import org.apache.batik.swing.svg.SVGDocumentLoaderAdapter;
 import org.apache.batik.swing.gvt.GVTTreeRendererAdapter;
 import org.apache.batik.swing.gvt.GVTTreeRendererEvent;
 
-
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.svggen.SVGGeneratorContext;
 import org.apache.batik.svggen.CachedImageHandlerBase64Encoder;
 
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 
-import com.vividsolutions.jump.workbench.ui.renderer.RenderingManager; 
+import com.vividsolutions.jump.workbench.model.Layer;
 
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 
-import com.vividsolutions.jump.workbench.model.Layer;
-
+import com.vividsolutions.jump.workbench.ui.renderer.RenderingManager; 
 import com.vividsolutions.jump.workbench.ui.renderer.LayerRenderer;
 import com.vividsolutions.jump.workbench.ui.renderer.Renderer;   
+
 import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -108,8 +99,6 @@ extends      JFrame
 implements   PickingInteractor.PickingListener
 {
   protected DocumentManager    docManager;
-
-  protected LayoutCanvas       svgCanvas;
 
 	protected PlugInContext      pluginContext;
 
@@ -146,7 +135,7 @@ implements   PickingInteractor.PickingListener
 	public JComponent createComponents() {
 		JPanel panel = new JPanel(new BorderLayout());
 
-		svgCanvas = new LayoutCanvas(
+		LayoutCanvas svgCanvas = new LayoutCanvas(
 			new SVGUserAgentGUIAdapter(panel), true, true);
 
 		docManager = new DocumentManager(svgCanvas);
@@ -175,14 +164,14 @@ implements   PickingInteractor.PickingListener
 				if (!done) {
 					done = true;
 					docManager.generateRulers();
-					svgCanvas.removeGVTTreeRendererListener(this);
+					docManager.getCanvas().removeGVTTreeRendererListener(this);
 				}
 			}
 		};
 
     svgCanvas.addGVTTreeRendererListener(r);
 
-		SVGDocument doc = createSheet("A4");
+		SVGDocument doc = PaperSizes.createSheet("A4");
 
 		if (doc == null)
 			return null;
@@ -210,7 +199,7 @@ implements   PickingInteractor.PickingListener
 		AddMapAction       addMapAction       = new AddMapAction();
 		                   addScalebarAction  = new AddScalebarAction();
 		                   addScaletextAction = new AddScaletextAction();
-		AboutDialogAction   infoDialogAction   = new AboutDialogAction();	
+		AboutDialogAction  infoDialogAction   = new AboutDialogAction();	
 											 
 		fileMenu.add(svgExportAction);
 		fileMenu.add(pdfAction);
@@ -263,7 +252,8 @@ implements   PickingInteractor.PickingListener
 		svgCanvas.addMouseMotionListener(
 			new MouseMotionAdapter() {
 				public void mouseMoved(MouseEvent e) {
-					SVGDocument doc = svgCanvas.getSVGDocument();
+
+					SVGDocument doc = docManager.getSVGDocument();
 					if (doc == null) {
 						mousePosition.setText("(" + e.getX() + "; " + e.getY() + ")");
 						return;
@@ -313,15 +303,6 @@ implements   PickingInteractor.PickingListener
 		attributes.setStrokeColor(Color.black);
 		attributes.setFillColor(null);
 		attributes.setStroke(new BasicStroke());
-		/*
-			new BasicStroke(
-				5.0f, 
-				BasicStroke.CAP_BUTT,
-				BasicStroke.JOIN_MITER,
-				1.0f,
-				new float[]{ 3f, 3f, 3f, 3f},
-				0.0f));
-		*/
 
 		BoxFactory boxFactory = new BoxFactory();
 		boxFactory.setDrawingAttributes(attributes);
@@ -385,6 +366,8 @@ implements   PickingInteractor.PickingListener
 		toolBar.add(boxBnt);
 		toolBar.add(textBnt);
 
+		LayoutCanvas svgCanvas = docManager.getCanvas();
+
 		ActionMap actionMap = svgCanvas.getActionMap();
 
 		Action fullExtendAction =
@@ -424,6 +407,8 @@ implements   PickingInteractor.PickingListener
 			tools = new ArrayList();
 
 		tools.add(tool);
+
+		LayoutCanvas svgCanvas = docManager.getCanvas();
 
 		List overlays = svgCanvas.getOverlays();
 		overlays.add(0, tool);
@@ -587,31 +572,6 @@ implements   PickingInteractor.PickingListener
 		docManager.exportSVG(file);
 	}
 
-	protected static SVGDocument createSheet(String id) {
-		return createSheet(id, "A4", false);
-	}
-
-	protected static SVGDocument createSheet(
-		String id, String def,
-		boolean landscape
-	) {
-		String text = PaperSizes.sheetForPaperSize(id, def, landscape);
-		if (text == null)
-			return null;
-
-		String parser = XMLResourceDescriptor.getXMLParserClassName();
-		SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
-
-		try {
-			return (SVGDocument)factory.createDocument(
-				null,
-				new StringReader(text));
-		}
-		catch (IOException ioe) {
-			ioe.printStackTrace();
-			return null;
-		}
-	}
 
 	protected void importSVG() {
 

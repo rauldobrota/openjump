@@ -17,8 +17,6 @@ import org.apache.batik.swing.JSVGCanvas;
 
 import org.apache.batik.bridge.UserAgent;
 
-import org.w3c.dom.svg.SVGDocument;
-
 import java.awt.Rectangle;
 
 public class LayoutCanvas

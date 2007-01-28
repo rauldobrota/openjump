@@ -1,5 +1,17 @@
 2007-01-28  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/LayoutCanvas.java:
+		removed needless import
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		- removed svgCanvas instance variable
+		- move creation of SVG sheet to PaperSizes
+
+	* src/de/intevation/printlayout/PaperSizes.java:
+		readded SVGDocument paper sheet creation here.
+
+2007-01-28  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
 	* src/de/intevation/printlayout/PaperSizes.java:
 		load paper sizes from paper-sizes.properties instead
 		of beeing hard coded in this class
