@@ -1256,6 +1256,88 @@ public class DocumentManager
 		});
 	}
 
+	public void scaleFixedIDs(
+		final String [] ids, 
+		final Point2D   screenDelta,
+		final Point2D   screenPos,
+		final Point2D   startPos
+	) {
+		if (ids == null || ids.length == 0)
+			return;
+
+		modifyDocumentLater(new DocumentModifier() {
+			public Object run(DocumentManager documentManager) {
+
+				SVGDocument document = documentManager.getSVGDocument();
+
+				for (int i = 0; i < ids.length; ++i) {
+					String id = ids[i];
+
+					AbstractElement element =
+						(AbstractElement)document.getElementById(id);
+
+					if (element == null)
+						return null;
+
+					SVGLocatable locatable = (SVGLocatable)element;
+
+					AffineTransform invCTM;
+					try {
+						invCTM = MatrixTools.toJavaTransform(locatable.getScreenCTM())
+							.createInverse();
+					}
+					catch (NoninvertibleTransformException nite) {
+						continue;
+					}
+
+					Point2D startPosOnPaper = new Point2D.Double();
+					invCTM.transform(startPos, startPosOnPaper);
+
+					double distanceOrg = startPos.distance(screenPos);
+
+					screenPos.setLocation(
+						screenPos.getX() + screenDelta.getX(),
+						screenPos.getY() + screenDelta.getY());
+
+					double distanceDelta = startPos.distance(screenPos);
+
+					double scale = distanceDelta/distanceOrg;
+
+					AffineTransform trans1 =
+						AffineTransform.getTranslateInstance(
+							-startPosOnPaper.getX(),
+							-startPosOnPaper.getY());
+
+					AffineTransform scaleTrans =
+						AffineTransform.getScaleInstance(scale, scale);
+
+					AffineTransform trans2 =
+						AffineTransform.getTranslateInstance(
+							startPosOnPaper.getX(),
+							startPosOnPaper.getY());
+
+					scaleTrans.concatenate(trans1);
+					trans2.concatenate(scaleTrans);
+
+					String xformS = element.getAttributeNS(null, "transform");
+
+					AffineTransform xform = xformS == null
+						? new AffineTransform()
+						: MatrixTools.toJavaTransform(xformS);
+
+					xform.concatenate(trans2);
+
+					element.setAttributeNS(
+						null, "transform", MatrixTools.toSVGString(xform));
+
+					recursiveTransform(element);
+				}
+
+				return null;
+			}
+		});
+	}
+
 	public void scaleIDs(
 		final String [] ids, 
 		final Point2D   screenDelta,

@@ -26,9 +26,9 @@ import de.intevation.printlayout.GeometricMath;
 
 public class OnScreenBox
 {
-	public static final int OUTSIDE           = 0;
-	public static final int INSIDE            = 1;
-	public static final int INSIDE_DECORATION = 2;
+	public static final Object OUTSIDE        = null;
+	public static final Object INSIDE         = new Object();
+	//public static final int INSIDE_DECORATION = 2;
 
 	protected String     id;
 	protected Shape      shape;
@@ -44,7 +44,7 @@ public class OnScreenBox
 		this.id = id;
 	}
 
-	protected int insideRect(int x, int y) {
+	protected Object insideRect(int x, int y) {
 
 		for (int i = 0; i < points.length; ++i) {
 			int j = (i + 1) % points.length;
@@ -68,14 +68,14 @@ public class OnScreenBox
 		return INSIDE;
 	}
 
-	public int inside(int x, int y) {
+	public Object inside(int x, int y) {
 		if (points == null)
 			return OUTSIDE;
 
 		if (decoration != null)
 			for (int i = 0; i < decoration.length; ++i)
 				if (decoration[i].contains(x, y))
-					return INSIDE_DECORATION;
+					return points[(i+2)%points.length];
 
 		return insideRect(x, y);
 	}

@@ -87,6 +87,25 @@ implements   Overlay, Tool
 			}
 		}; // TRANSLATE
 
+	public static class Scale
+	implements          TransformOperation
+	{
+		private Point2D startPoint;
+
+		public Scale(Point2D startPoint) {
+			this.startPoint = startPoint;
+		}
+
+		public void transform(
+			String []       ids,
+			DocumentManager documentManager,
+			Point2D         delta,
+			Point2D         orginal
+		) {
+			documentManager.scaleFixedIDs(ids, delta, orginal, startPoint);
+		}
+	} // Scale
+
 	public static final TransformOperation SCALE =
 		new TransformOperation() {
 			public void transform(
@@ -174,6 +193,10 @@ implements   Overlay, Tool
 	}
 
 	public void setInUse(boolean inUse) {
+		if (this.inUse) {
+			clearSelection();
+			documentManager.getCanvas().repaint();
+		}
 		this.inUse = inUse;
 	}
 
@@ -456,7 +479,7 @@ implements   Overlay, Tool
 
 	public void mousePressed(MouseEvent e) {
 
-		int inside = OnScreenBox.OUTSIDE;
+		Object inside = OnScreenBox.OUTSIDE;
 
 		int x = e.getX();
 		int y = e.getY();
@@ -471,7 +494,7 @@ implements   Overlay, Tool
 
 			transformOperation = inside == OnScreenBox.INSIDE
 				? TRANSLATE
-				: getTransformOperation();
+				: getTransformOperation(inside);
 
 			startX = e.getX();
 			startY = e.getY();
@@ -481,9 +504,9 @@ implements   Overlay, Tool
 	}
 
 	// map decoration -> operation
-	protected TransformOperation getTransformOperation() {
+	protected TransformOperation getTransformOperation(Object parameter) {
 		switch (decoration) {
-			case SCALE_DECORATION: return SCALE;
+			case SCALE_DECORATION: return new Scale((Point2D)parameter);
 			default:               return ROTATE;
 		}
 	}

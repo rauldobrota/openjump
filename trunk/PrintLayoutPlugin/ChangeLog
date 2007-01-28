@@ -1,12 +1,32 @@
+2007-01-29  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		add method scaleFixedIDs() to scale along fixed point.
+		The orginal scaleIDs() is left inside as a later option, e.g.
+		pressing shift during the drag may change the behavior!?
+
+	* src/de/intevation/printlayout/LayoutCanvas.java:
+		use damaged region in even more repaint() & Co. methods.
+		TODO: figure out why handles in selection mode not
+		redraw properly.
+
+	* src/de/intevation/printlayout/tools/OnScreenBox.java:
+		if dragging starts on decoration the opposite point
+		of the touched handle is returned as a reference point.
+
+	* src/de/intevation/printlayout/tools/PickingInteractor.java:
+		scaling in selection mode fixates the opposite site side of
+		the touched handle and scales proportional.
+
 2007-01-28  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/DocumentManager.java:
 		added methods saveSession() and loadSession().
-		Saving produces a ZIP file containinf two files: 'document.svg'
+		Saving produces a ZIP file containing of two files: 'document.svg'
 		and 'extra.xml'. The SVG entry represents the current state
 		of the graphical part. The extra.xml is a Java Beans serialization
 		of the non graphical "magic" like the connection between 
-		maps an scale text.
+		maps and scale text.
 
 	* src/de/intevation/printlayout/LayoutFrame.java:
 		added menu entries to save and load a session.
