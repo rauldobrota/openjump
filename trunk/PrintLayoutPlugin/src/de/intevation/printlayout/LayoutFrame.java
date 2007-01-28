@@ -153,6 +153,8 @@ implements   PickingInteractor.PickingListener
 		ExportSVGAction    svgExportAction    = new ExportSVGAction();
 		PDFAction          pdfAction          = new PDFAction();
 		PrintAction        printAction        = new PrintAction();
+		SaveSessionAction  saveSessionAction  = new SaveSessionAction();
+		LoadSessionAction  loadSessionAction  = new LoadSessionAction();
 		QuitAction         quitAction         = new QuitAction();
 
 		                   removeAction       = new RemoveAction();
@@ -166,6 +168,9 @@ implements   PickingInteractor.PickingListener
 		                   addScaletextAction = new AddScaletextAction();
 		AboutDialogAction  infoDialogAction   = new AboutDialogAction();	
 											 
+		fileMenu.add(loadSessionAction);
+		fileMenu.add(saveSessionAction);
+		fileMenu.addSeparator();
 		fileMenu.add(svgExportAction);
 		fileMenu.add(pdfAction);
 		fileMenu.add(printAction);
@@ -553,7 +558,6 @@ implements   PickingInteractor.PickingListener
 		docManager.exportSVG(file);
 	}
 
-
 	protected void importSVG() {
 
 		JFileChooser fc = new JFileChooser(lastDirectory);
@@ -567,6 +571,36 @@ implements   PickingInteractor.PickingListener
 
 		docManager.appendSVG(fc.getSelectedFile());
 	}
+
+	protected void saveSession() {
+		JFileChooser fc = new JFileChooser(lastDirectory);
+
+		int result = fc.showSaveDialog(docManager.getCanvas());
+
+		lastDirectory = fc.getCurrentDirectory();
+
+		if (result != JFileChooser.APPROVE_OPTION)
+			return;
+
+		File file = fc.getSelectedFile();
+
+		docManager.saveSession(file);
+	}
+
+	protected void loadSession() {
+
+		JFileChooser fc = new JFileChooser(lastDirectory);
+
+		int result = fc.showOpenDialog(docManager.getCanvas());
+
+		lastDirectory = fc.getCurrentDirectory();
+
+		if (result != JFileChooser.APPROVE_OPTION)
+			return;
+
+		docManager.loadSession(fc.getSelectedFile());
+	}
+
 
 	protected void importImage() {
 
@@ -857,6 +891,32 @@ implements   PickingInteractor.PickingListener
 		}
 		public void actionPerformed(ActionEvent ae) {
 			switchToPaperSize((String)getValue(ACTION_COMMAND_KEY));
+		}
+	}
+
+	private class SaveSessionAction extends AbstractAction {
+		SaveSessionAction() {
+			super(I18N.getName(
+					I18N.getString("LayoutFrame.SaveSession", "S&ave...")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.SaveSession", "S&ave...")));
+			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control S"));
+		}
+		public void actionPerformed(ActionEvent ae) {
+			saveSession();
+		}
+	}
+
+	private class LoadSessionAction extends AbstractAction {
+		LoadSessionAction() {
+			super(I18N.getName(
+					I18N.getString("LayoutFrame.LoadSession", "&Load...")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.LoadSession", "&Load...")));
+			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control L"));
+		}
+		public void actionPerformed(ActionEvent ae) {
+			loadSession();
 		}
 	}
 }

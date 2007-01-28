@@ -59,12 +59,21 @@ import javax.xml.transform.OutputKeys;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.FileOutputStream;
+import java.io.FilterOutputStream;
 import java.io.BufferedOutputStream;
 import java.io.OutputStream;
 
 import java.util.ArrayList;
 import java.util.Stack;
+
+import java.util.zip.ZipOutputStream;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipEntry;
+
+import java.beans.XMLEncoder;
+import java.beans.XMLDecoder;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -342,6 +351,163 @@ public class DocumentManager
 		}
 		catch (TransformerException e) {
 			e.printStackTrace();
+		}
+	}
+
+	public void loadSession(File file) {
+
+		ZipFile zip = null;
+
+		try {
+			zip = new ZipFile(file);
+
+			// first read extra data
+			ZipEntry extraEntry = zip.getEntry("extra.xml");
+			if (extraEntry == null)
+				return;
+
+			XMLDecoder decoder = null;
+
+			ExtraData extra;
+
+			try {
+				decoder =
+					new XMLDecoder(
+					zip.getInputStream(extraEntry));
+
+				extra = (ExtraData)decoder.readObject();
+			}
+			finally {
+				if (decoder != null) {
+					decoder.close();
+					decoder = null;
+				}
+			}
+
+			// now the SVG document
+			ZipEntry documentEntry = zip.getEntry("document.svg");
+			if (documentEntry == null)
+				return;
+
+			SVGDocument document;
+
+			InputStream is = null;
+
+			try {
+				is = zip.getInputStream(documentEntry);
+
+				String parser = XMLResourceDescriptor.getXMLParserClassName();
+				SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
+				String uri = new File("document.svg").toURL().toString();
+
+				document =
+					(SVGDocument)factory.createDocument(uri, is);
+			}
+			finally {
+				if (is != null) {
+					try { is.close(); } catch (IOException ioe) {}
+					is = null;
+				}
+			}
+
+			final ExtraData   extraDataFromZip = extra;
+			final SVGDocument documentFromZip  = document;
+
+			modifyDocumentLater(new DocumentModifier() {
+				public Object run(DocumentManager manager) {
+					manager.loadSessionWithInUM(
+						extraDataFromZip, 
+						documentFromZip);
+					return null;
+				}
+			});
+		}
+		catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+
+	}
+
+	protected void loadSessionWithInUM(
+		ExtraData   extraData,
+		SVGDocument document
+	) {
+		this.extraData = extraData;
+		setDocument(document);
+	}
+
+	public void saveSession(final File file) {
+		modifyDocumentLater(new DocumentModifier() {
+			public Object run(DocumentManager manager) {
+				manager.saveSessionWithinUM(file);
+				return null;
+			}
+		});
+	}
+
+	protected void saveSessionWithinUM(File file) {
+
+		AbstractDocument document =
+			(AbstractDocument)getSVGDocument();
+
+		if (document == null)
+			return;
+
+		ZipOutputStream zip = null;
+
+		try {
+			zip =
+				new ZipOutputStream(
+				new BufferedOutputStream(
+				new FileOutputStream(file)));
+
+			// first store the extra data
+			zip.putNextEntry(new ZipEntry("extra.xml"));
+
+			XMLEncoder encoder = null;
+			try {
+				encoder = new XMLEncoder(
+					new FilterOutputStream(zip) { 
+						public void close() throws IOException {} 
+					});
+				encoder.writeObject(extraData);
+			}
+			finally {
+				if (encoder != null) {
+					encoder.close();
+					encoder = null;
+				}
+			}
+
+			// now store the SVG document
+			zip.putNextEntry(new ZipEntry("document.svg"));
+			
+			TransformerFactory factory     = TransformerFactory.newInstance();
+			Transformer        transformer = factory.newTransformer();
+
+			StreamResult outputTarget = new StreamResult(zip);
+
+			DOMSource xmlSource = new DOMSource(document);
+
+			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+			transformer.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, "");
+			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+			transformer.transform(xmlSource, outputTarget);   	
+		}
+		catch (TransformerConfigurationException e) {
+			e.printStackTrace();
+		}
+		catch (TransformerException e) {
+			e.printStackTrace();
+		}
+		catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+		finally {
+			if (zip != null) {
+				try { zip.close(); } catch (IOException ioe) {}
+				zip = null;
+			}
 		}
 	}
 

@@ -1,6 +1,23 @@
 2007-01-28  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/DocumentManager.java:
+		added methods saveSession() and loadSession().
+		Saving produces a ZIP file containinf two files: 'document.svg'
+		and 'extra.xml'. The SVG entry represents the current state
+		of the graphical part. The extra.xml is a Java Beans serialization
+		of the non graphical "magic" like the connection between 
+		maps an scale text.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		added menu entries to save and load a session.
+
+	* src/de/intevation/printlayout/i18n/messages.properties,
+	  src/de/intevation/printlayout/i18n/messages_de.properties:
+		message for save/load.
+
+2007-01-28  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/DocumentManager.java:
 		added method switchToDocument() to allow paper size changes.
 
 	* src/de/intevation/printlayout/LayoutFrame.java:
