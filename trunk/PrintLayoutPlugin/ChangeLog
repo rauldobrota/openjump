@@ -1,3 +1,11 @@
+2007-01-30  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/tools/PanInteractor.java:
+		added. Panning tool. pressing shift is no longer needed.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		deactivates default panning tool and uses our custom one.
+
 2007-01-30  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
 
 	Doing the 0.8.2 release.

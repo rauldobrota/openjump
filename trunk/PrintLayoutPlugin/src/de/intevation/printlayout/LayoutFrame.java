@@ -53,9 +53,10 @@ import java.text.NumberFormat;
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.JSVGScrollPane;
 
+import org.apache.batik.swing.gvt.Overlay;
+
 import org.apache.batik.dom.AbstractDocument;
 import org.apache.batik.dom.AbstractElement;
-
 
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 
@@ -86,6 +87,7 @@ import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 
 import com.vividsolutions.jts.geom.Envelope;
 
+import de.intevation.printlayout.tools.PanInteractor;
 import de.intevation.printlayout.tools.BoxInteractor;
 import de.intevation.printlayout.tools.PickingInteractor;
 import de.intevation.printlayout.tools.BoxFactory;
@@ -137,6 +139,7 @@ implements   PickingInteractor.PickingListener
 			new SVGUserAgentGUIAdapter(panel), true, false);
 
 		svgCanvas.setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
+		svgCanvas.setEnablePanInteractor(false);
 
 		docManager = new DocumentManager(svgCanvas);
 
@@ -298,6 +301,7 @@ implements   PickingInteractor.PickingListener
 
 		BoxInteractor     boxInteractor     = new BoxInteractor();
 		                  pickingInteractor = new PickingInteractor();
+		PanInteractor     panInteractor     = new PanInteractor();
 
 		pickingInteractor.addPickingListener(this);
 
@@ -305,8 +309,11 @@ implements   PickingInteractor.PickingListener
 		boxInteractor.setDocumentManager(docManager);
 		pickingInteractor.setDocumentManager(docManager);
 
+		addTool(panInteractor);
 		addTool(boxInteractor);
 		addTool(pickingInteractor);
+
+		activateTool(panInteractor.getToolIdentifier());
 
 		JToolBar toolBar = new JToolBar();
 
@@ -399,8 +406,10 @@ implements   PickingInteractor.PickingListener
 
 		LayoutCanvas svgCanvas = docManager.getCanvas();
 
-		List overlays = svgCanvas.getOverlays();
-		overlays.add(0, tool);
+		if (tool instanceof Overlay) {
+			List overlays = svgCanvas.getOverlays();
+			overlays.add(0, tool);
+		}
 
 		List interactors = svgCanvas.getInteractors();
 		interactors.add(0, tool);
