@@ -1,3 +1,13 @@
+2007-01-30  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* HowTo-Release.txt:
+		added a 'clean' to the 'ant dist' line. -> 'ant clean dist'
+		to avoid that old garbage makes its way into the release.
+
+	* src/de/intevation/printlayout/I18N.java,
+	  src/de/intevation/printlayout/LayoutFrame.java:
+		added a few extra 'if's to make i18n more null pointer bullet proof.
+
 2007-01-30  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
 
 	* HowTo-Release.txt: New. Guide for doing a release.
