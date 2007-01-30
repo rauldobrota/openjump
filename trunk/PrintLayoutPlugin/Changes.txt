@@ -1,0 +1,26 @@
+General Changes of PrintLayout Plugin
+-------------------------------------
+
+Version 0.8.1 (2007-01-30)
+
+  Maintenance and feature release.
+
+  * I18N: englisch was broken -- fixed.
+  * New: Paper Size selection.
+  * New: Status line with paper coordinates.
+  * New: Scalebar.
+  * Changed: Sizing of objects now keeps
+    the opposite corner fixed instead of
+    scaling around the center.
+
+Version 0.8.0 (2007-01-29)
+
+  This is the inital release.
+
+  Features:
+  - adding of maps and rectangles.
+  - Scaling (cool: scaletext "1:XXXX" changes accordingly :-)
+  - rotation
+  - group/ungroup 
+  - Print as PDF, to printer, as SVG
+  - import any SVG, raster image

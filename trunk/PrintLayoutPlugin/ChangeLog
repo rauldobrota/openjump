@@ -1,5 +1,13 @@
 2007-01-30  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
 
+	Doing the 0.8.1 release.
+
+	* Changes.txt: New. Describes the overall change history for users.
+
+	* src/de/intevation/printlayout/InfoDialog.java: Version to 0.8.1.
+
+2007-01-30  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
+
 	* INSTALL.txt: New. Describes how to install when receiving
 	only the jar file. Intended to accompany the jar file.
 
