@@ -1,6 +1,16 @@
 General Changes of PrintLayout Plugin
 -------------------------------------
 
+Version 0.8.2 (2007-01-30)
+
+  Maintenance 'bullet-proof' release.
+
+  * I18N even more bullet proof.
+  * Old files made it into 0.8.1 that
+    should have been updated. Made Release guide
+    more bullet proof.
+  * Improved INSTALL.txt guide to be bullet proof for Windows.
+
 Version 0.8.1 (2007-01-30)
 
   Maintenance and feature release.
@@ -9,6 +19,7 @@ Version 0.8.1 (2007-01-30)
   * New: Paper Size selection.
   * New: Status line with paper coordinates.
   * New: Scalebar.
+  * New: Storing/Loading of sessions.
   * Changed: Sizing of objects now keeps
     the opposite corner fixed instead of
     scaling around the center.
