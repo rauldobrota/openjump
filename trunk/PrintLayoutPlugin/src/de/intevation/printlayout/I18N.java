@@ -28,7 +28,8 @@ public class I18N
 
 	public static String getString(String key, String def) {
 		try {
-			return I18N.getString(key);
+			String value = I18N.getString(key);
+			return value != null ? value : def;
 		}
 		catch (MissingResourceException mre) {
 			return def;

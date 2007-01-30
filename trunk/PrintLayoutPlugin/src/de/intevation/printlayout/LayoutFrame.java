@@ -146,10 +146,10 @@ implements   PickingInteractor.PickingListener
 
 		panel.add(scroller, BorderLayout.CENTER);
 
-		JMenu fileMenu   = createMenu("LayoutFrame.File", "File");
-		JMenu editMenu   = createMenu("LayoutFrame.Edit", "Edit");
-		JMenu insertMenu = createMenu("LayoutFrame.Insert", "Insert");
-		JMenu infoMenu   = createMenu("LayoutFrame.Help", "Help");
+		JMenu fileMenu   = createMenu("LayoutFrame.File",   "&File");
+		JMenu editMenu   = createMenu("LayoutFrame.Edit",   "&Edit");
+		JMenu insertMenu = createMenu("LayoutFrame.Insert", "&Insert");
+		JMenu infoMenu   = createMenu("LayoutFrame.Help",   "&Help");
 
 		ExportSVGAction    svgExportAction    = new ExportSVGAction();
 		PDFAction          pdfAction          = new PDFAction();
@@ -261,9 +261,15 @@ implements   PickingInteractor.PickingListener
 	
 	protected static JMenu createMenu(String key, String def) {
 		String label = I18N.getString(key, def);
+
+		if (label == null)
+			label = key;
 		
 		JMenu menu = new JMenu(I18N.getName(label));
-		menu.setMnemonic(I18N.getMnemonic(label));
+
+		Integer mnemonic = I18N.getMnemonic(label);
+		if (mnemonic != null)
+			menu.setMnemonic(mnemonic);
 
 		return menu;
 	}

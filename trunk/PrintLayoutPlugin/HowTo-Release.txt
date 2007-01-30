@@ -8,7 +8,7 @@ Guide for developers for creating a new release
    Changes.txt
 
 3. $ cd etc
-   $ ant dist
+   $ ant clean dist
    $ cd ..
 
 4. cd ..
