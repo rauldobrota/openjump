@@ -16,6 +16,7 @@ import java.awt.Graphics2D;
 import java.awt.Component;
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.awt.BasicStroke;
 
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
@@ -383,6 +384,15 @@ implements   Overlay, Tool
 
 		return ordered;
 	}
+
+	private static final BasicStroke RUBBER =
+		new BasicStroke(
+			3f,
+			BasicStroke.CAP_BUTT,
+      BasicStroke.JOIN_MITER,
+      10f,
+      new float [] { 5 },
+      0f);
   
 	public void paint(Graphics g) {
 		if (!inUse || selected == null)
@@ -391,6 +401,7 @@ implements   Overlay, Tool
 		Graphics2D g2d = (Graphics2D)g;
 
 		g2d.setPaint(Color.red);
+		g2d.setStroke(RUBBER);
 
 		SVGDocument document = documentManager.getSVGDocument();
 
@@ -420,6 +431,7 @@ implements   Overlay, Tool
 			box.bbox2shape(bbox, xform);
 			box.draw(g2d, damaged);
 		}
+
 
 		int NOW = selected.size();
 

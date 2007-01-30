@@ -23,7 +23,6 @@ import org.w3c.dom.svg.SVGMatrix;
 import org.w3c.dom.svg.SVGElement;
 
 import org.apache.batik.dom.AbstractElement;
-import org.apache.batik.dom.AbstractDocument;
 
 import org.apache.batik.dom.svg.SVGDOMImplementation; 
 
