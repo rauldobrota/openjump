@@ -28,3 +28,10 @@ or a separate installation of OpenJump could help here.
    http://jump-pilot.cvs.sourceforge.net/*checkout*/jump-pilot/PrintLayoutPlugin/lib/pdf-transcoder.jar
    http://jump-pilot.cvs.sourceforge.net/*checkout*/jump-pilot/PrintLayoutPlugin/lib/xml-apis-ext.jar
    http://jump-pilot.cvs.sourceforge.net/*checkout*/jump-pilot/PrintLayoutPlugin/lib/xml-apis.jar
+
+4. Only on Windows:
+   The orginal openjump.bat adds all old batik jars
+   to the CLASSPATH explicitly.
+
+   You have to remove all %LIB%/batik/foobar.jar
+   and add %LIB%/batik-all.jar

@@ -1,5 +1,9 @@
 2007-01-30  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
 
+	* INSTALL.txt: Added hint for Windows.
+
+2007-01-30  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
+
 	Doing the 0.8.1 release.
 
 	* Changes.txt: New. Describes the overall change history for users.
