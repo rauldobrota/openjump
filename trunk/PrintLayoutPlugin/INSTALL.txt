@@ -1,0 +1,30 @@
+How to install a prepared PrintLayout plugin jar file
+=====================================================
+
+This is a description how to install a prepared jar-file.
+Along with this text you should find a file printlayout.jar.
+
+If you work with CVS versions, your should now better refer
+to the file README.txt.
+
+1. Copy the the printlayout.jar
+   into the the lib/ext directory of
+   your OpenJump installation.
+
+ATTENTION: The next steps replace existing jar files. Be sure
+you don't get into trouble when you loose these files. Backups
+or a separate installation of OpenJump could help here.
+
+2. Remove the batik libraries coming with
+   OpenJump and replace them:
+
+   rm -rf <where you installed OpenJump>/lib/batik
+
+3. Download these jar files and place them into
+   <where you installed OpenJump>/lib
+
+   http://jump-pilot.cvs.sourceforge.net/*checkout*/jump-pilot/PrintLayoutPlugin/lib/batik-all.jar
+   http://jump-pilot.cvs.sourceforge.net/*checkout*/jump-pilot/PrintLayoutPlugin/lib/js.jar
+   http://jump-pilot.cvs.sourceforge.net/*checkout*/jump-pilot/PrintLayoutPlugin/lib/pdf-transcoder.jar
+   http://jump-pilot.cvs.sourceforge.net/*checkout*/jump-pilot/PrintLayoutPlugin/lib/xml-apis-ext.jar
+   http://jump-pilot.cvs.sourceforge.net/*checkout*/jump-pilot/PrintLayoutPlugin/lib/xml-apis.jar
