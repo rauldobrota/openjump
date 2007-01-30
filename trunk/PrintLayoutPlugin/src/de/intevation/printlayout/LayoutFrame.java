@@ -76,6 +76,7 @@ import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.model.Layer;
 
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
+import com.vividsolutions.jump.workbench.ui.Viewport;
 
 import com.vividsolutions.jump.workbench.ui.renderer.RenderingManager; 
 import com.vividsolutions.jump.workbench.ui.renderer.LayerRenderer;
@@ -441,9 +442,9 @@ implements   PickingInteractor.PickingListener
 
 		LayerViewPanel lvp = pluginContext.getLayerViewPanel();
 
-		Envelope env =  lvp.getViewport().getEnvelopeInModelCoordinates();
+		Viewport vp = lvp.getViewport();
 
-		System.err.println(env);
+		Envelope env =  vp.getEnvelopeInModelCoordinates();
 
 		RenderingManager rms = lvp.getRenderingManager();
 
@@ -483,6 +484,7 @@ implements   PickingInteractor.PickingListener
 		Envelope xenv = new Envelope(
 			0, lvp.getWidth(), 0, lvp.getHeight());
 
+		// should be identical to  vp.getScale(); 
 		double geo2screen = env2env(env, xenv);
 
 		double scale2paper = fitToPaper(xenv);
@@ -491,7 +493,6 @@ implements   PickingInteractor.PickingListener
 			scale2paper, scale2paper);
 
 		final MapData mapData = new MapData(geo2screen);
-
 
 		AbstractElement root = (AbstractElement)document.getDocumentElement();
 		root = (AbstractElement)svgGenerator.getRoot(root);
@@ -640,6 +641,25 @@ implements   PickingInteractor.PickingListener
 		}
 	}
 
+	protected void addScaleBar() {
+		final String [] ids = pickingInteractor.getSelectedIDs();
+
+		if (ids == null || ids.length < 1)
+			return;
+
+		Object object = docManager.getData(ids[0]);
+		if (!(object instanceof MapData))
+			return;
+
+		MapData map = (MapData)object;
+
+		ScaleBarUpdater updater = new ScaleBarUpdater(
+			map.getInitialScale(),
+			ids[0]);
+
+		docManager.addCenteredElement(updater, null);
+	}
+
 	protected void addScaleText() {
 		final String [] ids = pickingInteractor.getSelectedIDs();
 
@@ -706,6 +726,7 @@ implements   PickingInteractor.PickingListener
 				&& docManager.getData(ids[0]) instanceof MapData);
 	}
 
+	/*
 	protected void notImplementedYet() {
 		JOptionPane.showMessageDialog(
 			this,
@@ -713,6 +734,7 @@ implements   PickingInteractor.PickingListener
 			I18N.getString("LayoutFrame.Warning", "Warning"),
 			JOptionPane.WARNING_MESSAGE);
 	}
+	*/
 
 	private class PrintAction extends AbstractAction {
 		PrintAction() {
@@ -855,7 +877,7 @@ implements   PickingInteractor.PickingListener
 			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl B"));
 		}
 		public void actionPerformed(ActionEvent ae) {
-			notImplementedYet();
+			addScaleBar();
 		}
 	}
 

@@ -1,3 +1,18 @@
+2007-01-30  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		add method to insert AbstractElements in center of
+		view. uses new interface GenerateElement. TODO:
+		modify addText() to use this interface as well.
+
+	* src/de/intevation/printlayout/ScaleBarUpdater.java:
+		builds an SVG scale bar for a given map.
+		TODO: make it to listener of map.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		uses ScaleBarUpdater if user wants to add a scale bar
+		to a map.
+		
 2007-01-29  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/DocumentManager.java:

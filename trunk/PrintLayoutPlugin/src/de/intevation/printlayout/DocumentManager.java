@@ -259,6 +259,66 @@ public class DocumentManager
 		addText(text, null);
 	}
 
+	public interface ElementGenerator {
+		AbstractElement generateElement(DocumentManager document);
+	}
+
+	public void addCenteredElement(
+		final ElementGenerator     generator, 
+		final ModificationCallback callback
+	) {
+		modifyDocumentLater(new DocumentModifier() {
+			public Object run(DocumentManager documentManager) {
+
+				AbstractElement element =
+					generator.generateElement(documentManager);
+
+				if (element == null)
+					return null;
+
+				SVGDocument document = documentManager.getSVGDocument();
+
+				String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+
+				AbstractElement xform =
+					(AbstractElement)document.createElementNS(svgNS, "g");
+
+				xform.setAttributeNS(null, "id", uniqueObjectID());
+
+				Rectangle rect = documentManager.getCanvas().getBounds();
+
+				AbstractElement sheet =
+					(AbstractElement)document.getElementById(DOCUMENT_SHEET);
+
+				Point2D centerScreen = new Point2D.Double(
+					rect.x + 0.5d * rect.width,
+					rect.y + 0.5d * rect.height);
+
+				AffineTransform trans =
+					MatrixTools.toJavaTransform(
+						((SVGLocatable)sheet).getScreenCTM().inverse());
+
+				Point2D center = new Point2D.Double();
+				trans.transform(centerScreen, center);
+
+				trans = AffineTransform
+					.getTranslateInstance(center.getX(), center.getY());
+
+				xform.setAttributeNS(
+					null, "transform", MatrixTools.toSVGString(trans));
+
+				xform.appendChild(element);
+
+				sheet.appendChild(xform);
+
+				if (callback != null)
+					callback.run(documentManager, xform);
+
+				return null;
+			}
+		});
+	}
+
 	public void addText(final String text, final ModificationCallback callback) {
 		modifyDocumentLater(new DocumentModifier() {
 			public Object run(DocumentManager documentManager) {
