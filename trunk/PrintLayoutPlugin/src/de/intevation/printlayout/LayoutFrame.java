@@ -335,7 +335,7 @@ implements   PickingInteractor.PickingListener
 		textBnt.setEnabled(false);
 		
 		boxBnt .setActionCommand(boxInteractor.getToolIdentifier());
-		nopBnt .setActionCommand("pan");
+		nopBnt .setActionCommand(panInteractor.getToolIdentifier());
 		pickBtn.setActionCommand(pickingInteractor.getToolIdentifier());
 
 		ActionListener listener = new ActionListener() {

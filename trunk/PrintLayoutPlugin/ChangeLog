@@ -1,5 +1,11 @@
 2007-01-30  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		fix incorrect switching between new panning tool and
+		the other tools.
+
+2007-01-30  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
 	* src/de/intevation/printlayout/tools/PanInteractor.java:
 		added. Panning tool. pressing shift is no longer needed.
 
