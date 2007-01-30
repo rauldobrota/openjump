@@ -1,6 +1,11 @@
 2007-01-30  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/i18n/messages.properties:
+		correct typo in messages.
+
+2007-01-30  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/i18n/messages.properties:
 		fix for broken english i18n messages. Added missing '&'
 		for menu entries.
 
