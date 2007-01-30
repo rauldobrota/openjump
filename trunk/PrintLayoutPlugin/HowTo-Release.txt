@@ -1,0 +1,29 @@
+Guide for developers for creating a new release
+-----------------------------------------------
+
+1. Change Version number (N.N.N) in
+   src/de/intevation/printlayout/InfoDialog.java
+
+2. Updated file
+   Changes.txt
+
+3. $ cd etc
+   $ ant dist
+   $ cd ..
+
+4. cd ..
+   $ mkdir PrintLayoutPlugin-N.N.N
+   $ cp PrintLayoutPlugin/INSTALL.txt PrintLayoutPlugin-N.N.N
+   $ cp PrintLayoutPlugin/dist/printlayoutplugin-YYYYMMDD.jar PrintLayoutPlugin-N.N.N/printlayoutplugin.jar
+   $ zip -r PrintLayoutPlugin-N.N.N.zip PrintLayoutPlugin-N.N.N
+
+5. Upload to SourceForge:
+   $ ftp upload.sourceforge.net
+   Login as "anonymous"
+   Use your e-mail address as the password for this login
+   ftp> bin
+   ftp> cd /incoming
+   ftp> put PrintLayoutPlugin-N.N.N
+   ftp> exit
+
+6. Create release "N.N.N" on SourceForge

@@ -1,5 +1,9 @@
 2007-01-30  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
 
+	* HowTo-Release.txt: New. Guide for doing a release.
+
+2007-01-30  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
+
 	* INSTALL.txt: Added hint for Windows.
 
 2007-01-30  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
