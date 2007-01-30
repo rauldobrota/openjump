@@ -1,5 +1,11 @@
 2007-01-30  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/i18n/messages.properties:
+		fix for broken english i18n messages. Added missing '&'
+		for menu entries.
+
+2007-01-30  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
 	* src/de/intevation/printlayout/DocumentManager.java:
 		add method to insert AbstractElements in center of
 		view. uses new interface GenerateElement. TODO:
