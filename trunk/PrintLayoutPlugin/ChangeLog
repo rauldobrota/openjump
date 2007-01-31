@@ -1,3 +1,17 @@
+2007-01-31  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	* src/de/intevation/printlayout/tools/BoxPropertiesDialog.java:
+		Added. A dialog for box drawing attributes.
+
+	* src/de/intevation/printlayout/tools/BoxPropPanel.java:
+		Added. Main GUI part of BoxPropertiesDialog.
+
+	* src/de/intevation/printlayout/tools/ColorButton.java:
+		Added. Button for choosing colors.
+	
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		installed the BoxPropertiesDialog.
+	
 2007-01-31  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/tools/PickingInteractor.java:
@@ -165,13 +179,13 @@
 		- move creation of SVG sheet to PaperSizes
 
 	* src/de/intevation/printlayout/PaperSizes.java:
-		readded SVGDocument paper sheet creation here.
+		readed SVGDocument paper sheet creation here.
 
 2007-01-28  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/PaperSizes.java:
 		load paper sizes from paper-sizes.properties instead
-		of beeing hard coded in this class
+		of being hard coded in this class
 
 	* src/de/intevation/printlayout/resources/paper-sizes.properties:
 		added. list of paper sizes
@@ -203,7 +217,7 @@
 		uses Template
 		
 	* src/de/intevation/printlayout/Template.java:
-		Smarter template replacer
+		smarter template replacer
 
 	* src/de/intevation/printlayout/resources/paper-tmpl.svg:
 		smarter template

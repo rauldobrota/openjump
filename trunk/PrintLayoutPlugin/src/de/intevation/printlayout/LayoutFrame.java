@@ -92,6 +92,7 @@ import de.intevation.printlayout.tools.BoxInteractor;
 import de.intevation.printlayout.tools.PickingInteractor;
 import de.intevation.printlayout.tools.BoxFactory;
 import de.intevation.printlayout.tools.DrawingAttributes;
+import de.intevation.printlayout.tools.BoxPropertiesDialog;
 import de.intevation.printlayout.tools.Tool;
 
 public class LayoutFrame 
@@ -334,6 +335,7 @@ implements   PickingInteractor.PickingListener
 		textBnt.setToolTipText(I18N.getString("LayoutFrame.Text", "text"));
 		textBnt.setEnabled(false);
 		
+		
 		boxBnt .setActionCommand(boxInteractor.getToolIdentifier());
 		nopBnt .setActionCommand(panInteractor.getToolIdentifier());
 		pickBtn.setActionCommand(pickingInteractor.getToolIdentifier());
@@ -380,15 +382,17 @@ implements   PickingInteractor.PickingListener
 		zoomInAction.putValue(Action.NAME, "+");
 		zoomOutAction.putValue(Action.NAME, "-");
 
+		JButton boxProp = new JButton(new BoxPropAction(boxFactory));
 		JButton fullExtend = new JButton(fullExtendAction);
 		JButton zoomIn     = new JButton(zoomInAction);
 		JButton zoomOut    = new JButton(zoomOutAction);
 		
 		toolBar.addSeparator();
+		toolBar.add(boxProp);
+		toolBar.addSeparator();
 		toolBar.add(fullExtend);
 		toolBar.add(zoomIn);
 		toolBar.add(zoomOut);
-		toolBar.addSeparator();
 
 		JPanel north = new JPanel(
 			new FlowLayout(FlowLayout.LEADING));
@@ -954,6 +958,21 @@ implements   PickingInteractor.PickingListener
 		}
 		public void actionPerformed(ActionEvent ae) {
 			loadSession();
+		}
+	}
+
+	private class BoxPropAction extends AbstractAction {
+		private BoxFactory factory;
+		
+		BoxPropAction(BoxFactory factory) {
+			super("");
+			putValue(SMALL_ICON, IconLoader.icon("Palette.gif"));
+			this.factory = factory;
+		}
+		public void actionPerformed(ActionEvent ae) {
+			DrawingAttributes attr = BoxPropertiesDialog.showDialog(LayoutFrame.this);
+			if (attr != null)
+				factory.setDrawingAttributes(attr);
 		}
 	}
 }
