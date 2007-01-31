@@ -1,5 +1,11 @@
 2007-01-31  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
+	* src/de/intevation/printlayout/i18n/messages.properties,
+	  src/de/intevation/printlayout/i18n/messages_de.properties:
+	  	added i18n of the box properties dialog.
+
+2007-01-31  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
 	* src/de/intevation/printlayout/tools/BoxPropertiesDialog.java:
 		Added. A dialog for box drawing attributes.
 
