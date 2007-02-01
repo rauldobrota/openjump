@@ -1563,6 +1563,7 @@ public class DocumentManager
 		});
 	}
 
+	/*
 	public static void decorateWithRulers(SVGDocument document) {
 		if (document == null)
 			return;
@@ -1638,5 +1639,6 @@ public class DocumentManager
 	
 		return l;
 	}
+	*/
 }
 // end of file

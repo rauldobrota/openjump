@@ -46,6 +46,7 @@ import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
 import java.util.EventObject;
+import java.util.EventListener;
 
 public class PickingInteractor
 extends      InteractorAdapter
@@ -62,8 +63,9 @@ implements   Overlay, Tool
 		}
 	} // class PickingEvent
 
-	public interface PickingListener {
-
+	public interface PickingListener
+	extends          EventListener
+	{
 		void selectionChanged(PickingEvent evt);
 
 	} // interface PickingListener
@@ -416,7 +418,7 @@ implements   Overlay, Tool
 			SVGGraphicsElement element =
 				(SVGGraphicsElement)document.getElementById(box.getID());
 
-			if (element == null) { // no available any longer
+			if (element == null) { // not available any longer
 				selected.remove(i);
 				continue;
 			}

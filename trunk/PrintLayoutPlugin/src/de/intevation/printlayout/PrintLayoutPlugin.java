@@ -65,7 +65,7 @@ implements   ThreadedPlugIn
 		if (document == null)
 			return;
 
-		DocumentManager.decorateWithRulers(document);
+		//DocumentManager.decorateWithRulers(document);
 
 		LayoutFrame viewer = new LayoutFrame(context);
 

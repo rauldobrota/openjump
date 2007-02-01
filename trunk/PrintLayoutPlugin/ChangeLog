@@ -1,3 +1,30 @@
+2007-02-01  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/RulerOverlay.java:
+		added. rulers are now modeled as an overlay not
+		as part of the document.
+
+	* src/de/intevation/printlayout/DocumentManager.java,
+	  src/de/intevation/printlayout/PrintLayoutPlugin.java:
+		comment out decorateWithRulers(). TODO: remove it.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		Add a new menu 'view' ('Ansicht') with an entry
+		'Show Ruler' ('Lineal anzeigen'). off by default.
+
+	* src/de/intevation/printlayout/i18n/messages.properties,
+	  src/de/intevation/printlayout/i18n/messages_de.properties:
+		messages for the view menu.
+
+	* src/de/intevation/printlayout/MatrixTools.java:
+		little error in matrix decomposition fixed.
+
+	* src/de/intevation/printlayout/tools/BoxPropPanel.java:
+		removed needless imports.
+
+	* src/de/intevation/printlayout/tools/PickingInteractor.java:
+		PickingListener now extends java.util.EventListener.
+
 2007-01-31  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	* src/de/intevation/printlayout/i18n/messages.properties,

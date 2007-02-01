@@ -29,7 +29,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JSlider;
-import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 
@@ -37,10 +36,6 @@ import javax.swing.border.TitledBorder;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import javax.swing.plaf.basic.BasicComboBoxEditor;
-
-import com.vividsolutions.jump.workbench.ui.ValidatingTextField;
 
 import de.intevation.printlayout.I18N;
 

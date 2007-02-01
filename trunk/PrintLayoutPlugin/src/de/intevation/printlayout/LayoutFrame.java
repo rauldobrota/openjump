@@ -27,6 +27,7 @@ import javax.swing.JToggleButton;
 import javax.swing.ActionMap;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.JCheckBoxMenuItem;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -118,6 +119,8 @@ implements   PickingInteractor.PickingListener
 	protected JLabel             mousePosition;
 	protected NumberFormat       mouseFormat;
 
+	protected RulerOverlay       rulerOverlay;
+
 	public LayoutFrame() {
 	}
 
@@ -144,6 +147,10 @@ implements   PickingInteractor.PickingListener
 
 		docManager = new DocumentManager(svgCanvas);
 
+		rulerOverlay = new RulerOverlay(docManager);
+
+		svgCanvas.getOverlays().add(0, rulerOverlay);
+
 		svgCanvas.setBackground(Color.gray);
 
 		JSVGScrollPane scroller = new JSVGScrollPane(svgCanvas);
@@ -152,6 +159,7 @@ implements   PickingInteractor.PickingListener
 
 		JMenu fileMenu   = createMenu("LayoutFrame.File",   "&File");
 		JMenu editMenu   = createMenu("LayoutFrame.Edit",   "&Edit");
+		JMenu viewMenu   = createMenu("LayoutFrame.View",   "&View");
 		JMenu insertMenu = createMenu("LayoutFrame.Insert", "&Insert");
 		JMenu infoMenu   = createMenu("LayoutFrame.Help",   "&Help");
 
@@ -165,6 +173,8 @@ implements   PickingInteractor.PickingListener
 		                   removeAction       = new RemoveAction();
 										   groupAction        = new GroupAction();
 										   ungroupAction      = new UngroupAction();
+
+		RulerAction        rulerAction        = new RulerAction();
 
 		ImportImageAction  imageImportAction  = new ImportImageAction();
 		ImportSVGAction    svgImportAction    = new ImportSVGAction();
@@ -192,6 +202,8 @@ implements   PickingInteractor.PickingListener
 		groupAction   .setEnabled(false);
 		ungroupAction .setEnabled(false);
 
+		viewMenu.add(new JCheckBoxMenuItem(rulerAction));
+
 		insertMenu.add(addMapAction);
 		insertMenu.add(svgImportAction);
 		insertMenu.add(imageImportAction);
@@ -207,11 +219,11 @@ implements   PickingInteractor.PickingListener
 
 		menubar.add(fileMenu);
 		menubar.add(editMenu);
+		menubar.add(viewMenu);
 		menubar.add(insertMenu);
 		menubar.add(infoMenu);
 
 		setJMenuBar(menubar);
-
 
 		createTools(panel);
 
@@ -712,10 +724,14 @@ implements   PickingInteractor.PickingListener
 		if (guess == null || !guess.equals(key)) {
 			SVGDocument document = PaperSizes.createSheet(key, null);
 			if (document != null) {
-				DocumentManager.decorateWithRulers(document);
+				//DocumentManager.decorateWithRulers(document);
 				docManager.switchToDocument(document);
 			}
 		}
+	}
+
+	protected void activateRuler(boolean state) {
+		rulerOverlay.setInUse(state);
 	}
 
 	/** PickingInteractor.PickingListener */
@@ -973,6 +989,19 @@ implements   PickingInteractor.PickingListener
 			DrawingAttributes attr = BoxPropertiesDialog.showDialog(LayoutFrame.this);
 			if (attr != null)
 				factory.setDrawingAttributes(attr);
+		}
+	}
+
+	private class RulerAction extends AbstractAction {
+		RulerAction() {
+			super(I18N.getName(
+					I18N.getString("LayoutFrame.ShowRuler", "&Show Ruler")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.ShowRuler", "&Show Ruler")));
+			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control R"));
+		}
+		public void actionPerformed(ActionEvent ae) {
+			activateRuler(((JCheckBoxMenuItem)ae.getSource()).getState());
 		}
 	}
 }

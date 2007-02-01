@@ -55,7 +55,7 @@ public class MatrixTools
 
 			double tanskx = (a*c + b*d)/const1;
 
-			skx = Math.toDegrees(Math.atan(tanskx));
+			skx = Math.atan(tanskx);
 			sky = 0d;
 
 			scx = const1*const2;
@@ -71,7 +71,7 @@ public class MatrixTools
 			StringBuffer sb = new StringBuffer();
 			sb.append("skewY(").append(sky)
 				.append(") translate(").append(tx).append(",")
-				.append(ty).append(") rotate(").append(ro)
+				.append(ty).append(") rotate(").append(Math.toDegrees(ro))
 				.append(") scale(").append(scx).append(",")
 				.append(scy).append(") skewX(").append(skx).append(")");
 			return sb.toString();
