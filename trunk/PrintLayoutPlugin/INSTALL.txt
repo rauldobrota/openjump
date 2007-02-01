@@ -30,6 +30,8 @@ or a separate installation of OpenJump could help here.
    http://jump-pilot.cvs.sourceforge.net/*checkout*/jump-pilot/PrintLayoutPlugin/lib/xml-apis.jar
 
 4. Only on Windows:
+   You need to use the .bat start file and fix CLASSPATH there.
+
    The orginal openjump.bat adds all old batik jars
    to the CLASSPATH explicitly.
 

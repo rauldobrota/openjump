@@ -1,3 +1,14 @@
+2007-02-01  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
+
+	Documentation fixes.
+
+	* HowTo-Release.txt: Slight improvements.
+
+	* INSTALL.txt: Added hint on .bat-file
+
+	* src/de/intevation/printlayout/resources/info.html:
+	  Fixed Version number.
+
 2007-02-01  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/RulerOverlay.java:

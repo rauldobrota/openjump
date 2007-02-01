@@ -3,6 +3,7 @@ Guide for developers for creating a new release
 
 1. Change Version number (N.N.N) in
    src/de/intevation/printlayout/InfoDialog.java
+   src/de/intevation/printlayout/resources/info.html
 
 2. Updated file
    Changes.txt
@@ -11,7 +12,7 @@ Guide for developers for creating a new release
    $ ant clean dist
    $ cd ..
 
-4. cd ..
+4. $ cd ..
    $ mkdir PrintLayoutPlugin-N.N.N
    $ cp PrintLayoutPlugin/INSTALL.txt PrintLayoutPlugin-N.N.N
    $ cp PrintLayoutPlugin/dist/printlayoutplugin-YYYYMMDD.jar PrintLayoutPlugin-N.N.N/printlayoutplugin.jar
