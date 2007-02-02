@@ -111,6 +111,7 @@ implements   PickingInteractor.PickingListener
 	protected UngroupAction      ungroupAction;
 	protected	AddScalebarAction  addScalebarAction;
 	protected	AddScaletextAction addScaletextAction;
+	protected	BoxPropAction      boxPropAction;
 
 	protected PickingInteractor  pickingInteractor;
 
@@ -181,8 +182,8 @@ implements   PickingInteractor.PickingListener
 		AddMapAction       addMapAction       = new AddMapAction();
 		                   addScalebarAction  = new AddScalebarAction();
 		                   addScaletextAction = new AddScaletextAction();
-		AboutDialogAction  infoDialogAction   = new AboutDialogAction();	
-											 
+		AboutDialogAction  infoDialogAction   = new AboutDialogAction(); 
+
 		fileMenu.add(loadSessionAction);
 		fileMenu.add(saveSessionAction);
 		fileMenu.addSeparator();
@@ -212,7 +213,7 @@ implements   PickingInteractor.PickingListener
 
 		addScalebarAction .setEnabled(false);
 		addScaletextAction.setEnabled(false);
-
+		
 		infoMenu.add(infoDialogAction);
 
 		JMenuBar menubar = new JMenuBar();
@@ -394,10 +395,13 @@ implements   PickingInteractor.PickingListener
 		zoomInAction.putValue(Action.NAME, "+");
 		zoomOutAction.putValue(Action.NAME, "-");
 
-		JButton boxProp = new JButton(new BoxPropAction(boxFactory));
+		JButton boxProp = new JButton(
+				boxPropAction =new BoxPropAction(pickingInteractor));
 		JButton fullExtend = new JButton(fullExtendAction);
 		JButton zoomIn     = new JButton(zoomInAction);
 		JButton zoomOut    = new JButton(zoomOutAction);
+	
+		boxPropAction.setEnabled(false);
 		
 		toolBar.addSeparator();
 		toolBar.add(boxProp);
@@ -740,7 +744,7 @@ implements   PickingInteractor.PickingListener
 		PickingInteractor pi = (PickingInteractor)evt.getSource();
 		String [] ids = pi.getSelectedIDs();
 		int N = pi.numSelections();
-
+			
 		if (removeAction != null)
 			removeAction.setEnabled(N > 0 
 			&& !docManager.hasRecursiveChangeListeners(ids));
@@ -760,6 +764,12 @@ implements   PickingInteractor.PickingListener
 			addScalebarAction.setEnabled(
 				N == 1 
 				&& docManager.getData(ids[0]) instanceof MapData);
+	
+		if (boxPropAction != null)
+			boxPropAction.setEnabled(
+				N > 0
+				&& docManager.checkIDsByTag(ids, "rect"));
+	
 	}
 
 	/*
@@ -979,17 +989,22 @@ implements   PickingInteractor.PickingListener
 	}
 
 	private class BoxPropAction extends AbstractAction {
-		private BoxFactory factory;
+		private PickingInteractor interactor;
 		
-		BoxPropAction(BoxFactory factory) {
+		BoxPropAction(final PickingInteractor interactor) {
 			super("");
 			putValue(SMALL_ICON, IconLoader.icon("Palette.gif"));
-			this.factory = factory;
+			this.interactor = interactor;
+			
 		}
 		public void actionPerformed(ActionEvent ae) {
 			DrawingAttributes attr = BoxPropertiesDialog.showDialog(LayoutFrame.this);
-			if (attr != null)
-				factory.setDrawingAttributes(attr);
+			String [] ids = interactor.getSelectedIDs();
+			if (attr != null 
+			&& ids != null
+			) {
+				docManager.configureBoxID(ids, attr);
+			}	
 		}
 	}
 
