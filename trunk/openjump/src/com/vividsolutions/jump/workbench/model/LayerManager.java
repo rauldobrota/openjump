@@ -331,7 +331,10 @@ public class LayerManager {
             return;
         }
 
-        for (Iterator i = layerListeners.iterator(); i.hasNext();) {
+        //[sstein 2.Feb.2007] old line results sometimes in ConcurrentModificationException
+        //for (Iterator i = layerListeners.iterator(); i.hasNext();) {
+        //[sstein 2.Feb.2007] new line by Larry
+        for (Iterator i = new ArrayList(layerListeners).iterator(); i.hasNext();) {//LDB added
             final LayerListener layerListener = (LayerListener) i.next();
             fireLayerEvent(new Runnable() {
                     public void run() {
