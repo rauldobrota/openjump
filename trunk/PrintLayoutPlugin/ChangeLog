@@ -1,3 +1,8 @@
+2007-02-02  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		set after point precision of SVG map import from GIS to 12 digits.
+
 2007-02-01  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
 
 	Documentation fixes.

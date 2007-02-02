@@ -464,6 +464,7 @@ implements   PickingInteractor.PickingListener
 			(AbstractDocument)impl.createDocument(svgNS, "svg", null);
 
 		SVGGeneratorContext ctx = SVGGeneratorContext.createDefault(document);
+		ctx.setPrecision(12);
 
 		ctx.setGenericImageHandler(new CachedImageHandlerBase64Encoder());
 
