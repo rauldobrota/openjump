@@ -44,6 +44,7 @@ import org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn;
 import org.openjump.core.ui.plugin.tools.JoinWithArcPlugIn;
 import org.openjump.core.ui.plugin.tools.LineSimplifyJTS15AlgorithmPlugIn;
 import org.openjump.core.ui.plugin.tools.MeasureM_FPlugIn;
+import org.openjump.core.ui.plugin.tools.MergeTwoSelectedPolygonsPlugIn;
 import org.openjump.core.ui.plugin.tools.ReducePointsISAPlugIn;
 import org.openjump.core.ui.plugin.view.InstallKeyPanPlugIn;
 import org.openjump.core.ui.plugin.view.MapToolTipPlugIn;
@@ -189,6 +190,9 @@ public class OpenJumpConfiguration{
 		
 		BlendLineStringsPlugIn myLSBlender= new BlendLineStringsPlugIn();
 		myLSBlender.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		MergeTwoSelectedPolygonsPlugIn twopolymerger = new MergeTwoSelectedPolygonsPlugIn();
+		twopolymerger.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
 		/**** EDIT_ATTIBUTES *****/
 		ReplaceValuePlugIn myRepVal = new ReplaceValuePlugIn();
