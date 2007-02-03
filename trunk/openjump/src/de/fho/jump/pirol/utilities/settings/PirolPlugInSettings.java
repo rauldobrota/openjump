@@ -31,7 +31,7 @@ import de.fho.jump.pirol.utilities.i18n.PirolPlugInMessages;
  */
 public class PirolPlugInSettings {
     
-    protected static PersonalLogger logger = new PersonalLogger(DebugUserIds.OLE);
+    protected static PersonalLogger logger = new PersonalLogger(DebugUserIds.ALL);
     
     private static final String KEY_PIROLMENUNAME = "PirolMenuName";
     

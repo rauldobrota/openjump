@@ -42,7 +42,7 @@ public class MetaInformationHandler implements HandlerToMakeYourLifeEasier {
     protected ObjectContainingMetaInformation objectWithMetaInformation = null;
 
 
-    protected PersonalLogger logger = new PersonalLogger(DebugUserIds.OLE);
+    protected PersonalLogger logger = new PersonalLogger(DebugUserIds.ALL);
     /**
      * 
      *@param layerWithMetaInformation the layer you want the meta information of (has to have a DataSource!!)

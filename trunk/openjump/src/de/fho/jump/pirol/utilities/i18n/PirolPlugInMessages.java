@@ -35,7 +35,7 @@ public class PirolPlugInMessages implements HandlerToMakeYourLifeEasier {
     
     private static boolean inited = false;
 
-    protected static PersonalLogger logger = new PersonalLogger(DebugUserIds.OLE);
+    protected static PersonalLogger logger = new PersonalLogger(DebugUserIds.ALL);
     /**
      * We don't need instances of the class!
      */

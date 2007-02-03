@@ -56,7 +56,7 @@ import de.fho.jump.pirol.utilities.debugOutput.PersonalLogger;
  */
 public class FormulaEditingPanel extends JPanel implements ActionListener, ValueChecker {
     
-    protected PersonalLogger logger = new PersonalLogger(DebugUserIds.OLE);
+    protected PersonalLogger logger = new PersonalLogger(DebugUserIds.ALL);
     
     private static final long serialVersionUID = -7709755834905111906L;
     

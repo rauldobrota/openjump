@@ -8,6 +8,9 @@
  *  $Rev: 2509 $
  *  $Id$
  *  $Log$
+ *  Revision 1.2  2007/02/03 14:19:29  mentaer
+ *  modified debug output for pirol stuff
+ *
  *  Revision 1.1  2006/11/23 18:53:51  mentaer
  *  added EditAttributeByFormula Plugin by Pirol including some parts of the baseclasses - note: plugin needs java 1.5
  *
@@ -58,7 +61,7 @@ public class OKCancelListener implements ActionListener {
     
     protected JDialog dialog = null;
     
-    protected PersonalLogger logger = new PersonalLogger(DebugUserIds.OLE);
+    protected PersonalLogger logger = new PersonalLogger(DebugUserIds.ALL);
     
     protected ArrayList valueCheckers = new ArrayList();
 

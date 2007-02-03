@@ -67,7 +67,7 @@ public final class GenericDebugLogger {
      * 4  - severe error	- an error that may invalidate the current and future results or may crash the VM, etc. 
      * </pre> 
      */
-    protected int logLevel = 3; // errors with effect on the results, only
+    protected int logLevel = 1; // errors with effect on the results, only //sstein: set from 3 to 1
     protected final static String KEY_LOGLEVEL = "logLevel";
     /**Constant {@link #logLevel} for debugging purposes.*/
     public final static int SEVERITY_DEBUG 			= 0;

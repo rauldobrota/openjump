@@ -8,6 +8,9 @@
  *  $Rev: 2509 $
  *  $Id$
  *  $Log$
+ *  Revision 1.2  2007/02/03 14:19:29  mentaer
+ *  modified debug output for pirol stuff
+ *
  *  Revision 1.1  2006/11/23 18:53:51  mentaer
  *  added EditAttributeByFormula Plugin by Pirol including some parts of the baseclasses - note: plugin needs java 1.5
  *
@@ -79,7 +82,7 @@ public class NewAttributePanel extends JPanel implements ActionListener {
     protected String drownActionCommand = "selectType";
     protected AttributeType[] onlyTypes = null;
     
-    protected PersonalLogger logger = new PersonalLogger(DebugUserIds.OLE);
+    protected PersonalLogger logger = new PersonalLogger(DebugUserIds.ALL);
     
     protected String typeLabelText = I18N.get("pirol.ui.panels.type-of-new-attribute");
     protected String nameLabelText = I18N.get("pirol.ui.panels.name-of-new-attribute");

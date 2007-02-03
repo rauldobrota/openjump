@@ -60,7 +60,7 @@ public class FeatureCollectionTools extends ToolToMakeYourLifeEasier {
     protected List<Feature> featureList;
     private HashMap<Integer, Feature> fid2Object = new HashMap<Integer, Feature>();
     
-    protected static PersonalLogger logger = new PersonalLogger(DebugUserIds.OLE); 
+    protected static PersonalLogger logger = new PersonalLogger(DebugUserIds.ALL); 
     
     public FeatureCollectionTools( FeatureCollection fc ){
         super(); 

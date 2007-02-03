@@ -28,7 +28,7 @@ import de.fho.jump.pirol.utilities.debugOutput.PersonalLogger;
  */
 public abstract class FormulaValue {
     
-    protected PersonalLogger logger = new PersonalLogger(DebugUserIds.OLE);
+    protected PersonalLogger logger = new PersonalLogger(DebugUserIds.ALL);
 
     /**
      * Returns the value (as a double) of this part of the formula.

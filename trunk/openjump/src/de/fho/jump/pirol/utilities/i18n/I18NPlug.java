@@ -82,7 +82,7 @@ import de.fho.jump.pirol.utilities.debugOutput.PersonalLogger;
 public final class I18NPlug {
 	
 	protected static PersonalLogger logger = new de.fho.jump.pirol.utilities.debugOutput.PersonalLogger(
-			DebugUserIds.OLE);
+			DebugUserIds.ALL);
 	
 	public static boolean jumpi18n = true;
 	

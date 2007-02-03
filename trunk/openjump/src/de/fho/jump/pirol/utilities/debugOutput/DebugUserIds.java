@@ -27,7 +27,8 @@ public enum DebugUserIds implements DebugId {
 	CARSTEN("carsten_schulz"),
 	OLE("ole_rahn"),
 	MICHAEL("michael_bruening"),
-	HAYO("hayo_janssen");
+	HAYO("hayo_janssen"),
+	ALL("alluser");
 	
 	protected String userName = null;
 	

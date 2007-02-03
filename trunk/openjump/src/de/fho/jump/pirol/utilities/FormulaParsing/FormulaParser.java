@@ -45,7 +45,7 @@ import de.fho.jump.pirol.utilities.i18n.PirolPlugInMessages;
  */
 public class FormulaParser {
     
-    protected static PersonalLogger logger = new PersonalLogger(DebugUserIds.OLE);
+    protected static PersonalLogger logger = new PersonalLogger(DebugUserIds.ALL);
     public static final String KEY_SQRT = "sqrt:";
     public static final String KEY_POW = "power:";
     

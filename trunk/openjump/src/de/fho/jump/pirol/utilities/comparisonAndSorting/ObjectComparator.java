@@ -25,7 +25,7 @@ import de.fho.jump.pirol.utilities.debugOutput.PersonalLogger;
  * @version $Rev: 2509 $
  */
 public class ObjectComparator {
-    public static PersonalLogger logger = new PersonalLogger(DebugUserIds.OLE);
+    public static PersonalLogger logger = new PersonalLogger(DebugUserIds.ALL);
     
 	public static int compare( Object o1, Object o2 ){
 		
