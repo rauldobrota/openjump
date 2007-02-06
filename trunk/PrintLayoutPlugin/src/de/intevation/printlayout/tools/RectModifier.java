@@ -18,41 +18,47 @@ import org.w3c.dom.svg.SVGDocument;
 
 import org.apache.batik.dom.AbstractElement;
 
-
-
 import de.intevation.printlayout.DocumentManager;
+import de.intevation.printlayout.DocumentManagerUtils;
 
-public class RectModifier {
-	public static DocumentManager.DocumentModifier createModifier(
+public class RectModifier 
+implements DocumentManager.DocumentModifier 
+{
+	protected String[] ids;
+	protected DrawingAttributes attributes;
+	
+	public RectModifier(
 			final String[] ids,
 			final DrawingAttributes attributes
 	) {
-		return new DocumentManager.DocumentModifier() {
-			public Object run(DocumentManager documentManager) {
-
-				SVGDocument document = documentManager.getSVGDocument();
-        for (int i = 0; i < ids.length; i++) {
-					AbstractElement element =
-						(AbstractElement)document.getElementById(ids[i]);
-					
-					if (element == null)
-						return null;
-					
-					BoxFactory factory = new 	BoxFactory();
-					factory.setDrawingAttributes(attributes);
-					
-					ArrayList nodes = documentManager.getElementByTag(element, "rect");
-				
-					for (Iterator iter = nodes.iterator(); iter.hasNext();) {
-						AbstractElement rect = (AbstractElement) iter.next();
-						factory.configureBoxElement(rect , document);
-					}
-				}
-				
-				return null;
-			}
+		this.ids = ids;
+		this.attributes = attributes;
+	}
+	
+	public Object run(DocumentManager documentManager) {
+		
+		SVGDocument document = documentManager.getSVGDocument();
+		for (int i = 0; i < ids.length; i++) {
+			AbstractElement element =
+				(AbstractElement)document.getElementById(ids[i]);
 			
-		};
-	} // createModifier
+			if (element == null)
+				return null;
+			
+			BoxFactory factory = new 	BoxFactory();
+			factory.setDrawingAttributes(attributes);
+			
+			ArrayList nodes 
+				= DocumentManagerUtils.getElementByTag(element, "rect");
+		
+			for (Iterator iter = nodes.iterator(); iter.hasNext();) {
+				AbstractElement rect = (AbstractElement) iter.next();
+				factory.configureBoxElement(rect , document);
+			}
+		}
+		
+		return null;
+	}
+		
 }
 // end of file

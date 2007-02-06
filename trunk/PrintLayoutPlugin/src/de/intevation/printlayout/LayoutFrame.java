@@ -769,7 +769,8 @@ implements   PickingInteractor.PickingListener
 		if (boxPropAction != null)
 			boxPropAction.setEnabled(
 				N > 0
-				&& docManager.checkIDsByTag(ids, "rect"));
+				&& DocumentManagerUtils.checkIDsByTag(ids, "rect",
+					docManager.getSVGDocument()));
 	
 	}
 
@@ -1000,15 +1001,18 @@ implements   PickingInteractor.PickingListener
 		}
 		public void actionPerformed(ActionEvent ae) {
 			DrawingAttributes oldAttr = 
-				docManager.getRectDrawingAttributs(pickingInteractor.getSelectedIDs());
+				GUIUtils.getRectDrawingAttributs(
+				DocumentManagerUtils.firstElementByTag(
+				pickingInteractor.getSelectedIDs(),
+				"rect",
+				docManager.getSVGDocument()));
 			DrawingAttributes attr = 
 				BoxPropertiesDialog.showDialog(LayoutFrame.this, oldAttr);
 			String [] ids = interactor.getSelectedIDs();
 			if (attr != null 
 			&& ids != null
 			) {
-				//docManager.configureBoxID(ids, attr);
-				docManager.modifyDocumentLater(RectModifier.createModifier(ids, attr));
+				docManager.modifyDocumentLater(new RectModifier(ids, attr));
 			}	
 		}
 	}

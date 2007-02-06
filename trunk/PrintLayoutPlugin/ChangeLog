@@ -1,5 +1,22 @@
 2007-02-06  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
+	A small code clean up.
+	Extracted some methods from DocumentManager and moved
+	them to DocumentManagerUtils.
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		extracted the methodes checkIDsByTag, getElementByTag
+		and getREctDrawingAttributes.
+	
+	* src/de/intevation/printlayout/DocumentManagerUtils.java:
+		installed the methods from the DocumentManager here.
+
+	* src/de/intevation/printlayout/tools/RectModifier.java,
+	  src/de/intevation/printlayout/LayoutFrame.java:
+	  	adjusted.
+
+2007-02-06  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
 	Second part of the box properties dialog.
 	The box properties dialog shows the old values of the rectangle.
 	So you can modify the properties, rather than select new ones.

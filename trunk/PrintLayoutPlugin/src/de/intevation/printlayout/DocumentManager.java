@@ -66,7 +66,6 @@ import java.io.BufferedOutputStream;
 import java.io.OutputStream;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Stack;
 
 import java.util.zip.ZipOutputStream;
@@ -95,9 +94,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 
 import javax.imageio.ImageIO;
-
-import de.intevation.printlayout.tools.BoxFactory;
-import de.intevation.printlayout.tools.DrawingAttributes;
 
 public class DocumentManager
 {
@@ -1565,94 +1561,6 @@ public class DocumentManager
 				return null;
 			}
 		});
-	}
-  
-	/*public void configureBoxID(
-			final String[] ids, 
-			final DrawingAttributes attributes
-	) {
-		modifyDocumentLater(new DocumentModifier() {
-			public Object run(DocumentManager documentManager) {
-
-				SVGDocument document = documentManager.getSVGDocument();
-        for (int i = 0; i < ids.length; i++) {
-					AbstractElement element =
-						(AbstractElement)document.getElementById(ids[i]);
-					
-					if (element == null)
-						return null;
-					
-					BoxFactory factory = new 	BoxFactory();
-					factory.setDrawingAttributes(attributes);
-					
-					ArrayList nodes = getElementByTag(element, "rect");
-				
-					for (Iterator iter = nodes.iterator(); iter.hasNext();) {
-						AbstractElement rect = (AbstractElement) iter.next();
-						factory.configureBoxElement(rect , document);
-					}
-				}
-				
-				return null;
-			}
-		});
-	}*/
-	public boolean checkIDsByTag(String [] ids, String tag) {
-		SVGDocument document = getSVGDocument();
-		for (int i = 0; i < ids.length; i++) {
-			AbstractElement element = 
-				(AbstractElement)document.getElementById(ids[i]);
-			if(element == null)
-				continue;
-			if(getElementByTag(element, tag).size() > 0)
-				return true;
-		}
-
-		return false;
-	}
-	
-	public ArrayList getElementByTag(AbstractElement element, String tag) {
-		ArrayList list = new ArrayList();
-		getElementByTag(element, tag, list);
-
-		return list;
-	}
-
-	protected void getElementByTag(
-			AbstractElement element,
-			String tag, 
-			ArrayList list
-	) {
-		if (element == null)
-			return;
-		if (tag.equals(element.getTagName()))
-			list.add(element);
-		
-		if (!element.hasChildNodes())
-			return;		
-		NodeList nodes = element.getChildNodes();
-		for (int N = nodes.getLength(); N >= 0; N--) {
-			if(nodes.item(N) instanceof AbstractElement)	
-				getElementByTag((AbstractElement)nodes.item(N), tag, list);
-		}
-	}
-
-	public DrawingAttributes getRectDrawingAttributs(String [] ids) {
-		if (!checkIDsByTag(ids, "rect"))
-			return null;
-		
-		SVGDocument document = getSVGDocument();
-		for (int i = 0; i < ids.length; i++) {
-			AbstractElement element = 
-				(AbstractElement)document.getElementById(ids[i]);
-			if(element == null)
-				continue;
-			ArrayList list = getElementByTag(element, "rect");
-			if (list != null
-			&& list.size() > 0)
-				return GUIUtils.getRectDrawingAttributs((AbstractElement) list.get(0));
-		}
-		return null;
 	}
 	
 	/*
