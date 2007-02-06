@@ -29,15 +29,18 @@ extends JDialog
 	BoxPropPanel panel = new BoxPropPanel();
 	boolean accepted = false;
 
-	public BoxPropertiesDialog(JFrame owner) {
+	public BoxPropertiesDialog(JFrame owner, DrawingAttributes attributes) {
 		super(owner);
 		setTitle(I18N.getString("BoxPropertiesDialog.Title", "box properties"));
 		
+		panel.setDrawingAttributes(attributes);
 		createComponents();
 	}
 
-	public static DrawingAttributes showDialog(JFrame owner) {
-		BoxPropertiesDialog dialog = new BoxPropertiesDialog(owner);
+	public static DrawingAttributes showDialog(JFrame owner,
+			DrawingAttributes attributes
+	) {
+		BoxPropertiesDialog dialog = new BoxPropertiesDialog(owner, attributes);
 		dialog.setModal(true);
 
 		dialog.setVisible(true);

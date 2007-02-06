@@ -40,6 +40,7 @@ import javax.swing.event.ChangeListener;
 import de.intevation.printlayout.I18N;
 
 public class BoxPropPanel extends JPanel {
+	private static float EPSILON = 0.001f;
 	private static String[] linesPattern = new String[] {
 			"0", "1", "3", "5", "5,1", "7", "7,12", "9", "9,2", "15,6", "20,3"};
 
@@ -86,7 +87,13 @@ public class BoxPropPanel extends JPanel {
 	private JSlider     lineWidthSlider = new JSlider();
 
 	public BoxPropPanel() {
+		this(null);
+	}
+	
+	public BoxPropPanel(DrawingAttributes attr) {
+		setDrawingAttributes(attr);
 		createComponents();
+
 	}
 
 	protected void createComponents() {
@@ -187,6 +194,8 @@ public class BoxPropPanel extends JPanel {
 	protected float[] dashArray(String value) {
 		if(value == null)
 			value = (String)linesPatternCB.getSelectedItem();
+	  if (value == null)
+			return null;
 		
 		StringTokenizer tokens 
 			= new StringTokenizer(value, ",");
@@ -220,5 +229,80 @@ public class BoxPropPanel extends JPanel {
 		attributes.setFillColor(getFillColor());
 
 		return attributes;
+	}
+
+	public void setDrawingAttributes(DrawingAttributes attributes) {
+		if (attributes == null)
+			return;
+		
+		if (strokeColorBtn != null 
+		&& attributes.getStrokeColor() != null
+		&& attributes.getStrokeColor() instanceof Color)
+			strokeColorBtn.setColor((Color)attributes.getStrokeColor());
+
+		if (fillColorBtn != null 
+		&& fillColorChB != null
+		&& attributes.getFillColor() != null
+		&& attributes.getFillColor() instanceof Color) {
+			fillColorChB.setSelected(true);	
+			fillColorBtn.setColor((Color)attributes.getFillColor());
+		}
+		else if(fillColorChB != null) {
+			fillColorChB.setSelected(false);
+		}
+
+		if (linesPatternCB != null
+		&& lineWidthSlider != null
+		&& attributes.getStroke() != null
+		&& attributes.getStroke() instanceof BasicStroke) {
+			BasicStroke stroke = (BasicStroke)attributes.getStroke();
+			lineWidthSlider.setValue((int)stroke.getLineWidth());
+			updatePatternCB(stroke);
+		}
+	}
+
+	protected void updatePatternCB(BasicStroke stroke) {
+		float width = stroke.getLineWidth();
+		float[] dash = stroke.getDashArray();
+		
+		if ((int)width == 0) {
+			linesPatternCB.setSelectedItem("0");
+			return;
+		}
+	
+		for (int N = linesPatternCB.getItemCount(); N >= 0; N--) {
+			float [] comboBoxDash = dashArray((String)linesPatternCB.getItemAt(N));
+			if (same(dash, comboBoxDash)) {
+				linesPatternCB.setSelectedIndex(N);
+				return;
+			}
+		}
+
+		if (dash == null ) {
+			linesPatternCB.setSelectedItem(null);
+			return;
+		}
+		
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < dash.length; i++) {
+			if (i > 0)
+				sb.append(',');
+			sb.append(Float.toString(dash[i]/ width));
+		}
+		String str = sb.toString();
+		linesPatternCB.addItem(str);
+		linesPatternCB.setSelectedItem(str);
+	}
+
+	protected static boolean same(float [] fa1, float [] fa2) {
+		if (fa1 == null || fa2 == null || fa1.length != fa2.length)
+			return false;
+	
+		for (int i = 0; i < fa1.length; i++) {
+			if (fa1[i] - EPSILON > fa2[i] || fa1[i] + EPSILON < fa2[i])
+				return false;
+		}
+
+		return true;
 	}
 }

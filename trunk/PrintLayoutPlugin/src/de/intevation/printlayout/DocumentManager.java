@@ -1567,7 +1567,7 @@ public class DocumentManager
 		});
 	}
   
-	public void configureBoxID(
+	/*public void configureBoxID(
 			final String[] ids, 
 			final DrawingAttributes attributes
 	) {
@@ -1596,7 +1596,7 @@ public class DocumentManager
 				return null;
 			}
 		});
-	}
+	}*/
 	public boolean checkIDsByTag(String [] ids, String tag) {
 		SVGDocument document = getSVGDocument();
 		for (int i = 0; i < ids.length; i++) {
@@ -1636,6 +1636,25 @@ public class DocumentManager
 				getElementByTag((AbstractElement)nodes.item(N), tag, list);
 		}
 	}
+
+	public DrawingAttributes getRectDrawingAttributs(String [] ids) {
+		if (!checkIDsByTag(ids, "rect"))
+			return null;
+		
+		SVGDocument document = getSVGDocument();
+		for (int i = 0; i < ids.length; i++) {
+			AbstractElement element = 
+				(AbstractElement)document.getElementById(ids[i]);
+			if(element == null)
+				continue;
+			ArrayList list = getElementByTag(element, "rect");
+			if (list != null
+			&& list.size() > 0)
+				return GUIUtils.getRectDrawingAttributs((AbstractElement) list.get(0));
+		}
+		return null;
+	}
+	
 	/*
 	public static void decorateWithRulers(SVGDocument document) {
 		if (document == null)

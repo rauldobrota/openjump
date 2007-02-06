@@ -1,3 +1,31 @@
+2007-02-06  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	Second part of the box properties dialog.
+	The box properties dialog shows the old values of the rectangle.
+	So you can modify the properties, rather than select new ones.
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		new methods to find elements by tags.
+	
+	* src/de/intevation/printlayout/GUIUtils.java:
+		added. This class helps to generate a current 
+		DrawingAttribute for the box property dialog.
+		It has methods to get a color or a stroke from
+		a Element.
+	
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		adjusted the box properties button.
+	
+	* src/de/intevation/printlayout/tools/BoxPropPanel.java,
+	  src/de/intevation/printlayout/tools/BoxPropertiesDialog.java:
+	  	The dialog can now show the current properties of
+		an existing rectangle.
+		
+	* src/de/intevation/printlayout/tools/RectModifier.java:
+		added. After configuring box properties, the properties
+		of the rectangle in the SVGDocument are modified
+	        by using this class.
+
 2007-01-31  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	First part of the box properties dialog. It is now possible

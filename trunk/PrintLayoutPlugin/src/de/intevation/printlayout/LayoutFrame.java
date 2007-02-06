@@ -94,6 +94,7 @@ import de.intevation.printlayout.tools.PickingInteractor;
 import de.intevation.printlayout.tools.BoxFactory;
 import de.intevation.printlayout.tools.DrawingAttributes;
 import de.intevation.printlayout.tools.BoxPropertiesDialog;
+import de.intevation.printlayout.tools.RectModifier;
 import de.intevation.printlayout.tools.Tool;
 
 public class LayoutFrame 
@@ -998,12 +999,16 @@ implements   PickingInteractor.PickingListener
 			
 		}
 		public void actionPerformed(ActionEvent ae) {
-			DrawingAttributes attr = BoxPropertiesDialog.showDialog(LayoutFrame.this);
+			DrawingAttributes oldAttr = 
+				docManager.getRectDrawingAttributs(pickingInteractor.getSelectedIDs());
+			DrawingAttributes attr = 
+				BoxPropertiesDialog.showDialog(LayoutFrame.this, oldAttr);
 			String [] ids = interactor.getSelectedIDs();
 			if (attr != null 
 			&& ids != null
 			) {
-				docManager.configureBoxID(ids, attr);
+				//docManager.configureBoxID(ids, attr);
+				docManager.modifyDocumentLater(RectModifier.createModifier(ids, attr));
 			}	
 		}
 	}
