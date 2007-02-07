@@ -95,6 +95,10 @@ import java.awt.image.RenderedImage;
 
 import javax.imageio.ImageIO;
 
+/**
+ *	Main class. It handles the operations of the DOM document.
+ *	(Like printing, exporting, saving/loading projects, updating).
+ */
 public class DocumentManager
 {
 	public static final String DOCUMENT_SHEET = "viewer-layout-sheet-svg";
@@ -107,8 +111,10 @@ public class DocumentManager
 	protected int          objectID;
 
 	protected ExtraData    extraData;
-
-
+	
+	/**
+	 * should be used to modify documents.
+	 */
 	public interface DocumentModifier {
 		Object run(DocumentManager documentManager);
 	}
@@ -215,6 +221,11 @@ public class DocumentManager
 		svgCanvas.setSVGDocument(document);
 	}
 
+	/**
+	 * modifies the document. This is the correct way to modify a document.
+	 * First write a DocumentModifier containing the modifiy code in the 
+	 * run method, then use this methode.
+	 */	
 	public void modifyDocumentLater(final DocumentModifier modifier) {
 		UpdateManager um = svgCanvas.getUpdateManager();
 

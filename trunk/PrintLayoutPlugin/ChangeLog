@@ -1,3 +1,12 @@
+2007-02-07  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	Added some comments.
+
+	* src/de/intevation/printlayout/DocumentManager.java,
+	  src/de/intevation/printlayout/DocumentManagerUtils.java,
+	  src/de/intevation/printlayout/GUIUtils.java:
+	  	added some javadoc comments.
+	
 2007-02-06  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	A small code clean up.

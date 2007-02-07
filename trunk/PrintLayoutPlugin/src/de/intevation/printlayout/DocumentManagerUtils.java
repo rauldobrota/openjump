@@ -19,7 +19,20 @@ import org.w3c.dom.svg.SVGDocument;
 
 import org.apache.batik.dom.AbstractElement;
 
+/**
+ * Contains class methods to get elements by tag name. 
+ */
 public class DocumentManagerUtils {
+	
+	/**
+	 * searchs for the first element with a specific tagname 
+	 * in the subtrees of the id elements.
+	 *
+	 * @param ids      an array of ids, which subtrees are checked.
+	 * @param tag      the specific tagname
+	 * @param document SVGDocument containing the elements of the ids.
+	 * @return         if an element is found , the element else null.
+	 */
 	public static AbstractElement firstElementByTag(
 			String [] ids, 
 			String tag,
@@ -41,6 +54,15 @@ public class DocumentManagerUtils {
 		return null;
 	} 
 	
+	/**
+	 * checks all subtrees of the id elements, if an element with a
+	 * specific tagname exists.
+	 *
+	 * @param ids      an array of ids which subtrees are checked.
+	 * @param tag      the searched for tagname.
+	 * @param document a SVGDocument containing the id elements.
+	 * @return         found or not found.
+	 */
 	public static boolean checkIDsByTag(
 			String [] ids, 
 			String tag,
@@ -58,6 +80,15 @@ public class DocumentManagerUtils {
 		return false;
 	}
 	
+	/**
+	 * Search a DOM tree for elements with specific tagname 
+	 * and collect them in an ArrayList.
+	 *
+	 * @param element  the root element.
+	 * @param tag      tagname which is searched for.
+	 * @return         arraylist of the found elements.
+	 */
+	
 	public static ArrayList getElementByTag(AbstractElement element, String tag) {
 		ArrayList list = new ArrayList();
 		getElementByTag(element, tag, list);
@@ -65,6 +96,9 @@ public class DocumentManagerUtils {
 		return list;
 	}
 
+	/**
+	 * helper method.
+	 */
 	protected static void getElementByTag(
 			AbstractElement element,
 			String tag, 

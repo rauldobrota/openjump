@@ -29,8 +29,18 @@ import org.w3c.dom.svg.SVGPaint;
 
 import de.intevation.printlayout.tools.DrawingAttributes;
 
+/**
+ * contains class methods for getting gui objects from svg object.
+ */
 public class GUIUtils {
 	
+	/**
+	 * extract the information to create a DrawingAttributes object
+	 * from an element.
+	 * 
+	 * @param element the element the color and the stroke is extracted from.
+	 * @return        a new filled DrawingAttributes.
+	 */
 	public static DrawingAttributes getRectDrawingAttributs(Element element) {
 		if (element == null)
 			return null;
@@ -42,7 +52,14 @@ public class GUIUtils {
 		
 		return attributes;
 	}
-
+	
+	/**
+	 * extracts a color out of an SVGColor attribute of an element.
+	 *
+	 * @param element   the element which has a color attribute.
+	 * @param attribute the color attribute
+	 * @return          a color.
+	 */
 	public static Color getColor(Element element, String attribute) {
 		Color returnColor = null;
 		Document document = element.getOwnerDocument();
@@ -66,7 +83,13 @@ public class GUIUtils {
 		return returnColor;
 	}
 	
-	
+	/**
+	 *	extracts stroke-width and stroke-dasharray out of an SVGStylable
+	 *	element and constructs a new BasicStroke.
+	 *
+	 *	@param element an SVGStylable element.
+	 *	@return        the constructed stroke.
+	 */
 	public static Stroke getStroke(Element element)
 	throws NumberFormatException
 	{
