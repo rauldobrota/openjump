@@ -51,7 +51,7 @@ implements   BoxInteractor.Factory
 		return attributes;
 	}
 	
-	public DocumentManager.DocumentModifier createBox(
+	public DocumentManager.DocumentModifier createNewModifier(
 		final Rectangle2D     rect,
 		final AffineTransform xform
 	) {
@@ -86,6 +86,12 @@ implements   BoxInteractor.Factory
 			}
 		};
 	}
+  
+	public DocumentManager.DocumentModifier createUpdateModifier(
+			String[] ids) {
+		return new BoxUpdateModifier(ids, attributes);
+	}
+	
 
 	public void configureBoxElement(AbstractElement box, SVGDocument document) {
 		Paint   strokeColor  = attributes.getStrokeColor();

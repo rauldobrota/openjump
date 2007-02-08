@@ -1002,6 +1002,7 @@ implements   PickingInteractor.PickingListener
 
 	private class BoxPropAction extends AbstractAction {
 		private PickingInteractor interactor;
+		private BoxFactory        factory = new BoxFactory();
 		
 		BoxPropAction(final PickingInteractor interactor) {
 			super("");
@@ -1022,7 +1023,8 @@ implements   PickingInteractor.PickingListener
 			if (attr != null 
 			&& ids != null
 			) {
-				docManager.modifyDocumentLater(new RectModifier(ids, attr));
+				factory.setDrawingAttributes(attr);
+				docManager.modifyDocumentLater(factory.createUpdateModifier(ids));
 			}	
 		}
 	}

@@ -77,12 +77,14 @@ implements   Overlay, Tool
 	protected float[] screenPoints;
 
 	protected Factory factory;
-
 	
 	public interface Factory {
-		DocumentManager.DocumentModifier createBox(
+		DocumentManager.DocumentModifier createNewModifier(
 			Rectangle2D     rect,
 			AffineTransform xform);
+
+		DocumentManager.DocumentModifier createUpdateModifier(
+			String[] ids);
 
 		DrawingAttributes getDrawingAttributes();
 	}
@@ -290,6 +292,6 @@ implements   Overlay, Tool
 		}
 
 		documentManager.modifyDocumentLater(
-			factory.createBox(rect, xform));
+			factory.createNewModifier(rect, xform));
 	}
 }

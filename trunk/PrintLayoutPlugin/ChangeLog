@@ -1,5 +1,18 @@
 2007-02-07  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
+	another small code clean up. 
+	
+	* src/de/intevation/printlayout/tools/RectModifier.java,
+	  src/de/intevation/printlayout/tools/BoxUpdateModifier.java:
+		Moved RectModifier to BoxUpdateModifier.
+	
+	* src/de/intevation/printlayout/tools/BoxInteractor.java,
+	  src/de/intevation/printlayout/tools/BoxFactory.java,
+	  src/de/intevation/printlayout/LayoutFrame.java:
+	  	adjusted.
+
+2007-02-07  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
 	small code clean up.
 	
 	* src/de/intevation/printlayout/tools/BoxFactory.java,

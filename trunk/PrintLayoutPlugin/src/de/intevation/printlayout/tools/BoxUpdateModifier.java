@@ -1,5 +1,5 @@
 /*
- * RectModifier.java
+ * BoxUpdateModifier.java
  * --------------------
  * (c) 2007 by Intevation GmbH
  *
@@ -21,13 +21,13 @@ import org.apache.batik.dom.AbstractElement;
 import de.intevation.printlayout.DocumentManager;
 import de.intevation.printlayout.DocumentManagerUtils;
 
-public class RectModifier 
+public class BoxUpdateModifier 
 implements DocumentManager.DocumentModifier 
 {
 	protected String[] ids;
 	protected DrawingAttributes attributes;
 	
-	public RectModifier(
+	public BoxUpdateModifier(
 			final String[] ids,
 			final DrawingAttributes attributes
 	) {
