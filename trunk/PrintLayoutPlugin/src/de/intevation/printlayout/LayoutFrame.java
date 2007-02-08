@@ -96,7 +96,6 @@ import de.intevation.printlayout.tools.BoxFactory;
 import de.intevation.printlayout.tools.TextConsumer;
 import de.intevation.printlayout.tools.DrawingAttributes;
 import de.intevation.printlayout.tools.BoxPropertiesDialog;
-import de.intevation.printlayout.tools.RectModifier;
 import de.intevation.printlayout.tools.Tool;
 
 

@@ -12,14 +12,12 @@
 package de.intevation.printlayout.tools;
 
 import java.awt.Paint;
-import java.awt.Color;
 import java.awt.Stroke;
 import java.awt.BasicStroke;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import org.w3c.dom.svg.SVGDocument;
@@ -28,9 +26,7 @@ import org.apache.batik.dom.AbstractElement;
 
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 
-import org.apache.batik.svggen.SVGColor;
 import org.apache.batik.svggen.SVGGeneratorContext;
-import org.apache.batik.svggen.SVGPaintDescriptor;
 import org.apache.batik.svggen.SVGBasicStroke;
 import org.apache.batik.svggen.SVGStrokeDescriptor;
 

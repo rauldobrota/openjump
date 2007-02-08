@@ -19,10 +19,8 @@ import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 
 import java.util.Map;
-import java.util.Iterator;
 
 import org.w3c.dom.svg.SVGDocument;
-import org.w3c.dom.svg.SVGTextElement;
 
 import org.apache.batik.dom.AbstractElement;
 
