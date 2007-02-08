@@ -42,7 +42,11 @@ implements   BoxInteractor.Factory
 {
 	protected DrawingAttributes attributes;
 
-	protected String getSVGColor(Color c, String attrName, SVGDocument document) {
+	public static String getSVGColor(
+			Color c, 
+			String attrName, 
+			SVGDocument document) 
+	{
 		SVGPaintDescriptor desc = SVGColor.toSVG(c,
 					SVGGeneratorContext.createDefault(document));
 		Map attrMap = desc.getAttributeMap(null);

@@ -91,11 +91,14 @@ import com.vividsolutions.jts.geom.Envelope;
 import de.intevation.printlayout.tools.PanInteractor;
 import de.intevation.printlayout.tools.BoxInteractor;
 import de.intevation.printlayout.tools.PickingInteractor;
+import de.intevation.printlayout.tools.TextInteractor;
 import de.intevation.printlayout.tools.BoxFactory;
+import de.intevation.printlayout.tools.TextConsumer;
 import de.intevation.printlayout.tools.DrawingAttributes;
 import de.intevation.printlayout.tools.BoxPropertiesDialog;
 import de.intevation.printlayout.tools.RectModifier;
 import de.intevation.printlayout.tools.Tool;
+
 
 public class LayoutFrame 
 extends      JFrame
@@ -314,19 +317,25 @@ implements   PickingInteractor.PickingListener
 		BoxFactory boxFactory = new BoxFactory();
 		boxFactory.setDrawingAttributes(attributes);
 
+		TextConsumer textConsumer = new TextConsumer();
+
 		BoxInteractor     boxInteractor     = new BoxInteractor();
 		                  pickingInteractor = new PickingInteractor();
 		PanInteractor     panInteractor     = new PanInteractor();
+		TextInteractor    textInteractor    = new TextInteractor();
 
 		pickingInteractor.addPickingListener(this);
 
 		boxInteractor.setFactory(boxFactory);
+		textInteractor.setConsumer(textConsumer);
 		boxInteractor.setDocumentManager(docManager);
 		pickingInteractor.setDocumentManager(docManager);
+		textInteractor.setDocumentManager(docManager);
 
 		addTool(panInteractor);
 		addTool(boxInteractor);
 		addTool(pickingInteractor);
+		addTool(textInteractor);
 
 		activateTool(panInteractor.getToolIdentifier());
 
@@ -347,13 +356,13 @@ implements   PickingInteractor.PickingListener
 		JToggleButton textBnt = new JToggleButton(
 			IconLoader.icon("LabelOn.gif"));
 		textBnt.setToolTipText(I18N.getString("LayoutFrame.Text", "text"));
-		textBnt.setEnabled(false);
 		
 		
 		boxBnt .setActionCommand(boxInteractor.getToolIdentifier());
 		nopBnt .setActionCommand(panInteractor.getToolIdentifier());
 		pickBtn.setActionCommand(pickingInteractor.getToolIdentifier());
-
+		textBnt.setActionCommand(textInteractor.getToolIdentifier());
+		
 		ActionListener listener = new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				activateTool(ae.getActionCommand());
@@ -363,6 +372,7 @@ implements   PickingInteractor.PickingListener
 		boxBnt .addActionListener(listener);
 		nopBnt .addActionListener(listener);
 		pickBtn.addActionListener(listener);
+		textBnt.addActionListener(listener);
 
 		ButtonGroup group = new ButtonGroup();
 
