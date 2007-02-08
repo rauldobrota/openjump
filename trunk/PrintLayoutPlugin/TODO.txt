@@ -1,0 +1,17 @@
+To do for next release
+----------------------
+
+
+General Feature Wishes
+----------------------
+
+* an option for landscape x portrait printing
+
+* For most practical applications it is important to be able to
+  produce a scaled drawing on paper, often at some nice rounded
+  value (like 1: 10000)
+
+* Evaluate/Test:
+  Instead of using an built-in PDF converter maybe using a print
+  driver (like PDF995) is more effective for saving printed images all
+  nicely set out. This driver will also produce multi-page outputs.
