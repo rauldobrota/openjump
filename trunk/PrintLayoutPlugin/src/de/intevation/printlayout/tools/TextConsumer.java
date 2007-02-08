@@ -65,14 +65,6 @@ implements TextInteractor.Consumer {
 
 				ConsumerUtils.setAttributesByMap(textElement, 
 						getFontAttrMap(font, document));
-			/*	if (font != null) {
-					SVGFontDescriptor sfd =
-						new SVGFont(SVGGeneratorContext.createDefault(document))
-						.toSVG(font, new FontRenderContext(
-						null, true, true));
-					Map attributeMap = sfd.getAttributeMap(null);
-					ConsumerUtils.setAttributesByMap(textElement, attributeMap);
-				}	*/
 						
 				AbstractElement xform =
 					(AbstractElement)document.createElementNS(svgNS, "g");
@@ -107,4 +99,5 @@ implements TextInteractor.Consumer {
 		
 		return sfd.getAttributeMap(null);
 	}
+
 }
