@@ -1,15 +1,27 @@
 2007-02-07  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	small code clean up.
 	
+	* src/de/intevation/printlayout/tools/BoxFactory.java,
+	  src/de/intevation/printlayout/tools/TextConsumer.java:
+		moved some methods to the ConsumerUtils.
+
+	* src/de/intevation/printlayout/tools/ConsumerUtils.java:
+		New. It contains some class methods for setting
+		attributes to an AbstractElement.
+
+2007-02-07  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
 	First part of the text tool. 
 
 	* src/de/intevation/printlayout/tools/TextDialog.java:
 		New. A dialog for text and its properties.
-		
+
 	* src/de/intevation/printlayout/tools/TextInteractor.java:
 		New. If this new tool is activated and somewhere 
 		is clicked in the sheet, it opens a TextDialog and
 		uses a TextConsumer to write a text in the sheet.
-		
+
 	* src/de/intevation/printlayout/tools/TextConsumer.java:
 		New. This consumes the text properties and the text and 
 		creates a DocumentModifer, which inserts the text in the
@@ -17,10 +29,10 @@
 
 	* src/de/intevation/printlayout/tools/BoxFactory.java:
 		The method getSVGColor became public and static.
-		
+
 	* src/de/intevation/printlayout/LayoutFrame.java:
 		adjusted to the new tool.
-		
+
 2007-02-08  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
 
 	* TODO.txt: New. Wishes and whats needs to be done.
@@ -32,8 +44,8 @@
 	* src/de/intevation/printlayout/DocumentManager.java,
 	  src/de/intevation/printlayout/DocumentManagerUtils.java,
 	  src/de/intevation/printlayout/GUIUtils.java:
-	  	added some javadoc comments.
-	
+		added some javadoc comments.
+
 2007-02-06  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	A small code clean up.

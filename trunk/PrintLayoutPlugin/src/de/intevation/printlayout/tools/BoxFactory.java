@@ -41,19 +41,6 @@ public class BoxFactory
 implements   BoxInteractor.Factory 
 {
 	protected DrawingAttributes attributes;
-
-	public static String getSVGColor(
-			Color c, 
-			String attrName, 
-			SVGDocument document) 
-	{
-		SVGPaintDescriptor desc = SVGColor.toSVG(c,
-					SVGGeneratorContext.createDefault(document));
-		Map attrMap = desc.getAttributeMap(null);
-
-		return (String)attrMap.get(attrName);
-	}
-	
 	public BoxFactory() {}
 
 	public void setDrawingAttributes(DrawingAttributes attributes) {
@@ -105,42 +92,39 @@ implements   BoxInteractor.Factory
 		Stroke  stroke       = attributes.getStroke();
 		Paint   fillColor    = attributes.getFillColor();
 		
-		if (strokeColor != null && strokeColor instanceof Color) {
-			box.setAttributeNS(null, "stroke",
-					getSVGColor((Color)strokeColor, "stroke", document));
-			box.setAttributeNS(null, "stroke-opacity",
-					getSVGColor((Color)strokeColor, "stroke-opacity", document));
-		}
-		if (fillColor != null && fillColor instanceof Color) {
-			box.setAttributeNS(null, "fill", getSVGColor(
-					(Color)fillColor, "fill", document));
-			box.setAttributeNS(null, "fill-opacity", 
-					getSVGColor((Color)fillColor, "fill-opacity", document));
-		}
+		String[] names = {"stroke", "stroke-opacity"};
+		ConsumerUtils.setColorByPaint(strokeColor, names, box, document);
+		names = new String[] {"fill", "fill-opacity"};
+		if (fillColor != null)
+			ConsumerUtils.setColorByPaint(fillColor, names, box, document);
 		else
 			box.setAttributeNS(null, "fill", "none");
-	
+			
 		if (stroke != null && stroke instanceof BasicStroke) {
 			Map attributeMap = getStrokeAttrMap((BasicStroke) stroke, document);
-			for(Iterator iter = attributeMap.entrySet().iterator(); iter.hasNext();) {
-				Map.Entry entry = (Map.Entry)iter.next();
-				box.setAttributeNS(null, (String) entry.getKey(), 
-					(String) entry.getValue());
-			}	
+			ConsumerUtils.setAttributesByMap(box, attributeMap);
 		}
 	}
+	
 	protected Map getStrokeAttrMap(BasicStroke stroke, SVGDocument document) {
 		
 		SVGStrokeDescriptor ssd = 
 				new SVGBasicStroke(SVGGeneratorContext.createDefault(document))
 				.toSVG((BasicStroke) stroke);
+		
 		return ssd.getAttributeMap(null);
 	}
 	
 	protected void setRectAttributes(AbstractElement el, Rectangle2D rect) {
-		el.setAttributeNS(null, "x", String.valueOf(rect.getX()));
-		el.setAttributeNS(null, "y", String.valueOf(rect.getY()));
-		el.setAttributeNS(null, "width", String.valueOf(rect.getWidth()));
-		el.setAttributeNS(null, "height", String.valueOf(rect.getHeight()));
+		setAttributeByInt(el, "x", rect.getX());
+		setAttributeByInt(el, "y", rect.getY());
+		setAttributeByInt(el, "width", rect.getWidth());
+		setAttributeByInt(el, "height", rect.getHeight());
+	}
+
+	protected void setAttributeByInt(AbstractElement el, 
+			String attrName, double value) 
+	{
+		el.setAttributeNS(null, attrName, String.valueOf(value));
 	}
 }

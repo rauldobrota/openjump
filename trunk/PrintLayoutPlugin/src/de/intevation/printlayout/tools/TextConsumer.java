@@ -58,31 +58,21 @@ implements TextInteractor.Consumer {
 
 				textElement.appendChild(document.createTextNode(text));
 				
-				if (color != null)
-					textElement.setAttributeNS(null, "stroke",
-						BoxFactory.getSVGColor(color, "stroke", document));
-				  textElement.setAttributeNS(null, "stroke-opacity",
-						BoxFactory.getSVGColor(color, "stroke-opacity", document));
-					textElement.setAttributeNS(null, "fill",
-						BoxFactory.getSVGColor(color, "fill", document));
-				  textElement.setAttributeNS(null, "fill-opacity",
-						BoxFactory.getSVGColor(color, "fill-opacity", document));
-						
-				if (font != null) {
+				String[] names = {"stroke", "stroke-opacity", 
+				                  "fill",  "fill-opacity"};
+				ConsumerUtils.setColor(color, names, textElement, document);
+		
+
+				ConsumerUtils.setAttributesByMap(textElement, 
+						getFontAttrMap(font, document));
+			/*	if (font != null) {
 					SVGFontDescriptor sfd =
 						new SVGFont(SVGGeneratorContext.createDefault(document))
 						.toSVG(font, new FontRenderContext(
 						null, true, true));
 					Map attributeMap = sfd.getAttributeMap(null);
-					for(Iterator iter = attributeMap.entrySet().iterator();
-							iter.hasNext();) 
-					{
-						Map.Entry entry = (Map.Entry)iter.next();
-						textElement.setAttributeNS(null, (String) entry.getKey(), 
-						(String) entry.getValue());
-					}	
-
-				}	
+					ConsumerUtils.setAttributesByMap(textElement, attributeMap);
+				}	*/
 						
 				AbstractElement xform =
 					(AbstractElement)document.createElementNS(svgNS, "g");
@@ -100,9 +90,21 @@ implements TextInteractor.Consumer {
 
 				sheet.appendChild(xform);
 
-				
 				return null;
 			}
 		};
+	}
+
+	protected Map getFontAttrMap(Font font, SVGDocument document) {
+	
+		if( font == null)
+			return null;
+		
+		SVGFontDescriptor sfd =
+				new SVGFont(SVGGeneratorContext.createDefault(document))
+				.toSVG(font, new FontRenderContext(
+				null, true, true));
+		
+		return sfd.getAttributeMap(null);
 	}
 }
