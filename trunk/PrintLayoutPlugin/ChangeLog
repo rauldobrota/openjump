@@ -1,18 +1,18 @@
-2007-02-01  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+2007-02-09  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/LayoutFrame.java,
 	  src/de/intevation/printlayout/tools/BoxFactory.java,
 	  src/de/intevation/printlayout/tools/TextConsumer.java:
 		Project was not compilable. Removed needless imports.
 
-2007-02-02  Ludwig Reiter  <ludwig.reiter@intevation.de>
+2007-02-08  Ludwig Reiter  <ludwig.reiter@intevation.de>
 	
 	comment clean up.
 
 	* src/de/intevation/printlayout/tools/TextConsumer.java:
 		removed a unneeded comment.
 
-2007-02-07  Ludwig Reiter  <ludwig.reiter@intevation.de>
+2007-02-08  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	another small code clean up. 
 	
@@ -25,7 +25,7 @@
 	  src/de/intevation/printlayout/LayoutFrame.java:
 	  	adjusted.
 
-2007-02-07  Ludwig Reiter  <ludwig.reiter@intevation.de>
+2007-02-08  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	small code clean up.
 	
@@ -37,7 +37,7 @@
 		New. It contains some class methods for setting
 		attributes to an AbstractElement.
 
-2007-02-07  Ludwig Reiter  <ludwig.reiter@intevation.de>
+2007-02-08  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	First part of the text tool. 
 
