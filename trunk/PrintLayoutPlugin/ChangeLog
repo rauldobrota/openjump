@@ -1,3 +1,25 @@
+2007-02-09  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	Second part of the text tool.
+	A selected text can be changed by a text properties dialog,
+	but this dialog doesn't know the values of the text.
+
+	* src/de/intevation/printlayout/DocumentManagerUtils.java:
+		small bugfix.
+		
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		added a text properties button.
+		
+	* src/de/intevation/printlayout/tools/TextConsumer.java:
+		added an update modifier.
+		
+	* src/de/intevation/printlayout/tools/TextDialog.java:
+		The method "isAccepted()" became public. 
+		
+	* src/de/intevation/printlayout/tools/TextInteractor.java:
+		small change of the Consumer interface.
+		createText() --> createNewText().
+
 2007-02-09  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/LayoutFrame.java,

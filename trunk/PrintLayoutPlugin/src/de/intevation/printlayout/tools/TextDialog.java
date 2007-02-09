@@ -257,7 +257,7 @@ implements ColorButton.ColorChangedListener,
 		accepted = b;
 	}
 	
-	protected boolean isAccepted() {
+	public boolean isAccepted() {
 		return accepted;
 	}
 	

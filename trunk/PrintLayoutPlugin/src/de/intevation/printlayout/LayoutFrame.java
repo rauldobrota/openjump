@@ -94,6 +94,7 @@ import de.intevation.printlayout.tools.PickingInteractor;
 import de.intevation.printlayout.tools.TextInteractor;
 import de.intevation.printlayout.tools.BoxFactory;
 import de.intevation.printlayout.tools.TextConsumer;
+import de.intevation.printlayout.tools.TextDialog;
 import de.intevation.printlayout.tools.DrawingAttributes;
 import de.intevation.printlayout.tools.BoxPropertiesDialog;
 import de.intevation.printlayout.tools.Tool;
@@ -115,6 +116,7 @@ implements   PickingInteractor.PickingListener
 	protected	AddScalebarAction  addScalebarAction;
 	protected	AddScaletextAction addScaletextAction;
 	protected	BoxPropAction      boxPropAction;
+	protected TextPropAction     textPropAction;
 
 	protected PickingInteractor  pickingInteractor;
 
@@ -405,16 +407,20 @@ implements   PickingInteractor.PickingListener
 		zoomInAction.putValue(Action.NAME, "+");
 		zoomOutAction.putValue(Action.NAME, "-");
 
-		JButton boxProp = new JButton(
+		JButton boxProp    = new JButton(
 				boxPropAction =new BoxPropAction(pickingInteractor));
+		JButton textProp   = new JButton(
+				textPropAction = new TextPropAction(pickingInteractor));
 		JButton fullExtend = new JButton(fullExtendAction);
 		JButton zoomIn     = new JButton(zoomInAction);
 		JButton zoomOut    = new JButton(zoomOutAction);
 	
 		boxPropAction.setEnabled(false);
+		textPropAction.setEnabled(false);
 		
 		toolBar.addSeparator();
 		toolBar.add(boxProp);
+		toolBar.add(textProp);
 		toolBar.addSeparator();
 		toolBar.add(fullExtend);
 		toolBar.add(zoomIn);
@@ -780,6 +786,12 @@ implements   PickingInteractor.PickingListener
 				N > 0
 				&& DocumentManagerUtils.checkIDsByTag(ids, "rect",
 					docManager.getSVGDocument()));
+		
+		if (textPropAction != null)
+			textPropAction.setEnabled(
+				N > 0
+				&& DocumentManagerUtils.checkIDsByTag(ids, "text",
+					docManager.getSVGDocument()));
 	
 	}
 
@@ -1025,6 +1037,29 @@ implements   PickingInteractor.PickingListener
 				factory.setDrawingAttributes(attr);
 				docManager.modifyDocumentLater(factory.createUpdateModifier(ids));
 			}	
+		}
+	}
+
+	private class TextPropAction extends AbstractAction {
+		private PickingInteractor interactor;
+		private TextConsumer      consumer = new TextConsumer();
+		
+		TextPropAction(final PickingInteractor interactor) {
+			super("");
+			putValue(SMALL_ICON, IconLoader.icon("LabelAbove.gif"));
+			this.interactor = interactor;
+			
+		}
+		public void actionPerformed(ActionEvent ae) {
+			TextDialog dialog = new TextDialog(LayoutFrame.this);
+			dialog.setVisible(true);
+
+			if(dialog.isAccepted() && interactor.getSelectedIDs() != null
+			&& interactor.getSelectedIDs().length > 0)
+				docManager.modifyDocumentLater(
+						consumer.createUpdateModifier(interactor.getSelectedIDs()[0],
+							dialog.getChoosenText(), dialog.getChoosenColor(),
+							dialog.getChoosenFont()));
 		}
 	}
 

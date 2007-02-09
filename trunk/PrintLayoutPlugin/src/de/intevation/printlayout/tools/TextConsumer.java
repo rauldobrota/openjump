@@ -33,11 +33,12 @@ import org.apache.batik.svggen.SVGFont;
 import org.apache.batik.util.XMLConstants;
 
 import de.intevation.printlayout.DocumentManager;
+import de.intevation.printlayout.DocumentManagerUtils;
 import de.intevation.printlayout.MatrixTools;
 
 public class TextConsumer 
 implements TextInteractor.Consumer {
-	public DocumentManager.DocumentModifier createText(
+	public DocumentManager.DocumentModifier createNewText(
 			final String text,
 			final AffineTransform trans,
 			final Color color,
@@ -80,6 +81,32 @@ implements TextInteractor.Consumer {
 
 				sheet.appendChild(xform);
 
+				return null;
+			}
+		};
+	}
+
+	public DocumentManager.DocumentModifier createUpdateModifier(
+		final String id,
+		final String text,
+		final Color color,
+		final Font font
+	) {
+		return new DocumentManager.DocumentModifier() {
+			public Object run(DocumentManager documentManager) {
+				SVGDocument document = documentManager.getSVGDocument();
+				AbstractElement textElement = 
+					DocumentManagerUtils.firstElementByTag(new String[]{id}, "text",
+							document);
+				
+				textElement.setTextContent(text); 
+			 	
+				String[] names = {"stroke", "stroke-opacity", 
+				                  "fill",  "fill-opacity"};
+				ConsumerUtils.setColor(color, names, textElement, document);
+		
+				ConsumerUtils.setAttributesByMap(textElement, 
+						getFontAttrMap(font, document));
 				return null;
 			}
 		};

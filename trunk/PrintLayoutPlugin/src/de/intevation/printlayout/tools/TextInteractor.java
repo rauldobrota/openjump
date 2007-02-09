@@ -38,7 +38,7 @@ implements Tool
   protected Consumer consumer; 
 
 	public interface Consumer {
-		DocumentManager.DocumentModifier createText(String text,
+		DocumentManager.DocumentModifier createNewText(String text,
 				AffineTransform xform,
 				Color color,
 				Font font);
@@ -104,7 +104,7 @@ implements Tool
 			xform.transform(new Point2D.Double(e.getX(), e.getY()), pt);
 
 			xform = AffineTransform.getTranslateInstance(pt.getX(), pt.getY());
-			docManager.modifyDocumentLater(consumer.createText(
+			docManager.modifyDocumentLater(consumer.createNewText(
 					dialog.getChoosenText(),
 					xform,
 					dialog.getChoosenColor(),

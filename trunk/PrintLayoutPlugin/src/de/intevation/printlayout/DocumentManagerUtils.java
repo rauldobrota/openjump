@@ -38,7 +38,7 @@ public class DocumentManagerUtils {
 			String tag,
 			SVGDocument document
 	) {
-		if (!checkIDsByTag(ids, "rect", document))
+		if (!checkIDsByTag(ids, tag, document))
 			return null;
 		
 		for (int i = 0; i < ids.length; i++) {
