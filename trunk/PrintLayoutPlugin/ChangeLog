@@ -1,3 +1,19 @@
+2007-02-12  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	Third part of the text tool.
+	A selected text can be changed by a text properties dialog
+	and the dialog knows the old values.
+
+	* src/de/intevation/printlayout/GUIUtils.java:
+		added getFont and getText methods.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		The text dialog in the TextPropAction gets the
+		old values of the text element.
+	
+	* src/de/intevation/printlayout/tools/TextDialog.java:
+		can now handle null as font.
+	
 2007-02-09  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	Second part of the text tool.
