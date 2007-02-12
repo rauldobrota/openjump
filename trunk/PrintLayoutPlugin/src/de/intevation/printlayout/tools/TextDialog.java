@@ -104,8 +104,9 @@ implements ColorButton.ColorChangedListener,
 		super(owner, "text properties", true);
 		fillFamilyL();
 		fillsizeCB();
-		
-		textArea.setFont(font);
+	
+		if(font != null)
+			textArea.setFont(font);
 		textArea.setText(text);
 
 		colorBtn.setColor(color);

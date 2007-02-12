@@ -14,6 +14,7 @@ package de.intevation.printlayout;
 import java.awt.Color;
 import java.awt.Stroke;
 import java.awt.BasicStroke;
+import java.awt.Font;
 
 import java.util.StringTokenizer;
 
@@ -123,4 +124,28 @@ public class GUIUtils {
 		return el.getAttributeNS(null, attrName);
 	}
 
+	public static String getText(Element el) {
+			return el.getTextContent();
+	}
+
+	public static Font getFont(Element el) {
+		String fontSizeStr   = el.getAttributeNS(null, "font-size");
+		String fontFamilyStr = el.getAttributeNS(null, "font-family");
+		String fontWeightStr = el.getAttributeNS(null, "font-weight");
+		String fontStyleStr  = el.getAttributeNS(null, "font-style");
+
+		return Font.decode(fontFamilyStr.replaceAll("\'" , "") + "-" +
+				getFontStyle(fontWeightStr, fontStyleStr) + "-" + fontSizeStr);
+	}
+	
+	private static String getFontStyle(String weight, String style) {
+		if (weight.equals("bold") && style.equals("italic"))
+			return "bolditalic";
+		else if (weight.equals("bold"))
+			return "bold";
+		else if (style.equals("italic"))
+			return "italic";
+		else 
+			return "plain";
+	}
 }

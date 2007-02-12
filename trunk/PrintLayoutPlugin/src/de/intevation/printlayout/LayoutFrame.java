@@ -1051,7 +1051,15 @@ implements   PickingInteractor.PickingListener
 			
 		}
 		public void actionPerformed(ActionEvent ae) {
-			TextDialog dialog = new TextDialog(LayoutFrame.this);
+			AbstractElement element = DocumentManagerUtils.firstElementByTag(
+					pickingInteractor.getSelectedIDs(),
+					"text",
+					docManager.getSVGDocument());
+			
+			TextDialog dialog = new TextDialog(LayoutFrame.this,
+					GUIUtils.getText(element), 
+					GUIUtils.getFont(element),
+					GUIUtils.getColor(element, "stroke"));
 			dialog.setVisible(true);
 
 			if(dialog.isAccepted() && interactor.getSelectedIDs() != null
