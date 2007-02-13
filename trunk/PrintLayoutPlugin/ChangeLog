@@ -1,3 +1,12 @@
+2007-01-30  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
+
+	Doing the 0.9.0 release.
+
+	* src/de/intevation/printlayout/InfoDialog.java,
+	src/de/intevation/printlayout/resources/info.html: Version to 0.9.0.
+
+	* Changes.txt: Summarized changes for 0.9.0.
+
 2007-02-12  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	Third part of the text tool.

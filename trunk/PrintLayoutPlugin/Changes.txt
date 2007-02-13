@@ -1,6 +1,17 @@
 General Changes of PrintLayout Plugin
 -------------------------------------
 
+Version 0.9.0 (2007-02-13)
+
+  Feature-completeness release.
+
+  * New: Tool for adding text elements.
+  * Improved Rulers.
+  * New: Box properties dialog.
+  * better visibility for selected objects.
+  * panning now directly possible (no pressing of shift anymore).
+  * some minor bug-fixes.
+
 Version 0.8.2 (2007-01-30)
 
   Maintenance 'bullet-proof' release.
