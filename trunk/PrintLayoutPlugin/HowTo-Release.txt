@@ -1,24 +1,38 @@
 Guide for developers for creating a new release
 -----------------------------------------------
 
+0. Make sure, the current version compiles and works
+   nicely.
+
 1. Change Version number (N.N.N) in
    src/de/intevation/printlayout/InfoDialog.java
    src/de/intevation/printlayout/resources/info.html
 
-2. Updated file
+2. Update file
    Changes.txt
+   which summarizes ChangeLog for normal users.
 
-3. $ cd etc
+3. Check in the three files together with ChangeLog.
+   See the last release information in ChangLog.
+
+4. $ cd etc
    $ ant clean dist
    $ cd ..
 
-4. $ cd ..
+5. $ cd ..
    $ mkdir PrintLayoutPlugin-N.N.N
    $ cp PrintLayoutPlugin/INSTALL.txt PrintLayoutPlugin-N.N.N
    $ cp PrintLayoutPlugin/dist/printlayoutplugin-YYYYMMDD.jar PrintLayoutPlugin-N.N.N/printlayoutplugin.jar
+   $ cd PrintLayoutPlugin-N.N.N
+   $ cvs -d:pserver:anonymous@jump-pilot.cvs.sourceforge.net:/cvsroot/jump-pilot login
+   (just hit return)
+   $ cvs -z3 -d:pserver:anonymous@jump-pilot.cvs.sourceforge.net:/cvsroot/jump-pilot co -P PrintLayoutPlugin
+   $ zip -r PrintLayoutPlugin.src.zip PrintLayoutPlugin
+   $ rm -rf PrintLayoutPlugin
+   $ cd ..
    $ zip -r PrintLayoutPlugin-N.N.N.zip PrintLayoutPlugin-N.N.N
 
-5. Upload to SourceForge:
+6. Upload to SourceForge:
    $ ftp upload.sourceforge.net
    Login as "anonymous"
    Use your e-mail address as the password for this login
@@ -27,4 +41,4 @@ Guide for developers for creating a new release
    ftp> put PrintLayoutPlugin-N.N.N
    ftp> exit
 
-6. Create release "N.N.N" on SourceForge
+7. Create release "N.N.N" on SourceForge

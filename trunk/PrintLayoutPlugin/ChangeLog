@@ -1,4 +1,9 @@
-2007-01-30  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
+2007-02-13  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
+
+	* HowTo-Release.txt: Updated to include source code and
+	refined here and there.
+
+2007-02-13  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
 
 	Doing the 0.9.0 release.
 
