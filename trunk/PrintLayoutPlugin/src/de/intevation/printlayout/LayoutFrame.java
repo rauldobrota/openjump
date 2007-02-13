@@ -187,7 +187,8 @@ implements   PickingInteractor.PickingListener
 		AddMapAction       addMapAction       = new AddMapAction();
 		                   addScalebarAction  = new AddScalebarAction();
 		                   addScaletextAction = new AddScaletextAction();
-		AboutDialogAction  infoDialogAction   = new AboutDialogAction(); 
+		AboutDialogAction  aboutDialogAction  = new AboutDialogAction();
+		InfoDialogAction   infoDialogAction   = new InfoDialogAction();
 
 		fileMenu.add(loadSessionAction);
 		fileMenu.add(saveSessionAction);
@@ -220,6 +221,7 @@ implements   PickingInteractor.PickingListener
 		addScaletextAction.setEnabled(false);
 		
 		infoMenu.add(infoDialogAction);
+		infoMenu.add(aboutDialogAction);
 
 		JMenuBar menubar = new JMenuBar();
 
@@ -971,9 +973,22 @@ implements   PickingInteractor.PickingListener
 					I18N.getString("LayoutFrame.ShowAboutDialog", "&About...")));
 		}
 		public void actionPerformed(ActionEvent ae) {
-			InfoDialog.showDialog(LayoutFrame.this);
+			InfoDialog.showDialog(LayoutFrame.this, "resources/about.html");
 		}
 	}
+
+	private class InfoDialogAction extends AbstractAction {
+		InfoDialogAction() {
+			super(I18N.getName(
+					I18N.getString("LayoutFrame.ShowInfoDialog", "&Info...")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.ShowInfoDialog", "&Info...")));
+		}
+		public void actionPerformed(ActionEvent ae) {
+			InfoDialog.showDialog(LayoutFrame.this, "resources/info.html");
+		}
+	}
+	
 
 	private class SwitchPaperSizeAction extends AbstractAction {
 		SwitchPaperSizeAction(String text, String actionCmd) {

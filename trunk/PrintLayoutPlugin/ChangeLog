@@ -1,3 +1,25 @@
+2007-02-13  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	added a help dialog.
+	
+	* src/de/intevation/printlayout/resources/about.html:
+		New. The text of the about dialog.
+	
+	* src/de/intevation/printlayout/resources/info_de.html:
+		New. The German text of the help dialog.
+		
+	* src/de/intevation/printlayout/resources/info.html:
+		contains the English text of the help dialog.
+
+	* src/de/intevation/printlayout/InfoDialog.java:
+		Added a getLocalizedResource() method and used
+		this to get the resource.
+		Added a new constructor with variable resource.
+		
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		used the new constructor to display the info
+		dialog and the about dialog.
+	
 2007-02-13  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
 
 	* HowTo-Release.txt: Updated to include source code and

@@ -18,21 +18,27 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
+
+import java.util.Locale;
+
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JEditorPane;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ByteArrayOutputStream;
-
 public class InfoDialog extends JDialog {
 
 	public static String resource = "resources/info.html";
 	
 	public InfoDialog(JFrame owner) {
+		this(owner, resource);
+	}
+	
+	public InfoDialog(JFrame owner, String resource) {
 		super(owner);
 
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -52,7 +58,13 @@ public class InfoDialog extends JDialog {
 		add(south, BorderLayout.SOUTH);
 
 		setTitle("Print/Layout v0.9.0");
-		InputStream is = InfoDialog.class.getResourceAsStream(resource);
+		InputStream is = InfoDialog.class.getResourceAsStream(
+				getLocalizedResource(resource));
+		if (is == null) {
+			is = InfoDialog.class.getResourceAsStream(resource);
+		
+		}
+		
     String text;
 		
 		if (is == null)
@@ -86,5 +98,18 @@ public class InfoDialog extends JDialog {
 		InfoDialog dialog = new InfoDialog(owner);
 		dialog.setVisible(true);
 	
+	}
+
+	public static void showDialog(JFrame owner, String resource) {
+		InfoDialog dialog = new InfoDialog(owner, resource);
+		dialog.setVisible(true);
+	}
+
+	private static String getLocalizedResource(String str) {
+		Locale locale = Locale.getDefault();
+		if (str.lastIndexOf('.') > -1)
+			return str.substring(0, str.lastIndexOf('.')) + "_"+ locale.getLanguage()
+					+ str.substring(str.lastIndexOf('.'));
+		return str;
 	}
 }
