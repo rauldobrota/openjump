@@ -1,4 +1,16 @@
 2007-02-14  Ludwig Reiter  <ludwig.reiter@intevation.de>
+	
+	I18n of the text dialog and the box dialog.
+
+	* src/de/intevation/printlayout/i18n/messages.properties,
+	  src/de/intevation/printlayout/i18n/messages_de.properties:
+		added some new messages.
+
+	* src/de/intevation/printlayout/tools/BoxPropertiesDialog.java,
+	  src/de/intevation/printlayout/tools/TextDialog.java:
+	  	installed the i18n of the dialogs.
+
+2007-02-14  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	small bugfixes.
 

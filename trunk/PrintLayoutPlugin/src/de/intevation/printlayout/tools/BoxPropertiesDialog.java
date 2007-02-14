@@ -60,8 +60,9 @@ extends JDialog
 	protected JPanel createButtonPanel() {
 		JPanel buttonPanel = new JPanel();
 
-		JButton okBtn = new JButton(I18N.getString("Ok", "Ok"));
-		JButton cancelBtn = new JButton(I18N.getString("Cancel", "Cancel"));
+		JButton okBtn = new JButton(I18N.getString("PropertiesDialog.Ok", "Ok"));
+		JButton cancelBtn = new JButton(
+				I18N.getString("PropertiesDialog.Cancel", "Cancel"));
 
 		buttonPanel.add(okBtn);
 		buttonPanel.add(cancelBtn);

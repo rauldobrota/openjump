@@ -40,6 +40,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 
+import de.intevation.printlayout.I18N;
+
 public class TextDialog 
 extends JDialog
 implements ColorButton.ColorChangedListener,
@@ -101,7 +103,7 @@ implements ColorButton.ColorChangedListener,
 	}
 
 	public TextDialog(JFrame owner, String text, Font font, Color color) {
-		super(owner, "text properties", true);
+		super(owner, I18N.getString("TextDialog.Title", "text properties"), true);
 		fillFamilyL();
 		fillsizeCB();
 	
@@ -164,7 +166,8 @@ implements ColorButton.ColorChangedListener,
 	
 	protected void createGUI() {
 		textArea.setRows(10);
-		textArea.setBorder(new TitledBorder("text:"));
+		textArea.setBorder(new TitledBorder(
+					I18N.getString("TextDialog.Text", "text")));
 		familyL.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		styleL.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		styleL.setVisibleRowCount(4);
@@ -180,7 +183,9 @@ implements ColorButton.ColorChangedListener,
 	protected JPanel createPropertiesPanel() {
 		JPanel panel = new JPanel(new GridLayout(1,2));
 
-		panel.add(createTitledPanel("font family:", new JScrollPane(familyL)));
+		panel.add(createTitledPanel(
+					I18N.getString("TextDialog.FontFamily", "font family"),
+					new JScrollPane(familyL)));
 		panel.add(createStyleSizeColorPanel());
 		
 		return panel;
@@ -201,11 +206,14 @@ implements ColorButton.ColorChangedListener,
 	protected JPanel createStyleSizeColorPanel() {
 		JPanel panel = new JPanel(new BorderLayout());
 
-		JPanel stylePanel = createTitledPanel("style:", new JScrollPane(styleL));
+		JPanel stylePanel = createTitledPanel(
+				I18N.getString("TextDialog.Style", "style"), new JScrollPane(styleL));
 
 		JPanel sizeColorPanel = new JPanel(new GridLayout(2,1));
-		sizeColorPanel.add(createTitledPanel("size:", sizeCB));
-		sizeColorPanel.add(createTitledPanel("color:", colorBtn));
+		sizeColorPanel.add(createTitledPanel(
+					I18N.getString("TextDialog.Size", "size"), sizeCB));
+		sizeColorPanel.add(createTitledPanel(
+					I18N.getString("TextDialog.Color", "color"), colorBtn));
 
 		panel.add(stylePanel, BorderLayout.CENTER);
 		panel.add(sizeColorPanel, BorderLayout.SOUTH);
@@ -231,8 +239,9 @@ implements ColorButton.ColorChangedListener,
 	}
 	
 	protected JPanel createControlButtonsPanel() {
-		JButton okBtn = new JButton("Ok");
-		JButton cancelBtn = new JButton("Cancel");
+		JButton okBtn = new JButton(I18N.getString("PropertiesDialog.Ok", "Ok"));
+		JButton cancelBtn = new JButton(
+				I18N.getString("PropertiesDialog.Cancel", "Cancel"));
 		
 		okBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
