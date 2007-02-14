@@ -11,9 +11,6 @@
  */
 package de.intevation.printlayout.tools;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import org.w3c.dom.svg.SVGDocument;
 
 import org.apache.batik.dom.AbstractElement;

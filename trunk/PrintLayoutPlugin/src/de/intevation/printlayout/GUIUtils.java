@@ -20,6 +20,7 @@ import java.util.StringTokenizer;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import org.w3c.dom.css.CSSStyleDeclaration;
 import org.w3c.dom.css.CSSValue;
@@ -125,7 +126,23 @@ public class GUIUtils {
 	}
 
 	public static String getText(Element el) {
+		if (!el.hasChildNodes())	
 			return el.getTextContent();
+			
+		NodeList children = el.getChildNodes();
+		StringBuffer sb = new StringBuffer();
+
+		for (int N = children.getLength(), i = 0; i < N; i++) {
+			Element tspan = (Element) children.item(i);
+			if ("tspan".equals(tspan.getTagName())) {
+				sb.append(tspan.getTextContent());
+				sb.append("\n");
+			}
+		}
+		if (sb.length() > 0)
+			sb.deleteCharAt(sb.length() -1);
+		
+		return sb.toString();
 	}
 
 	public static Font getFont(Element el) {

@@ -19,12 +19,17 @@ import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 
 import java.util.Map;
+import java.util.StringTokenizer;
+
+import org.w3c.dom.NodeList;
 
 import org.w3c.dom.svg.SVGDocument;
 
 import org.apache.batik.dom.AbstractElement;
+import org.apache.batik.dom.AbstractDocument;
 
 import org.apache.batik.dom.svg.SVGDOMImplementation;
+import org.apache.batik.dom.svg.SVGOMTSpanElement;
 
 import org.apache.batik.svggen.SVGGeneratorContext;
 import org.apache.batik.svggen.SVGFontDescriptor;
@@ -55,7 +60,12 @@ implements TextInteractor.Consumer {
 				textElement.setAttributeNS(XMLConstants.XML_NAMESPACE_URI,
 						"space", "preserve");
 
-				textElement.appendChild(document.createTextNode(text));
+				//textElement.appendChild(document.createTextNode(text));
+				configureTextElement(
+						textElement, 
+						text, 
+						font != null ? font.getSize() : 14,
+						documentManager.getSVGDocument());
 				
 				String[] names = {"stroke", "stroke-opacity", 
 				                  "fill",  "fill-opacity"};
@@ -100,7 +110,15 @@ implements TextInteractor.Consumer {
 				AbstractElement textElement = 
 					DocumentManagerUtils.getIDObjectByTag(idElement, "text");
 				
-				textElement.setTextContent(text); 
+				//textElement.setTextContent(text);
+				NodeList children = textElement.getChildNodes();
+				for (int j = children.getLength()-1; j > -1; j--) 
+					textElement.removeChild(children.item(j));
+				configureTextElement(
+						textElement, 
+						text, 
+						font != null ? font.getSize() : 14,
+						documentManager.getSVGDocument());
 			 	
 				String[] names = {"stroke", "stroke-opacity", 
 				                  "fill",  "fill-opacity"};
@@ -124,6 +142,24 @@ implements TextInteractor.Consumer {
 				null, true, true));
 		
 		return sfd.getAttributeMap(null);
+	}
+
+	protected void configureTextElement(
+			AbstractElement element,
+			String text,
+			int fontsize,
+			SVGDocument document
+	) {
+		StringTokenizer lines = new StringTokenizer(text, "\n");
+		for (; lines.hasMoreTokens();) {
+			AbstractElement tspan = 
+				 new SVGOMTSpanElement(null, (AbstractDocument)document);
+			tspan.setAttributeNS(null, "x", "0");
+			tspan.setAttributeNS(null, "dy", String.valueOf(fontsize + 2));
+			tspan.appendChild(document.createTextNode(lines.nextToken()));
+
+			element.appendChild(tspan);
+		}
 	}
 
 }

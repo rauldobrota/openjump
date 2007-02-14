@@ -11,11 +11,7 @@
  */
 package de.intevation.printlayout;
 
-import java.util.ArrayList;
-
 import org.w3c.dom.NodeList;
-
-import org.w3c.dom.svg.SVGDocument;
 
 import org.apache.batik.dom.AbstractElement;
 

@@ -1,5 +1,22 @@
 2007-02-14  Ludwig Reiter  <ludwig.reiter@intevation.de>
 	
+	Fourth part of the text tool.
+	Used the tspan tag to create newlines in texts.
+	Removed some wrong imports.
+
+	* src/de/intevation/printlayout/DocumentManagerUtils.java,
+	  src/de/intevation/printlayout/tools/BoxUpdateModifier.java:
+		removed imports.
+		
+	* src/de/intevation/printlayout/GUIUtils.java:
+		the getText method accepts text with tspan tags.
+
+	* src/de/intevation/printlayout/tools/TextConsumer.java:
+		now uses configureTextElement to append tspan lines
+		into the text element. So that newlines are displayed.
+
+2007-02-14  Ludwig Reiter  <ludwig.reiter@intevation.de>
+	
 	change of the methods of DocumentManagerUtils and adjusting
 	the Modifier.
 	The only rect/text elements which are wanted to be modified,
