@@ -1,3 +1,43 @@
+2007-02-14  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	- Fixes a nasty bug in selection tool: If you moved a selected
+	  object too fast around (large deltas) the handles of the
+	  selected object were not redrawn properly (only partial visible).
+
+	- Fixes some wrong file names in headers (C&P mistakes).
+
+	* src/de/intevation/printlayout/LayoutCanvas.java:
+		Offers a new interface DamageRegion. An implementor
+		can determine the damaged area on screen before the
+		drawing is actually done. Incoming repaint() requests
+		are enlarged so that the repaint is done on the complete
+		forseen damaged region. Batik trys to optimize the
+		redraw by minimizing the repaint region. If you use overlays
+		this region is calculated too small because Batik does
+		not know where the overlay will do its painting. 
+		
+	* src/de/intevation/printlayout/tools/PickingInteractor.java:
+		if activated the selection tool is registered as a
+		DamageRegion to the LayoutCanvas, so the real damage done
+		by its overlay can be calculated before repainting.
+
+	* src/de/intevation/printlayout/tools/OnScreenBox.java:
+		The calculation of the damage and  the drawing are now
+		separated to fit in the forecast model of DamageRegion.
+
+	* src/de/intevation/printlayout/ExtraData.java,
+	  src/de/intevation/printlayout/GUIUtils.java,
+	  src/de/intevation/printlayout/InfoDialog.java,
+	  src/de/intevation/printlayout/MatrixTools.java,
+	  src/de/intevation/printlayout/PatternExt.java,
+	  src/de/intevation/printlayout/Template.java,
+	  src/de/intevation/printlayout/tools/Arrows.java,
+	  src/de/intevation/printlayout/tools/BoxPropPanel.java,
+	  src/de/intevation/printlayout/tools/ColorButton.java,
+	  src/de/intevation/printlayout/tools/ConsumerUtils.java,
+	  src/de/intevation/printlayout/tools/TextConsumer.java:
+		Corrected wrong file names in headers.
+	
 2007-02-14  Ludwig Reiter  <ludwig.reiter@intevation.de>
 	
 	Fourth part of the text tool.

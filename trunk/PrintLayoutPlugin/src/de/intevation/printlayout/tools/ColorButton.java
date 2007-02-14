@@ -1,6 +1,6 @@
 /*
  * ColorButton.java
- * ----------------------
+ * ----------------
  * (c) 2007 by Intevation GmbH
  *
  * @author Sascha L. Teichmann (teichmann@intevation.de)

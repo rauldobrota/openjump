@@ -17,6 +17,8 @@ import java.awt.Component;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.BasicStroke;
+import java.awt.RenderingHints;
+import java.awt.Shape;
 
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
@@ -35,6 +37,7 @@ import org.apache.batik.dom.svg.SVGGraphicsElement;
 
 import de.intevation.printlayout.MatrixTools;
 import de.intevation.printlayout.DocumentManager;
+import de.intevation.printlayout.LayoutCanvas;
 
 import org.w3c.dom.svg.SVGSVGElement;
 import org.w3c.dom.svg.SVGMatrix;
@@ -50,7 +53,7 @@ import java.util.EventListener;
 
 public class PickingInteractor
 extends      InteractorAdapter
-implements   Overlay, Tool
+implements   Overlay, Tool, LayoutCanvas.DamagedRegion
 {
 	public static final String IDENTIFIER = "picking-tool";
 
@@ -153,6 +156,8 @@ implements   Overlay, Tool
 	protected int startX;
 	protected int startY;
 
+	protected int renderTime = -1;
+
 	protected TransformOperation transformOperation;
 
 	protected int decoration = SCALE_DECORATION;
@@ -195,12 +200,17 @@ implements   Overlay, Tool
 		return IDENTIFIER;
 	}
 
-	public void setInUse(boolean inUse) {
-		if (this.inUse) {
+	public void setInUse(boolean flag) {
+		if (inUse != flag) {
+			inUse = flag;
 			clearSelection();
-			documentManager.getCanvas().repaint();
+			LayoutCanvas canvas = documentManager.getCanvas();
+			if (inUse)
+				canvas.addDamagedRegion(this);
+			else
+				canvas.removeDamagedRegion(this);
+			canvas.repaint();
 		}
-		this.inUse = inUse;
 	}
 
 	public boolean getInUse() {
@@ -395,24 +405,19 @@ implements   Overlay, Tool
       10f,
       new float [] { 5 },
       0f);
-  
-	public void paint(Graphics g) {
+
+
+	public Rectangle damagedRegion() {
 		if (!inUse || selected == null)
-			return;
-
-		Graphics2D g2d = (Graphics2D)g;
-
-		g2d.setPaint(Color.red);
-		g2d.setStroke(RUBBER);
-
-		SVGDocument document = documentManager.getSVGDocument();
+			return null;
 
 		int BEFORE = selected.size();
 
-		Rectangle damaged = new Rectangle();
+		Rectangle damaged = null;
+
+		SVGDocument document = documentManager.getSVGDocument();
 
 		for (int i = 0; i < selected.size();) {
-
 			OnScreenBox box = (OnScreenBox)selected.get(i);
 
 			SVGGraphicsElement element =
@@ -430,26 +435,99 @@ implements   Overlay, Tool
 
 			AffineTransform xform = MatrixTools.toJavaTransform(matrix);
 
+			box.setTransformTime(renderTime);
 			box.bbox2shape(bbox, xform);
-			box.draw(g2d, damaged);
+			damaged = LayoutCanvas.enlarge(damaged, box.getShape().getBounds());
 		}
-
 
 		int NOW = selected.size();
 
 		// if only one is selected draw decoration
-		if (NOW == 1)
-			((OnScreenBox)selected.get(0))
-				.drawDecoration(g2d, decoration, damaged);
+		if (NOW == 1) {
+			OnScreenBox box = (OnScreenBox)selected.get(0);
+			damaged = LayoutCanvas.enlarge(damaged, box.buildDecoration(decoration));
+		}
 
-		documentManager.getCanvas().damagedRegion(damaged);
-		
 		// some one has removed selected objects from DOM
 		// inform listeners that selection is no longer valid
 		if (BEFORE != NOW) {
-
 			if (NOW == 0) resetSelection();
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					fireSelectionChanged();
+				}
+			});
+		}
 
+		return damaged;
+	}
+  
+	public void paint(Graphics g) {
+		if (!inUse || selected == null)
+			return;
+
+		Graphics2D g2d = (Graphics2D)g;
+
+		Object oldAntialias =
+			g2d.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+
+		g2d.setRenderingHint(
+			RenderingHints.KEY_ANTIALIASING,
+			RenderingHints.VALUE_ANTIALIAS_ON);
+
+		g2d.setPaint(Color.red);
+		g2d.setStroke(RUBBER);
+
+		SVGDocument document = documentManager.getSVGDocument();
+
+		int BEFORE = selected.size();
+
+		for (int i = 0; i < selected.size();) {
+
+			OnScreenBox box = (OnScreenBox)selected.get(i);
+
+			SVGGraphicsElement element =
+				(SVGGraphicsElement)document.getElementById(box.getID());
+
+			if (element == null) { // not available any longer
+				selected.remove(i);
+				continue;
+			}
+
+			++i;
+
+			if (box.getTransformTime() != renderTime) {
+				box.setTransformTime(renderTime);
+				SVGMatrix matrix = element.getScreenCTM();
+				AffineTransform xform = MatrixTools.toJavaTransform(matrix);
+				SVGRect bbox = element.getBBox();
+				box.bbox2shape(bbox, xform);
+			}
+			Shape shape = box.getShape();
+			if (shape != null)
+				g2d.draw(shape);
+		}
+
+		int NOW = selected.size();
+
+		// if only one is selected draw decoration
+		if (NOW == 1) {
+			OnScreenBox box = (OnScreenBox)selected.get(0);
+			if (!box.hasDecoration())
+				box.buildDecoration(decoration);
+			box.drawDecoration(g2d);
+		}
+
+		++renderTime;
+
+		g2d.setRenderingHint(
+			RenderingHints.KEY_ANTIALIASING,
+			oldAntialias);
+
+		// some one has removed selected objects from DOM
+		// inform listeners that selection is no longer valid
+		if (BEFORE != NOW) {
+			if (NOW == 0) resetSelection();
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					fireSelectionChanged();

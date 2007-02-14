@@ -18,6 +18,7 @@ import java.awt.BasicStroke;
 import java.awt.Rectangle;
 
 import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
 import org.w3c.dom.svg.SVGRect;
@@ -28,7 +29,6 @@ public class OnScreenBox
 {
 	public static final Object OUTSIDE        = null;
 	public static final Object INSIDE         = new Object();
-	//public static final int INSIDE_DECORATION = 2;
 
 	protected String     id;
 	protected Shape      shape;
@@ -37,6 +37,8 @@ public class OnScreenBox
 
 	protected Shape []   decoration;
 
+	protected int        transformTime;
+
 	public OnScreenBox() {
 	}
 
@@ -44,28 +46,12 @@ public class OnScreenBox
 		this.id = id;
 	}
 
-	protected Object insideRect(int x, int y) {
+	public int getTransformTime() {
+		return transformTime;
+	}
 
-		for (int i = 0; i < points.length; ++i) {
-			int j = (i + 1) % points.length;
-
-			Point2D p1 = points[i];
-			Point2D p2 = points[j];
-
-			double dx = p1.getX() - p2.getX();
-			double dy = p1.getY() - p2.getY();
-
-			double nx = dy;
-			double ny = -dx;
-
-			// nx*p1.x + ny*p1.y + b = 0
-			double b = -(nx*p1.getX() + ny*p1.getY());
-
-			if (x*nx + y*ny + b > 0d)
-				return OUTSIDE;
-		}
-
-		return INSIDE;
+	public void setTransformTime(int transformTime) {
+		this.transformTime = transformTime;
 	}
 
 	public Object inside(int x, int y) {
@@ -77,7 +63,9 @@ public class OnScreenBox
 				if (decoration[i].contains(x, y))
 					return points[(i+2)%points.length];
 
-		return insideRect(x, y);
+		return getShape().contains(x, y)
+			? INSIDE
+			: OUTSIDE;
 	}
 
 	public boolean equals(Object other) {
@@ -92,11 +80,15 @@ public class OnScreenBox
 		return id;
 	}
 
-	public void bbox2shape(SVGRect bbox, AffineTransform xform) {
+	public Rectangle bbox2shape(SVGRect bbox, AffineTransform xform) {
 
-		if (points == null)
+		if (points == null) {
 			points = new Point2D[4];
+			for (int i = 0; i < points.length; ++i)
+				points[i] = new Point2D.Double();
+		}
 
+		shape      = null;
 		decoration = null;
 
 		double x1 = bbox.getX();
@@ -106,19 +98,21 @@ public class OnScreenBox
 		double y2 = y1 + bbox.getHeight();
 
 		Point2D.Double src = new Point2D.Double(x1, y1);
-		xform.transform(src, points[0] = new Point2D.Double());
+		xform.transform(src, points[0]);
 
 		/* src.x = x1; */ src.y = y2;
-		xform.transform(src, points[1] = new Point2D.Double());
+		xform.transform(src, points[1]);
 
 		src.x = x2;  /* src.y = y2; */
-		xform.transform(src, points[2] = new Point2D.Double());
+		xform.transform(src, points[2]);
 
 		/* src.x = x2; */  src.y = y1;
-		xform.transform(src, points[3] = new Point2D.Double());
+		xform.transform(src, points[3]);
+
+		return getShape().getBounds();
 	}
 
-	protected void buildDecoration(int type) {
+	public Rectangle buildDecoration(int type) {
 
 		switch (type) {
 			case PickingInteractor.SCALE_DECORATION:
@@ -130,6 +124,13 @@ public class OnScreenBox
 			default:
 				decoration = null;
 		}
+		if (decoration != null && decoration.length > 0) {
+			Rectangle damaged = decoration[0].getBounds();
+			for (int i = 1; i < decoration.length; ++i)
+				damaged.add(decoration[i].getBounds());
+			return damaged;
+		}
+		return null;
 	}
 
 	protected void buildScaleDecoration() {
@@ -202,53 +203,53 @@ public class OnScreenBox
 		decoration = new Shape [] { s1, s2, s3, s4 };
 	}
 
-	public void draw(Graphics2D g2d, Rectangle damaged) {
-		if (points == null)
-			return;
+	public Shape getShape() {
+		if (shape == null && points != null) {
+			GeneralPath path = new GeneralPath();
 
-		int minX = Integer.MAX_VALUE;
-		int minY = Integer.MAX_VALUE;
-		int maxX = Integer.MIN_VALUE;
-		int maxY = Integer.MIN_VALUE;
+			path.moveTo(
+				(float)points[0].getX(),
+				(float)points[0].getY());
 
-		for (int i = 0; i < points.length; ++i) {
-			int j = (i + 1) % points.length;
+			for (int i = 1; i <= points.length; ++i) {
+				Point2D p = points[i % points.length];
+				path.lineTo((float)p.getX(), (float)p.getY());
+			}
 
-			Point2D p1 = points[i];
-			Point2D p2 = points[j];
-
-			int p2x = (int)Math.round(p2.getX());
-			int p2y = (int)Math.round(p2.getY());
-
-			if (p2x < minX) minX = p2x;
-			if (p2x > maxY) maxX = p2x;
-			if (p2y < minY) minY = p2y;
-			if (p2y > maxY) maxY = p2y;
-
-			g2d.drawLine(
-				(int)Math.round(p1.getX()), (int)Math.round(p1.getY()), 
-				p2x, p2y);
+			path.closePath();
+			shape = path;
 		}
+		return shape;
+	}
 
-		damaged.add(new Rectangle(
-			minX, minY, maxX-minX+1, maxY-minY+1));
+	public Rectangle draw(Graphics2D g2d) {
+		if (points == null)
+			return null;
+
+		Shape shape = getShape();
+
+		g2d.draw(shape);
+		
+		return shape.getBounds();
 	}
 
 	public static final BasicStroke STROKE = new BasicStroke(2f);
 
-	public void drawDecoration(Graphics2D g2d, int type, Rectangle damaged) {
+	public boolean hasDecoration() {
+		return decoration != null;
+	}
 
-		buildDecoration(type);
+	public void drawDecoration(Graphics2D g2d) {
 
-		for (int i = 0; i < decoration.length; ++i) {
-			Shape deco = decoration[i];
-			g2d.setPaint(Color.red);
-			g2d.fill(deco);
-			g2d.setPaint(Color.black);
-			g2d.setStroke(STROKE);
-			g2d.draw(deco);
-			damaged.add(deco.getBounds());
-		}
+		if (decoration != null)
+			for (int i = 0; i < decoration.length; ++i) {
+				Shape deco = decoration[i];
+				g2d.setPaint(Color.red);
+				g2d.fill(deco);
+				g2d.setPaint(Color.black);
+				g2d.setStroke(STROKE);
+				g2d.draw(deco);
+			}
 	}
 }
 // end of file

@@ -1,5 +1,5 @@
 /*
- * MatriyTools.java
+ * MatrixTools.java
  * ----------------
  * (c) 2007 by Intevation GmbH
  *
