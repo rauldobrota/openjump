@@ -1,3 +1,17 @@
+2007-02-14  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	small bugfixes.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		added accelerator key to the info dialog.
+
+	* src/de/intevation/printlayout/resources/info.html,
+	  src/de/intevation/printlayout/resources/info_de.html:
+		rewrited the texts.
+
+	* src/de/intevation/printlayout/tools/BoxFactory.java:
+		changed the pointer-events property of a box.
+	
 2007-02-13  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	added a help dialog.

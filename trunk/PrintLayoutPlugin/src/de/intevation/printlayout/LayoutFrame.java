@@ -983,6 +983,8 @@ implements   PickingInteractor.PickingListener
 					I18N.getString("LayoutFrame.ShowInfoDialog", "&Info...")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.ShowInfoDialog", "&Info...")));
+			putValue(Action.ACCELERATOR_KEY, 
+					KeyStroke.getKeyStroke("F1"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			InfoDialog.showDialog(LayoutFrame.this, "resources/info.html");

@@ -68,8 +68,8 @@ implements   BoxInteractor.Factory
 				setRectAttributes(box, rect);
 				
 				configureBoxElement(box, document);	
-
-				box.setAttributeNS(null, "pointer-events", "all");
+			
+				
 
 				group.setAttributeNS(null, "id", documentManager.uniqueObjectID());
         group.appendChild(box);
@@ -106,6 +106,11 @@ implements   BoxInteractor.Factory
 			Map attributeMap = getStrokeAttrMap((BasicStroke) stroke, document);
 			ConsumerUtils.setAttributesByMap(box, attributeMap);
 		}
+		if (fillColor != null)
+			box.setAttributeNS(null, "pointer-events", "all");
+		else
+			box.setAttributeNS(null, "pointer-events", "stroke");
+			
 	}
 	
 	protected Map getStrokeAttrMap(BasicStroke stroke, SVGDocument document) {
