@@ -1,5 +1,26 @@
 2007-02-14  Ludwig Reiter  <ludwig.reiter@intevation.de>
 	
+	change of the methods of DocumentManagerUtils and adjusting
+	the Modifier.
+	The only rect/text elements which are wanted to be modified,
+	are the only child of an element with leaf id.
+	So the algorithmens of the firstElementByTag and the getElementByTag
+	methods cost much and were wrong.
+	So I replaced them.
+	Now only a single selected rect/text can be modified and the
+	getElementById method is mostly used.
+
+	* src/de/intevation/printlayout/DocumentManagerUtils.java:
+		replaced firstElementByTag an getElementByTag
+		by getIDObjectByTag.
+
+	* src/de/intevation/printlayout/LayoutFrame.java,
+	  src/de/intevation/printlayout/tools/BoxUpdateModifier.java,
+	  src/de/intevation/printlayout/tools/TextConsumer.java:
+	  	adjusted.
+
+2007-02-14  Ludwig Reiter  <ludwig.reiter@intevation.de>
+	
 	I18n of the text dialog and the box dialog.
 
 	* src/de/intevation/printlayout/i18n/messages.properties,

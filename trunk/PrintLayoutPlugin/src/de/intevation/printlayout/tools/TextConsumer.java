@@ -95,9 +95,10 @@ implements TextInteractor.Consumer {
 		return new DocumentManager.DocumentModifier() {
 			public Object run(DocumentManager documentManager) {
 				SVGDocument document = documentManager.getSVGDocument();
+				AbstractElement idElement = (AbstractElement)
+					documentManager.getSVGDocument().getElementById(id);
 				AbstractElement textElement = 
-					DocumentManagerUtils.firstElementByTag(new String[]{id}, "text",
-							document);
+					DocumentManagerUtils.getIDObjectByTag(idElement, "text");
 				
 				textElement.setTextContent(text); 
 			 	

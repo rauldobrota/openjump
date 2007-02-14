@@ -785,16 +785,15 @@ implements   PickingInteractor.PickingListener
 	
 		if (boxPropAction != null)
 			boxPropAction.setEnabled(
-				N > 0
-				&& DocumentManagerUtils.checkIDsByTag(ids, "rect",
-					docManager.getSVGDocument()));
+				N == 1
+				&& DocumentManagerUtils.checkIDObjectByTag(
+					getElementById(ids[0]), "rect"));
 		
 		if (textPropAction != null)
 			textPropAction.setEnabled(
-				N > 0
-				&& DocumentManagerUtils.checkIDsByTag(ids, "text",
-					docManager.getSVGDocument()));
-	
+				N == 1
+				&& DocumentManagerUtils.checkIDObjectByTag(
+					getElementById(ids[0]), "text"));
 	}
 
 	/*
@@ -1041,10 +1040,9 @@ implements   PickingInteractor.PickingListener
 		public void actionPerformed(ActionEvent ae) {
 			DrawingAttributes oldAttr = 
 				GUIUtils.getRectDrawingAttributs(
-				DocumentManagerUtils.firstElementByTag(
-				pickingInteractor.getSelectedIDs(),
-				"rect",
-				docManager.getSVGDocument()));
+					DocumentManagerUtils.getIDObjectByTag(
+						getElementById(pickingInteractor.getSelectedIDs()[0]),
+						"rect"));
 			DrawingAttributes attr = 
 				BoxPropertiesDialog.showDialog(LayoutFrame.this, oldAttr);
 			String [] ids = interactor.getSelectedIDs();
@@ -1056,7 +1054,11 @@ implements   PickingInteractor.PickingListener
 			}	
 		}
 	}
-
+	
+	protected AbstractElement getElementById(String id) {
+		return (AbstractElement)docManager.getSVGDocument().getElementById(id);
+	}
+	
 	private class TextPropAction extends AbstractAction {
 		private PickingInteractor interactor;
 		private TextConsumer      consumer = new TextConsumer();
@@ -1068,10 +1070,9 @@ implements   PickingInteractor.PickingListener
 			
 		}
 		public void actionPerformed(ActionEvent ae) {
-			AbstractElement element = DocumentManagerUtils.firstElementByTag(
-					pickingInteractor.getSelectedIDs(),
-					"text",
-					docManager.getSVGDocument());
+			AbstractElement element = DocumentManagerUtils.getIDObjectByTag(
+					getElementById(pickingInteractor.getSelectedIDs()[0]),
+					"text");
 			
 			TextDialog dialog = new TextDialog(LayoutFrame.this,
 					GUIUtils.getText(element), 

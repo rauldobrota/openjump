@@ -48,13 +48,10 @@ implements DocumentManager.DocumentModifier
 			BoxFactory factory = new 	BoxFactory();
 			factory.setDrawingAttributes(attributes);
 			
-			ArrayList nodes 
-				= DocumentManagerUtils.getElementByTag(element, "rect");
+			AbstractElement rect
+				= DocumentManagerUtils.getIDObjectByTag(element, "rect");
 		
-			for (Iterator iter = nodes.iterator(); iter.hasNext();) {
-				AbstractElement rect = (AbstractElement) iter.next();
-				factory.configureBoxElement(rect , document);
-			}
+			factory.configureBoxElement(rect , document);
 		}
 		
 		return null;
