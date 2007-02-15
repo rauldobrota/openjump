@@ -829,7 +829,7 @@ implements   PickingInteractor.PickingListener
 					I18N.getString("LayoutFrame.ExportPDF", "Export PDF...")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.ExportPDF", "Export PDF...")));	
-			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control X"));
+			//putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control X"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			exportPDF();
@@ -842,7 +842,7 @@ implements   PickingInteractor.PickingListener
 					I18N.getString("LayoutFrame.ImportImage", "Import Image...")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.ImportImage", "Import Image...")));
-			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control I"));
+			//putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control I"));
 		}
 
 		public void actionPerformed(ActionEvent ae) {
@@ -856,7 +856,7 @@ implements   PickingInteractor.PickingListener
 					I18N.getString("LayoutFrame.ImportSVG", "Import SVG...")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.ImportSVG", "Import SVG...")));
-			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control V"));
+			//putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control V"));
 		}
 
 		public void actionPerformed(ActionEvent ae) {
@@ -883,7 +883,7 @@ implements   PickingInteractor.PickingListener
 					I18N.getString("LayoutFrame.AddMap", "Add Map")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.AddMap", "Add Map")));
-			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control M"));
+			//putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control M"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			addMap();
@@ -896,7 +896,7 @@ implements   PickingInteractor.PickingListener
 					I18N.getString("LayoutFrame.Close", "Close")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.Close", "Close")));
-			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control C"));
+			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control W"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			LayoutFrame.this.dispose();
@@ -935,7 +935,7 @@ implements   PickingInteractor.PickingListener
 					I18N.getString("LayoutFrame.Ungroup", "Ungroup")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.Ungroup", "Ungroup")));
-			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl U"));
+			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("shift ctrl G"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			ungroup();
@@ -948,7 +948,7 @@ implements   PickingInteractor.PickingListener
 					I18N.getString("LayoutFrame.AddScaleBar", "Add Scale&bar")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.AddScaleBar", "Add Scale&bar")));
-			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl B"));
+			//putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl B"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			addScaleBar();
@@ -961,7 +961,7 @@ implements   PickingInteractor.PickingListener
 					I18N.getString("LayoutFrame.AddScaleText", "Add S&caletext")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.AddScaleText", "Add S&caletext")));
-			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl T"));
+			//putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl T"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			addScaleText();
@@ -1011,7 +1011,7 @@ implements   PickingInteractor.PickingListener
 					I18N.getString("LayoutFrame.SaveSession", "S&ave...")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.SaveSession", "S&ave...")));
-			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control S"));
+		  //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control S"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			saveSession();
@@ -1024,7 +1024,7 @@ implements   PickingInteractor.PickingListener
 					I18N.getString("LayoutFrame.LoadSession", "&Load...")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.LoadSession", "&Load...")));
-			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control L"));
+			//putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control O"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			loadSession();
@@ -1099,7 +1099,7 @@ implements   PickingInteractor.PickingListener
 					I18N.getString("LayoutFrame.ShowRuler", "&Show Ruler")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.ShowRuler", "&Show Ruler")));
-			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control R"));
+			//putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control R"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			activateRuler(((JCheckBoxMenuItem)ae.getSource()).getState());

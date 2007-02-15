@@ -1,4 +1,9 @@
-2007-02-14  Ludwig Reiter  <ludwig.reiter@intevation.de>
+2007-02-15  Ludwig Reiter  <ludwig.reiter@intevation.de>
+	
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		changed the accelerator keys.
+
+2007-02-15  Ludwig Reiter  <ludwig.reiter@intevation.de>
 	
 	added some icons for the zooming buttons.
 
