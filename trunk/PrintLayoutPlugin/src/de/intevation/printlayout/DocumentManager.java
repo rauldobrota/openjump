@@ -61,13 +61,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileOutputStream;
+import java.io.FileInputStream;
 import java.io.FilterOutputStream;
 import java.io.BufferedOutputStream;
 import java.io.OutputStream;
+import java.io.FileNotFoundException;
 
 import java.util.ArrayList;
 import java.util.Stack;
 
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipOutputStream;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipEntry;
@@ -407,6 +411,11 @@ public class DocumentManager
 			Transformer        transformer = factory.newTransformer();
 
 			StreamResult outputTarget = new StreamResult(file);
+			OutputStream outputStream = null;
+			if (file.getName().endsWith("z")) {
+				outputTarget =  new StreamResult(
+					outputStream = new GZIPOutputStream(new FileOutputStream(file)));
+			}
 			DOMSource    xmlSource    = new DOMSource(innerSVG);
 
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
@@ -416,12 +425,19 @@ public class DocumentManager
 			transformer.setOutputProperty(
 				"{http://xml.apache.org/xslt}indent-amount", "2");
 			transformer.transform(xmlSource, outputTarget);
+			
+			if (outputStream != null) {
+				outputStream.close();
+			}
 		} 
 		catch (TransformerConfigurationException e) {
 			e.printStackTrace();
 		}
 		catch (TransformerException e) {
 			e.printStackTrace();
+		}
+		catch (IOException ioe) {
+			ioe.printStackTrace();
 		}
 	}
 
@@ -760,7 +776,11 @@ public class DocumentManager
 
 		try {
 			String uri = file.toURL().toString();
-			appendSVG((AbstractDocument)factory.createDocument(uri), null);
+			if (file.getName().endsWith("z"))
+				appendSVG((AbstractDocument)factory.createDocument(uri,
+							new GZIPInputStream(new FileInputStream(file))), null);
+			else
+				appendSVG((AbstractDocument)factory.createDocument(uri), null);
 		}
 		catch (IOException ioe) {
 			ioe.printStackTrace();

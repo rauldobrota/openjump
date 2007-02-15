@@ -588,7 +588,10 @@ implements   PickingInteractor.PickingListener
 
 	protected void exportPDF() {
 		JFileChooser fc = new JFileChooser(lastDirectory);
-
+		fc.setFileFilter(new FileUtils.MultiExtFileFilter(
+					new String[]{"pdf"},
+					"*.pdf: PDF Document"));
+		
 		int result = fc.showSaveDialog(docManager.getCanvas());
 
 		lastDirectory = fc.getCurrentDirectory();
@@ -597,14 +600,19 @@ implements   PickingInteractor.PickingListener
 			return;
 
 		File file = fc.getSelectedFile();
-
+		file = FileUtils.addExtIfNeeded(file, new String[] {"pdf"}, ".pdf");
+		
 		docManager.exportPDF(file);
 	}
 
 
 	protected void exportSVG() {
 		JFileChooser fc = new JFileChooser(lastDirectory);
-
+		String[] exts = {"svg", "svgz"};
+		fc.setFileFilter(new FileUtils.MultiExtFileFilter(
+					exts,
+					"*.svg, *.svgz: SVG(Z) Document"));
+		
 		int result = fc.showSaveDialog(docManager.getCanvas());
 
 		lastDirectory = fc.getCurrentDirectory();
@@ -613,13 +621,17 @@ implements   PickingInteractor.PickingListener
 			return;
 
 		File file = fc.getSelectedFile();
-
+		file = FileUtils.addExtIfNeeded(file, exts, ".svg");
+		
 		docManager.exportSVG(file);
 	}
 
 	protected void importSVG() {
 
 		JFileChooser fc = new JFileChooser(lastDirectory);
+		fc.setFileFilter(new FileUtils.MultiExtFileFilter(
+					new String[] { "svg", "svgz"},
+					"*.svg, *.svgz: SVG(Z) Document"));
 
 		int result = fc.showOpenDialog(docManager.getCanvas());
 
@@ -664,7 +676,15 @@ implements   PickingInteractor.PickingListener
 	protected void importImage() {
 
 		JFileChooser fc = new JFileChooser(lastDirectory);
-
+		fc.setFileFilter(new FileUtils.MultiExtFileFilter(
+					new String[] {"gif"}, "*.gif" ));
+		fc.addChoosableFileFilter(new FileUtils.MultiExtFileFilter(
+					new String[] {"jpeg"}, "*.jpeg" ));
+		fc.addChoosableFileFilter(new FileUtils.MultiExtFileFilter(
+					new String[] {"tiff", "tif"}, "*.tiff, *.tif" ));
+		
+		
+		
 		int result = fc.showOpenDialog(docManager.getCanvas());
 
 		lastDirectory = fc.getCurrentDirectory();

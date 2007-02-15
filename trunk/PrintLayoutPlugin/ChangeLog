@@ -1,5 +1,19 @@
 2007-02-15  Ludwig Reiter  <ludwig.reiter@intevation.de>
 	
+	added file filter and svgz support.
+
+	* src/de/intevation/printlayout/FileUtils.java:
+		New. Contains a generic FileFilter and a class method
+		to append an extension, if needed.
+	
+	* src/de/intevation/printlayout/DocumentManager.java:
+		added svgz support.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		added file filter.
+
+2007-02-15  Ludwig Reiter  <ludwig.reiter@intevation.de>
+	
 	* src/de/intevation/printlayout/LayoutFrame.java:
 		changed the accelerator keys.
 
