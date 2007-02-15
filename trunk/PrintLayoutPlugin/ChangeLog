@@ -1,3 +1,16 @@
+2007-02-14  Ludwig Reiter  <ludwig.reiter@intevation.de>
+	
+	added some icons for the zooming buttons.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		installed new icons.
+
+	* src/de/intevation/printlayout/resources/Magnify11.gif,
+	  src/de/intevation/printlayout/resources/Magnifyminus.gif,
+	  src/de/intevation/printlayout/resources/Magnifyplus.gif,
+	  src/de/intevation/printlayout/resources/ZoomIconLoader.java:
+	  	New. Icons and loader.
+
 2007-02-14  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	- Fixes a nasty bug in selection tool: If you moved a selected

@@ -88,6 +88,8 @@ import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 
 import com.vividsolutions.jts.geom.Envelope;
 
+import de.intevation.printlayout.resources.ZoomIconLoader;
+
 import de.intevation.printlayout.tools.PanInteractor;
 import de.intevation.printlayout.tools.BoxInteractor;
 import de.intevation.printlayout.tools.PickingInteractor;
@@ -404,10 +406,12 @@ implements   PickingInteractor.PickingListener
 		Action zoomOutAction =
 			actionMap.get(LayoutCanvas.ZOOM_OUT_ACTION);
 
-		// TODO: store icon here
-		fullExtendAction.putValue(Action.NAME, "1:1");
-		zoomInAction.putValue(Action.NAME, "+");
-		zoomOutAction.putValue(Action.NAME, "-");
+		fullExtendAction.putValue(Action.SMALL_ICON,
+				ZoomIconLoader.icon("Magnify11.gif"));
+		zoomInAction.putValue(Action.SMALL_ICON,
+				ZoomIconLoader.icon("Magnifyplus.gif"));
+		zoomOutAction.putValue(Action.SMALL_ICON,
+				ZoomIconLoader.icon("Magnifyminus.gif"));
 
 		JButton boxProp    = new JButton(
 				boxPropAction =new BoxPropAction(pickingInteractor));
