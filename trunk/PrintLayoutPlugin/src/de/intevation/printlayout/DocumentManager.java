@@ -100,8 +100,8 @@ import java.awt.image.RenderedImage;
 import javax.imageio.ImageIO;
 
 /**
- *	Main class. It handles the operations of the DOM document.
- *	(Like printing, exporting, saving/loading projects, updating).
+ *  Main class. It handles the operations of the SVG document.
+ *  (Like printing, exporting, saving/loading projects, updating).
  */
 public class DocumentManager
 {
@@ -117,7 +117,20 @@ public class DocumentManager
 	protected ExtraData    extraData;
 	
 	/**
-	 * should be used to modify documents.
+	 * Use this interface to work on the SVG document.
+	 *
+	 * If you want to do operations on the SVG document (especially chage it),
+	 * you need to do this inside an UpdateManager(UM).
+	 * This is for synchronising the document with the Batik scenegraph.
+	 *
+	 * The DocumentManager works together with the modifyDocumentLater and
+	 * the modifyDocumentNow methods. These two methods gives easy access
+	 * to the UpdateManager.
+	 * You have to implement the DocumentModifier interface and send it to one 
+	 * of these methods to work on the document.
+	 *
+	 * Note: Every new added data element should be inserted
+	 * into a g element with an unique object ID.
 	 */
 	public interface DocumentModifier {
 		Object run(DocumentManager documentManager);
@@ -226,10 +239,11 @@ public class DocumentManager
 	}
 
 	/**
-	 * modifies the document. This is the correct way to modify a document.
-	 * First write a DocumentModifier containing the modifiy code in the 
-	 * run method, then use this methode.
-	 */	
+	 * used to work on the SVG document. Mainly this method should be used
+	 * for modifing the document.
+	 * 
+	 * @param modifier used to describe the modifications.
+	 */ 
 	public void modifyDocumentLater(final DocumentModifier modifier) {
 		UpdateManager um = svgCanvas.getUpdateManager();
 
@@ -245,6 +259,11 @@ public class DocumentManager
 		});
 	}
 
+	/**
+	 * tries to mofify the document at once. Normally modifyDocumentLater
+	 * should be used.
+	 * @param modifier used to describe the modifications.
+	 */
 	public Object modifyDocumentNow(final DocumentModifier modifier) {
 		UpdateManager um = svgCanvas.getUpdateManager();
 
@@ -619,13 +638,13 @@ public class DocumentManager
 
 		DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
 
-    String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
 
 		AbstractDocument newDocument = (AbstractDocument)
 			impl.createDocument(svgNS, "svg", null);
 
 		NodeList children = sheet.getChildNodes();
-		
+
 		AbstractElement newRoot = 
 			(AbstractElement)newDocument.getDocumentElement();
 
@@ -871,11 +890,25 @@ public class DocumentManager
 		setAttrib(svg, "width",  px2mm, viewBox.getWidth());
 		setAttrib(svg, "height", px2mm, viewBox.getHeight());
 	}     
- 
+
+	/**
+	 * used to create an unique object leaf id.
+	 */
 	public String uniqueObjectID() {
 		return uniqueObjectID(true);
 	}
 
+	/**
+	 * used to create unique object ids and object leaf ids..
+	 * 
+	 * There are to kinds of ids: object ids and object leaf ids.
+	 * A single text, rect or etc element should be child of a "g"
+	 * element with an unique object leaf id.
+	 * That is also right for a map, because the subtree of a map
+	 * should remain as a whole.
+	 *
+	 * A group of elements normallly has an unique object id.
+	 */
 	public String uniqueObjectID(boolean leaf) {
 		String idString;
 		String prefix = leaf ? OBJECT_ID_LEAF : OBJECT_ID;
@@ -1042,10 +1075,30 @@ public class DocumentManager
 			modificationCallback.run(this, xform);
 	}
 
+	/**
+	 * used to search for different objects.
+	 * This interface works together with the visit method.
+	 */
 	protected interface ElementVisitor {
+		/**
+		 * looks at an element, chooses to save it and returns a status.
+		 * The method DocumentManager.visit stops searching, 
+		 * if visit returns false.
+		 * 
+		 * @param element the scaned element.
+		 * @return        status, true if the search should continue
+		 *												false if not.
+		 */
 		boolean visit(AbstractElement element);
 	}
 
+	/**
+	 * searchs the subtree of element. Looks for element with object id or
+	 * object leaf id and asks the visitor about them.
+	 * @param element the subtree of this element is searched.
+	 * @param visitor knows what to do with elements with ids.
+	 * @return false, if the search is stopped, else true.
+	 */
 	protected static boolean visit(
 		AbstractElement element,
 		ElementVisitor  visitor
