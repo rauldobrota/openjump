@@ -102,14 +102,36 @@ import javax.imageio.ImageIO;
 /**
  *  Main class. It handles the operations of the SVG document.
  *  (Like printing, exporting, saving/loading projects, updating).
+ *  It is also the place to modify a document.
  */
 public class DocumentManager
 {
+	/**
+	 * token of the layout sheet.
+	 * In the SVG document always exist such a element.
+	 * This element contains the paper size.
+	 */
 	public static final String DOCUMENT_SHEET = "viewer-layout-sheet-svg";
+	
+	/**
+	 * token of the white rect below the sheet.
+	 */
 	public static final String DOCUMENT_BELOW = "viewer-layout-below";
+	
+	/**
+	 * object id prefix.
+	 */
 	public static final String OBJECT_ID      = "viewer-layout-id";
+	
+	/**
+	 * object leaf id prefix.
+	 */
 	public static final String OBJECT_ID_LEAF = "viewer-layout-id-leaf";
 
+
+	/**
+	 * stores the LayoutCanvas, which contains the SVG document.
+	 */
 	protected LayoutCanvas svgCanvas;
 
 	protected int          objectID;
@@ -144,6 +166,10 @@ public class DocumentManager
 		extraData = new ExtraData();
 	}
 
+	/**
+	 * should be used. The DocumentManager needs the LayoutCanvas, because
+	 * it contains the SVG document.
+	 */
 	public DocumentManager(LayoutCanvas svgCanvas) {
 		this();
 		this.svgCanvas = svgCanvas;
@@ -200,20 +226,39 @@ public class DocumentManager
 		return extraData.hasChangeListeners(id);
 	}
 
+	/**
+	 * returns the internal LayoutCanvas.
+	 * @return svgCanvas
+	 */
 	public LayoutCanvas getCanvas() {
 		return svgCanvas;
 	}
-
+	
+	/**
+	 * returns the managed SVG document from the svgCanvas.
+	 * @return the document.
+	 */
 	public SVGDocument getSVGDocument() {
 		return svgCanvas.getSVGDocument();
 	}
 
+	/**
+	 * stores the paper size from the document sheet into the size
+	 * array.
+	 * @param size two dimensional array containing width and height
+	 */
 	public void getPaperSize(double [] size) {
 		SVGDocument document = svgCanvas.getSVGDocument();
 		if (document != null)
 			getPaperSize(document, size);
 	}
 
+	/**
+	 * helper method for getPaperSize
+	 * 
+	 * @param document the svg document
+	 * @param size two dimensional array containing width and height
+	 */
 	public static void getPaperSize(SVGDocument document, double [] size) {
 
 		AbstractElement sheet =
@@ -234,6 +279,10 @@ public class DocumentManager
 		}
 	}
 
+	/**
+	 * sets the svg document to the LayoutCanvas.
+	 * @param document the new SVG document.
+	 */
 	public void setDocument(SVGDocument document) {
 		svgCanvas.setSVGDocument(document);
 	}
@@ -289,14 +338,30 @@ public class DocumentManager
 		return result[0];
 	}
 
+	/**
+	 * adds a text to the middle of the sheet of the document.
+	 *
+	 * @param text  the text
+	 */	
 	public void addText(String text) {
 		addText(text, null);
 	}
 
+	/**
+	 * is a generator for element.
+	 * It works together with the addCenteredElement method.
+	 */
 	public interface ElementGenerator {
 		AbstractElement generateElement(DocumentManager document);
 	}
 
+	/**
+	 * addes an element in the center of the sheet.
+	 * The element is created by the ElementGenerator.
+	 * 
+	 * @param generator used to create a SVG element.
+	 * @param callback  called after inserting the element.
+	 */
 	public void addCenteredElement(
 		final ElementGenerator     generator, 
 		final ModificationCallback callback
@@ -353,6 +418,13 @@ public class DocumentManager
 		});
 	}
 
+	/**
+	 * adds text to a document.
+	 * The callback is called after adding the text.
+	 *
+	 * @param text the text added to the document.
+	 * @param callback invoked after text adding.
+	 */
 	public void addText(final String text, final ModificationCallback callback) {
 		modifyDocumentLater(new DocumentModifier() {
 			public Object run(DocumentManager documentManager) {
@@ -406,6 +478,11 @@ public class DocumentManager
 		});
 	}
 
+	/**
+	 * export the SVG to a file.
+	 * It uses the UpdateManager and exportSVGWithinUM.
+	 * @param file destination.
+	 */
 	public void exportSVG(final File file) {
 
 		UpdateManager um = svgCanvas.getUpdateManager();
@@ -422,6 +499,10 @@ public class DocumentManager
 		});
 	}
 
+	/**
+	 * helper method for exportSVG. It should be called in a UpdateManager.
+	 * @param file destination
+	 */
 	public void exportSVGwithinUM(File file) {
 		AbstractDocument innerSVG = isolateInnerDocument();
 
@@ -460,6 +541,10 @@ public class DocumentManager
 		}
 	}
 
+	/**
+	 * loads a PrintLayoutPlugin session from a file.
+	 * @param file source
+	 */
 	public void loadSession(File file) {
 
 		ZipFile zip = null;
@@ -534,6 +619,14 @@ public class DocumentManager
 
 	}
 
+	/**
+	 * helper method for loadSession. It should be called inside a 
+	 * UpdateManager and then sets all the information for displaying
+	 * the svg.
+	 * 
+	 * @param extraData the new ExtraData 
+	 * @param document  the new SVG document
+	 */
 	protected void loadSessionWithInUM(
 		ExtraData   extraData,
 		SVGDocument document
@@ -542,6 +635,10 @@ public class DocumentManager
 		setDocument(document);
 	}
 
+	/**
+	 * saves the PrintLayoutPlugin session to a file-
+	 * @param file destination.
+	 */
 	public void saveSession(final File file) {
 		modifyDocumentLater(new DocumentModifier() {
 			public Object run(DocumentManager manager) {
@@ -551,6 +648,11 @@ public class DocumentManager
 		});
 	}
 
+	/**
+	 * helper method for saveSession. It should be called inside an 
+	 * UpdateManager.
+	 * @param file destination.
+	 */
 	protected void saveSessionWithinUM(File file) {
 
 		AbstractDocument document =
@@ -622,6 +724,12 @@ public class DocumentManager
 		return isolateInnerDocument(null);
 	}
 
+	/**
+	 * extracts the inner document form a SVG document.
+	 * It should be run in synced context.
+	 * @param aspectRatio sets this string to the preserveAspectRatio attribute
+	 * of the root node.
+	 */
 	public AbstractDocument isolateInnerDocument(String aspectRatio) {
 
 		AbstractDocument document = (AbstractDocument)svgCanvas.getSVGDocument();
@@ -676,6 +784,11 @@ public class DocumentManager
 		return newDocument;
 	}
 
+	/**
+	 * switches to a new document. If a new paper size is choosen,
+	 * this method is called.
+	 * @param newDocument the new SVG document.
+	 */
 	public void switchToDocument(final SVGDocument newDocument) {
 		modifyDocumentLater(new DocumentModifier() {
 			public Object run(DocumentManager manager) {
@@ -685,6 +798,11 @@ public class DocumentManager
 		});
 	}
 
+	/**
+	 * helper method for switchToDocument. It should be invoked inside
+	 * an UpdateManager.
+	 * @param newDocument the new document.
+	 */
 	protected void switchToDocumentWithinUM(SVGDocument newDocument) {
 
 		AbstractDocument document =
@@ -712,6 +830,10 @@ public class DocumentManager
 		setDocument(newDocument);
 	}
 
+	/**
+	 * appends an image to the document.
+	 * @param file source of the image.
+	 */
 
 	public void appendImage(File file) {
 		try {
@@ -788,6 +910,10 @@ public class DocumentManager
 		}
 	}
 
+	/**
+	 * append the data of a svg(z) file to the document.
+	 * @param file source of the svg(z) data.
+	 */
 	public void appendSVG(File file) {
 
 		String parser = XMLResourceDescriptor.getXMLParserClassName();
@@ -806,6 +932,13 @@ public class DocumentManager
 		}
 	}
 
+	/**
+	 * appends a SVG document with an affine transformation into the document of
+	 * this manager.
+	 *
+	 * @param document the document to append.
+	 * @param xform    the transform.
+	 */
 	public void appendSVG(
 		AbstractDocument document, 
 		AffineTransform  xform
@@ -922,8 +1055,10 @@ public class DocumentManager
 		return idString;
 	}    
 
+	/**
+	 * prints the document of this manager.
+	 */
  	public void print() {
-
 		modifyDocumentLater(new DocumentModifier() {
 			public Object run(DocumentManager documentManager) {
 				SVGDocument document = documentManager.getSVGDocument();
@@ -998,6 +1133,10 @@ public class DocumentManager
 		});
 	}          
 
+	/**
+	 * exports the document as PDF to a file.
+	 * @param file the destination of the pdf.
+	 */
 	public void exportPDF(final File file) {
 		modifyDocumentLater(new DocumentModifier() {
 			public Object run(DocumentManager documentManager) {
@@ -1034,6 +1173,15 @@ public class DocumentManager
 		});
 	}
 
+	/**
+	 * helper method for appending SVG documents to the document of 
+	 * this manager.
+	 * 
+	 * @param newDocument the new document.
+	 * @param matrix   an affine transform of the new document.
+	 * @param adjustView should the view be adjusted?
+	 * @param modificationCallback called after the adding. It can be null.
+	 */
 	public void appendSVGwithinUM(
 		AbstractDocument     newDocument, 
 		AffineTransform      matrix,
@@ -1180,6 +1328,10 @@ public class DocumentManager
 		});
 	}
 
+	/**
+	 * removes element subtrees which root has an specific id.
+	 * @param ids  the ids which should be removed.
+	 */
 	public void removeIDs(final String [] ids) {
 		modifyDocumentLater(new DocumentModifier() {
 			public Object run(DocumentManager documentManager) {
@@ -1208,6 +1360,10 @@ public class DocumentManager
 		});
 	}
 
+	/**
+	 * groups some element together.
+	 * @param ids  the elements with this ids are grouped together.
+	 */
 	public void groupIDs(final String [] ids) {
 		if (ids == null || ids.length < 2)
 			return;
@@ -1261,9 +1417,11 @@ public class DocumentManager
 		});
 	}
 
+	/**
+	 * ungroups elements by id.
+	 * @param ids the elements to ungroup.
+	 */
 	public void ungroupIDs(final String [] ids) {
-
-
 		modifyDocumentLater(new DocumentModifier() {
 			public Object run(DocumentManager documentManager) {
 
@@ -1344,7 +1502,13 @@ public class DocumentManager
 		});
 	}
 
-
+	/**
+	 * translates the elements by a delta.
+	 * Should be called inside an UpdateManager.
+	 * 
+	 * @param ids translated elements
+	 * @param screenDelta the delta
+	 */
 	public void translateIDs(final String [] ids, final Point2D screenDelta) {
 
 		if (ids == null || ids.length == 0)
@@ -1400,6 +1564,9 @@ public class DocumentManager
 		});
 	}
 
+	/**
+	 * scales some elements
+	 */
 	public void scaleFixedIDs(
 		final String [] ids, 
 		final Point2D   screenDelta,
@@ -1482,6 +1649,9 @@ public class DocumentManager
 		});
 	}
 
+	/**
+	 * scales some elements
+	 */
 	public void scaleIDs(
 		final String [] ids, 
 		final Point2D   screenDelta,
@@ -1563,6 +1733,9 @@ public class DocumentManager
 		});
 	}
 
+	/**
+	 * rotates some elements
+	 */
 	public void rotateIDs(
 		final String [] ids, 
 		final Point2D   screenDelta,
@@ -1646,83 +1819,5 @@ public class DocumentManager
 			}
 		});
 	}
-	
-	/*
-	public static void decorateWithRulers(SVGDocument document) {
-		if (document == null)
-			return;
-
-		AbstractElement root =
-			(AbstractElement)document.getElementById(DOCUMENT_BELOW);
-
-		if (root == null) {
-			System.err.println("'" + DOCUMENT_BELOW + "' no found");
-			return;
-		}
-
-		double [] sizes = new double[2];
-		getPaperSize(document, sizes);
-
-		// down
-		root.appendChild(line(document, 17d, 20d, 17d, sizes[1] + 20d));
-		// right
-		root.appendChild(line(document, 20d, 17d, sizes[0]+ 20d, 17d));
-
-		int count = 0;
-
-		// markings x
-		double end = sizes[0];
-		for (double x = 0d; x <= end; ++x) {
-
-			double length;
-					 if (count == 0) length = 7d;
-			else if (count == 5) length = 3.5d;
-			else                 length = 2d;
-
-			if (++count > 9) count = 0;
-
-			root.appendChild(
-				line(document, 20d+x, 17d, 20d+x, 17d-length));
-		}
-
-		count = 0;
-
-		// markings y
-		end = sizes[1];
-		for (double y = 0d; y <= end; ++y) {
-
-			double length;
-					 if (count == 0) length = 7d;
-			else if (count == 5) length = 3.5d;
-			else                 length = 2d;
-
-			if (++count > 9) count = 0;
-
-			root.appendChild(
-				line(document, 17d, 20d+y, 17d-length, 20d+y));
-		}
-	}
-
-	protected static AbstractElement line(
-		SVGDocument document,
-		double x1, double y1,
-		double x2, double y2
-	) 
-	{
-		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
-
-		AbstractElement l = 
-			(AbstractElement)document.createElementNS(svgNS, "line");
-		
-		l.setAttributeNS(null, "x1", String.valueOf(x1));
-		l.setAttributeNS(null, "y1", String.valueOf(y1));
-		l.setAttributeNS(null, "x2", String.valueOf(x2));
-		l.setAttributeNS(null, "y2", String.valueOf(y2));
-		l.setAttributeNS(null, "stroke", "black");
-		l.setAttributeNS(null, "stroke-width", "0.5"); 
-	
-		return l;
-	}
-	*/
 }
 // end of file
