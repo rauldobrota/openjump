@@ -9,7 +9,7 @@
  * This program is free software under the LGPL (>=v2.1)
  * Read the file LICENSE.txt coming with the sources for details.
  */
-package de.intevation.printlayout;
+package de.intevation.printlayout.tools;
 
 import org.apache.batik.swing.gvt.Overlay;
 
@@ -35,6 +35,11 @@ import org.w3c.dom.svg.SVGLocatable;
 import org.w3c.dom.svg.SVGMatrix;
 
 import java.util.ArrayList;
+
+import de.intevation.printlayout.util.MatrixTools;
+
+import de.intevation.printlayout.DocumentManager;
+
 
 public class RulerOverlay
 implements   Overlay

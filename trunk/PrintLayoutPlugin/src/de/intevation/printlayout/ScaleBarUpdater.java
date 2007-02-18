@@ -26,6 +26,8 @@ import org.apache.batik.dom.AbstractElement;
 
 import org.apache.batik.dom.svg.SVGDOMImplementation; 
 
+import de.intevation.printlayout.util.MatrixTools;
+
 public class ScaleBarUpdater
 implements   Serializable, DocumentManager.ElementGenerator
 {

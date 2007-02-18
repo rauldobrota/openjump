@@ -23,7 +23,7 @@ import java.awt.geom.Point2D;
 
 import org.w3c.dom.svg.SVGRect;
 
-import de.intevation.printlayout.GeometricMath;
+import de.intevation.printlayout.util.GeometricMath;
 
 public class OnScreenBox
 {

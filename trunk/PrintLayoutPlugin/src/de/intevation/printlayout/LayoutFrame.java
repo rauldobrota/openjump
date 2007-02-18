@@ -28,6 +28,7 @@ import javax.swing.ActionMap;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.ImageIcon;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -88,8 +89,6 @@ import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-import de.intevation.printlayout.resources.ZoomIconLoader;
-
 import de.intevation.printlayout.tools.PanInteractor;
 import de.intevation.printlayout.tools.BoxInteractor;
 import de.intevation.printlayout.tools.PickingInteractor;
@@ -100,12 +99,26 @@ import de.intevation.printlayout.tools.TextDialog;
 import de.intevation.printlayout.tools.DrawingAttributes;
 import de.intevation.printlayout.tools.BoxPropertiesDialog;
 import de.intevation.printlayout.tools.Tool;
+import de.intevation.printlayout.tools.RulerOverlay;
+
+import de.intevation.printlayout.util.FileFilter;
+import de.intevation.printlayout.util.PaperSizes;
+import de.intevation.printlayout.util.MatrixTools;
 
 
 public class LayoutFrame 
 extends      JFrame
 implements   PickingInteractor.PickingListener
 {
+	public static final String ZOOM_IN_ICON =
+		"resources/Magnifyplus.gif";
+
+	public static final String ZOOM_OUT_ICON =
+		"resources/Magnifyminus.gif";
+
+	public static final String ZOOM_100_ICON =
+		"resources/Magnify11.gif";
+
   protected DocumentManager    docManager;
 
 	protected PlugInContext      pluginContext;
@@ -406,15 +419,20 @@ implements   PickingInteractor.PickingListener
 		Action zoomOutAction =
 			actionMap.get(LayoutCanvas.ZOOM_OUT_ACTION);
 
-		fullExtendAction.putValue(Action.SMALL_ICON,
-				ZoomIconLoader.icon("Magnify11.gif"));
-		zoomInAction.putValue(Action.SMALL_ICON,
-				ZoomIconLoader.icon("Magnifyplus.gif"));
-		zoomOutAction.putValue(Action.SMALL_ICON,
-				ZoomIconLoader.icon("Magnifyminus.gif"));
+		fullExtendAction.putValue(
+			Action.SMALL_ICON,
+			new ImageIcon(getClass().getResource(ZOOM_100_ICON)));
+
+		zoomInAction.putValue(
+			Action.SMALL_ICON,
+			new ImageIcon(getClass().getResource(ZOOM_IN_ICON)));
+
+		zoomOutAction.putValue(
+			Action.SMALL_ICON,
+			new ImageIcon(getClass().getResource(ZOOM_OUT_ICON)));
 
 		JButton boxProp    = new JButton(
-				boxPropAction =new BoxPropAction(pickingInteractor));
+				boxPropAction  = new BoxPropAction(pickingInteractor));
 		JButton textProp   = new JButton(
 				textPropAction = new TextPropAction(pickingInteractor));
 		JButton fullExtend = new JButton(fullExtendAction);
@@ -588,9 +606,9 @@ implements   PickingInteractor.PickingListener
 
 	protected void exportPDF() {
 		JFileChooser fc = new JFileChooser(lastDirectory);
-		fc.setFileFilter(new FileUtils.MultiExtFileFilter(
-					new String[]{"pdf"},
-					"*.pdf: PDF Document"));
+		FileFilter ff = new FileFilter("pdf", "*.pdf: PDF Document");
+
+		fc.setFileFilter(ff);
 		
 		int result = fc.showSaveDialog(docManager.getCanvas());
 
@@ -600,7 +618,8 @@ implements   PickingInteractor.PickingListener
 			return;
 
 		File file = fc.getSelectedFile();
-		file = FileUtils.addExtIfNeeded(file, new String[] {"pdf"}, ".pdf");
+
+		file = ff.addExtIfNeeded(file);
 		
 		docManager.exportPDF(file);
 	}
@@ -608,10 +627,12 @@ implements   PickingInteractor.PickingListener
 
 	protected void exportSVG() {
 		JFileChooser fc = new JFileChooser(lastDirectory);
-		String[] exts = {"svg", "svgz"};
-		fc.setFileFilter(new FileUtils.MultiExtFileFilter(
-					exts,
-					"*.svg, *.svgz: SVG(Z) Document"));
+
+		FileFilter ff = new FileFilter(
+			new String [] { "svg", "svgz" },
+			"*.svg, *.svgz: SVG(Z) Document");
+
+		fc.setFileFilter(ff);
 		
 		int result = fc.showSaveDialog(docManager.getCanvas());
 
@@ -621,7 +642,7 @@ implements   PickingInteractor.PickingListener
 			return;
 
 		File file = fc.getSelectedFile();
-		file = FileUtils.addExtIfNeeded(file, exts, ".svg");
+		file = ff.addExtIfNeeded(file);
 		
 		docManager.exportSVG(file);
 	}
@@ -629,9 +650,12 @@ implements   PickingInteractor.PickingListener
 	protected void importSVG() {
 
 		JFileChooser fc = new JFileChooser(lastDirectory);
-		fc.setFileFilter(new FileUtils.MultiExtFileFilter(
-					new String[] { "svg", "svgz"},
-					"*.svg, *.svgz: SVG(Z) Document"));
+
+		FileFilter ff = new FileFilter(
+			new String[] { "svg", "svgz" },
+			"*.svg, *.svgz: SVG(Z) Document");
+
+		fc.setFileFilter(ff);
 
 		int result = fc.showOpenDialog(docManager.getCanvas());
 
@@ -676,14 +700,11 @@ implements   PickingInteractor.PickingListener
 	protected void importImage() {
 
 		JFileChooser fc = new JFileChooser(lastDirectory);
-		fc.setFileFilter(new FileUtils.MultiExtFileFilter(
-					new String[] {"gif"}, "*.gif" ));
-		fc.addChoosableFileFilter(new FileUtils.MultiExtFileFilter(
-					new String[] {"jpeg"}, "*.jpeg" ));
-		fc.addChoosableFileFilter(new FileUtils.MultiExtFileFilter(
-					new String[] {"tiff", "tif"}, "*.tiff, *.tif" ));
-		
-		
+		fc.setFileFilter(new FileFilter("gif", "*.gif"));
+		fc.addChoosableFileFilter(
+			new FileFilter(new String[] { "jpg", "jpeg" }, "*.jpeg"));
+		fc.addChoosableFileFilter(
+			new FileFilter(new String[] {"tiff", "tif"}, "*.tiff, *.tif" ));
 		
 		int result = fc.showOpenDialog(docManager.getCanvas());
 

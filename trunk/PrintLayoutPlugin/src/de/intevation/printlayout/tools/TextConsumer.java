@@ -39,7 +39,7 @@ import org.apache.batik.util.XMLConstants;
 
 import de.intevation.printlayout.DocumentManager;
 import de.intevation.printlayout.DocumentManagerUtils;
-import de.intevation.printlayout.MatrixTools;
+import de.intevation.printlayout.util.MatrixTools;
 
 public class TextConsumer 
 implements TextInteractor.Consumer {

@@ -34,7 +34,7 @@ import org.w3c.dom.svg.SVGMatrix;
 
 import org.apache.batik.dom.svg.SVGOMSVGElement;
 
-import de.intevation.printlayout.MatrixTools;
+import de.intevation.printlayout.util.MatrixTools;
 import de.intevation.printlayout.DocumentManager;
 
 public class BoxInteractor 

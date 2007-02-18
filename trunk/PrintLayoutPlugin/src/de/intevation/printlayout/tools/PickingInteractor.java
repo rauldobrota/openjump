@@ -35,7 +35,7 @@ import org.apache.batik.dom.AbstractElement;
 
 import org.apache.batik.dom.svg.SVGGraphicsElement;
 
-import de.intevation.printlayout.MatrixTools;
+import de.intevation.printlayout.util.MatrixTools;
 import de.intevation.printlayout.DocumentManager;
 import de.intevation.printlayout.LayoutCanvas;
 

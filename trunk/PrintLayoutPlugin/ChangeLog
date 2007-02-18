@@ -1,3 +1,51 @@
+2007-02-18  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	Refactoring package structure to clarify the internal 
+	structure of the plugin (part 1).
+	Introduction of util package
+	
+	* etc/build.xml:
+		improved javadoc target to generate better JavaDocs.
+
+	* src/de/intevation/printlayout/util/:
+		created.
+
+	* src/de/intevation/printlayout/util/GeometricMath.java,
+	  src/de/intevation/printlayout/util/MatrixTools.java,
+	  src/de/intevation/printlayout/util/PaperSizes.java,
+	  src/de/intevation/printlayout/util/Template.java,
+	  src/de/intevation/printlayout/util/TypoUnits.java,
+	  src/de/intevation/printlayout/util/resources/paper-sizes.properties,
+	  src/de/intevation/printlayout/util/resources/paper-tmpl.svg:
+		Files moved here from one package level up.
+
+	* src/de/intevation/printlayout/FileUtils.java:
+		removed.
+
+	* src/de/intevation/printlayout/util/FileFilter.java:
+		added. was FileUtils. All static methods are
+		promoted to instance methods. Old usage was silly
+		procedural programming style.
+
+	* src/de/intevation/printlayout/resources/ZoomIconLoader.java:
+		needless class.
+
+	* src/de/intevation/printlayout/tools/RulerOverlay.java:
+		moved from one level up to here because it is some kind
+		of tool.
+
+	* src/de/intevation/printlayout/DocumentManager.java,
+	  src/de/intevation/printlayout/LayoutFrame.java,
+	  src/de/intevation/printlayout/PrintLayoutPlugin.java,
+	  src/de/intevation/printlayout/ScaleBarUpdater.java,
+	  src/de/intevation/printlayout/ScaleUpdater.java,
+	  src/de/intevation/printlayout/tools/BoxFactory.java,
+	  src/de/intevation/printlayout/tools/BoxInteractor.java,
+	  src/de/intevation/printlayout/tools/OnScreenBox.java,
+	  src/de/intevation/printlayout/tools/PickingInteractor.java,
+	  src/de/intevation/printlayout/tools/TextConsumer.java:
+		adjusted to new package structure.
+
 2007-02-16  Ludwig Reiter  <ludwig.reiter@intevation.de>
 	
 	* src/de/intevation/printlayout/DocumentManager.java:

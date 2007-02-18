@@ -24,6 +24,8 @@ import com.vividsolutions.jump.task.TaskMonitor;
 
 import org.w3c.dom.svg.SVGDocument;
 
+import de.intevation.printlayout.util.PaperSizes;
+
 public class PrintLayoutPlugin 
 extends      AbstractPlugIn 
 implements   ThreadedPlugIn

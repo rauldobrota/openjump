@@ -25,6 +25,8 @@ import org.apache.batik.dom.AbstractElement;
 
 import java.text.NumberFormat;
 
+import de.intevation.printlayout.util.MatrixTools;
+
 public class ScaleUpdater
 implements   Serializable, ExtraData.ChangeListener, ExtraData.RemoveListener
 {

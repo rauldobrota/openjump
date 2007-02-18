@@ -99,6 +99,10 @@ import java.awt.image.RenderedImage;
 
 import javax.imageio.ImageIO;
 
+import de.intevation.printlayout.util.TypoUnits;
+import de.intevation.printlayout.util.GeometricMath;
+import de.intevation.printlayout.util.MatrixTools;
+
 /**
  *  Main class. It handles the operations of the SVG document.
  *  (Like printing, exporting, saving/loading projects, updating).

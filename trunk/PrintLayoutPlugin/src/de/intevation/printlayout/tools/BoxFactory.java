@@ -31,7 +31,7 @@ import org.apache.batik.svggen.SVGBasicStroke;
 import org.apache.batik.svggen.SVGStrokeDescriptor;
 
 import de.intevation.printlayout.DocumentManager;
-import de.intevation.printlayout.MatrixTools;
+import de.intevation.printlayout.util.MatrixTools;
 
 public class BoxFactory 
 implements   BoxInteractor.Factory 
