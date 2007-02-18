@@ -38,8 +38,9 @@ import org.apache.batik.svggen.SVGFont;
 import org.apache.batik.util.XMLConstants;
 
 import de.intevation.printlayout.DocumentManager;
-import de.intevation.printlayout.DocumentManagerUtils;
+
 import de.intevation.printlayout.util.MatrixTools;
+import de.intevation.printlayout.util.ElementUtils;
 
 public class TextConsumer 
 implements TextInteractor.Consumer {
@@ -108,7 +109,7 @@ implements TextInteractor.Consumer {
 				AbstractElement idElement = (AbstractElement)
 					documentManager.getSVGDocument().getElementById(id);
 				AbstractElement textElement = 
-					DocumentManagerUtils.getIDObjectByTag(idElement, "text");
+					ElementUtils.getIDObjectByTag(idElement, "text");
 				
 				//textElement.setTextContent(text);
 				NodeList children = textElement.getChildNodes();

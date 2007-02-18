@@ -9,7 +9,7 @@
  * This program is free software under the LGPL (>=v2.1)
  * Read the file LICENSE.txt coming with the sources for details.
  */
-package de.intevation.printlayout;
+package de.intevation.printlayout.beans;
 
 import com.vividsolutions.jump.workbench.ui.plugin.scalebar.RoundQuantity;
 import com.vividsolutions.jump.workbench.ui.plugin.scalebar.IncrementChooser;
@@ -27,6 +27,8 @@ import org.apache.batik.dom.AbstractElement;
 import org.apache.batik.dom.svg.SVGDOMImplementation; 
 
 import de.intevation.printlayout.util.MatrixTools;
+
+import de.intevation.printlayout.DocumentManager;
 
 public class ScaleBarUpdater
 implements   Serializable, DocumentManager.ElementGenerator

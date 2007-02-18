@@ -16,7 +16,8 @@ import org.w3c.dom.svg.SVGDocument;
 import org.apache.batik.dom.AbstractElement;
 
 import de.intevation.printlayout.DocumentManager;
-import de.intevation.printlayout.DocumentManagerUtils;
+
+import de.intevation.printlayout.util.ElementUtils;
 
 public class BoxUpdateModifier 
 implements DocumentManager.DocumentModifier 
@@ -46,7 +47,7 @@ implements DocumentManager.DocumentModifier
 			factory.setDrawingAttributes(attributes);
 			
 			AbstractElement rect
-				= DocumentManagerUtils.getIDObjectByTag(element, "rect");
+				= ElementUtils.getIDObjectByTag(element, "rect");
 		
 			factory.configureBoxElement(rect , document);
 		}

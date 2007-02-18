@@ -1,3 +1,44 @@
+2007-02-19  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	Refactoring package structure to clarify the internal 
+	structure of the plugin (part 2).
+	Introduction of beans and batik packages
+
+	* src/de/intevation/printlayout/DocumentManagerUtils.java:
+		removed and reinserted as ...
+
+	* src/de/intevation/printlayout/util/ElementUtils.java:
+		because they offer methods to handle Elements not DocumentManagers.
+
+	* src/de/intevation/printlayout/beans/:
+		created. Contains all the extra magic of the document
+		which is not SVG.
+
+	* src/de/intevation/printlayout/beans/ExtraData.java,
+	  src/de/intevation/printlayout/beans/MapData.java,
+	  src/de/intevation/printlayout/beans/ScaleBarUpdater.java,
+	  src/de/intevation/printlayout/beans/ScaleUpdater.java:
+		Moved here from one level up.
+
+	* src/de/intevation/printlayout/batik:
+		Created. Contains special Batik stuff e.g. extensions
+
+	* src/de/intevation/printlayout/batik/PatternExt.java:
+		Moved here from one level up.
+		
+
+	* src/de/intevation/printlayout/tools/BoxUpdateModifier.java,
+	  src/de/intevation/printlayout/tools/DrawingAttributes.java,
+	  src/de/intevation/printlayout/tools/TextConsumer.java,
+	  src/de/intevation/printlayout/LayoutFrame.java,
+	  src/de/intevation/printlayout/DocumentManager.java:
+		Adjusted to new package structure.
+
+	* src/de/intevation/printlayout/resources/ZoomIconLoader.java,
+		src/de/intevation/printlayout/resources/paper-sizes.properties,
+		src/de/intevation/printlayout/resources/paper-tmpl.svg:
+		Forgot to commit removal last check in.
+
 2007-02-18  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	Refactoring package structure to clarify the internal 

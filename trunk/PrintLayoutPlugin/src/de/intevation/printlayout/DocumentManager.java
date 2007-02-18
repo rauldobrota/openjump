@@ -103,6 +103,8 @@ import de.intevation.printlayout.util.TypoUnits;
 import de.intevation.printlayout.util.GeometricMath;
 import de.intevation.printlayout.util.MatrixTools;
 
+import de.intevation.printlayout.beans.ExtraData;
+
 /**
  *  Main class. It handles the operations of the SVG document.
  *  (Like printing, exporting, saving/loading projects, updating).

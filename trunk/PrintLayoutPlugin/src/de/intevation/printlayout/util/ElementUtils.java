@@ -1,6 +1,6 @@
 /*
- * DocumentManagerUtils.java
- * --------------------
+ * ElementUtils.java
+ * -----------------
  * (c) 2007 by Intevation GmbH
  *
  * @author Sascha L. Teichmann (teichmann@intevation.de)
@@ -9,16 +9,21 @@
  * This program is free software under the LGPL (>=v2.1)
  * Read the file LICENSE.txt coming with the sources for details.
  */
-package de.intevation.printlayout;
+package de.intevation.printlayout.util;
 
 import org.w3c.dom.NodeList;
 
 import org.apache.batik.dom.AbstractElement;
 
+import de.intevation.printlayout.DocumentManager;
+
 /**
  * Contains class methods to get elements by tag name. 
  */
-public class DocumentManagerUtils {
+public final class ElementUtils {
+
+	private ElementUtils() {
+	}
 	
 	/**
 	 * scans the element if it is an object leaf and has a child with tagname
@@ -45,7 +50,7 @@ public class DocumentManagerUtils {
   /**
 	 * helper methods. Checks the tagname of an element.
 	 */	
-	protected static boolean checkElementByTag(
+	private static final boolean checkElementByTag(
 			AbstractElement element, 
 			String tag
 	) {
@@ -60,9 +65,10 @@ public class DocumentManagerUtils {
 	 * @param tag     Has child this tagname?
 	 * @return  Is there a child with tagname tag?
 	 */
-	public static boolean checkIDObjectByTag(AbstractElement element, String tag) {
-		if (getIDObjectByTag(element, tag) != null)
-			return true;
-		return false;
+	public static boolean checkIDObjectByTag(
+		AbstractElement element, 
+		String tag
+	) {
+		return getIDObjectByTag(element, tag) != null;
 	}
 }

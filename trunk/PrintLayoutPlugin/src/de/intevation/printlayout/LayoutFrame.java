@@ -104,7 +104,13 @@ import de.intevation.printlayout.tools.RulerOverlay;
 import de.intevation.printlayout.util.FileFilter;
 import de.intevation.printlayout.util.PaperSizes;
 import de.intevation.printlayout.util.MatrixTools;
+import de.intevation.printlayout.util.ElementUtils;
 
+import de.intevation.printlayout.beans.MapData;
+import de.intevation.printlayout.beans.ScaleUpdater;
+import de.intevation.printlayout.beans.ScaleBarUpdater;
+
+import de.intevation.printlayout.batik.PatternExt;
 
 public class LayoutFrame 
 extends      JFrame
@@ -831,13 +837,13 @@ implements   PickingInteractor.PickingListener
 		if (boxPropAction != null)
 			boxPropAction.setEnabled(
 				N == 1
-				&& DocumentManagerUtils.checkIDObjectByTag(
+				&& ElementUtils.checkIDObjectByTag(
 					getElementById(ids[0]), "rect"));
 		
 		if (textPropAction != null)
 			textPropAction.setEnabled(
 				N == 1
-				&& DocumentManagerUtils.checkIDObjectByTag(
+				&& ElementUtils.checkIDObjectByTag(
 					getElementById(ids[0]), "text"));
 	}
 
@@ -1084,8 +1090,8 @@ implements   PickingInteractor.PickingListener
 		}
 		public void actionPerformed(ActionEvent ae) {
 			DrawingAttributes oldAttr = 
-				GUIUtils.getRectDrawingAttributs(
-					DocumentManagerUtils.getIDObjectByTag(
+				DrawingAttributes.getRectDrawingAttributs(
+					ElementUtils.getIDObjectByTag(
 						getElementById(pickingInteractor.getSelectedIDs()[0]),
 						"rect"));
 			DrawingAttributes attr = 
@@ -1115,14 +1121,14 @@ implements   PickingInteractor.PickingListener
 			
 		}
 		public void actionPerformed(ActionEvent ae) {
-			AbstractElement element = DocumentManagerUtils.getIDObjectByTag(
+			AbstractElement element = ElementUtils.getIDObjectByTag(
 					getElementById(pickingInteractor.getSelectedIDs()[0]),
 					"text");
 			
 			TextDialog dialog = new TextDialog(LayoutFrame.this,
-					GUIUtils.getText(element), 
-					GUIUtils.getFont(element),
-					GUIUtils.getColor(element, "stroke"));
+					DrawingAttributes.getText(element), 
+					DrawingAttributes.getFont(element),
+					DrawingAttributes.getColor(element, "stroke"));
 			dialog.setVisible(true);
 
 			if(dialog.isAccepted() && interactor.getSelectedIDs() != null

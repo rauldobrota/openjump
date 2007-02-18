@@ -9,7 +9,7 @@
  * This program is free software under the LGPL (>=v2.1)
  * Read the file LICENSE.txt coming with the sources for details.
  */  
-package de.intevation.printlayout;
+package de.intevation.printlayout.beans;
 
 import java.io.Serializable;
 
@@ -26,6 +26,8 @@ import org.apache.batik.dom.AbstractElement;
 import java.text.NumberFormat;
 
 import de.intevation.printlayout.util.MatrixTools;
+
+import de.intevation.printlayout.DocumentManager;
 
 public class ScaleUpdater
 implements   Serializable, ExtraData.ChangeListener, ExtraData.RemoveListener
