@@ -21,6 +21,9 @@ import java.awt.Rectangle;
 
 import java.util.ArrayList;
 
+/**
+ * A special JSVGCanvas that can handle damaged screen regions.
+ */
 public class LayoutCanvas
 extends      JSVGCanvas
 {

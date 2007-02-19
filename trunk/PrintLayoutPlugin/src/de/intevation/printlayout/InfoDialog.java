@@ -30,6 +30,9 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JEditorPane;
 
+/**
+ * JDialog listing the basic user mouse interactions.
+ */
 public class InfoDialog extends JDialog {
 
 	public static String resource = "resources/info.html";

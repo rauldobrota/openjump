@@ -20,11 +20,19 @@ import org.apache.batik.dom.AbstractElement;
 
 import java.io.Serializable;
 
+/**
+ * Associative lookup between the id of on SVG element and
+ * some special data extracted from OpenJump.
+ */
+
 public class ExtraData
 implements   Serializable
 {
 	protected HashMap id2entry;
 
+	/**
+	 * Event fired by ChangeListener and RemoveListener.
+	 */
 	public static class Event
 	extends             EventObject
 	{
@@ -40,18 +48,29 @@ implements   Serializable
 		}
 	}
 
+	/**
+	 * informed if a certain SVG element with a given id has been changed
+	 * (e.g. being transformed).
+	 */
 	public interface ChangeListener
 	extends          Serializable, EventListener
 	{
 		void elementTransformed(Event evt);
 	}
 
+	/**
+	 * informed if a certain SVG element with a given id has
+	 * been removed from the SVG document.
+	 */
 	public interface RemoveListener
 	extends          Serializable, EventListener
 	{
 		void elementRemoved(Event event);
 	}
 
+	/**
+	 * Class that models an entry id to listeners and extra data
+	 */
 	public static class Entry 
 	implements          Serializable
 	{

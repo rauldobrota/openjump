@@ -28,6 +28,10 @@ import com.vividsolutions.jump.workbench.ui.renderer.style.BasicFillPattern;
 
 import com.vividsolutions.jump.util.Blackboard;
 
+/**
+ * This converts OpenJump BasicFillPattern to java.awt.Texture
+ * so it can be used in svggen renderings.
+ */ 
 public class PatternExt
 extends      DefaultExtensionHandler
 {

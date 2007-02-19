@@ -30,6 +30,10 @@ import de.intevation.printlayout.util.MatrixTools;
 
 import de.intevation.printlayout.DocumentManager;
 
+/**
+ * Constructs and maintains a scale bar for a given
+ * map and given scale.
+ */
 public class ScaleBarUpdater
 implements   Serializable, DocumentManager.ElementGenerator
 {

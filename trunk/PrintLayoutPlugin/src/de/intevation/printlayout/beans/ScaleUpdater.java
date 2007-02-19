@@ -29,6 +29,10 @@ import de.intevation.printlayout.util.MatrixTools;
 
 import de.intevation.printlayout.DocumentManager;
 
+/**
+ * constructs and maintains a scale text (e.g. 1:10000)
+ * for a given map id.
+ */
 public class ScaleUpdater
 implements   Serializable, ExtraData.ChangeListener, ExtraData.RemoveListener
 {

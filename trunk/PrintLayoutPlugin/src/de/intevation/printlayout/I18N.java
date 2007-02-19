@@ -14,6 +14,9 @@ package de.intevation.printlayout;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+/**
+ * Class used to offer i18n support.
+ */
 public class I18N
 {
 	private static final ResourceBundle I18N = 

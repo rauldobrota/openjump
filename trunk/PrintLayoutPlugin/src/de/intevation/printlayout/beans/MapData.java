@@ -13,6 +13,10 @@ package de.intevation.printlayout.beans;
 
 import java.io.Serializable;
 
+/**
+ * Bean that stores map data extracted from OpenJump
+ * for a given map (e.g. the initial scale of the map).
+ */
 public class MapData
 implements   Serializable
 {

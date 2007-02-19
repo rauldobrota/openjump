@@ -1,5 +1,30 @@
 2007-02-19  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
+	Added package informations and some short descriptions.
+
+	* src/de/intevation/printlayout/package.html,
+	  src/de/intevation/printlayout/batik/package.html,
+	  src/de/intevation/printlayout/beans/package.html,
+	  src/de/intevation/printlayout/tools/package.html,
+	  src/de/intevation/printlayout/util/package.html:
+		new: package informations for JavaDoc
+
+	* src/de/intevation/printlayout/DocumentManager.java,
+	  src/de/intevation/printlayout/I18N.java,
+	  src/de/intevation/printlayout/InfoDialog.java,
+	  src/de/intevation/printlayout/LayoutCanvas.java,
+	  src/de/intevation/printlayout/LayoutExtension.java,
+	  src/de/intevation/printlayout/LayoutFrame.java,
+	  src/de/intevation/printlayout/PrintLayoutPlugin.java,
+	  src/de/intevation/printlayout/batik/PatternExt.java,
+	  src/de/intevation/printlayout/beans/ExtraData.java,
+	  src/de/intevation/printlayout/beans/MapData.java,
+	  src/de/intevation/printlayout/beans/ScaleBarUpdater.java,
+	  src/de/intevation/printlayout/beans/ScaleUpdater.java:
+		added some short descriptions
+
+2007-02-19  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
 	Refactoring package structure to clarify the internal 
 	structure of the plugin (part 2).
 	Introduction of beans and batik packages

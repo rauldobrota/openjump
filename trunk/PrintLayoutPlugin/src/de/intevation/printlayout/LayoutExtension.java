@@ -14,6 +14,9 @@ package de.intevation.printlayout;
 import com.vividsolutions.jump.workbench.plugin.Extension;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 
+/**
+ * Configures the plugin as an extension.
+ */
 public class LayoutExtension
 extends      Extension
 {

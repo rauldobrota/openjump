@@ -26,6 +26,9 @@ import org.w3c.dom.svg.SVGDocument;
 
 import de.intevation.printlayout.util.PaperSizes;
 
+/**
+ * The plugin binding to OpenJump.
+ */
 public class PrintLayoutPlugin 
 extends      AbstractPlugIn 
 implements   ThreadedPlugIn

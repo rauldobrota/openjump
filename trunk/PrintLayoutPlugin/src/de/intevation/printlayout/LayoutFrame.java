@@ -112,6 +112,9 @@ import de.intevation.printlayout.beans.ScaleBarUpdater;
 
 import de.intevation.printlayout.batik.PatternExt;
 
+/**
+ * Top level window containing the tool bar and the sheet panel.
+ */
 public class LayoutFrame 
 extends      JFrame
 implements   PickingInteractor.PickingListener
