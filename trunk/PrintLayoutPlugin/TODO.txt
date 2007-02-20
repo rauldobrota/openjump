@@ -1,10 +1,7 @@
 To do for next release
 ----------------------
 
-* overwrite dialog for export/save
-
-* TextDialog: - i18n for plain,bold, etc
-              - assert that the fontfamily and the size are shown, after
+* TextDialog: - assert that the fontfamily and the size are shown, after
 	        the dialog is Visible.
 		
 * DocumentManager: - javadoc comments

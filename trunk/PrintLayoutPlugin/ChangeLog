@@ -1,5 +1,20 @@
 2007-02-20  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
+	completed i18n of TextDialog.
+
+	* src/de/intevation/printlayout/i18n/messages.properties,
+	  src/de/intevation/printlayout/i18n/messages_de.properties:
+	  	appended new properties for plain, bold, italic
+		and bolditalic.
+
+	* src/de/intevation/printlayout/tools/TextDialog.java:
+		added i18n of the font style.
+
+	* TODO.txt:
+		adjusted.
+
+2007-02-20  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
 	Added overwrite confirm dialog.
 
 	* src/de/intevation/printlayout/LayoutFrame.java:

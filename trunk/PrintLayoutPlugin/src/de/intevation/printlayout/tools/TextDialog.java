@@ -49,10 +49,14 @@ implements ColorButton.ColorChangedListener,
 {
 	private static int[] pointSizes = { 3, 5, 8, 10, 12, 14, 18, 24, 36, 48 };
 	private static StyleComboElement[] styles = {
-		new StyleComboElement(Font.PLAIN, "plain"),
-		new StyleComboElement(Font.BOLD, "bold"),
-		new StyleComboElement(Font.BOLD + Font.ITALIC, "bolditalic"),
-		new StyleComboElement(Font.ITALIC, "italic") };
+		new StyleComboElement(Font.PLAIN, 
+				I18N.getString("TextDialog.plain","plain")),
+		new StyleComboElement(Font.BOLD, 
+				I18N.getString("TextDialog.bold", "bold")),
+		new StyleComboElement(Font.BOLD + Font.ITALIC, 
+				I18N.getString("TextDialog.bolditalic", "bolditalic")),
+		new StyleComboElement(Font.ITALIC,
+				I18N.getString("TextDialog.italic", "italic")) };
 		
 
 	protected static class StyleComboElement {
