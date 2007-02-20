@@ -120,13 +120,13 @@ extends      JFrame
 implements   PickingInteractor.PickingListener
 {
 	public static final String ZOOM_IN_ICON =
-		"resources/Magnifyplus.gif";
+		"resources/viewmag+.png";
 
 	public static final String ZOOM_OUT_ICON =
-		"resources/Magnifyminus.gif";
+		"resources/viewmag-.png";
 
 	public static final String ZOOM_100_ICON =
-		"resources/Magnify11.gif";
+		"resources/viewmag1.png";
 
   protected DocumentManager    docManager;
 

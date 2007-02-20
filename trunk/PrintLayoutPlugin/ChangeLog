@@ -1,3 +1,20 @@
+2007-02-20  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	Added new icons for magnify.
+
+	* src/de/intevation/printlayout/resources/viewmag+.png,
+	  src/de/intevation/printlayout/resources/viewmag-.png,
+	  src/de/intevation/printlayout/resources/viewmag1.png:
+		New icons.
+
+	* src/de/intevation/printlayout/resources/Magnify11.gif,
+	  src/de/intevation/printlayout/resources/Magnifyminus.gif,
+	  src/de/intevation/printlayout/resources/Magnifyplus.gif:
+		removed the old icons.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		adjusted.
+
 2007-02-19  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	Added package informations and some short descriptions.
