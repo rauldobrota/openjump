@@ -119,12 +119,21 @@ public class LayoutFrame
 extends      JFrame
 implements   PickingInteractor.PickingListener
 {
+	/**
+	 * zoom in icon resource
+	 */
 	public static final String ZOOM_IN_ICON =
 		"resources/viewmag+.png";
 
+	/**
+	 * zoom out icon resource
+	 */
 	public static final String ZOOM_OUT_ICON =
 		"resources/viewmag-.png";
 
+	/**
+	 * zoom 1:1 icon resource
+	 */
 	public static final String ZOOM_100_ICON =
 		"resources/viewmag1.png";
 
@@ -166,7 +175,7 @@ implements   PickingInteractor.PickingListener
 		setContentPane(createComponents());
 	}
 
-	public JComponent createComponents() {
+	protected JComponent createComponents() {
 		JPanel panel = new JPanel(new BorderLayout());
 
 		LayoutCanvas svgCanvas = new LayoutCanvas(
@@ -467,6 +476,15 @@ implements   PickingInteractor.PickingListener
 		panel.add(north, BorderLayout.NORTH);
 	}
 
+	/**
+	 * adds a Tool to this frame.
+	 * A specific Tool can have a overlay, which is
+	 * added to the overlays of the canvas.
+	 * It also has an interactor, which is added to the interactors of
+	 * the canvas.
+	 *
+	 * @param tool  adds this to the frame.
+	 */
 	public void addTool(Tool tool) {
 		if (tools == null)
 			tools = new ArrayList();
@@ -484,10 +502,21 @@ implements   PickingInteractor.PickingListener
 		interactors.add(0, tool);
 	}
 
+	/**
+	 * returns the document manager.
+	 * @return DocumentManager
+	 */
 	public DocumentManager getDocumentManager() {
 		return docManager;
 	}
 
+	/**
+	 * activates tool by an identifier.
+	 * Iterates through the tools list and activates 
+	 * the tool with this identifier and deactivates the rest.
+	 *
+	 * @param identifier the identifier of the tool, which should be selected.
+	 */
 	public void activateTool(String identifier) {
 		if (tools == null || identifier == null)
 			return;
@@ -497,16 +526,29 @@ implements   PickingInteractor.PickingListener
 		}
 	}
 
+	/**
+	 * sets a point to the mouse position label.
+	 * 
+	 * @param p the point with x/y coordinates in mm.
+	 */
 	public void setMousePostion(Point2D p) {
 		mousePosition.setText(
 			"(" + mouseFormat.format(p.getX()) + 
 			"; " + mouseFormat.format(p.getY()) + ") [mm]");
 	}
 
+	/**
+	 * starts printing.
+	 */
 	public void print() {
 		docManager.print();
 	}
 
+	/**
+	 * adds the openjump map to the SVG document.
+	 * Fetches the openjump map from the core and put it in the SVG
+	 * document.
+	 */
 	public void addMap() {
 
 		DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();

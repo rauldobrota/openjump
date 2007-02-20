@@ -4,10 +4,7 @@ To do for next release
 * TextDialog: - assert that the fontfamily and the size are shown, after
 	        the dialog is Visible.
 		
-* DocumentManager: - javadoc comments
-                   - small clean up of the code
-
-* LayoutFrame: -javadoc comments
+* DocumentManager: - small clean up of the code
 
 * update the used Batik libraries.
 
@@ -34,3 +31,6 @@ General Feature Wishes
 * loading of rasterdata
 
 * loading of WMS maps
+
+* refactor: too many different Actions in LayoutFrame.
+* refactor: very long methods in LayoutFrame.
