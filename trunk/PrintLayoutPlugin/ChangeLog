@@ -1,4 +1,12 @@
 2007-02-20  Ludwig Reiter  <ludwig.reiter@intevation.de>
+	
+	* lib/batik-all.jar:
+		update to new svn version.
+
+	* TODO.txt:
+		adjusted.
+
+2007-02-20  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	* src/de/intevation/printlayout/tools/TextDialog.java:
 		ensure that the selected fontfamily is displayed.

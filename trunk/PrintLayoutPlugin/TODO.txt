@@ -3,8 +3,6 @@ To do for next release
 
 * DocumentManager: - small clean up of the code
 
-* update the used Batik libraries.
-
 General Feature Wishes
 ----------------------
 
