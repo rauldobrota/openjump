@@ -113,8 +113,12 @@ implements ColorButton.ColorChangedListener,
 	
 		if(font != null)
 			textArea.setFont(font);
+		
 		textArea.setText(text);
-
+		
+		distributeListeners();
+		createGUI();
+		
 		colorBtn.setColor(color);
 		textArea.setForeground(color);
 		if (font != null) {
@@ -123,20 +127,20 @@ implements ColorButton.ColorChangedListener,
 			setStyle(font.getStyle());
 		}
 		
-		distributeListeners();	
-		createGUI();
 		pack();
 
 	}
 
 	protected void setFontName(String fontname) {
 		familyL.setSelectedValue(fontname, true);
+		familyL.ensureIndexIsVisible(familyL.getSelectedIndex());
 	}
 
 	protected void setSize(int size) {
 		for (int i = 0, N = sizeCB.getItemCount(); i < N; i++) {
-			if (size == ((Integer) sizeCB.getItemAt(i)).intValue())
+			if (size == ((Integer) sizeCB.getItemAt(i)).intValue()) {
 				sizeCB.setSelectedIndex(i);
+			}
 		}
 	}
 
