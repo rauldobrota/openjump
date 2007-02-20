@@ -613,6 +613,22 @@ implements   PickingInteractor.PickingListener
 		return Math.max(s1, s2);
 	}
 
+	protected boolean confirmWrite(File file)
+	{
+	  if (!file.exists())
+			return true;
+		
+		if (JOptionPane.showConfirmDialog(LayoutFrame.this, 
+					I18N.getString("LayoutFrame.OverrideDialog.Message", 
+						"This file already exists. Override it?"),
+					I18N.getString("LayoutFrame.OverrideDialog.Title",
+						"override dialog"),
+					JOptionPane.YES_NO_CANCEL_OPTION) == JOptionPane.YES_OPTION)
+			return true;
+		return false;
+	}
+		
+			
 	protected void exportPDF() {
 		JFileChooser fc = new JFileChooser(lastDirectory);
 		FileFilter ff = new FileFilter("pdf", "*.pdf: PDF Document");
@@ -629,8 +645,9 @@ implements   PickingInteractor.PickingListener
 		File file = fc.getSelectedFile();
 
 		file = ff.addExtIfNeeded(file);
-		
-		docManager.exportPDF(file);
+	  
+		if (confirmWrite(file))
+			docManager.exportPDF(file);
 	}
 
 
@@ -652,8 +669,9 @@ implements   PickingInteractor.PickingListener
 
 		File file = fc.getSelectedFile();
 		file = ff.addExtIfNeeded(file);
-		
-		docManager.exportSVG(file);
+
+		if (confirmWrite(file))
+			docManager.exportSVG(file);
 	}
 
 	protected void importSVG() {
@@ -688,7 +706,8 @@ implements   PickingInteractor.PickingListener
 
 		File file = fc.getSelectedFile();
 
-		docManager.saveSession(file);
+		if (confirmWrite(file))
+			docManager.saveSession(file);
 	}
 
 	protected void loadSession() {

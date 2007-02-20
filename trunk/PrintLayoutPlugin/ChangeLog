@@ -1,5 +1,17 @@
 2007-02-20  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
+	Added overwrite confirm dialog.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		added the dialog.
+
+	* src/de/intevation/printlayout/i18n/messages.properties,
+	  src/de/intevation/printlayout/i18n/messages_de.properties:
+	  	inserted the message and the title of the overwrite
+		confirm dialog.
+
+2007-02-20  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
 	Added new icons for magnify.
 
 	* src/de/intevation/printlayout/resources/viewmag+.png,
