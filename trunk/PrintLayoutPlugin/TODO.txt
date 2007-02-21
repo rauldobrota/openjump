@@ -1,7 +1,6 @@
 To do for next release
 ----------------------
 
-* DocumentManager: - small clean up of the code
 
 General Feature Wishes
 ----------------------

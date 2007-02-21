@@ -433,56 +433,20 @@ public class DocumentManager
 	 * @param callback invoked after text adding.
 	 */
 	public void addText(final String text, final ModificationCallback callback) {
-		modifyDocumentLater(new DocumentModifier() {
-			public Object run(DocumentManager documentManager) {
-
-				SVGDocument document = documentManager.getSVGDocument();
-
+		ElementGenerator generator = new ElementGenerator() {
+			public AbstractElement generateElement(DocumentManager docManager) {
 				String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
-
 				AbstractElement textElement = 
-					(AbstractElement)document.createElementNS(svgNS, "text");
+					(AbstractElement)docManager.getSVGDocument()
+					.createElementNS(svgNS, "text");
 
 				textElement.setTextContent(text);
-
-				AbstractElement xform =
-					(AbstractElement)document.createElementNS(svgNS, "g");
-
-				xform.setAttributeNS(null, "id", uniqueObjectID());
-
-				Rectangle rect = documentManager.getCanvas().getBounds();
-
-				AbstractElement sheet =
-					(AbstractElement)document.getElementById(DOCUMENT_SHEET);
-
-				Point2D centerScreen = new Point2D.Double(
-					rect.x + 0.5d * rect.width,
-					rect.y + 0.5d * rect.height);
-
-				AffineTransform trans =
-					MatrixTools.toJavaTransform(
-						((SVGLocatable)sheet).getScreenCTM().inverse());
-
-				Point2D center = new Point2D.Double();
-				trans.transform(centerScreen, center);
-
-				trans = AffineTransform
-					.getTranslateInstance(center.getX(), center.getY());
-
-				xform.setAttributeNS(
-					null, "transform", MatrixTools.toSVGString(trans));
-
-				xform.appendChild(textElement);
-
-				sheet.appendChild(xform);
-
-				if (callback != null)
-					callback.run(documentManager, xform);
-
-
-				return null;
+			
+				return textElement;
 			}
-		});
+		};
+
+		addCenteredElement(generator, callback);
 	}
 
 	/**
@@ -743,7 +707,7 @@ public class DocumentManager
 
 		AbstractElement root = (AbstractElement)document.getDocumentElement();
 
-		AbstractElement sheet =
+		AbstractElement sheet = 
 			(AbstractElement)document.getElementById(DOCUMENT_SHEET);
 
 		if (sheet == null) {
@@ -815,14 +779,14 @@ public class DocumentManager
 		AbstractDocument document =
 			(AbstractDocument)svgCanvas.getSVGDocument();
 
-		AbstractElement oldSheet =
+		AbstractElement oldSheet = 
 			(AbstractElement)document.getElementById(DOCUMENT_SHEET);
 
 		if (oldSheet == null)
 			return;
 
-		AbstractElement newSheet =
-			(AbstractElement)newDocument.getElementById(DOCUMENT_SHEET);
+		AbstractElement newSheet = 
+			(AbstractElement) newDocument.getElementById(DOCUMENT_SHEET);
 
 		if (newSheet == null)
 			return;
@@ -902,8 +866,7 @@ public class DocumentManager
 
 					group.appendChild(img);
 
-					AbstractElement sheet =
-						(AbstractElement)document.getElementById(DOCUMENT_SHEET);
+					AbstractElement sheet = getElementById(document, DOCUMENT_SHEET);
 
 					sheet.appendChild(group);
 
@@ -951,14 +914,6 @@ public class DocumentManager
 		AffineTransform  xform
 	) {
 		appendSVG(document, xform, true, null);
-	}
-
-	public void appendSVG(
-		AbstractDocument document, 
-		AffineTransform  xform,
-		boolean          adjustView
-	) {
-		appendSVG(document, xform, adjustView);
 	}
 
 	public void appendSVG(
@@ -1091,13 +1046,6 @@ public class DocumentManager
 
 				pageFomat.setPaper(paper);
 
-				/*
-				pageFomat.setOrientation(
-					height > width
-					?	PageFormat.LANDSCAPE
-					: PageFormat.PORTRAIT);
-				*/
-
 				job.setPrintable(new Printable() {
 					public int print(Graphics g, PageFormat pf, int page) {
 
@@ -1197,7 +1145,7 @@ public class DocumentManager
 	) {
 		AbstractDocument document = (AbstractDocument)svgCanvas.getSVGDocument();
 
-		AbstractElement root = 
+		AbstractElement root =
 			(AbstractElement)document.getElementById(DOCUMENT_SHEET);
 
 		if (adjustView)
@@ -1292,8 +1240,7 @@ public class DocumentManager
 		SVGDocument document = getSVGDocument();
 
 		for (int i = 0; i < ids.length; ++i) {
-			AbstractElement element =
-				(AbstractElement)document.getElementById(ids[i]);
+			AbstractElement element = getElementById(document, ids[i]);
 			if (element != null && hasRecursiveChangeListeners(element))
 				return true;
 		}
@@ -1340,6 +1287,9 @@ public class DocumentManager
 	 * @param ids  the ids which should be removed.
 	 */
 	public void removeIDs(final String [] ids) {
+		if (ids == null || ids.length == 0)
+			return;
+		
 		modifyDocumentLater(new DocumentModifier() {
 			public Object run(DocumentManager documentManager) {
 
@@ -1347,19 +1297,15 @@ public class DocumentManager
 
 				for (int i = 0; i < ids.length; ++i) {
 
-					AbstractElement element =
-						(AbstractElement)document.getElementById(ids[i]);
+					AbstractElement element = getElementById(document, ids[i]);
 
 					if (element == null || hasRecursiveChangeListeners(element)) 
 						continue;
 
-					AbstractElement parent =
-						(AbstractElement)element.getParentNode();
-					if (parent != null)
-						parent.removeChild(element);
+					removeElementFromParentNode(element);
 
 					recursiveRemove(element);
-
+					
 				} // for all ids
 
 				return null;
@@ -1367,6 +1313,17 @@ public class DocumentManager
 		});
 	}
 
+	protected AbstractElement getElementById(SVGDocument document, String id) {
+		return (AbstractElement) document.getElementById(id);
+	}
+	
+	protected void removeElementFromParentNode(AbstractElement element) {
+		AbstractElement parent = (AbstractElement)element.getParentNode();
+		
+		if (parent != null)
+			parent.removeChild(element);
+	}
+	
 	/**
 	 * groups some element together.
 	 * @param ids  the elements with this ids are grouped together.
@@ -1380,14 +1337,12 @@ public class DocumentManager
 
 				SVGDocument document = documentManager.getSVGDocument();
 
-				AbstractElement sheet = 
-					(AbstractElement)document.getElementById(DOCUMENT_SHEET);
+				AbstractElement sheet = getElementById(document, DOCUMENT_SHEET);
 
 				ArrayList children = new ArrayList();
 
 				for (int i = 0; i < ids.length; ++i) {
-					AbstractElement element =
-						(AbstractElement)document.getElementById(ids[i]);
+					AbstractElement element = getElementById(document, ids[i]);
 
 					if (element != null) { // child found?
 						AbstractElement parent =
@@ -1405,14 +1360,7 @@ public class DocumentManager
 				if (N == 0)
 					return null;
 
-				String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
-
-				AbstractElement group = 
-					(AbstractElement)document.createElementNS(svgNS, "g");
-
-				group.setAttributeNS(null, "transform", "matrix(1 0 0 1 0 0)");
-
-				group.setAttributeNS(null, "id", uniqueObjectID(false));
+				AbstractElement group = createGroupElement(document);
 
 				for (int i = 0; i < N; ++i)
 					group.appendChild((AbstractElement)children.get(i));
@@ -1424,6 +1372,18 @@ public class DocumentManager
 		});
 	}
 
+	protected AbstractElement createGroupElement(SVGDocument document) {
+		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+
+		AbstractElement group = 
+			(AbstractElement)document.createElementNS(svgNS, "g");
+
+		group.setAttributeNS(null, "transform", "matrix(1 0 0 1 0 0)");
+		group.setAttributeNS(null, "id", uniqueObjectID(false));
+
+		return group;
+	}
+	
 	/**
 	 * ungroups elements by id.
 	 * @param ids the elements to ungroup.
@@ -1440,8 +1400,7 @@ public class DocumentManager
 
 					SVGDocument document = documentManager.getSVGDocument();
 
-					AbstractElement element =
-						(AbstractElement)document.getElementById(id);
+					AbstractElement element = getElementById(document, id);
 
 					// found?
 					if (element == null || !(element instanceof SVGGElement))
@@ -1531,8 +1490,7 @@ public class DocumentManager
 				for (int i = 0; i < ids.length; ++i) {
 					String id = ids[i];
 
-					AbstractElement element =
-						(AbstractElement)document.getElementById(id);
+					AbstractElement element = getElementById(document, id);
 
 					if (element == null)
 						return null;
@@ -1591,8 +1549,7 @@ public class DocumentManager
 				for (int i = 0; i < ids.length; ++i) {
 					String id = ids[i];
 
-					AbstractElement element =
-						(AbstractElement)document.getElementById(id);
+					AbstractElement element = getElementById(document, id);
 
 					if (element == null)
 						return null;
@@ -1673,10 +1630,7 @@ public class DocumentManager
 				SVGDocument document = documentManager.getSVGDocument();
 
 				for (int i = 0; i < ids.length; ++i) {
-					String id = ids[i];
-
-					AbstractElement element =
-						(AbstractElement)document.getElementById(id);
+					AbstractElement element = getElementById(document, ids[i]);
 
 					if (element == null)
 						return null;
@@ -1757,13 +1711,10 @@ public class DocumentManager
 				SVGDocument document = documentManager.getSVGDocument();
 
 				for (int i = 0; i < ids.length; ++i) {
-					String id = ids[i];
-
-					AbstractElement element =
-						(AbstractElement)document.getElementById(id);
+					AbstractElement element = getElementById(document, ids[i]);
 
 					if (element == null)
-						return null;
+						continue;
 
 					SVGLocatable locatable = (SVGLocatable)element;
 
