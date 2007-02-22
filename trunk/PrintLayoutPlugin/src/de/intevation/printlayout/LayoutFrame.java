@@ -280,41 +280,14 @@ implements   PickingInteractor.PickingListener
 		// track mouse coordinates
 		svgCanvas.addMouseMotionListener(
 			new MouseMotionAdapter() {
-				public void mouseMoved(MouseEvent e) {
-
-					SVGDocument doc = docManager.getSVGDocument();
-					if (doc == null) {
-						mousePosition.setText("(" + e.getX() + "; " + e.getY() + ")");
-						return;
-					}
-
-					SVGLocatable sheet =
-						(SVGLocatable)doc.getElementById(
-							DocumentManager.DOCUMENT_SHEET);
-
-					if (sheet != null)
-						try {
-							SVGMatrix matrix = sheet.getScreenCTM();
-
-							if (matrix != null) {
-								AffineTransform at =
-									MatrixTools.toJavaTransform(matrix).createInverse();
-
-								Point2D src = new Point2D.Double(e.getX(), e.getY());
-								Point2D dst = new Point2D.Double();
-								at.transform(src, dst);
-								setMousePostion(dst);
-								return;
-							}
-						} 
-						catch (Exception ex) {
-						}
-					mousePosition.setText("(0; 0)");
+				public void mouseMoved(MouseEvent me) {
+					updateMousePositionLabel(me);
 				}
 		});
 
 		return panel;
 	}
+
 	
 	protected static JMenu createMenu(String key, String def) {
 		String label = I18N.getString(key, def);
@@ -535,6 +508,42 @@ implements   PickingInteractor.PickingListener
 		mousePosition.setText(
 			"(" + mouseFormat.format(p.getX()) + 
 			"; " + mouseFormat.format(p.getY()) + ") [mm]");
+	}
+
+	/**
+	 * projects screen coordinates back to paper coordinates
+	 * and updates the mouse position label accordingly
+	 *
+	 * @param me  mouse event to extract screen coords from.
+	 */
+	protected void updateMousePositionLabel(MouseEvent me) {
+
+		SVGDocument doc = docManager.getSVGDocument();
+
+		if (doc != null) {
+			SVGLocatable sheet =
+				(SVGLocatable)doc.getElementById(
+					DocumentManager.DOCUMENT_SHEET);
+
+			if (sheet != null)
+				try {
+					SVGMatrix matrix = sheet.getScreenCTM();
+
+					if (matrix != null) {
+						AffineTransform at =
+							MatrixTools.toJavaTransform(matrix).createInverse();
+
+						Point2D src = new Point2D.Double(me.getX(), me.getY());
+						Point2D dst = new Point2D.Double();
+						at.transform(src, dst);
+						setMousePostion(dst);
+						return;
+					}
+				} 
+				catch (Exception ex) {
+				}
+		}
+		mousePosition.setText("(" + me.getX() + "; " + me.getY() + ")");
 	}
 
 	/**

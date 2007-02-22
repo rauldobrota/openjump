@@ -1,5 +1,13 @@
 2007-02-22  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/DocumentManager.java:
+		removed needless import.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		moved mouse postion tracking code out of GUI setup.
+		
+2007-02-22  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
 	Added support for non-uniform object scaling.
 
 	- Pressing shift during scaling forces uniform scaling.
