@@ -18,8 +18,6 @@ General Feature Wishes
 
 * error management and user feedback Systems
 
-* SVG order change system
-
 * just one properties button
 
 * loading of rasterdata
