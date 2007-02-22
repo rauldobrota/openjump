@@ -144,6 +144,11 @@ public class DocumentManager
 	protected int          objectID;
 
 	protected ExtraData    extraData;
+
+	/**
+	 * for numeric stability
+	 */
+	private static final double EPS = 1e-2d;
 	
 	/**
 	 * Use this interface to work on the SVG document.
@@ -1532,6 +1537,110 @@ public class DocumentManager
 	/**
 	 * scales some elements
 	 */
+	public void scaleNoneUniformFixedIDs(
+		final String [] ids, 
+		final Point2D   screenDelta,
+		final Point2D   screenPos,
+		final Point2D   startPos
+	) {
+		if (ids == null || ids.length == 0)
+			return;
+
+		modifyDocumentLater(new DocumentModifier() {
+			public Object run(DocumentManager documentManager) {
+
+				SVGDocument document = documentManager.getSVGDocument();
+
+				for (int i = 0; i < ids.length; ++i) {
+					String id = ids[i];
+
+					AbstractElement element = getElementById(document, id);
+
+					if (element == null)
+						return null;
+
+					SVGLocatable locatable = (SVGLocatable)element;
+
+					AffineTransform CTM;
+					AffineTransform invCTM;
+					try {
+						CTM = MatrixTools.toJavaTransform(locatable.getScreenCTM());
+						invCTM = CTM.createInverse();
+					}
+					catch (NoninvertibleTransformException nite) {
+						continue;
+					}
+
+					Point2D startPosOnPaper = new Point2D.Double();
+					invCTM.transform(startPos, startPosOnPaper);
+					Point2D screenPosOnPaper = new Point2D.Double();
+					invCTM.transform(screenPos, screenPosOnPaper);
+
+					double distanceOrgX = 
+						Math.abs(startPosOnPaper.getX() - screenPosOnPaper.getX());
+					double distanceOrgY = 
+						Math.abs(startPosOnPaper.getY() - screenPosOnPaper.getY());
+
+					Point2D deltaOnPaper = new Point2D.Double();
+					invCTM.deltaTransform(screenDelta, deltaOnPaper);
+
+					screenPosOnPaper.setLocation(
+						screenPosOnPaper.getX() + deltaOnPaper.getX(),
+						screenPosOnPaper.getY() + deltaOnPaper.getY());
+
+					double distanceDeltaX = 
+						Math.abs(startPosOnPaper.getX() - screenPosOnPaper.getX());
+					double distanceDeltaY = 
+						Math.abs(startPosOnPaper.getY() - screenPosOnPaper.getY());
+
+					double scaleX = Math.abs(distanceDeltaX - distanceOrgX) < EPS
+					|| distanceOrgX < EPS
+						? 1d
+						: distanceDeltaX/distanceOrgX;
+
+					double scaleY = Math.abs(distanceDeltaY - distanceOrgY) < EPS
+					|| distanceOrgY < EPS
+						? 1d
+						: distanceDeltaY/distanceOrgY;
+
+					AffineTransform trans1 =
+						AffineTransform.getTranslateInstance(
+							-startPosOnPaper.getX(),
+							-startPosOnPaper.getY());
+
+					AffineTransform scaleTrans =
+						AffineTransform.getScaleInstance(scaleX, scaleY);
+
+					AffineTransform trans2 =
+						AffineTransform.getTranslateInstance(
+							startPosOnPaper.getX(),
+							startPosOnPaper.getY());
+
+					scaleTrans.concatenate(trans1);
+					trans2.concatenate(scaleTrans);
+
+					String xformS = element.getAttributeNS(null, "transform");
+
+					AffineTransform xform = xformS == null
+						? new AffineTransform()
+						: MatrixTools.toJavaTransform(xformS);
+
+					xform.concatenate(trans2);
+
+					element.setAttributeNS(
+						null, "transform", MatrixTools.toSVGString(xform));
+
+					recursiveTransform(element);
+				}
+
+				return null;
+			}
+		});
+	}
+
+	/**
+	 * scales some elements
+	 */
 	public void scaleFixedIDs(
 		final String [] ids, 
 		final Point2D   screenDelta,
@@ -1590,87 +1699,6 @@ public class DocumentManager
 						AffineTransform.getTranslateInstance(
 							startPosOnPaper.getX(),
 							startPosOnPaper.getY());
-
-					scaleTrans.concatenate(trans1);
-					trans2.concatenate(scaleTrans);
-
-					String xformS = element.getAttributeNS(null, "transform");
-
-					AffineTransform xform = xformS == null
-						? new AffineTransform()
-						: MatrixTools.toJavaTransform(xformS);
-
-					xform.concatenate(trans2);
-
-					element.setAttributeNS(
-						null, "transform", MatrixTools.toSVGString(xform));
-
-					recursiveTransform(element);
-				}
-
-				return null;
-			}
-		});
-	}
-
-	/**
-	 * scales some elements
-	 */
-	public void scaleIDs(
-		final String [] ids, 
-		final Point2D   screenDelta,
-		final Point2D   screenPos
-	) {
-		if (ids == null || ids.length == 0)
-			return;
-
-		modifyDocumentLater(new DocumentModifier() {
-			public Object run(DocumentManager documentManager) {
-
-				SVGDocument document = documentManager.getSVGDocument();
-
-				for (int i = 0; i < ids.length; ++i) {
-					AbstractElement element = getElementById(document, ids[i]);
-
-					if (element == null)
-						return null;
-
-					SVGLocatable locatable = (SVGLocatable)element;
-
-					AffineTransform CTM =
-						MatrixTools.toJavaTransform(locatable.getScreenCTM());
-
-					SVGRect bbox = locatable.getBBox();
-
-					Point2D center = new Point2D.Double(
-						bbox.getX() + 0.5d * bbox.getWidth(),
-						bbox.getY() + 0.5d * bbox.getHeight());
-
-					Point2D centerOnScreen = new Point2D.Double();
-					CTM.transform(center, centerOnScreen);
-
-					double distanceOrg = centerOnScreen.distance(screenPos);
-
-					screenPos.setLocation(
-						screenPos.getX() + screenDelta.getX(),
-						screenPos.getY() + screenDelta.getY());
-
-					double distanceDelta = centerOnScreen.distance(screenPos);
-
-					double scale = distanceDelta/distanceOrg;
-
-					AffineTransform trans1 =
-						AffineTransform.getTranslateInstance(
-							-center.getX(),
-							-center.getY());
-
-					AffineTransform scaleTrans =
-						AffineTransform.getScaleInstance(scale, scale);
-
-					AffineTransform trans2 =
-						AffineTransform.getTranslateInstance(
-							center.getX(),
-							center.getY());
 
 					scaleTrans.concatenate(trans1);
 					trans2.concatenate(scaleTrans);
@@ -1764,6 +1792,7 @@ public class DocumentManager
 					AffineTransform xform = xformS == null
 						? new AffineTransform()
 						: MatrixTools.toJavaTransform(xformS);
+
 
 					xform.concatenate(rotate);
 

@@ -43,6 +43,20 @@ public class MatrixTools
 				matrix.getF());
 		}
 
+		public static double [] getMatrix(AffineTransform xform) {
+			double [] m = new double[6];
+			xform.getMatrix(m);
+			return m;
+		}
+
+		public Decomposition(AffineTransform xform) {
+			this(getMatrix(xform));
+		}
+
+		public Decomposition(double [] m) {
+			this(m[0], m[1], m[2], m[3], m[4], m[5]);
+		}
+
 		public Decomposition(
 			double a, double b,
 			double c, double d,

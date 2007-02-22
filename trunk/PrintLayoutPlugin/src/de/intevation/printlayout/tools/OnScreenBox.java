@@ -24,9 +24,11 @@ import java.awt.geom.Point2D;
 import org.w3c.dom.svg.SVGRect;
 
 import de.intevation.printlayout.util.GeometricMath;
+import de.intevation.printlayout.util.LineProjector;
 
 public class OnScreenBox
 {
+
 	public static final Object OUTSIDE        = null;
 	public static final Object INSIDE         = new Object();
 
@@ -60,8 +62,22 @@ public class OnScreenBox
 
 		if (decoration != null)
 			for (int i = 0; i < decoration.length; ++i)
-				if (decoration[i].contains(x, y))
-					return points[(i+2)%points.length];
+				if (decoration[i].contains(x, y)) {
+					int k = i >> 1;
+					int j = ((i + points.length) >> 1) % points.length;
+					Point2D current, origin;
+					if ((i & 1) == 0) {
+						current = points[k];
+						origin  = points[j];
+					}
+					else {
+						current = GeometricMath.mid(
+							points[k], points[(k+1) % points.length]);
+						origin = GeometricMath.mid(
+							points[j], points[(j+1) % points.length]);
+					}
+					return new LineProjector(origin, current);
+				}
 
 		return getShape().contains(x, y)
 			? INSIDE
@@ -134,38 +150,41 @@ public class OnScreenBox
 	}
 
 	protected void buildScaleDecoration() {
+
+		Point2D [] ps = new Point2D [] {
+			points[0],
+			GeometricMath.mid(points[0], points[1]),
+			points[1],
+			GeometricMath.mid(points[1], points[2]),
+			points[2],
+			GeometricMath.mid(points[2], points[3]),
+			points[3],
+			GeometricMath.mid(points[3], points[0])
+		};
+
 		double ang1 = GeometricMath.angleBetween(points[0], points[2]);
 		double ang2 = GeometricMath.angleBetween(points[1], points[3]);
 
-		Shape s1 = Arrows.createArrow(
-			0f, -11f,
-			ang1 + Math.PI*0.5d,
-			1f,
-			points[0].getX(),
-			points[0].getY());
+		double [] a = new double[ps.length];
 
-		Shape s2 = Arrows.createArrow(
-			0f, -11f,
-			ang2 + Math.PI*0.5d,
-			1f,
-			points[1].getX(),
-			points[1].getY());
+		a[0] = ang1 + Math.PI*0.5d;
+		a[2] = ang2 + Math.PI*0.5d;
+		a[1] = 0.5d*(a[2] + a[0]);
+		a[4] = ang1 + Math.PI*1.5d;
+		a[3] = 0.5d*(a[4] + a[2]) + Math.PI;
+    a[6] = ang2 + Math.PI*1.5d;
+		a[5] = 0.5d*(a[6] + a[4]);
+		a[7] = 0.5d*(a[6] + a[0]);
 
-		Shape s3 = Arrows.createArrow(
-			0f, -11f,
-			ang1 + Math.PI*1.5d,
-			1f,
-			points[2].getX(),
-			points[2].getY());
+		decoration = new Shape[ps.length];
 
-		Shape s4 = Arrows.createArrow(
-			0f, -11f,
-			ang2 + Math.PI*1.5d,
-			1f,
-			points[3].getX(),
-			points[3].getY());
-
-		decoration = new Shape [] { s1, s2, s3, s4 };
+		for (int i = 0; i < decoration.length; ++i)
+			decoration[i] = Arrows.createArrow(
+				0f, -11f,
+				a[i],
+				1f,
+				ps[i].getX(),
+				ps[i].getY());
 	}
 
 	protected void buildRotateDecoration() {

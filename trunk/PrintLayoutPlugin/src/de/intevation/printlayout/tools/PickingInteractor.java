@@ -51,6 +51,9 @@ import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.EventListener;
 
+import de.intevation.printlayout.util.LineProjector;
+import de.intevation.printlayout.util.GeometricMath;
+
 public class PickingInteractor
 extends      InteractorAdapter
 implements   Overlay, Tool, LayoutCanvas.DamagedRegion
@@ -96,10 +99,20 @@ implements   Overlay, Tool, LayoutCanvas.DamagedRegion
 	public static class Scale
 	implements          TransformOperation
 	{
-		private Point2D startPoint;
+		protected LineProjector proj;
 
-		public Scale(Point2D startPoint) {
-			this.startPoint = startPoint;
+		public Scale(LineProjector proj) {
+			this.proj = proj;
+		}
+
+		protected void projectedTransform(
+			String []       ids,
+			DocumentManager documentManager,
+			Point2D         delta,
+			Point2D         orginal
+		) {
+			documentManager.scaleFixedIDs(
+				ids, delta, orginal, proj.getOrigin());
 		}
 
 		public void transform(
@@ -108,21 +121,31 @@ implements   Overlay, Tool, LayoutCanvas.DamagedRegion
 			Point2D         delta,
 			Point2D         orginal
 		) {
-			documentManager.scaleFixedIDs(ids, delta, orginal, startPoint);
+			orginal = proj.nearestPointOnLine(orginal);
+			Point2D ndelta = GeometricMath.add(orginal, delta);
+			ndelta = proj.nearestPointOnLine(ndelta);
+			ndelta = GeometricMath.sub(ndelta, orginal);
+			projectedTransform(ids, documentManager, ndelta, orginal);
 		}
 	} // Scale
 
-	public static final TransformOperation SCALE =
-		new TransformOperation() {
-			public void transform(
-				String []       ids,
-				DocumentManager documentManager,
-				Point2D         delta,
-				Point2D         orginal
-			) {
-				documentManager.scaleIDs(ids, delta, orginal);
-			}
-		}; // SCALE
+	public static class NoneUniformScale
+	extends             Scale
+	{
+		public NoneUniformScale(LineProjector proj) {
+			super(proj);
+		}
+
+		protected void projectedTransform(
+			String []       ids,
+			DocumentManager documentManager,
+			Point2D         delta,
+			Point2D         orginal
+		) {
+			documentManager.scaleNoneUniformFixedIDs(
+				ids, delta, orginal, proj.getOrigin());
+		}
+	} // NoneUniformScale
 
 	public static final TransformOperation ROTATE =
 		new TransformOperation() {
@@ -569,12 +592,12 @@ implements   Overlay, Tool, LayoutCanvas.DamagedRegion
 		finished = true;
 	}
 
-	public void mousePressed(MouseEvent e) {
+	public void mousePressed(MouseEvent evt) {
 
 		Object inside = OnScreenBox.OUTSIDE;
 
-		int x = e.getX();
-		int y = e.getY();
+		int x = evt.getX();
+		int y = evt.getY();
 
 		for (int i = numSelections()-1; i >= 0; --i) {
 			OnScreenBox box = (OnScreenBox)selected.get(i);
@@ -586,20 +609,27 @@ implements   Overlay, Tool, LayoutCanvas.DamagedRegion
 
 			transformOperation = inside == OnScreenBox.INSIDE
 				? TRANSLATE
-				: getTransformOperation(inside);
+				: getTransformOperation(inside, evt);
 
-			startX = e.getX();
-			startY = e.getY();
+			startX = evt.getX();
+			startY = evt.getY();
 		}
 		else
 			finished = true;
 	}
 
 	// map decoration -> operation
-	protected TransformOperation getTransformOperation(Object parameter) {
+	protected TransformOperation getTransformOperation(
+		Object     parameter,
+		MouseEvent evt
+	) {
 		switch (decoration) {
-			case SCALE_DECORATION: return new Scale((Point2D)parameter);
-			default:               return ROTATE;
+			case SCALE_DECORATION: 
+				return isShiftDown(evt.getModifiers())
+					? new Scale((LineProjector)parameter)
+					: new NoneUniformScale((LineProjector)parameter);
+			default:
+				return ROTATE;
 		}
 	}
 

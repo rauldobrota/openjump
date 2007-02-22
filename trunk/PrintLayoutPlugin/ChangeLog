@@ -1,3 +1,36 @@
+2007-02-22  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	Added support for non-uniform object scaling.
+
+	- Pressing shift during scaling forces uniform scaling.
+	- Beware! Rotate non-uniform scaled objects introduce shear!
+	- On non-uniformly scaled maps the maximum of x and y scale
+	  is used to calculate scale bars and texts.
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		Add support for non-uniform object scaling. Removed
+		some unused scaling code.
+
+	* src/de/intevation/printlayout/util/LineProjector.java:
+		Added: Mainly a line with the ability to calculate
+		the point on the line which lies closest to a given point.
+		Used to stabilize mouse motions along a line.
+
+	* src/de/intevation/printlayout/tools/OnScreenBox.java:
+		Generate four extra handles in scaling mode for 
+		non-uniform scaling. Uses a LineProjector to project
+		mouse coordinates back to the scaling line to avoid
+		numerical problems.
+
+	* src/de/intevation/printlayout/tools/PickingInteractor.java:
+		adjust to use the new scaling code.
+		
+	* src/de/intevation/printlayout/util/GeometricMath.java:
+		added some vector math for Point2D.
+
+	* src/de/intevation/printlayout/util/MatrixTools.java:
+		a new AffineTransform constructor for Decomposition.
+
 2007-02-21  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	* src/de/intevation/printlayout/DocumentManager.java:
