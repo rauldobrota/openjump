@@ -1,5 +1,24 @@
 2007-02-22  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
+	Added support for changing the z order of the laid out elements.
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		added methods moveUp() and moveDown() to move
+		selected elements one level up or down.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		create menu entries in edit menu and connect
+		them to the respective actions.
+
+	* src/de/intevation/printlayout/i18n/messages.properties,
+	  src/de/intevation/printlayout/i18n/messages_de.properties:
+		i18n for new menu entries.
+
+	* TODO.txt:
+		removed point "SVG order change system"
+	
+2007-02-22  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
 	* src/de/intevation/printlayout/DocumentManager.java:
 		removed needless import.
 

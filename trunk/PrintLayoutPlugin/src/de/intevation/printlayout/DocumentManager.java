@@ -893,16 +893,25 @@ public class DocumentManager
 		String parser = XMLResourceDescriptor.getXMLParserClassName();
 		SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
 
+		InputStream in = null;
 		try {
 			String uri = file.toURL().toString();
 			if (file.getName().endsWith("z"))
-				appendSVG((AbstractDocument)factory.createDocument(uri,
-							new GZIPInputStream(new FileInputStream(file))), null);
+				appendSVG((AbstractDocument)factory.createDocument(
+					uri,
+					in = new GZIPInputStream(new FileInputStream(file))),
+					null);
 			else
 				appendSVG((AbstractDocument)factory.createDocument(uri), null);
 		}
 		catch (IOException ioe) {
 			ioe.printStackTrace();
+		}
+		finally {
+			if (in != null) {
+				try { in.close(); } catch (IOException ioe) {}
+				in = null;
+			}
 		}
 	}
 
@@ -1805,5 +1814,153 @@ public class DocumentManager
 			}
 		});
 	}
+
+	/**
+	 * looks if one of the given ids belong to an element
+	 * that has a next element so it can be moved up.
+	 * @param ids the ids to check
+	 */
+	public boolean hasNext(String [] ids) {
+		if (ids != null && ids.length > 0) {
+			SVGDocument document = getSVGDocument();
+			for (int i = 0; i < ids.length; ++i) {
+				if (!ids[i].startsWith(OBJECT_ID))
+					continue;
+				Node element = document.getElementById(ids[i]);
+				if (element == null
+				|| (element = element.getNextSibling()) == null
+				|| !(element instanceof AbstractElement))
+					continue;
+				String id = ((AbstractElement)element).getAttributeNS(null, "id");
+				if (id != null && id.startsWith(OBJECT_ID))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * looks if one of the given ids belong to an element
+	 * that has a previous element so it can be moved down.
+	 * @param ids the ids to check
+	 */
+	public boolean hasPrevious(String [] ids) {
+		if (ids != null && ids.length > 0) {
+			SVGDocument document = getSVGDocument();
+			for (int i = 0; i < ids.length; ++i) {
+				if (!ids[i].startsWith(OBJECT_ID))
+					continue;
+				Node element = document.getElementById(ids[i]);
+				if (element == null
+				|| (element = element.getPreviousSibling()) == null
+				|| !(element instanceof AbstractElement))
+					continue;
+				String id = ((AbstractElement)element).getAttributeNS(null, "id");
+				if (id != null && id.startsWith(OBJECT_ID))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * trys to move up the elements referenced by the ids one level.
+	 * @param ids      the ids to move
+	 * @param callback can be null. called when moving is done
+	 */
+	public void moveUp(
+		final String []            ids, 
+		final ModificationCallback callback
+	) {
+		if (ids == null || ids.length == 0)
+			return;
+
+		modifyDocumentLater(new DocumentModifier() {
+			public Object run(DocumentManager documentManager) {
+
+				SVGDocument document = documentManager.getSVGDocument();
+
+				for (int i = 0; i < ids.length; ++i) {
+
+					Node element = document.getElementById(ids[i]);
+					if (element == null || !(element instanceof AbstractElement))
+						continue;
+
+					String id = ((AbstractElement)element).getAttributeNS(null, "id");
+					if (id == null || !id.startsWith(OBJECT_ID))
+						continue;
+
+					Node next = element.getNextSibling();
+					if (next == null || !(next instanceof AbstractElement))
+						continue;
+
+					id = ((AbstractElement)next).getAttributeNS(null, "id");
+					if (id == null || !id.startsWith(OBJECT_ID))
+						continue;
+
+					Node parent = element.getParentNode();
+					if (parent != null) {
+						parent.removeChild(next);
+						parent.insertBefore(next, element);
+					}
+				}
+
+				if (callback != null)
+					callback.run(documentManager, null);
+
+				return null;
+			}
+		});
+	}
+
+	/**
+	 * trys to move down the elements referenced by the ids one level.
+	 * @param ids      the ids to move
+	 * @param callback can be null. called when moving is done
+	 */
+	public void moveDown(
+		final String []            ids,
+		final ModificationCallback callback
+	) {
+		if (ids == null || ids.length == 0)
+			return;
+
+		modifyDocumentLater(new DocumentModifier() {
+			public Object run(DocumentManager documentManager) {
+
+				SVGDocument document = documentManager.getSVGDocument();
+
+				for (int i = 0; i < ids.length; ++i) {
+
+					Node element = document.getElementById(ids[i]);
+					if (element == null || !(element instanceof AbstractElement))
+						continue;
+
+					String id = ((AbstractElement)element).getAttributeNS(null, "id");
+					if (id == null || !id.startsWith(OBJECT_ID))
+						continue;
+
+					Node prev = element.getPreviousSibling();
+					if (prev == null || !(prev instanceof AbstractElement))
+						continue;
+
+					id = ((AbstractElement)prev).getAttributeNS(null, "id");
+					if (id == null || !id.startsWith(OBJECT_ID))
+						continue;
+
+					Node parent = element.getParentNode();
+					if (parent != null) {
+						parent.removeChild(element);
+						parent.insertBefore(element, prev);
+					}
+				}
+				if (callback != null)
+					callback.run(documentManager, null);
+
+				return null;
+			}
+		});
+	}
+
 }
 // end of file

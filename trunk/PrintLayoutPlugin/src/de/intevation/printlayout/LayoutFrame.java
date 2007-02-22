@@ -146,6 +146,9 @@ implements   PickingInteractor.PickingListener
 	protected RemoveAction       removeAction;
 	protected GroupAction        groupAction;
 	protected UngroupAction      ungroupAction;
+	protected UpAction           upAction;
+	protected DownAction         downAction;
+
 	protected	AddScalebarAction  addScalebarAction;
 	protected	AddScaletextAction addScaletextAction;
 	protected	BoxPropAction      boxPropAction;
@@ -212,6 +215,8 @@ implements   PickingInteractor.PickingListener
 		                   removeAction       = new RemoveAction();
 										   groupAction        = new GroupAction();
 										   ungroupAction      = new UngroupAction();
+											 upAction           = new UpAction();
+											 downAction         = new DownAction();
 
 		RulerAction        rulerAction        = new RulerAction();
 
@@ -235,12 +240,18 @@ implements   PickingInteractor.PickingListener
 		fileMenu.add(quitAction);
 
 		editMenu.add(removeAction);
+		editMenu.addSeparator();
+		editMenu.add(upAction);
+		editMenu.add(downAction);
+		editMenu.addSeparator();
 		editMenu.add(groupAction);
 		editMenu.add(ungroupAction);
 
 		removeAction  .setEnabled(false);
 		groupAction   .setEnabled(false);
 		ungroupAction .setEnabled(false);
+		upAction      .setEnabled(false);
+		downAction    .setEnabled(false);
 
 		viewMenu.add(new JCheckBoxMenuItem(rulerAction));
 
@@ -881,6 +892,38 @@ implements   PickingInteractor.PickingListener
 		rulerOverlay.setInUse(state);
 	}
 
+	/**
+	 * called after layer reordering to update the actions
+	 */
+	private final DocumentManager.ModificationCallback UPDATE_LAYER_BUTTONS =
+		new DocumentManager.ModificationCallback() {
+			public void run(DocumentManager manager, AbstractElement dummy) {
+				String [] ids = pickingInteractor.getSelectedIDs();
+
+				if (upAction != null)
+					upAction.setEnabled(ids != null && docManager.hasNext(ids));
+
+				if (downAction != null)
+					downAction.setEnabled(ids != null && docManager.hasPrevious(ids));
+			}
+		};
+
+	/** called if the user wants to move the selected elements
+	 *  nearer to the top of the drawing.
+	 */
+	protected void elementsUp() {
+		String [] ids = pickingInteractor.getSelectedIDs();
+		docManager.moveUp(ids, UPDATE_LAYER_BUTTONS);
+	}
+
+	/** called if the user wants to move the selected elements
+	 *  nearer to the bottom of the drawing.
+	 */
+	protected void elementsDown() {
+		String [] ids = pickingInteractor.getSelectedIDs();
+		docManager.moveDown(ids, UPDATE_LAYER_BUTTONS);
+	}
+
 	/** PickingInteractor.PickingListener */
 	public void selectionChanged(PickingInteractor.PickingEvent evt) {
 		PickingInteractor pi = (PickingInteractor)evt.getSource();
@@ -896,6 +939,14 @@ implements   PickingInteractor.PickingListener
 
 		if (ungroupAction != null)
 			ungroupAction.setEnabled(N > 0);
+
+		if (upAction != null)
+			upAction.setEnabled(N > 0
+			&& docManager.hasNext(ids));
+
+		if (downAction != null)
+			downAction.setEnabled(N > 0
+			&& docManager.hasPrevious(ids));
 
 		if (addScaletextAction != null)
 			addScaletextAction.setEnabled(
@@ -1059,6 +1110,33 @@ implements   PickingInteractor.PickingListener
 		}
 		public void actionPerformed(ActionEvent ae) {
 			ungroup();
+		}
+	}
+
+	private class UpAction extends AbstractAction {
+		UpAction() {
+			super(I18N.getName(
+					I18N.getString("LayoutFrame.ElementsUp", "Move Up")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.ElementsUp", "Move U&p")));
+			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("shift PAGE_UP"));
+		}
+		public void actionPerformed(ActionEvent ae) {
+			elementsUp();
+		}
+	}
+
+	private class DownAction extends AbstractAction {
+		DownAction() {
+			super(I18N.getName(
+					I18N.getString("LayoutFrame.ElementsDown", "Move Down")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.ElementsDown", "Move &Down")));
+			putValue(
+				Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("shift PAGE_DOWN"));
+		}
+		public void actionPerformed(ActionEvent ae) {
+			elementsDown();
 		}
 	}
 
