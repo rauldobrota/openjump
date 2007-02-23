@@ -34,6 +34,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Node; 
 import org.w3c.dom.DOMImplementation;
 
+import org.apache.batik.transcoder.Transcoder;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.TranscoderException;
@@ -1028,7 +1029,63 @@ public class DocumentManager
 		}
 		while (document.getElementById(idString) != null);
 		return idString;
-	}    
+	}
+
+	/**
+	 * calls transcodeToFile(transcoder, file, true)
+	 */
+	public void transcodeToFile(
+		Transcoder transcoder,
+		File       file
+	) {
+		transcodeToFile(transcoder, file, false);
+	}
+
+	/**
+	 * Isolates the inner SVG document and transcode it to a file.
+	 * usefull for generating images.
+	 * @param transcoder          the respective transcoder
+	 * @param file                file to be written to
+	 * @param preserveAspectRatio maintain aspect ratio of inner SVG?
+	 */
+	public void transcodeToFile(
+		final Transcoder transcoder,
+		final File       file,
+		final boolean    preserveAspectRatio
+	) {
+		modifyDocumentLater(new DocumentModifier() {
+			public Object run(DocumentManager documentManager) {
+
+				SVGDocument document = documentManager.getSVGDocument();
+
+				BufferedOutputStream out = null;
+				try {
+					out =
+						new BufferedOutputStream(
+						new FileOutputStream(file));
+
+					TranscoderOutput output = new TranscoderOutput(out);
+					TranscoderInput  input  = new TranscoderInput(
+						isolateInnerDocument(preserveAspectRatio ? null : "none"));
+					transcoder.transcode(input, output);
+				}
+				catch (TranscoderException te) {
+					te.printStackTrace();
+				}
+				catch (IOException ioe) {
+					ioe.printStackTrace();
+				}
+				finally {
+					if (out != null) {
+						try { out.flush(); } catch (IOException ioe) {}
+						try { out.close(); } catch (IOException ioe) {}
+						out = null;
+					}
+				}
+				return null;
+			}
+		});
+	}
 
 	/**
 	 * prints the document of this manager.

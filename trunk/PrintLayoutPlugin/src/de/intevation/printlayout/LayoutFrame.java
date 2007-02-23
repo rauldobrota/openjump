@@ -62,6 +62,8 @@ import org.apache.batik.dom.AbstractElement;
 
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 
+import org.apache.batik.transcoder.Transcoder;
+
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGLocatable;
 import org.w3c.dom.svg.SVGMatrix;
@@ -112,6 +114,8 @@ import de.intevation.printlayout.beans.ScaleBarUpdater;
 
 import de.intevation.printlayout.batik.PatternExt;
 
+import de.intevation.printlayout.ui.JPEGParameterDialog;
+
 /**
  * Top level window containing the tool bar and the sheet panel.
  */
@@ -137,31 +141,33 @@ implements   PickingInteractor.PickingListener
 	public static final String ZOOM_100_ICON =
 		"resources/viewmag1.png";
 
-  protected DocumentManager    docManager;
+  protected DocumentManager     docManager;
 
-	protected PlugInContext      pluginContext;
+	protected PlugInContext       pluginContext;
 
-	protected ArrayList          tools;
+	protected ArrayList           tools;
 
-	protected RemoveAction       removeAction;
-	protected GroupAction        groupAction;
-	protected UngroupAction      ungroupAction;
-	protected UpAction           upAction;
-	protected DownAction         downAction;
+	protected RemoveAction        removeAction;
+	protected GroupAction         groupAction;
+	protected UngroupAction       ungroupAction;
+	protected UpAction            upAction;
+	protected DownAction          downAction;
 
-	protected	AddScalebarAction  addScalebarAction;
-	protected	AddScaletextAction addScaletextAction;
-	protected	BoxPropAction      boxPropAction;
-	protected TextPropAction     textPropAction;
+	protected	AddScalebarAction   addScalebarAction;
+	protected	AddScaletextAction  addScaletextAction;
+	protected	BoxPropAction       boxPropAction;
+	protected TextPropAction      textPropAction;
+                              
+	protected PickingInteractor   pickingInteractor;
 
-	protected PickingInteractor  pickingInteractor;
+	protected File                lastDirectory;
 
-	protected File               lastDirectory;
+	protected JLabel              mousePosition;
+	protected NumberFormat        mouseFormat;
 
-	protected JLabel             mousePosition;
-	protected NumberFormat       mouseFormat;
+	protected RulerOverlay        rulerOverlay;
 
-	protected RulerOverlay       rulerOverlay;
+	protected JPEGParameterDialog jpgParameters;
 
 	public LayoutFrame() {
 	}
@@ -207,6 +213,7 @@ implements   PickingInteractor.PickingListener
 
 		ExportSVGAction    svgExportAction    = new ExportSVGAction();
 		PDFAction          pdfAction          = new PDFAction();
+		JPGAction          jpgAction          = new JPGAction();
 		PrintAction        printAction        = new PrintAction();
 		SaveSessionAction  saveSessionAction  = new SaveSessionAction();
 		LoadSessionAction  loadSessionAction  = new LoadSessionAction();
@@ -232,6 +239,7 @@ implements   PickingInteractor.PickingListener
 		fileMenu.add(saveSessionAction);
 		fileMenu.addSeparator();
 		fileMenu.add(svgExportAction);
+		fileMenu.add(jpgAction);
 		fileMenu.add(pdfAction);
 		fileMenu.add(printAction);
 		fileMenu.addSeparator();
@@ -712,13 +720,48 @@ implements   PickingInteractor.PickingListener
 			docManager.exportPDF(file);
 	}
 
+	protected void exportJPG() {
+		JFileChooser fc = new JFileChooser(lastDirectory);
+
+		FileFilter ff = new FileFilter(
+			new String [] { "jpg", "jpeg"},
+			"*.jpg, *.jpeg: JPG Image");
+
+		fc.setFileFilter(ff);
+		
+		int result = fc.showSaveDialog(docManager.getCanvas());
+
+		lastDirectory = fc.getCurrentDirectory();
+
+		if (result != JFileChooser.APPROVE_OPTION)
+			return;
+
+		File file = fc.getSelectedFile();
+
+		file = ff.addExtIfNeeded(file);
+	  
+		if (!confirmWrite(file))
+			return;
+
+		if (jpgParameters == null)
+			jpgParameters = new JPEGParameterDialog(this);
+
+		double [] size = new double[2];
+		docManager.getPaperSize(size);
+
+		Transcoder transcoder = jpgParameters.getTranscoder(size);
+
+		if (transcoder != null)
+			docManager.transcodeToFile(transcoder, file);
+	}
+
 
 	protected void exportSVG() {
 		JFileChooser fc = new JFileChooser(lastDirectory);
 
 		FileFilter ff = new FileFilter(
 			new String [] { "svg", "svgz" },
-			"*.svg, *.svgz: SVG(Z) Document");
+			"*.svg, *.svgz: SVG Document");
 
 		fc.setFileFilter(ff);
 		
@@ -742,7 +785,7 @@ implements   PickingInteractor.PickingListener
 
 		FileFilter ff = new FileFilter(
 			new String[] { "svg", "svgz" },
-			"*.svg, *.svgz: SVG(Z) Document");
+			"*.svg, *.svgz: SVG Document");
 
 		fc.setFileFilter(ff);
 
@@ -999,11 +1042,22 @@ implements   PickingInteractor.PickingListener
 			super(I18N.getName(
 					I18N.getString("LayoutFrame.ExportPDF", "Export PDF...")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
-					I18N.getString("LayoutFrame.ExportPDF", "Export PDF...")));	
-			//putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control X"));
+					I18N.getString("LayoutFrame.ExportPDF", "Export &PDF...")));	
 		}
 		public void actionPerformed(ActionEvent ae) {
 			exportPDF();
+		}
+	}
+
+	private class JPGAction extends AbstractAction {
+		JPGAction() {
+			super(I18N.getName(
+					I18N.getString("LayoutFrame.ExportJPG", "Export JPG...")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.ExportJPG", "Export &JPG...")));	
+		}
+		public void actionPerformed(ActionEvent ae) {
+			exportJPG();
 		}
 	}
 
@@ -1012,8 +1066,7 @@ implements   PickingInteractor.PickingListener
 			super(I18N.getName(
 					I18N.getString("LayoutFrame.ImportImage", "Import Image...")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
-					I18N.getString("LayoutFrame.ImportImage", "Import Image...")));
-			//putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control I"));
+					I18N.getString("LayoutFrame.ImportImage", "Import &Image...")));
 		}
 
 		public void actionPerformed(ActionEvent ae) {
@@ -1026,8 +1079,7 @@ implements   PickingInteractor.PickingListener
 			super(I18N.getName(
 					I18N.getString("LayoutFrame.ImportSVG", "Import SVG...")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
-					I18N.getString("LayoutFrame.ImportSVG", "Import SVG...")));
-			//putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control V"));
+					I18N.getString("LayoutFrame.ImportSVG", "Import &SVG...")));
 		}
 
 		public void actionPerformed(ActionEvent ae) {
@@ -1040,7 +1092,7 @@ implements   PickingInteractor.PickingListener
 			super(I18N.getName(
 				I18N.getString("LayoutFrame.ExportSVG", "Export SVG...")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
-				I18N.getString("LayoutFrame.ExportSVG", "Export SVG...")));
+				I18N.getString("LayoutFrame.ExportSVG", "E&xport SVG...")));
 			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control E"));
 		}
 		public void actionPerformed(ActionEvent ae) {
@@ -1053,8 +1105,7 @@ implements   PickingInteractor.PickingListener
 			super(I18N.getName(
 					I18N.getString("LayoutFrame.AddMap", "Add Map")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
-					I18N.getString("LayoutFrame.AddMap", "Add Map")));
-			//putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control M"));
+					I18N.getString("LayoutFrame.AddMap", "Add &Map")));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			addMap();
@@ -1066,7 +1117,7 @@ implements   PickingInteractor.PickingListener
 			super(I18N.getName(
 					I18N.getString("LayoutFrame.Close", "Close")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
-					I18N.getString("LayoutFrame.Close", "Close")));
+					I18N.getString("LayoutFrame.Close", "&Close")));
 			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control W"));
 		}
 		public void actionPerformed(ActionEvent ae) {
@@ -1079,7 +1130,7 @@ implements   PickingInteractor.PickingListener
 			super(I18N.getName(
 				I18N.getString("LayoutFrame.Remove", "Remove")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
-				I18N.getString("LayoutFrame.Remove", "Remove")));
+				I18N.getString("LayoutFrame.Remove", "&Remove")));
 			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("DELETE"));
 		}
 		public void actionPerformed(ActionEvent ae) {
@@ -1092,7 +1143,7 @@ implements   PickingInteractor.PickingListener
 			super(I18N.getName(
 					I18N.getString("LayoutFrame.Group", "Group")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
-					I18N.getString("LayoutFrame.Group", "Group")));
+					I18N.getString("LayoutFrame.Group", "&Group")));
 			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl G"));
 		}
 		public void actionPerformed(ActionEvent ae) {
@@ -1105,7 +1156,7 @@ implements   PickingInteractor.PickingListener
 			super(I18N.getName(
 					I18N.getString("LayoutFrame.Ungroup", "Ungroup")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
-					I18N.getString("LayoutFrame.Ungroup", "Ungroup")));
+					I18N.getString("LayoutFrame.Ungroup", "&Ungroup")));
 			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("shift ctrl G"));
 		}
 		public void actionPerformed(ActionEvent ae) {
@@ -1143,10 +1194,9 @@ implements   PickingInteractor.PickingListener
 	private class AddScalebarAction extends AbstractAction {
 		AddScalebarAction() {
 			super(I18N.getName(
-					I18N.getString("LayoutFrame.AddScaleBar", "Add Scale&bar")));
+					I18N.getString("LayoutFrame.AddScaleBar", "Add Scalebar")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.AddScaleBar", "Add Scale&bar")));
-			//putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl B"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			addScaleBar();
@@ -1156,10 +1206,9 @@ implements   PickingInteractor.PickingListener
 	private class AddScaletextAction extends AbstractAction {
 		AddScaletextAction() {
 			super(I18N.getName(
-					I18N.getString("LayoutFrame.AddScaleText", "Add S&caletext")));
+					I18N.getString("LayoutFrame.AddScaleText", "Add Scaletext")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.AddScaleText", "Add S&caletext")));
-			//putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl T"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			addScaleText();
@@ -1169,7 +1218,7 @@ implements   PickingInteractor.PickingListener
 	private class AboutDialogAction extends AbstractAction {
 		AboutDialogAction() {
 			super(I18N.getName(
-					I18N.getString("LayoutFrame.ShowAboutDialog", "&About...")));
+					I18N.getString("LayoutFrame.ShowAboutDialog", "About...")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.ShowAboutDialog", "&About...")));
 		}
@@ -1181,7 +1230,7 @@ implements   PickingInteractor.PickingListener
 	private class InfoDialogAction extends AbstractAction {
 		InfoDialogAction() {
 			super(I18N.getName(
-					I18N.getString("LayoutFrame.ShowInfoDialog", "&Info...")));
+					I18N.getString("LayoutFrame.ShowInfoDialog", "Info...")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.ShowInfoDialog", "&Info...")));
 			putValue(Action.ACCELERATOR_KEY, 
@@ -1206,10 +1255,10 @@ implements   PickingInteractor.PickingListener
 	private class SaveSessionAction extends AbstractAction {
 		SaveSessionAction() {
 			super(I18N.getName(
-					I18N.getString("LayoutFrame.SaveSession", "S&ave...")));
+					I18N.getString("LayoutFrame.SaveSession", "Save...")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.SaveSession", "S&ave...")));
-		  //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control S"));
+		  putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control S"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			saveSession();
@@ -1219,10 +1268,10 @@ implements   PickingInteractor.PickingListener
 	private class LoadSessionAction extends AbstractAction {
 		LoadSessionAction() {
 			super(I18N.getName(
-					I18N.getString("LayoutFrame.LoadSession", "&Load...")));
+					I18N.getString("LayoutFrame.LoadSession", "Load...")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.LoadSession", "&Load...")));
-			//putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control O"));
+			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control O"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			loadSession();
@@ -1297,7 +1346,7 @@ implements   PickingInteractor.PickingListener
 					I18N.getString("LayoutFrame.ShowRuler", "&Show Ruler")));
 			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
 					I18N.getString("LayoutFrame.ShowRuler", "&Show Ruler")));
-			//putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control R"));
+			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control R"));
 		}
 		public void actionPerformed(ActionEvent ae) {
 			activateRuler(((JCheckBoxMenuItem)ae.getSource()).getState());

@@ -1,3 +1,28 @@
+2007-02-23  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	Added support for JPEG export.
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		added method transcodeToFile() for general SVG transcoding.
+		The special case of image encoding uses this method.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		added a menu entry to export as JPG.
+
+	* src/de/intevation/printlayout/ui/:
+		new: package for special GUI dialogs. 
+		TODO: move some of the dialogs from tool to this place.
+
+	* src/de/intevation/printlayout/ui/package.html:
+		new: short JavaDoc description of the new package.
+
+	* src/de/intevation/printlayout/ui/JPEGParameterDialog.java:
+		new. Asks user for image size and image quality.
+
+	* src/de/intevation/printlayout/i18n/messages.properties,
+	  src/de/intevation/printlayout/i18n/messages_de.properties:
+		added texts for new menu entry and JPG parameter dialog.
+
 2007-02-22  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	Added support for changing the z order of the laid out elements.
