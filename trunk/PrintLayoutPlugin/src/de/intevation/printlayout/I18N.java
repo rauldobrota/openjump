@@ -25,10 +25,21 @@ public class I18N
 	private I18N() {
 	}
 
+	/**
+	 * looks up a key in the i18n table.
+	 * @param key the key to the i18n string.
+	 * @return the i18n value of the key. key if not found.
+	 */
 	public static String getString(String key) {
-		return I18N.getString(key);
+		return getString(key, key);
 	}
 
+	/**
+	 * looks up a key in the i18n table.
+	 * @param key the key to the i18n string.
+	 * @param def the default value if no entry is found.
+	 * @return the i18n value of the key. def if not found.
+	 */
 	public static String getString(String key, String def) {
 		try {
 			String value = I18N.getString(key);
@@ -39,6 +50,13 @@ public class I18N
 		}
 	}
 
+	/**
+	 * extracts the name from a i18n string.
+	 * i18n strings may contain &amp; chars to mark menu shortcuts.
+	 * These shotcuts will be removed from name.
+	 * @param label the string with &amp; shortcut markers.
+	 * @return label without the shortcut markers.
+	 */
 	public static String getName(String label) {
 		StringBuffer sb = new StringBuffer();
 
@@ -58,6 +76,16 @@ public class I18N
 		}
 		return sb.toString();
 	}
+
+	/**
+	 * extracts a mnemonic from an i18n string.
+	 * In menus a mnemonic can be set. these markers
+	 * are prefixed with &amp; in the i18n string.
+	 * @param label i18n label with &amp; markers.
+	 * @return an integer constructed from the char
+	 *         following the &amp;. null if no maker
+	 *         was found.
+	 */
 	public static Integer getMnemonic(String label) {
 		Character c = null;
 		boolean lastWasQuoteAmp = false;
@@ -82,6 +110,5 @@ public class I18N
 			return new Integer((int) c.charValue());
 		return null;
 	}
-
 }
 // end of file

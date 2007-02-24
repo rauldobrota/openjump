@@ -20,6 +20,11 @@ import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 public class LayoutExtension
 extends      Extension
 {
+	/**
+	 * overrides configure() from base class. Used to bootstrap
+	 * the plugin by the OpenJUMP framework.
+	 * @param context the plugin context.
+	 */
 	public void configure(PlugInContext context) throws Exception {
 		new PrintLayoutPlugin().initialize(context);
 	}

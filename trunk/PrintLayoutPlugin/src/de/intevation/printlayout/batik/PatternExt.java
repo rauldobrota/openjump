@@ -38,6 +38,18 @@ extends      DefaultExtensionHandler
 	public PatternExt() {
 	}
 
+	/**
+	 * Filters out
+	 * com.vividsolutions.jump.workbench.ui.renderer.style.BasicFillPattern 
+	 * fill patterns, renders them to a texture and use this
+	 * texture to describe the SVG fill.
+	 * @param paint incoming Paint object.
+	 * @param generatorContext the SVG generator context
+	 * @return a SVGPaintDescriptor of a java.awt.TexturePaint 
+	 *         if the paint is a BasicFillPattern.<br>
+	 *         Else the return value of handlePaint() of the
+	 *         super class is return.
+	 */
 	public SVGPaintDescriptor handlePaint(
 		Paint paint,
     SVGGeneratorContext generatorContext

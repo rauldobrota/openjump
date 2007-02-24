@@ -33,8 +33,16 @@ public class PrintLayoutPlugin
 extends      AbstractPlugIn 
 implements   ThreadedPlugIn
 {
+	/**
+	 * the black board of the plugin
+	 */
 	protected Blackboard blackboard;
 
+	/**
+	 * implements the initialize() method needed to
+	 * initialize the plugin.
+	 * @param context the plugin context
+	 */
 	public void initialize(PlugInContext context)
 	throws Exception
 	{
@@ -50,17 +58,34 @@ implements   ThreadedPlugIn
 		 blackboard = new Blackboard();
 	}
 
+	/**
+	 * The name of the plugin. Actually 'Print/Layout'
+	 * @return 'Print/Layout'
+	 */
 	public String getName() {
 		return "Print/Layout";
 	}
    
 
+	/**
+	 * implements the execute() method of the plugin.
+	 * because its a long running plugin it return
+	 * immediately. The real execution is done in run().
+	 * @return always true
+	 */
 	public boolean execute(PlugInContext context)
 	throws Exception
 	{
 		return true;
 	}
 
+	/**
+	 * implements the run() method of the plugin.
+	 * It creates a A4 paper sheet and opens up a LayoutFrame
+	 * to edit it.
+	 * @param monitor the TaskMonitor of the plugin
+	 * @param context the plugin context
+	 */
 	public void run(TaskMonitor monitor, PlugInContext context)
 	{
 		monitor.allowCancellationRequests();
@@ -69,8 +94,6 @@ implements   ThreadedPlugIn
 
 		if (document == null)
 			return;
-
-		//DocumentManager.decorateWithRulers(document);
 
 		LayoutFrame viewer = new LayoutFrame(context);
 

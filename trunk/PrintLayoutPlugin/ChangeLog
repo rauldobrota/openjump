@@ -1,5 +1,18 @@
 2007-02-24  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/I18N.java,
+	  src/de/intevation/printlayout/InfoDialog.java,
+	  src/de/intevation/printlayout/LayoutCanvas.java,
+	  src/de/intevation/printlayout/LayoutExtension.java,
+	  src/de/intevation/printlayout/PrintLayoutPlugin.java,
+	  src/de/intevation/printlayout/batik/PatternExt.java,
+	  src/de/intevation/printlayout/ui/ImageParameterDialog.java,
+	  src/de/intevation/printlayout/util/Template.java,
+	  src/de/intevation/printlayout/util/TypoUnits.java:
+		Added some JavaDoc comments.
+
+2007-02-24  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
 	Introduce a new common base class for image encoding parameters.
 
 	* src/de/intevation/printlayout/ui/ImageParameterDialog.java:

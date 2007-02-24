@@ -11,6 +11,10 @@
  */
 package de.intevation.printlayout.util;
 
+/**
+ * helper class to extract paper units out of
+ * SVG attributes and convert them.
+ */
 public class TypoUnits
 {
 	/**
@@ -21,36 +25,98 @@ public class TypoUnits
    * pc (picas; 1pc=12pt)
 	 */
 
+	/**
+	 * type is in milimeter
+	 */
 	public static final int TYPE_MM   = 0;
+	/**
+	 * type is in inch
+	 */
 	public static final int TYPE_IN   = 1;
+	/**
+	 * type is in point
+	 */
 	public static final int TYPE_PT   = 2;
+	/**
+	 * type is in pica
+	 */
 	public static final int TYPE_PC   = 3;
+	/**
+	 * type is in centimeter
+	 */
 	public static final int TYPE_CM   = 4;
+	/**
+	 * type is in percent
+	 */
 	public static final int TYPE_PERC = 5;
+	/**
+	 * type is in pixel
+	 */
 	public static final int TYPE_PX   = 6;
+	/**
+	 * type is in em
+	 */
 	public static final int TYPE_EM   = 7;
+	/**
+	 * type is in ex
+	 */
 	public static final int TYPE_EX   = 8;
 
-	public static final double mm2in(double in) {
-		return in * 0.039370079d;
+	/**
+	 * converts mm to inch
+	 * @param mm value in mm
+	 * @return   value in inch
+	 */
+	public static final double mm2in(double mm) {
+		return mm * 0.039370079d;
 	}
 
+	/**
+	 * converts inch to mm
+	 * @param in value in inch
+	 * @return   value in mm
+	 */
 	public static final double in2mm(double in) {
 		return in * 25.4d;
 	}
 
+	/**
+	 * converts points to mm
+	 * @param pt value in points
+	 * @return   value in mm
+	 */
 	public static final double pt2mm(double pt) {
 		return pt * 0.3514598;
 	}
 
+	/**
+	 * converts pica to mm
+	 * @param pc value in pica
+	 * @return   value in mm
+	 */
 	public static final double pc2mm(double pc) {
 		return pc * 4.2175176;
 	}
 
+	/**
+	 * converts cm to mm
+	 * @param cm value in cm
+	 * @return   value in mm
+	 */
 	public static final double cm2mm(double cm) {
 		return cm * 10d;
 	}
 
+	/**
+	 * Takes a string, determine this unit type,
+	 * converts the parsed string to mm, stores
+	 * the result in v.
+	 * @param s     the string to parse
+	 * @param px2mm how to convert from px to mm (user agent value)
+	 * @param max   if in percent what is 100
+	 * @param v     to store the result in mm
+	 * @return      the unit type of the string.
+	 */
 	public static int stringToMM(
 		String s, 
 		double px2mm, 

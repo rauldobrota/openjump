@@ -37,10 +37,19 @@ public class InfoDialog extends JDialog {
 
 	public static String resource = "resources/info.html";
 	
+	/**
+	 * creates a dialog with the standard info text.
+	 * @param owner owner frame
+	 */
 	public InfoDialog(JFrame owner) {
 		this(owner, resource);
 	}
 	
+	/**
+	 * creates a dialog for a given resource.
+	 * @param owner owner frame
+	 * @param resource path to HTML resource file.
+	 */
 	public InfoDialog(JFrame owner, String resource) {
 		super(owner);
 
@@ -97,22 +106,42 @@ public class InfoDialog extends JDialog {
 		
 	} 
 
+	/**
+	 * static helper to create and show a standard info dialog
+	 * @param owner owner frame
+	 */
 	public static void showDialog(JFrame owner) {
 		InfoDialog dialog = new InfoDialog(owner);
 		dialog.setVisible(true);
-	
 	}
 
+	/**
+	 * static helper to create and show a dialog for a
+	 * given HTML resource.
+	 * @param owner owner frame
+	 * @param resource path to HTML resource file.
+	 */
 	public static void showDialog(JFrame owner, String resource) {
 		InfoDialog dialog = new InfoDialog(owner, resource);
 		dialog.setVisible(true);
 	}
 
+	/**
+	 * looks for the last occurence of '.' char in a given
+	 * string and inserts a two letter language code prefixed
+	 * by an '_'  before its location.
+	 * e.g. index.html becomes index_de.html if you are running
+	 * a german locale.
+	 * @param str string to look for '.' occurence.
+	 * @return the modified string. If no '.' was found the
+	 *         orginal string is returned.
+	 */
 	private static String getLocalizedResource(String str) {
 		Locale locale = Locale.getDefault();
-		if (str.lastIndexOf('.') > -1)
-			return str.substring(0, str.lastIndexOf('.')) + "_"+ locale.getLanguage()
-					+ str.substring(str.lastIndexOf('.'));
-		return str;
+		int index = str.lastIndexOf('.');
+		return index > -1
+			? str.substring(0, index) + "_"+ locale.getLanguage()
+			  + str.substring(index)
+			: str;
 	}
 }

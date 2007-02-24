@@ -258,8 +258,8 @@ extends               JDialog
 	/**
 	 * when keeping ascpect ratio this method calculates
 	 * the width belonging to height accordingly the scale.
-	 * @param width the height
-	 * @return      the width
+	 * @param height the height
+	 * @return       the width
 	 */
 	protected int widthFromHeight(int height) {
 		return Math.max(1, (int)Math.round(height/scale));
