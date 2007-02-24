@@ -1,5 +1,21 @@
 2007-02-24  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
+	Introduce a new common base class for image encoding parameters.
+
+	* src/de/intevation/printlayout/ui/ImageParameterDialog.java:
+		new: abstract base class to ease the implemention
+		of several image export parameter dialogs e.g. for PNG, TIFF etc.
+
+	* src/de/intevation/printlayout/ui/JPEGParameterDialog.java:
+		only the JPEG specific stuff is left. The rest has been moved
+		to base class ImageParameterDialog. Improved the JavaDoc.
+
+	* src/de/intevation/printlayout/i18n/messages.properties,
+	  src/de/intevation/printlayout/i18n/messages_de.properties:
+		adjusted for new ImageParameterDialog base class.
+
+2007-02-24  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
 	Improve parameter dialog for JPEG export a bit.
 
 	* src/de/intevation/printlayout/LayoutFrame.java:
