@@ -1,5 +1,14 @@
 2007-02-24  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/tools/Arrows.java,
+	  src/de/intevation/printlayout/tools/PanInteractor.java,
+	  src/de/intevation/printlayout/tools/Tool.java,
+	  src/de/intevation/printlayout/util/FileFilter.java,
+	  src/de/intevation/printlayout/util/LineProjector.java:
+		Added some JavaDoc comments.
+
+2007-02-24  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
 	* src/de/intevation/printlayout/util/GeometricMath.java,
 	  src/de/intevation/printlayout/util/LineProjector.java,
 	  src/de/intevation/printlayout/util/MatrixTools.java,

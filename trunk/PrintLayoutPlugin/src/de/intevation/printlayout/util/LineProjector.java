@@ -14,7 +14,7 @@ package de.intevation.printlayout.util;
 import java.awt.geom.Point2D;
 
 /**
- * An instances of this class represents a line in 2D
+ * An instance of this class represents a line in 2D
  * with the ability to calculate the point on
  * the line which is closest given another point
  * in the plane. This is used to stabilize motions

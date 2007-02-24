@@ -14,8 +14,16 @@ package de.intevation.printlayout.tools;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.AffineTransform;
 
+/**
+ * Produces double headed arrow shapes used
+ * as direction indicators in overlays.
+ */
 public final class Arrows
 {
+	/**
+	 * The coordinates of the arrow.
+	 * packed x0, y0, x1, y1, x2, y2, ...
+	 */
 	public static final float [] COORDS = {
 		-3f, -4f,
 		-6f, -4f,
@@ -30,6 +38,18 @@ public final class Arrows
 		-3f, -4f,
 	};
 
+	/**
+	 * Creates an arrow shape with a given zero point,
+	 * a rotation angle around this point, a given
+	 * scale and a given translation afterwards.
+	 * @param zx x coordiante of zero point
+	 * @param zy y coordiante of zero point
+	 * @param angle rotation angle
+	 * @param scale the scale
+	 * @param dx x coordinate of the translation
+	 * @param dy y coordinate of the translation
+	 * @return a GeneralPath shape of the transformed arrow
+	 */
 	public static final GeneralPath createArrow(
 		double zx, double zy,
 		double angle,
