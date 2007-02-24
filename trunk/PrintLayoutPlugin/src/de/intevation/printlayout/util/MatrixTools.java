@@ -18,21 +18,51 @@ import org.apache.batik.parser.ParseException;
 
 import java.awt.geom.AffineTransform;
 
+/**
+ * class providing static helper methods to ease
+ * the handling of affine transform (3x3 matrices)
+ * when interacting with SVG DOM.
+ */
 public class MatrixTools
 {
+	/**
+	 * class representing a decomposition of a given
+	 * affine transform.
+	 */
 	public static final class Decomposition 
 	{
-		public double tx; // translate x
-		public double ty; // translate y
-
-		public double ro; // rotation
-
-		public double scx; // scale x
-		public double scy; // scale y
-
-		public double skx; // skew x
+		/**
+		 * the translation in x direction
+		 */
+		public double tx;
+		/**
+		 * the translation in y direction
+		 */
+		public double ty;
+		/**
+		 * the rotation in radians
+		 */
+		public double ro;
+		/**
+		 * the scale in x direction
+		 */
+		public double scx;
+		/**
+		 * the scale in y direction
+		 */
+		public double scy;
+		/**
+		 * the shear (skew) in x direction
+		 */
+		public double skx;
+		/**
+		 * the shear (skew) in y direction
+		 */
 		public double sky; // skew y
 		
+		/**
+		 * Creates a decomposition for a given SVGMatrix
+		 */
 		public Decomposition(SVGMatrix matrix) {
 			this(
 				matrix.getA(),
@@ -43,20 +73,42 @@ public class MatrixTools
 				matrix.getF());
 		}
 
+		/**
+		 * extracts the 6 relevant matrix elements out of a given AffineTransform.
+		 * @param xform the AffineTransform
+		 * @return a six element array with a, b, c, d, e, f (see SVG specs)
+		 */
 		public static double [] getMatrix(AffineTransform xform) {
 			double [] m = new double[6];
 			xform.getMatrix(m);
 			return m;
 		}
 
+		/**
+		 * Creates a decomposition from a given AffineTransform
+		 * @param xform the AffineTransform
+		 */
 		public Decomposition(AffineTransform xform) {
 			this(getMatrix(xform));
 		}
 
+		/**
+		 * Creates a decomposition from a given six element array
+		 * @param m the array
+		 */
 		public Decomposition(double [] m) {
 			this(m[0], m[1], m[2], m[3], m[4], m[5]);
 		}
 
+		/**
+		 * Creates a decomposition from a given set of matrix coeffs a to f.
+		 * @param a the a coefficient
+		 * @param b the b coefficient
+		 * @param c the c coefficient
+		 * @param d the d coefficient
+		 * @param e the e coefficient
+		 * @param f the f coefficient
+		 */
 		public Decomposition(
 			double a, double b,
 			double c, double d,
@@ -81,6 +133,11 @@ public class MatrixTools
 			ro = Math.acos(a*const2);
 		}
 
+		/**
+		 * reconstructs a string description suitable for use
+		 * in SVG DOM.
+		 * @return SVG DOM string representation of the decomposed matrix.
+		 */
 		public String toString() {
 			StringBuffer sb = new StringBuffer();
 			sb.append("skewY(").append(sky)
@@ -95,10 +152,20 @@ public class MatrixTools
 	private MatrixTools() {
 	}
 
+	/**
+	 * static helper to create a decomposition of a given matrix.
+	 * @param matrix the matrix to decompose.
+	 * @return the decomposition
+	 */
 	public static Decomposition decompose(SVGMatrix matrix) {
 		return new Decomposition(matrix);
 	}
 
+	/**
+	 * static helper to convert an SVGMatrix to Java2D AffineTransform.
+	 * @param matrix the SVG matrix
+	 * @return the Java2D AffineTransform
+	 */
 	public static final AffineTransform toJavaTransform(SVGMatrix matrix) {
 		return new AffineTransform(
 			matrix.getA(),
@@ -109,22 +176,36 @@ public class MatrixTools
 			matrix.getF());
 	}
 
+	/**
+	 * static helper to create a SVG DOM suitable string representation
+	 * of a Java2D AffineTransform.
+	 * @param matrix the Java2D AffineTransform
+	 * @return the SVG DOM string for this matrix.<br>
+	 *         The identity matrix is return if matrix is null.
+	 */
 	public static String toSVGString(AffineTransform matrix) {
 		if (matrix == null)
 			return "matrix(1 0 0 1 0 0)";
 
-		StringBuffer sb = new StringBuffer("matrix(");
-		double [] m = new double[6];
 		// m00 m10 m01 m11 m02 m12 
+		double [] m = new double[6];
 		matrix.getMatrix(m);
-		for (int i = 0; i < m.length; ++i) {
-			if (i > 0) sb.append(' ');
-			sb.append(m[i]);
-		}
-		sb.append(')');
-		return sb.toString();
+		return new StringBuffer("matrix(")
+			.append(m[0]).append(' ')
+			.append(m[1]).append(' ')
+			.append(m[2]).append(' ')
+			.append(m[3]).append(' ')
+			.append(m[4]).append(' ')
+			.append(m[5]).append(')').toString();
 	}
 
+	/**
+	 * static helper to convert an SVG DOM string representation
+	 * of a AffineTransform to the Java2D equivalent.
+	 * @param string the SVG DOM string for the matrix
+	 * @return the Java2D AffineTransform.<br>
+	 *         null if string is null or string is not an SVG matrix string.
+	 */
 	public static AffineTransform toJavaTransform(String string) {
 		if (string == null)
 			return null;
@@ -135,15 +216,5 @@ public class MatrixTools
 			return null;
 		}
 	}
-
-	/*
-	public static void main(String [] args) {
-		for (int i = 0; i < args.length; ++i) {
-			System.out.println("'" + args[i] + "'");
-			AffineTransform xform = toJavaTransform(args[i]);
-			System.out.println(xform);
-		}
-	}
-	*/
 }
 // end of file
