@@ -24,6 +24,8 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 
+import javax.swing.text.NumberFormatter;
+
 import javax.swing.border.TitledBorder;
 
 import java.text.NumberFormat;
@@ -33,8 +35,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 
 import org.apache.batik.transcoder.Transcoder;
 
@@ -49,12 +55,16 @@ import de.intevation.printlayout.I18N;
 public class JPEGParameterDialog
 extends      JDialog
 {
-	public static final int INITIAL_WIDTH = 640;
+	public static final int INITIAL_WIDTH   = 640;
+	public static final int INITIAL_QUALITY =  85;
 
 	protected JFormattedTextField widthTF;
 	protected JFormattedTextField heightTF;
+
+	protected JFormattedTextField qualityTF;
+
 	protected JSlider             quality;
-	protected NumberFormat        format;
+
 	protected JCheckBox           keepAspect;
 
 	protected boolean             transcode;
@@ -90,46 +100,50 @@ extends      JDialog
 
 		JPanel dimC = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
-		format = NumberFormat.getInstance();
-		format.setMaximumFractionDigits(0);
+		NumberFormat format = NumberFormat.getIntegerInstance();
 		format.setGroupingUsed(false);
-		format.setParseIntegerOnly(true);
+		NumberFormatter formatter = new NumberFormatter(format);
+		formatter.setMinimum(new Integer(1));
 
 		String widthHeight = I18N.getString(
 			"JPEGParameterDialog.WidthHeight", "width x height:");
 
 		dimC.add(new JLabel(widthHeight, JLabel.RIGHT));
 
-		widthTF = new JFormattedTextField(format);
+		widthTF = new JFormattedTextField(formatter);
 		widthTF.setColumns(4);
+		widthTF.setHorizontalAlignment(JFormattedTextField.TRAILING);
+
 		dimC.add(widthTF);
 		dimC.add(new JLabel(" x ", JLabel.CENTER));
-		heightTF = new JFormattedTextField(format);
+
+		heightTF = new JFormattedTextField(formatter);
 		heightTF.setColumns(4);
+		heightTF.setHorizontalAlignment(JFormattedTextField.TRAILING);
 
-		widthTF.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-				widthChanged();
-			}
-		});
+		PropertyChangeListener cl = new PropertyChangeListener() {
 
-		heightTF.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-				heightChanged();
-			}
-		});
+			boolean changing; // protection against recursion
 
-		widthTF.addFocusListener(new FocusAdapter() {
-			public void focusLost(FocusEvent ae) {
-				widthChanged();
+			public void propertyChange(PropertyChangeEvent e) {
+				if (!"value".equals(e.getPropertyName()))
+					return;
+				Number value = (Number)e.getNewValue();
+				if (value == null)
+					return;
+				if (changing = !changing) {
+					boolean changed = e.getSource() == widthTF
+						? widthChanged(value)
+						: heightChanged(value);
+					if (!changed)
+						changing = false;
+				}
 			}
-		});
+		};
 
-		heightTF.addFocusListener(new FocusAdapter() {
-			public void focusLost(FocusEvent ae) {
-				heightChanged();
-			}
-		});
+		widthTF.addPropertyChangeListener(cl);
+
+		heightTF.addPropertyChangeListener(cl);
 
 		dimC.add(heightTF);
 
@@ -155,13 +169,46 @@ extends      JDialog
 
 		qual.setBorder(new TitledBorder(qualS));
 
-		quality = new JSlider(JSlider.HORIZONTAL, 0, 100, 85);
+		quality = new JSlider(JSlider.HORIZONTAL, 0, 100, INITIAL_QUALITY);
 		quality.setMajorTickSpacing(25);
 		quality.setMinorTickSpacing(5);
 		quality.setPaintTicks(true);
 		quality.setPaintLabels(true);
 
+		quality.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent ce) {
+				JSlider slider = (JSlider)ce.getSource();
+				Integer value = new Integer(slider.getValue());
+				if (!slider.getValueIsAdjusting())
+					qualityTF.setValue(value);
+				else
+        	qualityTF.setText(value.toString());
+			}
+		});
+
 		qual.add(quality);
+
+		NumberFormat qFormat = NumberFormat.getIntegerInstance();
+		qFormat.setGroupingUsed(false);
+		NumberFormatter qFormatter = new NumberFormatter(qFormat);
+		qFormatter.setMinimum(new Integer(0));
+		qFormatter.setMaximum(new Integer(100));
+
+		qualityTF = new JFormattedTextField(qFormatter);
+		qualityTF.setColumns(3);
+		qualityTF.setHorizontalAlignment(JFormattedTextField.TRAILING);
+
+		qualityTF.addPropertyChangeListener(new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent e) {
+				if ("value".equals(e.getPropertyName())) {
+					Number value = (Number)e.getNewValue();
+					if (quality != null && value != null)
+						quality.setValue(new Integer(value.intValue()));
+				}
+			}
+		});
+		qualityTF.setValue(new Integer(INITIAL_QUALITY));
+		qual.add(qualityTF);
 
 		middle.add(qual, BorderLayout.SOUTH);
 
@@ -206,30 +253,24 @@ extends      JDialog
 		setVisible(false);
 	}
 
-	protected void widthChanged() {
-		try { widthTF.commitEdit(); }
-		catch (ParseException pe) { return; }
-
-		int w = ((Number)widthTF.getValue()).intValue();
-		if (w < 1) { w = 1; widthTF.setValue(new Integer(1)); }
-
+	protected boolean widthChanged(Number width) {
 		if (keepAspect.isSelected()) {
+			int w = width.intValue();
 			int h = Math.max(1, (int)Math.round(scale*w));
 			heightTF.setValue(new Integer(h));
+			return true;
 		}
+		return false;
 	}
 
-	protected void heightChanged() {
-		try { heightTF.commitEdit(); }
-		catch (ParseException pe) { return; }
-
-		int h = ((Number)heightTF.getValue()).intValue();
-		if (h < 1) { h = 1; heightTF.setValue(new Integer(1)); }
-
+	protected boolean heightChanged(Number height) {
 		if (keepAspect.isSelected()) {
+			int h = height.intValue();
 			int w = Math.max(1, (int)Math.ceil(h/scale));
 			widthTF.setValue(new Integer(w));
+			return true;
 		}
+		return false;
 	}
 
 	protected void setImageSize(int width, int height) {

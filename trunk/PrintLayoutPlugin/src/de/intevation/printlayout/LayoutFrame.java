@@ -167,8 +167,6 @@ implements   PickingInteractor.PickingListener
 
 	protected RulerOverlay        rulerOverlay;
 
-	protected JPEGParameterDialog jpgParameters;
-
 	public LayoutFrame() {
 	}
 
@@ -743,13 +741,16 @@ implements   PickingInteractor.PickingListener
 		if (!confirmWrite(file))
 			return;
 
-		if (jpgParameters == null)
-			jpgParameters = new JPEGParameterDialog(this);
+		JPEGParameterDialog jpgParameters =
+			new JPEGParameterDialog(this);
 
 		double [] size = new double[2];
 		docManager.getPaperSize(size);
 
-		Transcoder transcoder = jpgParameters.getTranscoder(size);
+		Transcoder transcoder =
+			jpgParameters.getTranscoder(size);
+
+		jpgParameters.dispose();
 
 		if (transcoder != null)
 			docManager.transcodeToFile(transcoder, file);

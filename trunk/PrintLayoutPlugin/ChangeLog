@@ -1,3 +1,14 @@
+2007-02-24  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	Improve parameter dialog for JPEG export a bit.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		create always a fresh JPEGParameterDialog if export is requested.
+		Don't store it an instance variable any more.
+	 	 
+	* src/de/intevation/printlayout/ui/JPEGParameterDialog.java:
+		add a textfield for current quality. cleanup event handling.
+
 2007-02-23  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	Added support for JPEG export.
