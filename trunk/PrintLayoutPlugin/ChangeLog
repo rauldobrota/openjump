@@ -1,3 +1,8 @@
+2007-02-25  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/tools/RulerOverlay.java:
+		Added some JavaDoc comments.
+
 2007-02-24  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/tools/Arrows.java,

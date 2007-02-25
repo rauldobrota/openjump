@@ -41,28 +41,83 @@ import de.intevation.printlayout.util.MatrixTools;
 import de.intevation.printlayout.DocumentManager;
 
 
+/**
+ * Instances of this class paints a pair of rulers
+ * on top of an JSVGCanvas.<br>
+ * Each mm a tick is drawn.<br>
+ * Each 5 mm a longer tick is drawn.<br>
+ * Each 10 mm a even longer tick is drawn.<br>
+ * The 10 mm ticks are labeled with text of there
+ * value in cm.<br>
+ * It is checked if a label to draw would cause a
+ * collision. If so it is suppressed. If the distances
+ * between the ticks (depending on the current zoom)
+ * are to small, the 1 mm ticks are suppressed.
+ * If the 5 mm ticks a standing to close they are
+ * suppressed also. The 1 cm ticks are alsways drawn.
+ * If the viewport is rotated the labels are given
+ * as a pair of values in the 2D plane.
+ */
 public class RulerOverlay
 implements   Overlay
 {
+	/**
+	 * the font used to draw the labels
+	 */
 	public static final Font FONT =
 		new Font("Monospaced", Font.BOLD, 11);
 
+	/**
+	 * x start coordinate in pixels from where the rulers
+	 * are drawn on the canvas.
+	 */
 	public static final int X_START = 35;
+	/**
+	 * y start coordinate in pixels from where the rulers
+	 * are drawn on the canvas.
+	 */
 	public static final int Y_START = 20;
 
+	/**
+	 * for numerical stability
+	 */
 	private static final double FORMAT_EPS = 1e-4d;
+	/**
+	 * for numerical stability
+	 */
 	private static final double EPS        = 1d;
+	/**
+	 * for numerical stability
+	 */
 	private static final double MAX        = 10000d;
 
+	/**
+	 * the stroke to draw the ruler lines with.
+	 */
 	private static final BasicStroke STROKE =
 		new BasicStroke(1f);
 
+	/**
+	 * should the ruler been drawn?
+	 */
 	protected boolean inUse;
 
+	/**
+	 * reference to the DocumentManager.
+	 * used to access the canvas.
+	 */
 	protected DocumentManager documentManager;
 
+	/**
+	 * format for the label text
+	 */
 	protected NumberFormat format;
 
+	/**
+	 * inner class to help to differ between the directions
+	 * of the ruler lines and draw the labels accordingly.
+	 * The base class formats '(x, y)'.
+	 */
 	private class Formatter {
 		public String toString(Point2D p) {
 			StringBuffer sb = new StringBuffer("(");
@@ -74,18 +129,27 @@ implements   Overlay
 		}
 	}
 
+	/**
+	 * this class formats 'x'.
+	 */
 	private final class XFormatter extends Formatter {
 		public String toString(Point2D p) {
 			return format.format(p.getX() * 0.1d);
 		}
 	}
 
+	/**
+	 * this class formats 'y'.
+	 */
 	private final class YFormatter extends Formatter {
 		public String toString(Point2D p) {
 			return format.format(p.getY() * 0.1d);
 		}
 	}
 
+	/**
+	 * inner class to ease solution of linear equations.
+	 */
 	private static final class Linear
 	{
 		private double m;
@@ -104,22 +168,39 @@ implements   Overlay
 		}
 	} // class Linear
 
+	/**
+	 * Creates a Ruler. Use the RulerOverlay(DocumentManager)
+	 * constructor instead for easier wiring.
+	 */
 	public RulerOverlay() {
 		format = NumberFormat.getInstance();
 		format.setGroupingUsed(false);
 		format.setMaximumFractionDigits(2);
 	}
 
+	/**
+	 * Creates a Ruler and connects itself to a DocumentManager.
+	 * @param documentManager the DocumentManager to connect with
+	 */
 	public RulerOverlay(DocumentManager documentManager) {
 		this();
 		this.documentManager = documentManager;
 	}
 
+	/**
+	 * activated/deactive the drawing of the rulers.
+	 * @param inUse true if the rulers should be drawn else false.
+	 */
 	public void setInUse(boolean inUse) {
 		this.inUse = inUse;
 		documentManager.getCanvas().repaint();
 	}
 
+	/**
+	 * paint method to fullfill import org.apache.batik.swing.gvt.Overlay
+	 * interface. This actually draws the rulers.
+	 * @param g the graphics context of the canvas.
+	 */
 	public void paint(Graphics g) {
 		if (!inUse || documentManager == null)
 			return;
