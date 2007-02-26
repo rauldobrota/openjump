@@ -1,5 +1,10 @@
 2007-02-26  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
+	* src/de/intevation/printlayout/tools/PickingInteractor.java:
+		Added some JavaDoc comments.
+
+2007-02-26  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
 	Workaround for missing bounding boxes in selection tool.
 	In very rare(!) cases Batik returns an SVGLocatable which issues
 	a NullPointerException if one trys to access its bounding box.
