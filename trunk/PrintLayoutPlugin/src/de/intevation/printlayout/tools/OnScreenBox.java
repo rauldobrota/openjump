@@ -193,6 +193,9 @@ public class OnScreenBox
 	 */
 	public Rectangle bbox2shape(SVGRect bbox, AffineTransform xform) {
 
+		if (bbox == null)
+			return null;
+
 		if (points == null) {
 			points = new Point2D[4];
 			for (int i = 0; i < points.length; ++i)

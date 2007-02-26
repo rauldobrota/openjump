@@ -472,7 +472,6 @@ implements   Overlay, Tool, LayoutCanvas.DamagedRegion
 				continue;
 			}
 
-			++i;
 
 			SVGRect bbox = element.getBBox();
 			SVGMatrix matrix = element.getScreenCTM();
@@ -480,8 +479,14 @@ implements   Overlay, Tool, LayoutCanvas.DamagedRegion
 			AffineTransform xform = MatrixTools.toJavaTransform(matrix);
 
 			box.setTransformTime(renderTime);
-			box.bbox2shape(bbox, xform);
-			damaged = LayoutCanvas.enlarge(damaged, box.getShape().getBounds());
+			Rectangle r = box.bbox2shape(bbox, xform);
+			if (r != null) {
+				damaged = LayoutCanvas.enlarge(damaged, r);
+				++i;
+			}
+			else { // some trouble with the bounding box
+				selected.remove(i);
+			}
 		}
 
 		int NOW = selected.size();
@@ -538,19 +543,24 @@ implements   Overlay, Tool, LayoutCanvas.DamagedRegion
 				continue;
 			}
 
-			++i;
-
-			if (box.getTransformTime() != renderTime) {
-				box.setTransformTime(renderTime);
-				SVGMatrix matrix = element.getScreenCTM();
-				AffineTransform xform = MatrixTools.toJavaTransform(matrix);
-				SVGRect bbox = element.getBBox();
-				box.bbox2shape(bbox, xform);
+			try {
+				if (box.getTransformTime() != renderTime) {
+					box.setTransformTime(renderTime);
+					SVGMatrix matrix = element.getScreenCTM();
+					AffineTransform xform = MatrixTools.toJavaTransform(matrix);
+					SVGRect bbox = element.getBBox();
+					box.bbox2shape(bbox, xform);
+				}
+				Shape shape = box.getShape();
+				if (shape != null)
+					g2d.draw(shape);
+				++i;
 			}
-			Shape shape = box.getShape();
-			if (shape != null)
-				g2d.draw(shape);
-		}
+			catch (Exception e) {
+				// this one causes trouble -> remove it
+				selected.remove(i);
+			}
+		} // for all selected
 
 		int NOW = selected.size();
 

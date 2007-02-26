@@ -1,5 +1,20 @@
 2007-02-26  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
+	Workaround for missing bounding boxes in selection tool.
+	In very rare(!) cases Batik returns an SVGLocatable which issues
+	a NullPointerException if one trys to access its bounding box.
+	This seems to be a bug in Batik because there is no visible
+	reason why the selected objects should not have a bounding box.
+	It happens in the context of changing the rendering z order.
+
+	* src/de/intevation/printlayout/tools/OnScreenBox.java:
+		do an extra check for null references in setup the shape.
+
+	* src/de/intevation/printlayout/tools/PickingInteractor.java:
+		catches the exception and simply deselects the critical object.
+
+2007-02-26  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
 	Added support for shearing of selected elements.
 
 	* src/de/intevation/printlayout/tools/OnScreenBox.java:
