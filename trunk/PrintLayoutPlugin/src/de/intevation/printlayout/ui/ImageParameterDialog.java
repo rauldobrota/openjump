@@ -44,7 +44,7 @@ import org.apache.batik.transcoder.Transcoder;
 import de.intevation.printlayout.I18N;
 
 /**
- * Simple abstarct JDialog used to ask the user for the 
+ * Simple abstract JDialog used to ask the user for the 
  * size the an exported Image. Subclass it to add more
  * parameters.
  */

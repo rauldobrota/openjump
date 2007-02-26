@@ -1600,6 +1600,114 @@ public class DocumentManager
 	}
 
 	/**
+	 * shear some elements
+	 */
+	public void shearNoneUniformFixedIDs(
+		final String [] ids, 
+		final Point2D   screenDelta,
+		final Point2D   screenPos,
+		final Point2D   startPos,
+		final Point2D   refPos
+	) {
+		if (ids == null || ids.length == 0)
+			return;
+
+		modifyDocumentLater(new DocumentModifier() {
+			public Object run(DocumentManager documentManager) {
+
+				SVGDocument document = documentManager.getSVGDocument();
+
+				for (int i = 0; i < ids.length; ++i) {
+					String id = ids[i];
+
+					AbstractElement element = getElementById(document, id);
+
+					if (element == null)
+						return null;
+
+					SVGLocatable locatable = (SVGLocatable)element;
+
+					AffineTransform invCTM;
+					try {
+						AffineTransform CTM 
+							= MatrixTools.toJavaTransform(locatable.getScreenCTM());
+						invCTM = CTM.createInverse();
+					}
+					catch (NoninvertibleTransformException nite) {
+						continue;
+					}
+
+					Point2D startPosOnPaper = new Point2D.Double();
+					invCTM.transform(startPos, startPosOnPaper);
+					Point2D screenPosOnPaper = new Point2D.Double();
+					invCTM.transform(screenPos, screenPosOnPaper);
+					Point2D refPosOnPaper = new Point2D.Double();
+					invCTM.transform(refPos, refPosOnPaper);
+
+					Point2D deltaOnPaper = new Point2D.Double();
+					invCTM.deltaTransform(screenDelta, deltaOnPaper);
+
+					double alpha = GeometricMath.angleBetween(
+						refPosOnPaper,
+						screenPosOnPaper);
+
+					Point2D xDelta = new Point2D.Double(
+						screenPosOnPaper.getX() + deltaOnPaper.getX(),
+						screenPosOnPaper.getY());
+
+					Point2D yDelta = new Point2D.Double(
+						screenPosOnPaper.getX(),
+						screenPosOnPaper.getY() + deltaOnPaper.getY());
+
+					double betaX = GeometricMath.angleBetween(
+						refPosOnPaper,
+						xDelta);
+
+					double betaY = GeometricMath.angleBetween(
+						refPosOnPaper,
+						yDelta);
+
+					double gammaX = betaX - alpha;
+					double gammaY = alpha - betaY;
+
+					AffineTransform trans1 =
+						AffineTransform.getTranslateInstance(
+							-startPosOnPaper.getX(),
+							-startPosOnPaper.getY());
+
+					AffineTransform scaleTrans =
+						AffineTransform.getShearInstance(
+							Math.tan(gammaX),
+							Math.tan(gammaY));
+
+					AffineTransform trans2 =
+						AffineTransform.getTranslateInstance(
+							startPosOnPaper.getX(),
+							startPosOnPaper.getY());
+
+					scaleTrans.concatenate(trans1);
+					trans2.concatenate(scaleTrans);
+
+					String xformS = element.getAttributeNS(null, "transform");
+
+					AffineTransform xform = xformS == null
+						? new AffineTransform()
+						: MatrixTools.toJavaTransform(xformS);
+
+					xform.concatenate(trans2);
+
+					element.setAttributeNS(
+						null, "transform", MatrixTools.toSVGString(xform));
+
+					recursiveTransform(element);
+				}
+
+				return null;
+			}
+		});
+	}
+
+	/**
 	 * scales some elements
 	 */
 	public void scaleNoneUniformFixedIDs(

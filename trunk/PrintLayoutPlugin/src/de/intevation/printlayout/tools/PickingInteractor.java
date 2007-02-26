@@ -147,6 +147,27 @@ implements   Overlay, Tool, LayoutCanvas.DamagedRegion
 		}
 	} // NoneUniformScale
 
+	public static class Shear
+	extends             Scale
+	{
+		Point2D ref;
+
+		public Shear(LineProjector proj, Point2D ref) {
+			super(proj);
+			this.ref   = ref;
+		}
+
+		protected void projectedTransform(
+			String []       ids,
+			DocumentManager documentManager,
+			Point2D         delta,
+			Point2D         orginal
+		) {
+			documentManager.shearNoneUniformFixedIDs(
+				ids, delta, orginal, proj.getOrigin(), ref);
+		}
+	} // Shear
+
 	public static final TransformOperation ROTATE =
 		new TransformOperation() {
 			public void transform(
@@ -594,13 +615,15 @@ implements   Overlay, Tool, LayoutCanvas.DamagedRegion
 
 	public void mousePressed(MouseEvent evt) {
 
-		Object inside = OnScreenBox.OUTSIDE;
+		Integer inside = OnScreenBox.OUTSIDE;
 
 		int x = evt.getX();
 		int y = evt.getY();
 
+		OnScreenBox box = null;
+
 		for (int i = numSelections()-1; i >= 0; --i) {
-			OnScreenBox box = (OnScreenBox)selected.get(i);
+			box = (OnScreenBox)selected.get(i);
 			if ((inside = box.inside(x, y)) != OnScreenBox.OUTSIDE)
 				break;
 		}
@@ -609,7 +632,7 @@ implements   Overlay, Tool, LayoutCanvas.DamagedRegion
 
 			transformOperation = inside == OnScreenBox.INSIDE
 				? TRANSLATE
-				: getTransformOperation(inside, evt);
+				: getTransformOperation(box, inside, evt);
 
 			startX = evt.getX();
 			startY = evt.getY();
@@ -620,14 +643,41 @@ implements   Overlay, Tool, LayoutCanvas.DamagedRegion
 
 	// map decoration -> operation
 	protected TransformOperation getTransformOperation(
-		Object     parameter,
-		MouseEvent evt
+		OnScreenBox box,
+		Integer     point,
+		MouseEvent  evt
 	) {
+		int thisSide;
+		int otherSide;
+		int N;
+		Point2D p1, p2;
+		LineProjector proj;
 		switch (decoration) {
-			case SCALE_DECORATION: 
+			case SCALE_DECORATION:
+				N = box.numPoints();
+				thisSide  = point.intValue();
+				otherSide = (thisSide + (N >> 1)) % N;
+				p1 = box.getPoint(otherSide);
+				p2 = box.getPoint(thisSide);
+				proj = new LineProjector(p1, p2);
 				return isShiftDown(evt.getModifiers())
-					? new Scale((LineProjector)parameter)
-					: new NoneUniformScale((LineProjector)parameter);
+					? new Scale(proj)
+					: new NoneUniformScale(proj);
+
+			case ROTATE_DECORATION:
+				thisSide  = point.intValue();
+				if ((thisSide & 1) == 1) {
+					N = box.numPoints();
+					otherSide = (thisSide + (N>>1)) % N;
+
+					p1 = box.getPoint(otherSide);
+					p2 = box.getPoint((otherSide+1) % N);
+
+					proj = new LineProjector(p1, p2);
+					return new Shear(proj, box.getPoint(thisSide));
+				}
+				return ROTATE;
+
 			default:
 				return ROTATE;
 		}
