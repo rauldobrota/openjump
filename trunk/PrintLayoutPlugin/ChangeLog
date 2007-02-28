@@ -1,3 +1,20 @@
+2007-02-28  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	The generation of the SVG version of the GIS map is now
+	in a standalone class.
+
+	* src/de/intevation/printlayout/Map2SVG.java:
+		new. The code to generate the SVG version of the GIS map
+		is now inside a DocumentModifer und the DOM Factory of
+		the already existing document is used.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		removed the SVG creation code of the map.
+
+	* src/de/intevation/printlayout/beans/ExtraData.java,
+		src/de/intevation/printlayout/DocumentManager.java:
+		very small cleanups.
+
 2007-02-26  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/tools/PickingInteractor.java:

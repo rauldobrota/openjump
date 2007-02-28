@@ -57,10 +57,7 @@ import org.apache.batik.swing.JSVGScrollPane;
 
 import org.apache.batik.swing.gvt.Overlay;
 
-import org.apache.batik.dom.AbstractDocument;
 import org.apache.batik.dom.AbstractElement;
-
-import org.apache.batik.dom.svg.SVGDOMImplementation;
 
 import org.apache.batik.transcoder.Transcoder;
 
@@ -68,28 +65,11 @@ import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGLocatable;
 import org.w3c.dom.svg.SVGMatrix;
 
-import org.w3c.dom.DOMImplementation;
-
 import org.apache.batik.swing.svg.SVGUserAgentGUIAdapter;
-
-import org.apache.batik.svggen.SVGGraphics2D;
-import org.apache.batik.svggen.SVGGeneratorContext;
-import org.apache.batik.svggen.CachedImageHandlerBase64Encoder;
 
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 
-import com.vividsolutions.jump.workbench.model.Layer;
-
-import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
-import com.vividsolutions.jump.workbench.ui.Viewport;
-
-import com.vividsolutions.jump.workbench.ui.renderer.RenderingManager; 
-import com.vividsolutions.jump.workbench.ui.renderer.LayerRenderer;
-import com.vividsolutions.jump.workbench.ui.renderer.Renderer;   
-
 import com.vividsolutions.jump.workbench.ui.images.IconLoader;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 import de.intevation.printlayout.tools.PanInteractor;
 import de.intevation.printlayout.tools.BoxInteractor;
@@ -111,8 +91,6 @@ import de.intevation.printlayout.util.ElementUtils;
 import de.intevation.printlayout.beans.MapData;
 import de.intevation.printlayout.beans.ScaleUpdater;
 import de.intevation.printlayout.beans.ScaleBarUpdater;
-
-import de.intevation.printlayout.batik.PatternExt;
 
 import de.intevation.printlayout.ui.JPEGParameterDialog;
 
@@ -576,109 +554,7 @@ implements   PickingInteractor.PickingListener
 	 * document.
 	 */
 	public void addMap() {
-
-		DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
-
-		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
-
-		AbstractDocument document =
-			(AbstractDocument)impl.createDocument(svgNS, "svg", null);
-
-		SVGGeneratorContext ctx = SVGGeneratorContext.createDefault(document);
-		ctx.setPrecision(12);
-
-		ctx.setGenericImageHandler(new CachedImageHandlerBase64Encoder());
-
-		ctx.setExtensionHandler(new PatternExt());
-
-		SVGGraphics2D svgGenerator = new SVGGraphics2D(ctx, false);
-
-		LayerViewPanel lvp = pluginContext.getLayerViewPanel();
-
-		Viewport vp = lvp.getViewport();
-
-		Envelope env =  vp.getEnvelopeInModelCoordinates();
-
-		RenderingManager rms = lvp.getRenderingManager();
-
-		List layers = pluginContext.getLayerManager().getVisibleLayers(false);
-
-		int N = layers.size();
-
-		int [] oldMaxFeaures = new int[N];
-
-		// prevent image caching
-		for (int i = 0; i < N; ++i) {
-			Layer    layer    = (Layer)layers.get(i);		
-			Renderer renderer = rms.getRenderer(layer);
-
-			if (renderer instanceof LayerRenderer) {
-				LayerRenderer layerRenderer = (LayerRenderer)renderer;
-				oldMaxFeaures[i] = layerRenderer.getMaxFeatures();
-				layerRenderer.setMaxFeatures(Integer.MAX_VALUE);
-			}
-			else {
-				System.err.println("unknown renderer type: " + renderer.getClass());
-			}
-		}
-
-		lvp.repaint();
-		lvp.paintComponent(svgGenerator);
-
-		for (int i = 0; i < N; ++i) {
-			Layer    layer    = (Layer)layers.get(i);		
-			Renderer renderer = rms.getRenderer(layer);
-			if (renderer instanceof LayerRenderer) {
-				LayerRenderer layerRenderer = (LayerRenderer)renderer;
-				layerRenderer.setMaxFeatures(oldMaxFeaures[i]);
-			}
-		}
-
-		Envelope xenv = new Envelope(
-			0, lvp.getWidth(), 0, lvp.getHeight());
-
-		// should be identical to  vp.getScale(); 
-		double geo2screen = env2env(env, xenv);
-
-		double scale2paper = fitToPaper(xenv);
-
-		AffineTransform xform = AffineTransform.getScaleInstance(
-			scale2paper, scale2paper);
-
-		final MapData mapData = new MapData(geo2screen);
-
-		AbstractElement root = (AbstractElement)document.getDocumentElement();
-		root = (AbstractElement)svgGenerator.getRoot(root);
-
-		root.setAttributeNS(null, "width", String.valueOf(xenv.getWidth()));
-		root.setAttributeNS(null, "height", String.valueOf(xenv.getHeight()));
-
-		root.setAttributeNS(null, "x", "0");
-		root.setAttributeNS(null, "y", "0");
-
-		docManager.appendSVG((AbstractDocument)document, xform, false,
-			new DocumentManager.ModificationCallback() {
-				public void run(DocumentManager manager, AbstractElement element) {
-					String id = element.getAttributeNS(null, "id");
-					manager.setData(id, mapData);
-				}
-			});
-	}
-
-	protected double fitToPaper(Envelope env) {
-		double [] paper = new double[2];
-		docManager.getPaperSize(paper);
-
-		double s1 = paper[0]/env.getWidth();
-		double s2 = paper[1]/env.getHeight();
-
-		return Math.min(s1, s2);
-	}
-
-	protected static double env2env(Envelope env1, Envelope env2) {
-		double s1 = env2.getWidth()/env1.getWidth();
-		double s2 = env2.getHeight()/env1.getHeight();
-		return Math.max(s1, s2);
+		docManager.modifyDocumentLater(new Map2SVG(pluginContext));
 	}
 
 	protected boolean confirmWrite(File file)

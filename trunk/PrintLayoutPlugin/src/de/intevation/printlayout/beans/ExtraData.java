@@ -190,22 +190,20 @@ implements   Serializable
 
 	public void remove(Object source, AbstractElement element) {
 		String id = element.getAttributeNS(null, "id");
-		if (id == null)
-			return;
-		Entry entry = (Entry)id2entry.remove(id);
-		if (entry == null)
-			return;
-		entry.remove(source, element);
+		if (id != null) {
+			Entry entry = (Entry)id2entry.remove(id);
+			if (entry != null)
+				entry.remove(source, element);
+		}
 	}
 
 	public void fireElementTransformed(Object source, AbstractElement element) {
 		String id = element.getAttributeNS(null, "id");
-		if (id == null)
-			return;
-		Entry entry = (Entry)id2entry.get(id);
-		if (entry == null)
-			return;
-		entry.fireElementTransformed(source, element);
+		if (id != null) {
+			Entry entry = (Entry)id2entry.get(id);
+			if (entry != null)
+				entry.fireElementTransformed(source, element);
+		}
 	}
 
 	public HashMap getID2Entry() {

@@ -68,7 +68,6 @@ import java.io.BufferedOutputStream;
 import java.io.OutputStream;
 
 import java.util.ArrayList;
-import java.util.Stack;
 
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -1276,12 +1275,12 @@ public class DocumentManager
 		AbstractElement element,
 		ElementVisitor  visitor
 	) {
-		Stack stack = new Stack();
+		AbstractElement [] stack = new AbstractElement[64];
+		int stackTop = 1;
+		stack[0] = element;
 
-		stack.push(element);
-
-		while (!stack.empty()) {
-			element = (AbstractElement)stack.pop();
+		while (stackTop > 0) {
+			element = stack[--stackTop];
 			String id = element.getAttributeNS(null, "id");
 			if (id != null && id.startsWith(OBJECT_ID)) { 
 				if (!visitor.visit(element))
@@ -1289,12 +1288,16 @@ public class DocumentManager
 				if (id.startsWith(OBJECT_ID_LEAF))
 					continue;
 			}
-			if (element.hasChildNodes()) {
-				NodeList children = element.getChildNodes();
-				for (int i = children.getLength()-1; i >= 0; --i) {
-					Node node = children.item(i); 
-					if (node instanceof AbstractElement)
-						stack.push(node);
+			NodeList children = element.getChildNodes();
+			for (int i = children.getLength()-1; i >= 0; --i) {
+				Node node = children.item(i); 
+				if (node instanceof AbstractElement) {
+					if (stackTop == stack.length) {
+						AbstractElement [] nstack = new AbstractElement[stack.length << 1];
+						System.arraycopy(stack, 0, nstack, 0, stack.length);
+						stack = nstack;
+					}
+					stack[stackTop++] = (AbstractElement)node;
 				}
 			}
 		}
