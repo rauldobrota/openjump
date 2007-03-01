@@ -1,6 +1,27 @@
 General Changes of PrintLayout Plugin
 -------------------------------------
 
+Version 0.9.1 (2007-03-01)
+
+  Improvements release.
+
+  * New: support for z-ordering objects.
+  * New: support for shearing of objects.
+  * New: support for non-uniform object scaling.
+  * New: JPEG export.
+  * New: a help dialog that explains navigation.
+  * Text-Tool: Now multiline text is also possible.
+  * Text-Tool: Now full i18n support.
+  * Fixed: Too fast moving around selected objects
+    produced only partial redraws.
+  * New: Icons for zooming.
+  * Improved: File filters.
+  * New: Confirmation dialog before overwriting files.
+  * some minor bug-fixes.
+  * Some source code refactoring.
+  * Extensive source code documentation (JavaDocs).
+  * Batik: updated included jar-file.
+
 Version 0.9.0 (2007-02-13)
 
   Feature-completeness release.

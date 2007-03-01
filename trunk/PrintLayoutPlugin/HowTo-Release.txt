@@ -6,7 +6,7 @@ Guide for developers for creating a new release
 
 1. Change Version number (N.N.N) in
    src/de/intevation/printlayout/InfoDialog.java
-   src/de/intevation/printlayout/resources/info.html
+   src/de/intevation/printlayout/resources/about.html
 
 2. Update file
    Changes.txt
@@ -27,6 +27,14 @@ Guide for developers for creating a new release
    $ cvs -d:pserver:anonymous@jump-pilot.cvs.sourceforge.net:/cvsroot/jump-pilot login
    (just hit return)
    $ cvs -z3 -d:pserver:anonymous@jump-pilot.cvs.sourceforge.net:/cvsroot/jump-pilot co -P PrintLayoutPlugin
+
+   (check whether the anonymous CVS is in sync with the master CVS.
+   The following command should not result anything, ie. files are
+   identical. If the diff commands shows differences, you need
+   to wait until the anonymous CVS has catched up or use your
+   write access acount for getting the current contents)
+   $ diff PrintLayoutPlugin/ChangeLog ../PrintLayoutPlugin/ChangeLog
+
    $ zip -r PrintLayoutPlugin.src.zip PrintLayoutPlugin
    $ rm -rf PrintLayoutPlugin
    $ cd ..

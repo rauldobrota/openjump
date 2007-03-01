@@ -1,3 +1,16 @@
+2007-03-01  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
+
+	Doing the 0.9.1 release.
+
+	* src/de/intevation/printlayout/InfoDialog.java: Version to 0.9.1.
+	* src/de/intevation/printlayout/resources/about.html: Version to 0.9.1
+	and added credits.
+
+	* Changes.txt: Summarized changes for 0.9.1.
+
+	* HowTo-Release.txt: Fixed a filename. Added hint on CVS sync check.
+
+
 2007-02-28  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	The generation of the SVG version of the GIS map is now
