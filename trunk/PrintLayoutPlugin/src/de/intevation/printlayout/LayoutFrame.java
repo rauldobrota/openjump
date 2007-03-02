@@ -206,6 +206,7 @@ implements   PickingInteractor.PickingListener
 		ImportImageAction  imageImportAction  = new ImportImageAction();
 		ImportSVGAction    svgImportAction    = new ImportSVGAction();
 		AddMapAction       addMapAction       = new AddMapAction();
+		AddLegendAction    addLegendAction    = new AddLegendAction();
 		                   addScalebarAction  = new AddScalebarAction();
 		                   addScaletextAction = new AddScaletextAction();
 		AboutDialogAction  aboutDialogAction  = new AboutDialogAction();
@@ -240,6 +241,7 @@ implements   PickingInteractor.PickingListener
 		viewMenu.add(new JCheckBoxMenuItem(rulerAction));
 
 		insertMenu.add(addMapAction);
+		insertMenu.add(addLegendAction);
 		insertMenu.add(svgImportAction);
 		insertMenu.add(imageImportAction);
 		insertMenu.add(addScalebarAction);
@@ -549,8 +551,17 @@ implements   PickingInteractor.PickingListener
 	}
 
 	/**
+	 * adds the openjump legent to the SVG document.
+	 * Fetches the legend from the core and puts it into the SVG
+	 * document.
+	 */
+	public void addLegend() {
+		docManager.modifyDocumentLater(new Legend2SVG(pluginContext));
+	}
+
+	/**
 	 * adds the openjump map to the SVG document.
-	 * Fetches the openjump map from the core and put it in the SVG
+	 * Fetches the openjump map from the core and puts it into the SVG
 	 * document.
 	 */
 	public void addMap() {
@@ -1089,6 +1100,18 @@ implements   PickingInteractor.PickingListener
 		}
 		public void actionPerformed(ActionEvent ae) {
 			addScaleText();
+		}
+	}
+
+	private class AddLegendAction extends AbstractAction {
+		AddLegendAction() {
+			super(I18N.getName(
+					I18N.getString("LayoutFrame.AddLegend", "Add Legend")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.AddLegend", "Add &Legend")));
+		}
+		public void actionPerformed(ActionEvent ae) {
+			addLegend();
 		}
 	}
 
