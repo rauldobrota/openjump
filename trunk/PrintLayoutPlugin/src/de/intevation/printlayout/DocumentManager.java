@@ -68,6 +68,7 @@ import java.io.BufferedOutputStream;
 import java.io.OutputStream;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -1386,27 +1387,70 @@ public class DocumentManager
 		});
 	}
 
-	protected AbstractElement getElementById(SVGDocument document, String id) {
-		return (AbstractElement) document.getElementById(id);
+	protected static final AbstractElement getElementById(SVGDocument document, String id) {
+		return (AbstractElement)document.getElementById(id);
 	}
 	
-	protected void removeElementFromParentNode(AbstractElement element) {
+	protected static final void removeElementFromParentNode(AbstractElement element) {
 		AbstractElement parent = (AbstractElement)element.getParentNode();
 		
 		if (parent != null)
 			parent.removeChild(element);
+	}
+
+	/**
+	 * Scans the paper sheet for the given IDs and orders
+	 * the found ones in their order of appearance.
+	 * @param ids the IDs to look for
+	 * @return new string array with IDs ordered by their
+	 *         appearance in the sheet. null or zero length
+	 *         means that none of the IDs were found.
+	 */
+	protected String [] orderIDsByRenderingOrder(String [] ids) {
+
+		if (ids == null || ids.length == 0)
+			return ids;
+
+		SVGDocument document = getSVGDocument();
+		AbstractElement sheet = getElementById(document, DOCUMENT_SHEET);
+
+		if (sheet == null)
+			return null;
+
+		HashSet left = new HashSet();
+		for (int i = 0; i < ids.length; ++i)
+			left.add(ids[i]);
+
+		ArrayList ordered = new ArrayList(ids.length);
+
+		NodeList children = sheet.getChildNodes();
+		for (int N = children.getLength(), i = 0; i < N && !left.isEmpty(); ++i) {
+			Node child = children.item(i);
+			if (child instanceof AbstractElement) {
+				String id = ((AbstractElement)child).getAttributeNS(null, "id");
+				if (id != null && left.remove(id))
+					ordered.add(id);
+			}
+		}
+
+		return (String [])ordered.toArray(new String[ordered.size()]);
 	}
 	
 	/**
 	 * groups some element together.
 	 * @param ids  the elements with this ids are grouped together.
 	 */
-	public void groupIDs(final String [] ids) {
-		if (ids == null || ids.length < 2)
+	public void groupIDs(final String [] _ids) {
+		if (_ids == null || _ids.length < 2)
 			return;
 
 		modifyDocumentLater(new DocumentModifier() {
 			public Object run(DocumentManager documentManager) {
+
+				String [] ids = documentManager.orderIDsByRenderingOrder(_ids);
+
+				if (ids == null || ids.length < 2)
+					return null;
 
 				SVGDocument document = documentManager.getSVGDocument();
 

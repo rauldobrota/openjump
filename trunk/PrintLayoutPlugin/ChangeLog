@@ -1,5 +1,18 @@
 2007-03-02  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
+	Fixed: Inner rendering order was swaped when creating groups.
+	The inner rendering order of a new built group was determined
+	by the order of the selection. Having e.g. objects A and B
+	be selected, A behind B but A selected before B resulted in
+	a group where B was behind A.
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		Added a orderIDsByRenderingOrder() method which orders a set of
+		selected IDs by there rendering order. This is used by groupIDs()
+		to maintain the correct rendering order in a new built group.
+	
+2007-03-02  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
 	Added support for legends. (kind of "suggestion")
 
 	* src/de/intevation/printlayout/Legend2SVG.java:
@@ -33,7 +46,7 @@
 
 	* src/de/intevation/printlayout/Map2SVG.java:
 		new. The code to generate the SVG version of the GIS map
-		is now inside a DocumentModifer und the DOM Factory of
+		is now inside a DocumentModifer and the DOM factory of
 		the already existing document is used.
 
 	* src/de/intevation/printlayout/LayoutFrame.java:
