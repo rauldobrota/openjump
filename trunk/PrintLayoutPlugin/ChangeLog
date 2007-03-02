@@ -1,3 +1,18 @@
+2007-03-02  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	Added support for legends. (kind of "suggestion")
+
+	* src/de/intevation/printlayout/Legend2SVG.java:
+		New. Generates a legend for the current visible
+		and activated layers in OpenJUMP.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		Added the menu item and the action.
+
+	* src/de/intevation/printlayout/i18n/messages.properties,
+		src/de/intevation/printlayout/i18n/messages_de.properties:
+		Messages for the legend menu item.
+
 2007-03-01  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
 
 	Doing the 0.9.1 release.
