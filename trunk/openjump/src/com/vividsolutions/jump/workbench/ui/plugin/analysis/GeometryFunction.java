@@ -78,7 +78,8 @@ public abstract class GeometryFunction
     new EnvelopeFunction(),
     new LineMergeFunction(),
     new LineSequenceFunction(),
-    new PolygonizeFunction()
+    new PolygonizeFunction(),
+    new ReverseLinestringFunction()
   };
 
   public static List getNames()
@@ -340,5 +341,47 @@ public abstract class GeometryFunction
       Geometry[] polys = GeometryFactory.toGeometryArray(polyColl);
       return geom[0].getFactory().createGeometryCollection(polys);
     }
+  }
+  
+  /**
+   * added 3. March 2007
+   * @author finstef
+   *
+   */
+  private static class ReverseLinestringFunction extends GeometryFunction {
+	  public ReverseLinestringFunction() {
+		  super(I18N.get("ui.plugin.analysis.GeometryFunction.Reverse-Line-Direction"), 1, 0);
+	  }
+
+	  public Geometry execute(Geometry[] geom, double[] param)
+	  {
+		  if (geom[0] instanceof LineString){
+			  Coordinate[] a = geom[0].getCoordinates();
+			  CoordinateArrays.reverse(a);
+			  Geometry invLine = new GeometryFactory().createLineString(a);
+			  return invLine;
+		  }
+		  else if(geom[0] instanceof Polygon){
+			  Polygon p = (Polygon)geom[0];
+			  Coordinate[] outer = p.getExteriorRing().getCoordinates();
+			  CoordinateArrays.reverse(outer);
+			  LinearRing outLine = new GeometryFactory().createLinearRing(outer);
+			  //-- do so as well for inner rings
+			  LinearRing[] innerR = null;
+			  if (p.getNumInteriorRing() > 0){
+				  innerR = new LinearRing[p.getNumInteriorRing()];
+				for(int i=0; i < p.getNumInteriorRing(); i++){
+					Coordinate[] inner = p.getInteriorRingN(i).getCoordinates();
+					CoordinateArrays.reverse(inner);
+					innerR[i] = new GeometryFactory().createLinearRing(inner);
+				}
+			  }			  
+			  Polygon pout = new GeometryFactory().createPolygon(outLine, innerR);
+			  return pout;
+		  }
+		  else{
+			  return geom[0];
+		  }
+	  }
   }
 }
