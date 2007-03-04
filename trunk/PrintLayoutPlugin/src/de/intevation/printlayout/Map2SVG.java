@@ -37,9 +37,12 @@ import org.w3c.dom.svg.SVGDocument;
 
 import java.awt.Dimension;
 
+import java.awt.geom.Rectangle2D;
+
 import de.intevation.printlayout.beans.MapData;
 
 import de.intevation.printlayout.batik.PatternExt;
+import de.intevation.printlayout.batik.ClippingSVGGraphics2D;
 
 /**
  * Instances of this class are used to convert the
@@ -50,6 +53,13 @@ import de.intevation.printlayout.batik.PatternExt;
 public class Map2SVG
 implements   DocumentManager.DocumentModifier
 {
+	/**
+	 * If the system property de.intevation.printlayout.no.map.clip
+	 * is set to true the generated SVG map is not clipped.
+	 */
+	public static final boolean NO_MAP_CLIP =
+		Boolean.getBoolean("de.intevation.printlayout.no.map.clip");
+
 	/**
 	 * The plugin context is need to access the LayerViewPanel.
 	 */
@@ -103,7 +113,12 @@ implements   DocumentManager.DocumentModifier
 
 		ctx.setExtensionHandler(new PatternExt());
 
-		SVGGraphics2D svgGenerator = new SVGGraphics2D(ctx, false);
+		SVGGraphics2D svgGenerator = NO_MAP_CLIP
+			? new SVGGraphics2D(ctx, false)
+			:	new ClippingSVGGraphics2D(ctx, false,
+					new Rectangle2D.Double(
+						0d, 0d,
+						xenv.getWidth(), xenv.getHeight()));
 
 		RenderingManager rms = layerViewPanel.getRenderingManager();
 

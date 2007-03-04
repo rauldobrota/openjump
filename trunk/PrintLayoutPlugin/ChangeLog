@@ -1,3 +1,23 @@
+2007-03-04  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	Clip geometries to visible area while importing map as SVG from GIS.
+
+	* src/de/intevation/printlayout/batik/ClippingSVGGraphics2D.java:
+		New. Extends Batik's SVGGraphics2D and implements real clipping for 
+		the rendered geometries. TODO: handle the image stuff too.
+
+	* src/de/intevation/printlayout/util/CohenSutherland.java:
+		Implements Cohen Sutherland line clipping.
+
+	* src/de/intevation/printlayout/Map2SVG.java:
+		Modified to use the ClippingSVGGraphics2D instead of the
+		standard SVGGraphics2D. If the user sets the system property
+		de.intevation.printlayout.no.map.clip=true the unclipped
+		version is used.
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		Fixed broken JavaDoc tag.
+
 2007-03-02  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	Fixed: Inner rendering order was swaped when creating groups.

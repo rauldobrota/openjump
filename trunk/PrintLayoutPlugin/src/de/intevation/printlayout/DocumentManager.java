@@ -1440,16 +1440,16 @@ public class DocumentManager
 	 * groups some element together.
 	 * @param ids  the elements with this ids are grouped together.
 	 */
-	public void groupIDs(final String [] _ids) {
-		if (_ids == null || _ids.length < 2)
+	public void groupIDs(final String [] ids) {
+		if (ids == null || ids.length < 2)
 			return;
 
 		modifyDocumentLater(new DocumentModifier() {
 			public Object run(DocumentManager documentManager) {
 
-				String [] ids = documentManager.orderIDsByRenderingOrder(_ids);
+				String [] _ids = documentManager.orderIDsByRenderingOrder(ids);
 
-				if (ids == null || ids.length < 2)
+				if (_ids == null || _ids.length < 2)
 					return null;
 
 				SVGDocument document = documentManager.getSVGDocument();
@@ -1458,8 +1458,8 @@ public class DocumentManager
 
 				ArrayList children = new ArrayList();
 
-				for (int i = 0; i < ids.length; ++i) {
-					AbstractElement element = getElementById(document, ids[i]);
+				for (int i = 0; i < _ids.length; ++i) {
+					AbstractElement element = getElementById(document, _ids[i]);
 
 					if (element != null) { // child found?
 						AbstractElement parent =
