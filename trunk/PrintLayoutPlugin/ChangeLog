@@ -1,5 +1,21 @@
 2007-03-04  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
+	Replaced deprecated File.toURL() with File.toURI()
+	
+	* src/de/intevation/printlayout/DocumentManager.java:
+		Replace File.toURL() with File.toURI(). This toURL() call
+		is deprecated in Java 6 for a good reason. We need only the
+		URIs anyway and it's backwards compatible.
+
+	* src/de/intevation/printlayout/batik/ClippingSVGGraphics2D.java:
+		- Add a JavaDoc.
+		- Removed a needless import.
+
+	* src/de/intevation/printlayout/util/CohenSutherland.java:
+		Name of file was wrong in header.
+
+2007-03-04  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
 	Clip geometries to visible area while importing map as SVG from GIS.
 
 	* src/de/intevation/printlayout/batik/ClippingSVGGraphics2D.java:

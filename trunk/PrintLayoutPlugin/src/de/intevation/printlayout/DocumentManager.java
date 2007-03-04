@@ -565,7 +565,7 @@ public class DocumentManager
 
 				String parser = XMLResourceDescriptor.getXMLParserClassName();
 				SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
-				String uri = new File("document.svg").toURL().toString();
+				String uri = new File("document.svg").toURI().toString();
 
 				document =
 					(SVGDocument)factory.createDocument(uri, is);
@@ -896,8 +896,8 @@ public class DocumentManager
 
 		InputStream in = null;
 		try {
-			String uri = file.toURL().toString();
-			if (file.getName().endsWith("z"))
+			String uri = file.toURI().toString();
+			if (file.getName().toLowerCase().endsWith("z"))
 				appendSVG((AbstractDocument)factory.createDocument(
 					uri,
 					in = new GZIPInputStream(new FileInputStream(file))),

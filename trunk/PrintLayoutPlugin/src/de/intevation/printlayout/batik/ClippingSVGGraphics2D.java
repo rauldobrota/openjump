@@ -25,7 +25,6 @@ import java.awt.geom.QuadCurve2D;
 import java.awt.geom.CubicCurve2D;
 
 import java.awt.Shape;
-import java.awt.Graphics2D;
 
 import de.intevation.printlayout.util.CohenSutherland;
 
@@ -174,6 +173,13 @@ extends      SVGGraphics2D
 		return gp;
 	}
 
+	/**
+	 * Detects if the given shape is a sequence of closed
+	 * geometries.
+	 * @param shape the shape to test
+	 * @return true if the shape is a sequence of closed geometries,
+	 *         else false
+	 */
 	private static final boolean isSimpleClosed(Shape shape) {
 		PathIterator pi = shape.getPathIterator(null);
 		float [] data = new float[6];
