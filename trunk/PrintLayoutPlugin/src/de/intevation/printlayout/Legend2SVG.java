@@ -234,7 +234,10 @@ implements   DocumentManager.DocumentModifier
 				Map themes = themeStyle.getAttributeValueToBasicStyleMap();
 				for (Iterator t = themes.entrySet().iterator(); t.hasNext();) {
 					Map.Entry entry = (Map.Entry)t.next();
-					String key = (String)entry.getKey();
+					String key = 
+						entry.getKey() != null 
+						? entry.getKey().toString()
+						: null;
 					BasicStyle value = (BasicStyle)entry.getValue();
 					box = drawRect(
 						g2d,

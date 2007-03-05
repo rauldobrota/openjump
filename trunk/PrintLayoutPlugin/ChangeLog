@@ -1,3 +1,12 @@
+2007-03-05  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	Small bugfix.
+
+	* src/de/intevation/printlayout/Legend2SVG.java:
+		If ThemeStyle is enabled and the attribute contains 
+		integer, we need to handle Integers instead of Strings.
+		So use toString() as casting.
+	
 2007-03-05  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	Make plugin Java 1.4 compatible
