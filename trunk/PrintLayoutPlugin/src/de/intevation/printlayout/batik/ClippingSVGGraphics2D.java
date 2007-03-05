@@ -129,9 +129,9 @@ extends      SVGGraphics2D
 
 					if (clip.clip(line)) {
 						if (line.getX1() != x || line.getY1() != y)
-							gp.moveTo(line.getX1(), line.getY1());
+							gp.moveTo((float)line.getX1(), (float)line.getY1());
 
-						gp.lineTo(line.getX2(), line.getY2());
+						gp.lineTo((float)line.getX2(), (float)line.getY2());
 
 						if (line.getX2() != p[0] || line.getY2() != p[1])
 							gp.moveTo(p[0], p[1]);

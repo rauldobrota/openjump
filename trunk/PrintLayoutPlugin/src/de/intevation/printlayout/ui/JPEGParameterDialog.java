@@ -124,7 +124,7 @@ extends      ImageParameterDialog
 				if ("value".equals(e.getPropertyName())) {
 					Number value = (Number)e.getNewValue();
 					if (quality != null && value != null)
-						quality.setValue(new Integer(value.intValue()));
+						quality.setValue(value.intValue());
 				}
 			}
 		});

@@ -207,7 +207,7 @@ public class BoxPropPanel extends JPanel {
 		while(tokens.hasMoreTokens()) {
 			String token = tokens.nextToken();
 			try {
-				result[i] = Float.valueOf(token) * width;
+				result[i] = Float.parseFloat(token) * width;
 			}
 			catch(NumberFormatException nfe) {
 				System.err.println("cannot handle token:" + token);

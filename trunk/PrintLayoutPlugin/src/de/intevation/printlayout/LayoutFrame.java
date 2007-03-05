@@ -296,7 +296,7 @@ implements   PickingInteractor.PickingListener
 
 		Integer mnemonic = I18N.getMnemonic(label);
 		if (mnemonic != null)
-			menu.setMnemonic(mnemonic);
+			menu.setMnemonic(mnemonic.intValue());
 
 		return menu;
 	}

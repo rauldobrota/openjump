@@ -1,3 +1,18 @@
+2007-03-05  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	Make plugin Java 1.4 compatible
+
+	* etc/build.xml:
+		The 'compile' target forces compiler to treat source as Java 1.4
+		and build 1.4 stamped binaries.
+
+	* src/de/intevation/printlayout/LayoutFrame.java,
+		src/de/intevation/printlayout/batik/ClippingSVGGraphics2D.java,
+		src/de/intevation/printlayout/tools/BoxPropPanel.java,
+		src/de/intevation/printlayout/ui/JPEGParameterDialog.java:
+		Fixed some auto boxing problems. This feature was introduced
+		in Java 1.5
+		
 2007-03-04  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	Replaced deprecated File.toURL() with File.toURI()
