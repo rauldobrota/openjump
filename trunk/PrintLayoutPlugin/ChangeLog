@@ -1,3 +1,8 @@
+2007-03-05  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	* src/de/intevation/printlayout/Legend2SVG.java:
+		Simplified text generation in legend a bit.
+
 2007-03-05  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	Small bugfix.

@@ -120,15 +120,15 @@ implements   DocumentManager.DocumentModifier
 		double width, double height
 	) {
 		Map themes = themeStyles.getAttributeValueToBasicStyleMap();
-		int count = 0;
 		double w2 = width*0.5d;
 		double h2 = height*0.5d;
-		for (Iterator i = themes.values().iterator(); i.hasNext() && count < 4; ++count) {
-			int iy = count >> 1;
-			int ix = count &  1;
+		int c = 0;
+		for (Iterator i = themes.values().iterator(); i.hasNext() && c < 4; ++c) {
+			int iy = c >> 1;
+			int ix = c &  1;
 			drawRect(
 				g2d,
-				count == 0 ? basicStyle : (BasicStyle)i.next(),
+				c == 0 ? basicStyle : (BasicStyle)i.next(),
 				x + ix*w2, y + iy*h2,
 				w2, h2);
 		}
@@ -140,6 +140,7 @@ implements   DocumentManager.DocumentModifier
 	private static final Stroke ensure(Stroke stroke) {
 		return stroke != null ? stroke : new BasicStroke();
 	}
+
 
 	private static Rectangle2D drawRect(
 		Graphics2D g2d,
@@ -169,10 +170,10 @@ implements   DocumentManager.DocumentModifier
 		return rect;
 	}
 
-
 	private static final class Offset {
 		Rectangle2D bbox;
 		float       y;
+
 		void enlarge(Rectangle2D r1) {
 			if (bbox == null) {
 				bbox = new Rectangle2D.Double();
@@ -181,6 +182,7 @@ implements   DocumentManager.DocumentModifier
 			else
 				bbox.add(r1);
 		}
+
 		void enlarge(int extra) {
 			if (bbox != null)
 				bbox.setRect(
@@ -189,16 +191,51 @@ implements   DocumentManager.DocumentModifier
 					bbox.getWidth() + (extra << 1),
 					bbox.getHeight() + (extra << 1));
 		}
+
+		private static final Rectangle2D translate(
+			Rectangle2D r, 
+			double     dx,
+			double     dy
+		) {
+			r.setRect(
+				r.getX() + dx,
+				r.getY() + dy,
+				r.getWidth(),
+				r.getHeight());
+			return r;
+		}
+
+		void drawText(
+			Graphics2D g2d,
+			TextLayout tl,
+			float      px
+		) {
+			float py = y + SYMBOL_SIZE;
+			g2d.setPaint(Color.black);
+			tl.draw(g2d, px, py);
+			Rectangle2D bounds = translate(tl.getBounds(), px, py);
+			enlarge(bounds);
+			y = (float)(bounds.getY() + bounds.getHeight() + Y_GAP);
+		}
+
+		void nextRow() {
+			y += Y_GAP + SYMBOL_SIZE;
+		}
+	} // class Offset
+
+	private static final String trim(String s) {
+		return s == null || (s = s.trim()).length() == 0
+			? null
+			: s;
 	}
 
 	private static Rectangle2D drawLegend(Graphics2D g2d, List layers) {
-		int N = layers.size();
 
     FontRenderContext frc = g2d.getFontRenderContext();
 
 		Offset ofs = new Offset();
 		
-		for (int i = 0; i < N; ++i) {
+		for (int N = layers.size(), i = 0; i < N; ++i) {
 			Layer layer = (Layer)layers.get(i);		
 
 			ColorThemingStyle themeStyle =
@@ -207,84 +244,65 @@ implements   DocumentManager.DocumentModifier
 			BasicStyle basicStyle = layer.getBasicStyle();
 
 			if (themeStyle.isEnabled()) { // layer with extra styles
-				Rectangle2D box = drawThemedRect(
+
+				ofs.enlarge(drawThemedRect(
 					g2d, 
 					basicStyle, 
-					themeStyle, 0,
-					ofs.y, 
-					SYMBOL_SIZE, SYMBOL_SIZE);
+					themeStyle,
+					0d, ofs.y, 
+					SYMBOL_SIZE, SYMBOL_SIZE));
 
-				ofs.enlarge(box);
-				String name = layer.getName();
-				if (name == null || name.length() == 0)
-					ofs.y += Y_GAP + SYMBOL_SIZE;
-				else {
-					TextLayout tl = new TextLayout(name, FONT_BOLD, frc);
-					g2d.setPaint(Color.black);
-					tl.draw(g2d, (float)(SYMBOL_SIZE + X_GAP), ofs.y + SYMBOL_SIZE);
-					Rectangle2D tb = tl.getBounds();
-					tb.setRect(
-						tb.getX()+ SYMBOL_SIZE + X_GAP,
-						tb.getY()+ ofs.y + SYMBOL_SIZE,
-						tb.getWidth(),
-						tb.getHeight());
-					ofs.enlarge(tb);
-					ofs.y = (float)(tb.getY() + tb.getHeight() + Y_GAP);
-				}
-				Map themes = themeStyle.getAttributeValueToBasicStyleMap();
-				for (Iterator t = themes.entrySet().iterator(); t.hasNext();) {
-					Map.Entry entry = (Map.Entry)t.next();
-					String key = 
-						entry.getKey() != null 
-						? entry.getKey().toString()
-						: null;
-					BasicStyle value = (BasicStyle)entry.getValue();
-					box = drawRect(
+				String name = trim(layer.getName());
+
+				if (name == null)
+					ofs.nextRow();
+				else
+					ofs.drawText(
 						g2d,
-						value, 
+						new TextLayout(name, FONT_BOLD, frc),
+						SYMBOL_SIZE + X_GAP);
+
+				Map themes = themeStyle.getAttributeValueToBasicStyleMap();
+
+				for (Iterator t = themes.entrySet().iterator(); t.hasNext();) {
+
+					Map.Entry entry = (Map.Entry)t.next();
+
+					ofs.enlarge(drawRect(
+						g2d,
+						(BasicStyle)entry.getValue(), 
 						2*X_GAP, ofs.y,
-						SYMBOL_SIZE, SYMBOL_SIZE);
-					ofs.enlarge(box);
-					if (key == null || key.length() == 0)
-						ofs.y += Y_GAP + SYMBOL_SIZE;
-					else {
-						TextLayout tl = new TextLayout(key, FONT_PLAIN, frc);
-						g2d.setPaint(Color.black);
-						tl.draw(g2d, (float)(3*X_GAP + SYMBOL_SIZE), ofs.y + SYMBOL_SIZE);
-						Rectangle2D tb = tl.getBounds();
-						tb.setRect(
-							tb.getX()+ 3*X_GAP + SYMBOL_SIZE,
-							tb.getY()+ ofs.y + SYMBOL_SIZE,
-							tb.getWidth(),
-							tb.getHeight());
-						ofs.enlarge(tb);
-						ofs.y = (float)(tb.getY() + tb.getHeight() + Y_GAP);
-					}
+						SYMBOL_SIZE, SYMBOL_SIZE));
+
+					name = trim(entry.getKey() != null 
+						? entry.getKey().toString()
+						: null);
+
+					if (name == null)
+						ofs.nextRow();
+					else 
+						ofs.drawText(
+							g2d,
+							new TextLayout(name, FONT_PLAIN, frc),
+							3*X_GAP + SYMBOL_SIZE);
 				} // for all sub styles
 			}
 			else { // Layer with no extra styles
-				Rectangle2D box = drawRect(
+				ofs.enlarge(drawRect(
 					g2d,
 					basicStyle, 
 					0, ofs.y,
-					SYMBOL_SIZE, SYMBOL_SIZE);
-				ofs.enlarge(box);
-				String name = layer.getName();
-				if (name == null || name.length() == 0)
-					ofs.y += Y_GAP + SYMBOL_SIZE;
-				else {
-					TextLayout tl = new TextLayout(name, FONT_BOLD, frc);
-					g2d.setPaint(Color.black);
-					tl.draw(g2d, (float)(SYMBOL_SIZE + X_GAP), ofs.y + SYMBOL_SIZE);
-					Rectangle2D tb = tl.getBounds();
-					tb.setRect(
-						tb.getX()+ SYMBOL_SIZE + X_GAP,
-						tb.getY()+ ofs.y + SYMBOL_SIZE,
-						tb.getWidth(),
-						tb.getHeight());
-					ofs.enlarge(tb);
-					ofs.y = (float)(tb.getY() + tb.getHeight() + Y_GAP);
-				}
+					SYMBOL_SIZE, SYMBOL_SIZE));
+
+				String name = trim(layer.getName());
+
+				if (name == null)
+					ofs.nextRow();
+				else
+					ofs.drawText(
+						g2d,
+						new TextLayout(name, FONT_BOLD, frc),
+            SYMBOL_SIZE + X_GAP);
 			}
 		}
 		ofs.enlarge(3);
