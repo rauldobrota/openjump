@@ -44,6 +44,8 @@ import de.intevation.printlayout.beans.MapData;
 import de.intevation.printlayout.batik.PatternExt;
 import de.intevation.printlayout.batik.ClippingSVGGraphics2D;
 
+import de.intevation.printlayout.pathcompact.PathCompactor;
+
 /**
  * Instances of this class are used to convert the
  * content of OJ's LayerViewPanel to SVG.
@@ -59,6 +61,13 @@ implements   DocumentManager.DocumentModifier
 	 */
 	public static final boolean NO_MAP_CLIP =
 		Boolean.getBoolean("de.intevation.printlayout.no.map.clip");
+
+  /**
+	 * If the system property de.intevation.printlayout.optimize.map.svg
+	 * is set to true the generated SVG map is optimized.
+	 */
+	public static final boolean OPTIMIZE_MAP_SVG 
+		= Boolean.getBoolean("de.intevation.printlayout.optimize.map.svg");
 
 	/**
 	 * The plugin context is need to access the LayerViewPanel.
@@ -161,7 +170,14 @@ implements   DocumentManager.DocumentModifier
 
 		AbstractElement root = (AbstractElement)svgGenerator.getRoot();
 		svgGenerator.dispose();
-
+		
+		if (OPTIMIZE_MAP_SVG) {
+			PathCompactor.reorder(documentManager.getSVGDocument(), root);
+			System.err.println("Reordering done.");
+			PathCompactor.compactPathElements(root);
+			System.err.println("Compact Path Elements done.");
+		}
+		
 		// Uncomment this if you want to see the reason why
 		// the bounding box of the map doesn't fit:
 		// root.setAttributeNS(null, "overflow", "visible");

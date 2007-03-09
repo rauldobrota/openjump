@@ -1,3 +1,19 @@
+2007-03-09  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	* src/de/intevation/printlayout/Map2SVG.java:
+		If the system property
+		de.intevation.printlayout.optimize.map.svg
+		is set true, the map is optimized before appended to the 
+		SVG document.
+
+	* src/de/intevation/printlayout/pathcompact/AABB.java,
+	  src/de/intevation/printlayout/pathcompact/ElementAttributes.java,
+	  src/de/intevation/printlayout/pathcompact/OverlapSorter.java,
+	  src/de/intevation/printlayout/pathcompact/PathCompactor.java,
+	  src/de/intevation/printlayout/pathcompact/PathOptimizer.java:
+	  	added. Optimize a document.
+
+
 2007-03-05  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	* src/de/intevation/printlayout/Legend2SVG.java:
