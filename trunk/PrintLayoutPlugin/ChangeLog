@@ -1,5 +1,29 @@
 2007-03-10  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
 
+	Use CSS for map style attributes if wanted.
+
+	* src/de/intevation/printlayout/batik/StyleSheetHandler.java:
+		New. Generates CSS sections for SVG documents.
+
+	* src/de/intevation/printlayout/pathcompact/ElementAttributes.java:
+		Doubles as CSS lookup key now.
+
+	* src/de/intevation/printlayout/util/ElementUtils.java:
+		Add method getElementById(element, id). This is odd.
+		Is there a better way to lookup an element if you
+		only have an org.w3c.dom.Element as pseudo root and
+		no owner document?
+
+	* src/de/intevation/printlayout/Map2SVG.java:
+		Added support for CSS. This slows down the generation
+		process and only saves a little memory. Therefore
+		its off by default. Use the property 
+		"de.intevation.printlayout.use.css.map" to turn it on.
+		
+	* src/de/intevation/printlayout/pathcompact/OverlapSorter.java:
+		removed needless import
+2007-03-10  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
+
 	Not using Batik's DOM implementation for map generation anymore.
 
 	* src/de/intevation/printlayout/pathcompact/PathOptimizer.java:

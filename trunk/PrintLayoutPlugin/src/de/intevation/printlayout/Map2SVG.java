@@ -33,6 +33,7 @@ import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.apache.batik.svggen.CachedImageHandlerBase64Encoder;
 import org.apache.batik.svggen.SVGGeneratorContext;
 import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.svggen.SVGSyntax;
 
 import org.w3c.dom.svg.SVGDocument;
 
@@ -44,11 +45,15 @@ import de.intevation.printlayout.beans.MapData;
 
 import de.intevation.printlayout.batik.PatternExt;
 import de.intevation.printlayout.batik.ClippingSVGGraphics2D;
+import de.intevation.printlayout.batik.StyleSheetHandler;
 
 import de.intevation.printlayout.pathcompact.PathCompactor;
 
+import de.intevation.printlayout.util.ElementUtils;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.CDATASection;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -85,6 +90,13 @@ implements   DocumentManager.DocumentModifier
 		= Boolean.getBoolean("de.intevation.printlayout.optimize.map.batik.dom");
 
 	/**
+	 * If the system property de.intevation.printlayout.use.css.map
+	 * is set to true the generated SVG style attributes are expressed as CSS.
+	 */
+	public static final boolean USE_CSS =
+		Boolean.getBoolean("de.intevation.printlayout.use.css.map");
+
+	/**
 	 * The plugin context is need to access the LayerViewPanel.
 	 */
 	protected PlugInContext pluginContext;
@@ -103,9 +115,13 @@ implements   DocumentManager.DocumentModifier
 		this.pluginContext = pluginContext;
 	}
 
+	/**
+	 * Creates a new DOM document using the default factory.
+	 * @return new DOM document or null if construction failed.
+	 */
 	public static final Document createDocument() {
 		try {
-			DocumentBuilderFactory
+			return DocumentBuilderFactory
 				.newInstance()
 				.newDocumentBuilder()
 				.newDocument();
@@ -115,6 +131,7 @@ implements   DocumentManager.DocumentModifier
 		}
 		return null;
 	}
+
 
 	/**
 	 * implements the run() method of the DocumentModifier 
@@ -143,7 +160,7 @@ implements   DocumentManager.DocumentModifier
 
 		// setup the SVG generator ...
 		Document doc = USE_BATIK_DOM ? null : createDocument();
-		
+
 		SVGGeneratorContext ctx = SVGGeneratorContext.createDefault(
 			doc != null ? doc : document);
 
@@ -153,8 +170,18 @@ implements   DocumentManager.DocumentModifier
 
 		ctx.setExtensionHandler(new PatternExt());
 
+		// use CSS?
+    CDATASection styleSheetSection;
+		if (USE_CSS) {
+    	styleSheetSection = (doc != null ? doc : document).createCDATASection(""); 
+			ctx.setStyleHandler(new StyleSheetHandler(styleSheetSection));
+		}
+		else
+			styleSheetSection = null;
+		
 		SVGGraphics2D svgGenerator;
 
+		// clip the map?
 		if (NO_MAP_CLIP)
 			svgGenerator = new SVGGraphics2D(ctx, false);
 		else {
@@ -213,10 +240,20 @@ implements   DocumentManager.DocumentModifier
 		// add the new SVG node to the DOM tree
 
 		Element root = svgGenerator.getRoot();
-
 		svgGenerator.dispose();
 		svgGenerator = null;
 		ctx = null;
+
+		// adding the style sheet section
+		if (styleSheetSection != null) {
+			Element defs = ElementUtils.getElementById(root, SVGSyntax.ID_PREFIX_GENERIC_DEFS);
+			Element style = (doc != null ? doc : document).createElementNS(
+				SVGSyntax.SVG_NAMESPACE_URI, SVGSyntax.SVG_STYLE_TAG);
+			style.setAttributeNS(null, SVGSyntax.SVG_TYPE_ATTRIBUTE, "text/css");
+			style.appendChild(styleSheetSection);
+			defs.appendChild(style);
+			styleSheetSection = null;
+		}
 		
 		System.err.println("used memory before gc [MB]: " + inMegaBytes(usedMemory()));
 		gc();

@@ -13,6 +13,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Iterator;
 
 public class ElementAttributes
 implements   Comparable
@@ -51,6 +53,28 @@ implements   Comparable
 			pairs[i] = new Pair(item.getNodeName(), item.getNodeValue());
 		}
 		Arrays.sort(pairs);
+	}
+
+	public ElementAttributes(Map map) {
+		int N = map.size();
+		pairs = new Pair[N];
+
+    Iterator iter = map.entrySet().iterator();
+		for (int i = 0; i < N && iter.hasNext(); ++i) {
+			Map.Entry entry = (Map.Entry)iter.next();
+			String key   = (String)entry.getKey();
+			String value = (String)entry.getValue();
+			pairs[i] = new Pair(key, value);
+		}
+		Arrays.sort(pairs);
+	}
+
+	public String asStyleSheet() {
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < pairs.length; ++i) 
+			sb.append(pairs[i].key).append(':')
+				.append(pairs[i].value).append(';');
+		return sb.toString();
 	}
 
 	public int compareTo(Object o) {

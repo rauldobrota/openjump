@@ -12,10 +12,14 @@
 package de.intevation.printlayout.util;
 
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 
 import org.apache.batik.dom.AbstractElement;
 
 import de.intevation.printlayout.DocumentManager;
+
+import java.util.Stack;
 
 /**
  * Contains class methods to get elements by tag name. 
@@ -70,5 +74,34 @@ public final class ElementUtils {
 		String tag
 	) {
 		return getIDObjectByTag(element, tag) != null;
+	}
+
+	/**
+	 * Simulates decument.getElementById(id) without the document
+	 * for elements which have no owner.
+	 * This is ugly. Is there a better way?
+	 * @param element the fake 'root' node
+	 * @param idKey   the id to look for
+	 * @return if found the element with the given id, else null
+	 */
+	public static Element getElementById(Element element, String idKey) {
+		Stack stack = new Stack();
+		for (;;) {
+			NodeList children = element.getChildNodes();
+			for (int i = children.getLength(); i >= 0; --i) {
+				Node node = children.item(i);
+				if (node instanceof Element) {
+					element = (Element)node;
+					String id = element.getAttributeNS(null, "id");
+					if (id != null && id.equals(idKey))
+						return element;
+					stack.push(element);
+				}
+			}
+			if (stack.isEmpty())
+				break;
+			element = (Element)stack.pop();
+		}
+		return null;
 	}
 }

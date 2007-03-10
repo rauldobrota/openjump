@@ -10,7 +10,6 @@ package de.intevation.printlayout.pathcompact;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.TreeSet;
 import java.util.Collections;
