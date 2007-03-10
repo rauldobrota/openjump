@@ -58,9 +58,14 @@ extends      SVGGraphics2D
 	protected AffineTransform lastTransform;
 
 	/**
-	 * the cache inverse of lastTransform
+	 * the cached inverse of lastTransform
 	 */
 	protected AffineTransform lastInverse;
+
+	/**
+	 * make GeneralPaths out of other shapes?
+	 */
+	protected boolean makePaths;
 
 	/**
 	 * Creates the inverse of the given matrix.
@@ -235,13 +240,39 @@ extends      SVGGraphics2D
 	}
 
 	/**
+	 * Should shapes converted to GeneralPaths?
+	 * @param convertToPaths should shapes be converted to GeneralPaths?
+	 */
+	public void setConvertToGeneralPaths(boolean convertToPaths) {
+		this.makePaths = convertToPaths;
+	}
+
+	protected Shape toPath(Shape shape)  {
+		if (makePaths) {
+			// TODO: convert other types as well
+			if (shape instanceof Rectangle2D) {
+				GeneralPath gp = new GeneralPath(GeneralPath.WIND_NON_ZERO, 6);
+				Rectangle2D r = (Rectangle2D)shape;
+				gp.moveTo((float)r.getX(), (float)r.getY());
+				gp.lineTo((float)(r.getX() + r.getWidth()), (float)r.getY());
+				gp.lineTo((float)(r.getX() + r.getWidth()), (float)(r.getY() + r.getHeight()));
+				gp.lineTo((float)r.getX(), (float)(r.getY() + r.getHeight()));
+				gp.lineTo((float)r.getX(), (float)r.getY());
+				gp.closePath();
+				shape = gp;
+			}
+		}
+		return shape;
+	}
+
+	/**
 	 * Overwrites draw() from base class. This version of
 	 * draw clips a shape to the bounds before calling
 	 * draw() of the base class.
 	 */
 	public void draw(Shape shape) {
 		if ((shape = clipToBounds(shape)) != null)
-			super.draw(shape);
+			super.draw(toPath(shape));
 	}
 
 	/**
@@ -251,7 +282,7 @@ extends      SVGGraphics2D
 	 */
 	public void fill(Shape shape) {
 		if ((shape = clipToBounds(shape)) != null)
-			super.fill(shape);
+			super.fill(toPath(shape));
 	}
 }
 // end of file

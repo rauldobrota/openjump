@@ -120,8 +120,8 @@ public final class OverlapSorter
 		for (int i = 0, N = entries.size(); i < N; ++i) {
 			Entry entry = (Entry)entries.get(i);
 			spatial.insert(entry, entry);
-			if (((i+1) % 1000) == 0)
-				System.err.println(i + " in index");
+			if (((i+1) % 10000) == 0)
+				System.err.println((i+1) + " in index");
 		}
 		entries.clear();
 	}
@@ -150,7 +150,7 @@ public final class OverlapSorter
 							other.addParent();
 						}
 						else if (other.number == entry.number) {
-							if ((++count % 1000) == 0)
+							if ((++count % 10000) == 0)
 								System.err.println("intersected: " + count);
 						}
 						return true;

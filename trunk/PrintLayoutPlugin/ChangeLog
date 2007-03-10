@@ -1,3 +1,28 @@
+2007-03-10  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
+
+	Not using Batik's DOM implementation for map generation anymore.
+
+	* src/de/intevation/printlayout/pathcompact/PathOptimizer.java:
+		Fix a bug with redundant move commands. Now they are simply
+		eliminated.
+
+	* src/de/intevation/printlayout/Map2SVG.java:
+		- Added property "de.intevation.printlayout.optimize.map.batik.dom".
+		  The Batik DOM implementation is _very_ slow and memory hungry.
+		  For rendering and optimizing the Java on board DOM implementation
+		  is used instead and afterwards imported into the Batik document.
+		  If you want to use the Batik DOM anyway set this property to
+		  true.
+		- Added some extra garbage collection calls. 
+
+	* src/de/intevation/printlayout/batik/ClippingSVGGraphics2D.java:
+		Added the possibility to convert Shapes to GeneralPaths.
+		This enables to optimize point layers as well because
+		the points are represented by small Rectangle2D objects.
+		
+	* src/de/intevation/printlayout/pathcompact/OverlapSorter.java:
+		Cleanup the tracing output a bit.
+
 2007-03-09  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	* src/de/intevation/printlayout/Map2SVG.java:

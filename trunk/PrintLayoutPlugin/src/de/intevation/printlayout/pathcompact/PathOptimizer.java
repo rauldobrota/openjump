@@ -11,8 +11,8 @@ package de.intevation.printlayout.pathcompact;
 import org.apache.batik.parser.PathHandler;
 
 import java.util.ArrayList;
-
 import java.util.Locale;
+
 import java.text.NumberFormat;
 
 public class PathOptimizer
@@ -72,6 +72,10 @@ implements   PathHandler
 
 	protected final void emit(String segment) {
 		segments.add(segment);
+	}
+
+	protected final void replaceLast(String segment) {
+		segments.set(segments.size()-1, segment);
 	}
 
 	private static final String flag(boolean flag) {
@@ -223,12 +227,13 @@ implements   PathHandler
 
 		if (last == REL_LINE)
 			emit(DELTA_FORMAT.format(x) + " " + DELTA_FORMAT.format(y));
-		else
+		else {
+			last = REL_LINE;
 			emit("l" + DELTA_FORMAT.format(x) + " " + DELTA_FORMAT.format(y));
+		}
 
 		posX += x;
 		posY += y;
-		last = REL_LINE;
 	}
 
 	/** Invoked when a vertical absolute line command has been parsed. */
@@ -251,8 +256,8 @@ implements   PathHandler
 			//++ignoredMoves;
 		}
 		else {
-			if (last == MOVE)
-				emit(x + " " + y);
+			if (last == MOVE) // last move was redundant
+				replaceLast("M"  + x + " " + y);
 			else {
 				last = MOVE;
 				emit("M" + x + " " + y);
