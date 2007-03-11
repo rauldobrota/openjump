@@ -39,6 +39,7 @@ import org.openjump.core.ui.plugin.queries.SimpleQueryPlugIn;
 import org.openjump.core.ui.plugin.tools.BlendLineStringsPlugIn;
 import org.openjump.core.ui.plugin.tools.ConvexHullPlugIn;
 import org.openjump.core.ui.plugin.tools.CreateThiessenPolygonsPlugIn;
+import org.openjump.core.ui.plugin.tools.CutPolygonPlugIn;
 import org.openjump.core.ui.plugin.tools.DeleteEmptyGeometriesPlugIn;
 import org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn;
 import org.openjump.core.ui.plugin.tools.JoinWithArcPlugIn;
@@ -193,6 +194,9 @@ public class OpenJumpConfiguration{
 		
 		MergeTwoSelectedPolygonsPlugIn twopolymerger = new MergeTwoSelectedPolygonsPlugIn();
 		twopolymerger.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+		
+		CutPolygonPlugIn cutpoly = new CutPolygonPlugIn();
+		cutpoly.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 		
 		/**** EDIT_ATTIBUTES *****/
 		ReplaceValuePlugIn myRepVal = new ReplaceValuePlugIn();
