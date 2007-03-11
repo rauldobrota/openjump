@@ -34,18 +34,39 @@ extends            AbstractParsedURLProtocolHandler
 
 	private HashMap images;
 
-	private int uniqueId;
+	private int     uniqueId;
 
-	private static IncoreImageProtocolHandler instance;
+	private int     refCount;
+
+	private static  IncoreImageProtocolHandler instance;
 
 	/**
 	 * Make it a singleton because only one be registered as a factory
 	 * with ParseURL#registerHandler().
 	 */
+	private IncoreImageProtocolHandler() {
+		super(INCORE_IMAGE);
+	} 	
+
 	public static synchronized IncoreImageProtocolHandler getInstance() {
 		if (instance == null)
 			instance = new IncoreImageProtocolHandler();
 		return instance;
+	}
+
+	public synchronized void incrementReferenceCount() {
+		++refCount;
+	}
+
+	public synchronized void decrementReferenceCount() {
+		if (refCount > 0 && --refCount == 0) {
+			//System.err.println("IncoreImageProtocolHandler: ref count went zero");
+			if (images != null) {
+				HashMap x = images;
+				images = null;
+				x.clear();
+			}
+		}
 	}
 
 	private static final class ServeImage
@@ -86,30 +107,33 @@ extends            AbstractParsedURLProtocolHandler
 		}
 	} // class ServeImage
 
-	private IncoreImageProtocolHandler() {
-		super(INCORE_IMAGE);
-		images = new HashMap();
-	} 	
-
-
 	private String uniqueID() {
 		int id = uniqueId++;
 		return Integer.toString(id, 26);
 	}
 
 	public synchronized BufferedImage getImage(String id) {
-		return (BufferedImage)images.get(id);
+		return images != null
+			? (BufferedImage)images.get(id)
+			: null;
 	}
 
 
 	public synchronized String storeImage(BufferedImage image) {
 		String id = uniqueID();
+		if (images == null)
+			images = new HashMap();
 		images.put(id, image);
 		return id;
 	}
 
 	public synchronized BufferedImage removeImage(String id) {
-		return (BufferedImage)images.remove(id);
+		if (images == null)
+			return null;
+		BufferedImage image = (BufferedImage)images.remove(id);
+		if (images.isEmpty())
+			images = null;
+		return image;
 	}
 
 	public ParsedURLData parseURL(ParsedURL basepurl, String urlStr) {

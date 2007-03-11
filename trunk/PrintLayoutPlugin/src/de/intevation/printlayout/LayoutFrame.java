@@ -546,6 +546,35 @@ implements   PickingInteractor.PickingListener
 	}
 
 	/**
+	 * Nullify instance variables. Called on close.
+	 */
+	public void clear() {
+		docManager    = null;
+		pluginContext = null;
+
+		if (tools != null) {
+			ArrayList x = tools;
+			tools = null;
+			x.clear();
+		}
+
+		removeAction       = null;
+		groupAction        = null;
+		ungroupAction      = null;
+		upAction           = null;
+		downAction         = null;
+		addScalebarAction  = null;
+		addScaletextAction = null;
+		boxPropAction      = null;
+		textPropAction     = null;
+		pickingInteractor  = null;
+		lastDirectory      = null;
+		mousePosition      = null;
+		mouseFormat        = null;
+		rulerOverlay       = null;
+	}
+
+	/**
 	 * starts printing.
 	 */
 	public void print() {
@@ -823,10 +852,8 @@ implements   PickingInteractor.PickingListener
 		String guess = PaperSizes.guessPaperSize(current);
 		if (guess == null || !guess.equals(key)) {
 			SVGDocument document = PaperSizes.createSheet(key, null);
-			if (document != null) {
-				//DocumentManager.decorateWithRulers(document);
+			if (document != null)
 				docManager.switchToDocument(document);
-			}
 		}
 	}
 

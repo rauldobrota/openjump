@@ -30,6 +30,11 @@ import de.intevation.printlayout.batik.IncoreImageProtocolHandler;
 
 import org.apache.batik.util.ParsedURL;
 
+import javax.swing.JFrame;
+
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 /**
  * The plugin binding to OpenJump.
  */
@@ -61,8 +66,10 @@ implements   ThreadedPlugIn
 
 		blackboard = new Blackboard();
 
-		ParsedURL.registerHandler(
-			IncoreImageProtocolHandler.getInstance());
+		IncoreImageProtocolHandler iiph =
+			IncoreImageProtocolHandler.getInstance();
+
+		ParsedURL.registerHandler(iiph);
 	}
 
 	/**
@@ -102,6 +109,11 @@ implements   ThreadedPlugIn
 		if (document == null)
 			return;
 
+		IncoreImageProtocolHandler iiph =
+			IncoreImageProtocolHandler.getInstance();
+
+		iiph.incrementReferenceCount();
+
 		LayoutFrame viewer = new LayoutFrame(context);
 
 		DocumentManager documentManger =
@@ -110,7 +122,25 @@ implements   ThreadedPlugIn
 		documentManger.setDocument(document);
 
 		viewer.setSize(210*2, 297*2);
+		viewer.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		viewer.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent we) {
+				PrintLayoutPlugin.this.clear((LayoutFrame)we.getSource());
+			}
+		});
 		viewer.setVisible(true);
+	}
+
+	/**
+	 * Called on closing the viewer frame.
+	 * @param viewer the viewer to close.
+	 */
+	protected void clear(LayoutFrame viewer) {
+		IncoreImageProtocolHandler iiph =
+			IncoreImageProtocolHandler.getInstance();
+		iiph.decrementReferenceCount();
+		viewer.dispose();
+		viewer.clear();
 	}
 }		
 // end of file

@@ -1,4 +1,24 @@
-2007-03-10  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
+2007-03-11  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
+
+	Improved clean up code if closing a plugin frame.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		- Does not handles window closing itself anymore. Its done by 
+		  PrintLayoutPlugin.
+		- Added a clear() method to nullifies the instance variables.
+
+	* src/de/intevation/printlayout/batik/IncoreImageProtocolHandler.java:
+		Added a reference counter to track the need of the cached images.
+		If it wents down to zero all images are removed.
+
+	* src/de/intevation/printlayout/PrintLayoutPlugin.java:
+		- Increment the IncoreImageProtocolHandler ref counter if
+		  a new frame is opened.
+		- Add event handler to track the closing of frames.
+		  If event is caught dispose the frame, call its clear method
+			and	decrement the IncoreImageProtocolHandler's ref counter.
+		
+2007-03-11  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
 
 	Initial support for preview maps.
 
