@@ -79,7 +79,6 @@ implements   ThreadedPlugIn
 	public String getName() {
 		return "Print/Layout";
 	}
-   
 
 	/**
 	 * implements the execute() method of the plugin.
@@ -116,10 +115,13 @@ implements   ThreadedPlugIn
 
 		LayoutFrame viewer = new LayoutFrame(context);
 
-		DocumentManager documentManger =
+		DocumentManager documentManager =
 			viewer.getDocumentManager();
 
-		documentManger.setDocument(document);
+		documentManager.setDocument(document);
+
+		documentManager.addPostProcessor(
+			new PreviewMapReplacer(context));
 
 		viewer.setSize(210*2, 297*2);
 		viewer.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);

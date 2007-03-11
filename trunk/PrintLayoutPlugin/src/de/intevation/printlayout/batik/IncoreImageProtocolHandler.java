@@ -120,7 +120,16 @@ extends            AbstractParsedURLProtocolHandler
 
 
 	public synchronized String storeImage(BufferedImage image) {
+		return storeImage(image, null);
+	}
+
+	public synchronized String storeImage(
+		BufferedImage image, 
+		String        prefix
+	) {
 		String id = uniqueID();
+		if (prefix != null)
+			id = prefix + id;
 		if (images == null)
 			images = new HashMap();
 		images.put(id, image);

@@ -11,12 +11,13 @@
  */
 package de.intevation.printlayout;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
+import com.vividsolutions.jump.workbench.ui.Viewport;
 
 import com.vividsolutions.jump.workbench.ui.renderer.RenderingManager; 
 import com.vividsolutions.jump.workbench.ui.renderer.ThreadQueue;
-
-import com.vividsolutions.jump.workbench.ui.Viewport;
 
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 
@@ -33,7 +34,7 @@ import java.awt.Graphics2D;
 
 import java.awt.image.BufferedImage;
 
-import de.intevation.printlayout.beans.MapData;
+import de.intevation.printlayout.beans.PreviewData;
 
 import de.intevation.printlayout.batik.IncoreImageProtocolHandler;
 
@@ -47,9 +48,16 @@ public class PreviewMap
 implements   DocumentManager.DocumentModifier
 {
 	/**
+	 * This is used as a prefix to identify preview maps
+	 * in xlink:href attributes of image elements.
+	 */
+	public static final String PREVIEW_MAP = "preview-map";
+
+	/**
 	 * The plugin context is need to access the LayerViewPanel.
 	 */
 	protected PlugInContext pluginContext;
+
 
 	/**
 	 * Creates uninitialized PreviewMap
@@ -89,6 +97,7 @@ implements   DocumentManager.DocumentModifier
 		Dimension xenv = layerViewPanel.getSize(null);
 
 		double geo2screen = vp.getScale();
+		Envelope envelope = vp.getEnvelopeInModelCoordinates();
 
 		RenderingManager rms = layerViewPanel.getRenderingManager();
 		ThreadQueue q = rms.getDefaultRendererThreadQueue();
@@ -131,7 +140,7 @@ implements   DocumentManager.DocumentModifier
 		IncoreImageProtocolHandler iiph =
 			IncoreImageProtocolHandler.getInstance();
 
-		String imageID = iiph.storeImage(bitmap);
+		String imageID = iiph.storeImage(bitmap, PREVIEW_MAP);
 
 		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
 
@@ -166,10 +175,11 @@ implements   DocumentManager.DocumentModifier
 
 		// add the initial scale to beans
 
-		/*
-		MapData mapData = new MapData(geo2screen);
-		documentManager.setData(id, mapData);
-		*/
+		PreviewData previewData = new PreviewData(
+			geo2screen,
+			envelope);
+
+		documentManager.setData(id, previewData);
 
 		return null;
 	}

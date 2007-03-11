@@ -141,9 +141,21 @@ public class DocumentManager
 	 */
 	protected LayoutCanvas svgCanvas;
 
+	/**
+	 * used to  generate unique IDs.
+	 */
 	protected int          objectID;
 
+	/**
+	 * storage of the none SVG stuff
+	 */
 	protected ExtraData    extraData;
+
+	/**
+	 * a list of post processors when isolating the 
+	 * inner document for printing etc.
+	 */
+	protected ArrayList     postProcessors;
 
 	/**
 	 * for numeric stability
@@ -172,6 +184,19 @@ public class DocumentManager
 
 	public interface ModificationCallback {
 		void run(DocumentManager documentManager, AbstractElement element);
+	}
+
+	/**
+	 * When the inner document has been isolated
+	 * instances of this interface can be used to post process
+	 * the new created document. This is usefull to replace
+	 * e.g. elements before the document is send to its sink 
+	 * (printer, file, etc.).
+	 */
+	public interface PostProcessor {
+		AbstractDocument postProcess(
+			AbstractDocument document, 
+			DocumentManager  documentManager);
 	}
 
 	protected DocumentManager() {
@@ -236,6 +261,42 @@ public class DocumentManager
 
 	public boolean hasChangeListeners(String id) {
 		return extraData.hasChangeListeners(id);
+	}
+
+	/**
+	 * Adds a post processor to the list of processors
+	 * applied when the inner document is isolated and
+	 * is sent to a sink.
+	 * @param postProcessor the processor to add
+	 */
+	public void addPostProcessor(PostProcessor postProcessor) {
+		if (postProcessor == null)
+			throw new IllegalArgumentException();
+
+		if (postProcessors == null) {
+			postProcessors = new ArrayList(2);
+			postProcessors.add(postProcessor);
+		}
+		else {
+			if (!postProcessors.contains(postProcessor))
+				postProcessors.add(postProcessor);
+		}
+	}
+
+	/**
+	 * Removes a post processor from the list of processors
+	 * applied when the inner document is isolated and
+	 * is sent to a sink.
+	 * @param postProcessor the processor to remove
+	 */
+	public void removePostProcessor(PostProcessor postProcessor) {
+		if (postProcessor == null)
+			throw new IllegalArgumentException();
+
+		if (postProcessors != null
+		&&  postProcessors.remove(postProcessor)
+		&&  postProcessors.isEmpty())
+			postProcessors = null;
 	}
 
 	/**
@@ -756,6 +817,12 @@ public class DocumentManager
 			"viewBox",
 			"0 0 " + sheet.getAttributeNS(null, "width") + 
 			" "    + sheet.getAttributeNS(null, "height"));   
+
+		if (postProcessors != null) {
+			for (int N = postProcessors.size(), i = 0; i < N; ++i)
+				newDocument = ((PostProcessor)postProcessors.get(i))
+					.postProcess(newDocument, this);
+		}
 
 		return newDocument;
 	}
