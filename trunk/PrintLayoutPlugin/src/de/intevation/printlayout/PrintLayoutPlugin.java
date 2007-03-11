@@ -26,6 +26,10 @@ import org.w3c.dom.svg.SVGDocument;
 
 import de.intevation.printlayout.util.PaperSizes;
 
+import de.intevation.printlayout.batik.IncoreImageProtocolHandler;
+
+import org.apache.batik.util.ParsedURL;
+
 /**
  * The plugin binding to OpenJump.
  */
@@ -55,7 +59,10 @@ implements   ThreadedPlugIn
 				this, new String[] { MenuNames.FILE }, getName(),
 				false, null, check.createAtLeastNLayersMustExistCheck(1));
 
-		 blackboard = new Blackboard();
+		blackboard = new Blackboard();
+
+		ParsedURL.registerHandler(
+			IncoreImageProtocolHandler.getInstance());
 	}
 
 	/**

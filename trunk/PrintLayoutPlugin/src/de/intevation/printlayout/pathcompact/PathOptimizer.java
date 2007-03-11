@@ -1,5 +1,5 @@
 /*
- * PathCompactor.java
+ * PathOptimizer.java
  * ------------------
  * (c) 2007 by Sascha L. Teichmann (teichmann@intevation.de)
  *
@@ -43,11 +43,14 @@ implements   PathHandler
 	private ArrayList segments;
 
 	public PathOptimizer() {
-		segments = new ArrayList(1024);
+		segments = new ArrayList(8*1024);
+		last = OTHER;
 	}
 
 	public void clear() {
 		segments.clear();
+		last = OTHER;
+		posX = posY = 0f;
 	}
 
 	public String generate() {
@@ -58,14 +61,22 @@ implements   PathHandler
 
 		StringBuffer sb = new StringBuffer(size);
 
+		String last;
 		if (N > 0)
-			sb.append((String)segments.get(0));
+			sb.append(last = (String)segments.get(0));
+		else
+			last = null;
 
 		for (int i = 1; i < N; ++i) {
 			String s = (String)segments.get(i);
-			if (!Character.isLetter(s.charAt(0)))
+			if (Character.isLetter(s.charAt(0))) {
+				if (Character.isLetter(last.charAt(last.length()-1)))
+					sb.append(' ');
+			}
+			else
 				sb.append(' ');
 			sb.append(s);
+			last = s;
 		}
 		return sb.toString();
 	}
@@ -252,7 +263,7 @@ implements   PathHandler
 
 	/** Invoked when an absolute moveto command has been parsed. */
 	public void	movetoAbs(float x, float y) {
-		if (x == posX && y == posY) {
+		if (x == posX && y == posY && !segments.isEmpty()) {
 			//++ignoredMoves;
 		}
 		else {
@@ -269,7 +280,7 @@ implements   PathHandler
 	
 	/** Invoked when a relative moveto command has been parsed. */
 	public void	movetoRel(float x, float y) {
-		if (x == 0f && y == 0f) {
+		if (x == 0f && y == 0f && !segments.isEmpty()) {
 			//++ignoredMoves;
 		}
 		else {

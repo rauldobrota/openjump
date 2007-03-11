@@ -206,6 +206,7 @@ implements   PickingInteractor.PickingListener
 		ImportImageAction  imageImportAction  = new ImportImageAction();
 		ImportSVGAction    svgImportAction    = new ImportSVGAction();
 		AddMapAction       addMapAction       = new AddMapAction();
+		AddPreviewAction   addPreviewAction   = new AddPreviewAction();
 		AddLegendAction    addLegendAction    = new AddLegendAction();
 		                   addScalebarAction  = new AddScalebarAction();
 		                   addScaletextAction = new AddScaletextAction();
@@ -241,6 +242,7 @@ implements   PickingInteractor.PickingListener
 		viewMenu.add(new JCheckBoxMenuItem(rulerAction));
 
 		insertMenu.add(addMapAction);
+		insertMenu.add(addPreviewAction);
 		insertMenu.add(addLegendAction);
 		insertMenu.add(svgImportAction);
 		insertMenu.add(imageImportAction);
@@ -566,6 +568,15 @@ implements   PickingInteractor.PickingListener
 	 */
 	public void addMap() {
 		docManager.modifyDocumentLater(new Map2SVG(pluginContext));
+	}
+
+	/**
+	 * adds a preview image oth the openjump map to the SVG document.
+	 * Fetches the openjump map from the core and puts it into the SVG
+	 * document.
+	 */
+	public void addPreviewMap() {
+		docManager.modifyDocumentLater(new PreviewMap(pluginContext));
 	}
 
 	protected boolean confirmWrite(File file)
@@ -997,6 +1008,18 @@ implements   PickingInteractor.PickingListener
 		}
 		public void actionPerformed(ActionEvent ae) {
 			addMap();
+		}
+	}
+
+	private class AddPreviewAction extends AbstractAction {
+		AddPreviewAction() {
+			super(I18N.getName(
+					I18N.getString("LayoutFrame.AddPreviewMap", "Add Preview Map")));
+			putValue(Action.MNEMONIC_KEY, I18N.getMnemonic(
+					I18N.getString("LayoutFrame.AddPreviewMap", "Add &Preview Map")));
+		}
+		public void actionPerformed(ActionEvent ae) {
+			addPreviewMap();
 		}
 	}
 

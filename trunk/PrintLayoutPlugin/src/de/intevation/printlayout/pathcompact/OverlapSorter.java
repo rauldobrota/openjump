@@ -91,7 +91,7 @@ public final class OverlapSorter
 
 		public int compareTo(Object other) {
 			Entry e = (Entry)other;
-			int diff = e.number - number;
+			int diff = number - e.number;
 
 			if (diff < 0) return -1;
 			if (diff > 0) return +1;

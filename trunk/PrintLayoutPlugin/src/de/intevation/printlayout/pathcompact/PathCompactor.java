@@ -234,10 +234,10 @@ public class PathCompactor
 
 		ArrayList remove = new ArrayList();
 
-		int total = 0;
+		PathOptimizer optimizer = new PathOptimizer();
 
+		int total    = 0;
 		int numPaths = 0;
-		int pathsLeft = 0;
 
 		while (!stack.empty()) {
 			Element current = (Element)stack.pop();
@@ -259,8 +259,8 @@ public class PathCompactor
 						ranges.add(range);
 						range = new ArrayList();
 					}
-					else // recycle
-						range.clear();
+					else
+						optimizeOneElementRange(range, optimizer);
 
 					if (tagName.equals("g") || tagName.equals("svg"))
 						stack.push(child);
@@ -268,7 +268,7 @@ public class PathCompactor
 					continue;
 				}
 				if ((++numPaths % 10000) == 0)
-					System.err.println("paths found: " + numPaths);
+					System.err.println("Paths compacted: " + numPaths);
 
 				range.add(element);
 			} // for all children
@@ -282,12 +282,8 @@ public class PathCompactor
 				ranges.add(range);
 				range = new ArrayList();
 			}
-			else {
-				if (!range.isEmpty()) {
-					++pathsLeft;
-					range.clear();
-				}
-			}
+			else
+				optimizeOneElementRange(range, optimizer);
 
 			children = null;
 
@@ -304,11 +300,11 @@ public class PathCompactor
 						current.removeChild(last);
 					}
 					else
-						total += flushChunks(last, chunks);
+						total += flushChunks(last, chunks, optimizer);
 
 					last = before;
 				}
-				total += flushChunks(last, chunks);
+				total += flushChunks(last, chunks, optimizer);
 				range.clear();
 			} // for all ranges
 
@@ -321,28 +317,45 @@ public class PathCompactor
 		System.err.println("Paths left: " + (numPaths - total));
 	}
 
-	private static final int flushChunks(Element last, ArrayList chunks) {
+	private static final void optimizeOneElementRange(
+		ArrayList     range,
+		PathOptimizer optimizer
+	) {
+		if (!range.isEmpty()) {
+			Element element = (Element)range.get(0);
+			range.clear();
+
+			PathParser parser = new PathParser();
+			parser.setPathHandler(optimizer);
+			parser.parse(element.getAttributeNS(null, "d"));
+			element.setAttributeNS(null, "d", optimizer.generate());
+			optimizer.clear();
+		}
+	}
+
+	private static final int flushChunks(
+		Element       last, 
+		ArrayList     chunks,
+		PathOptimizer optimizer
+	) {
 		int C = chunks.size();
 		if (C == 0)
 			return 0;
 
-		int total = ((String)chunks.get(0)).length();
+		// pre calculate capacity to avoid reallocations
+		int total = ((String)chunks.get(0)).length() + C;
 		for (int k = 1; k < C; ++k)
-			total += ((String)chunks.get(k)).length() + 1; 
+			total += ((String)chunks.get(k)).length(); 
 
 		String dLast = last.getAttributeNS(null, "d");
 
 		total += dLast.length();
 
-		/*
-		System.err.println(
-			"compacted: " + C + 
-			" (chars: " + ((float)total*(1f/(1024f*1024f))) + "M)");
-		*/
-
 		StringBuffer sb = new StringBuffer(total);
 
 		sb.append(dLast);
+
+		dLast = null;
 
 		for (int k = C-1; k >= 0; --k)
 			sb.append(' ').append((String)chunks.get(k));
@@ -351,14 +364,14 @@ public class PathCompactor
 
 		String str = sb.toString();
 
-		sb.setLength(0); sb = null;
+		sb = null;
 
 		PathParser parser = new PathParser();
-		PathOptimizer optimizer = new PathOptimizer();
 		parser.setPathHandler(optimizer);
 		parser.parse(str);
 
 		last.setAttributeNS(null, "d", optimizer.generate());
+		optimizer.clear();
 
 		return C;
 	}

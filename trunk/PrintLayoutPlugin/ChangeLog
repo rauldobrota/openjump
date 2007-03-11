@@ -1,5 +1,46 @@
 2007-03-10  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
 
+	Initial support for preview maps.
+
+	* src/de/intevation/printlayout/PreviewMap.java:
+		New: DocumentModifier that creates a preview map. This
+		is mainly an image that is served to the SVG renderer
+		through the IncoreImageProtocolHandler.
+
+	* src/de/intevation/printlayout/batik/IncoreImageProtocolHandler.java:
+		Implements a protocol handler that offers an "incore-image:"
+		protocol to the SVG renderer. The data is served through instances
+		of an inner	class that extends Batik's ParsedURLData.
+
+	* src/de/intevation/printlayout/PrintLayoutPlugin.java:
+		Register the IncoreImageProtocolHandler to the protocol
+		serving ParsedURL class of Batik.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		Added a menu entry for new preview map.
+
+	* src/de/intevation/printlayout/i18n/messages.properties,
+		src/de/intevation/printlayout/i18n/messages_de.properties:
+		Text for the new menu entry.
+
+	* src/de/intevation/printlayout/pathcompact/OverlapSorter.java:
+		fix a _very_ minor bug: The reinsert order during group building
+		was inverted. That has no visual effect but the structure of
+		the generated SVG was partly upside down compared with the original.
+
+	* src/de/intevation/printlayout/pathcompact/PathCompactor.java:
+		- Reuse PathOptimizer for all paths to avoid needless
+		  constructing a new one again and again and again.
+		- Optimizing paths too that are not concatenated to others.
+		
+	* src/de/intevation/printlayout/pathcompact/PathOptimizer.java:
+		- Fix bug when "M0 0" is issued at the begin of the path.
+		  This one is _not_ redundant, even if we are at (0, 0)!
+		- Give segment list a larger initial size (8*1024). That
+		  should reduce the number of reallocation with larger paths.
+
+2007-03-10  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
+
 	Use CSS for map style attributes if wanted.
 
 	* src/de/intevation/printlayout/batik/StyleSheetHandler.java:
@@ -22,6 +63,7 @@
 		
 	* src/de/intevation/printlayout/pathcompact/OverlapSorter.java:
 		removed needless import
+
 2007-03-10  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
 
 	Not using Batik's DOM implementation for map generation anymore.
