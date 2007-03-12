@@ -1,5 +1,12 @@
 2007-03-12  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
 
+	Quick fix: Rendering call in PreviewMap got lost somehow ...
+
+	* src/de/intevation/printlayout/beans/PreviewData.java:
+		Readded the call to actually generate the preview. ;-)
+	
+2007-03-12  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
+
 	Implemented a preview map replacement.
 	TODO: Improve the rendering sync. OpenJUMP is _totally_ broken by
 	design and implementation here. 

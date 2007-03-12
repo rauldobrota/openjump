@@ -117,6 +117,8 @@ implements   DocumentManager.DocumentModifier
 				}
 			});
 
+		sync.run(q);
+
 		g2d.dispose();
 
 		IncoreImageProtocolHandler iiph =
