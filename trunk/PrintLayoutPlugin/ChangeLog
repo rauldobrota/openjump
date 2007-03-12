@@ -1,5 +1,18 @@
 2007-03-12  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
 
+	Another attempt to get in sync with the rendering.
+
+	* src/de/intevation/printlayout/Map2SVG.java:
+		Enqueue an Runnable into the ThreadQueue after its is filled
+		with rendering threads. Because its a queue it should be 
+		executed when all other threads are done. The run() of
+		this Runnable unlocks a monitor that is waiting. This is
+		better than the busy wait. But its still fails to get the
+		entire map if the map has a larger number for features.
+		Direct map generation works. Why?
+
+2007-03-12  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
+
 	Quick fix: Rendering call in PreviewMap got lost somehow ...
 
 	* src/de/intevation/printlayout/beans/PreviewData.java:

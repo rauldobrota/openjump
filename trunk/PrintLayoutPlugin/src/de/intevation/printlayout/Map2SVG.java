@@ -52,7 +52,6 @@ import de.intevation.printlayout.batik.StyleSheetHandler;
 import de.intevation.printlayout.pathcompact.PathCompactor;
 
 import de.intevation.printlayout.util.ElementUtils;
-import de.intevation.printlayout.util.OpenJumpRenderingSync;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -201,26 +200,34 @@ implements   DocumentManager.DocumentModifier
 			}
 		}
 
-		long renderStartTime, renderStopTime;
+		long renderStartTime = System.currentTimeMillis();
 
-		{ final Graphics2D     g2d   = svgGenerator;
-			final LayerViewPanel lvp   = layerViewPanel;
-			ThreadQueue          queue = rms.getDefaultRendererThreadQueue();
+		ThreadQueue queue = rms.getDefaultRendererThreadQueue();
+		rms.renderAll();
+		final boolean [] locked = { true };
 
-			OpenJumpRenderingSync sync = new OpenJumpRenderingSync(
-				new Runnable() {
-					public void run() {
-						// flush cached images
-						lvp.repaint();
-						lvp.paintComponent(g2d);
-					}
-				});
+		queue.add(new Runnable() {
+			public void run() {
+				synchronized (locked) {
+					locked[0] = false;
+					locked.notify();
+				}
+			}
+		});
 
-			// do the rendering
-			renderStartTime = System.currentTimeMillis();
-			sync.run(queue, true);
-			renderStopTime = System.currentTimeMillis();
+		layerViewPanel.paintComponent(svgGenerator);
+
+		try {
+			synchronized (locked) {
+				int i = 20; // max 2min
+				while (locked[0] && i-- > 0)
+					locked.wait(6000);
+			}
 		}
+		catch (InterruptedException ie) {
+		}
+
+		long renderStopTime = System.currentTimeMillis();
 
 		// restore the previous image caching behavior
 		for (int i = 0; i < N; ++i) {
