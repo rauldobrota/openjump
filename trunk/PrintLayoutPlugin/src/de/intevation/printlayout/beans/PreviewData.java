@@ -14,6 +14,8 @@ package de.intevation.printlayout.beans;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Coordinate;
 
+import java.lang.ref.Reference;
+
 /**
  * Bean that stores map data extracted from OpenJump
  * for a given map (e.g. the initial scale of the map).
@@ -21,11 +23,13 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class PreviewData
 extends      MapData
 {
-	protected double minX;
-	protected double minY;
+	protected double    minX;
+	protected double    minY;
 
-	protected double maxX;
-	protected double maxY;
+	protected double    maxX;
+	protected double    maxY;
+
+	protected transient Reference cache;
 
 	public PreviewData() {
 	}
@@ -42,6 +46,14 @@ extends      MapData
 		return new Envelope(
 			new Coordinate(minX, minY),
 			new Coordinate(maxX, maxY));
+	}
+
+	public Reference fetchCache() {
+		return cache;
+	}
+
+	public void storeCache(Reference cache) {
+		this.cache = cache;
 	}
 
 	public double getMinX() {

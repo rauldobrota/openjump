@@ -18,6 +18,7 @@ import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.renderer.LayerRenderer;
 import com.vividsolutions.jump.workbench.ui.renderer.Renderer;   
 import com.vividsolutions.jump.workbench.ui.renderer.RenderingManager; 
+import com.vividsolutions.jump.workbench.ui.renderer.ThreadQueue;
 
 import com.vividsolutions.jump.workbench.ui.Viewport;
 
@@ -38,6 +39,7 @@ import org.apache.batik.svggen.SVGSyntax;
 import org.w3c.dom.svg.SVGDocument;
 
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 
 import java.awt.geom.Rectangle2D;
 
@@ -50,6 +52,7 @@ import de.intevation.printlayout.batik.StyleSheetHandler;
 import de.intevation.printlayout.pathcompact.PathCompactor;
 
 import de.intevation.printlayout.util.ElementUtils;
+import de.intevation.printlayout.util.OpenJumpRenderingSync;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -97,6 +100,17 @@ implements   DocumentManager.DocumentModifier
 		Boolean.getBoolean("de.intevation.printlayout.use.css.map");
 
 	/**
+	 * If the system property de.intevation.printlayout.gc.calls
+	 * is set to a positive integer N the garbage collection is called
+	 * N times after each memory critcal operation. Beware: This may prevent
+	 * caching of results. Therefore it is set to 0 by default.
+	 */
+	public static final int GC_CALLS =
+		Math.max(0,
+			Integer.getInteger("de.intevation.printlayout.gc.calls", 0)
+				.intValue());
+
+	/**
 	 * The plugin context is need to access the LayerViewPanel.
 	 */
 	protected PlugInContext pluginContext;
@@ -115,48 +129,19 @@ implements   DocumentManager.DocumentModifier
 		this.pluginContext = pluginContext;
 	}
 
-	/**
-	 * Creates a new DOM document using the default factory.
-	 * @return new DOM document or null if construction failed.
-	 */
-	public static final Document createDocument() {
-		try {
-			return DocumentBuilderFactory
-				.newInstance()
-				.newDocumentBuilder()
-				.newDocument();
-		} 
-		catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-
-	/**
-	 * implements the run() method of the DocumentModifier 
-	 * interface. The map is rendered to an SVG context
-	 * and added to the SVG document afterwards.
-	 */
-	public Object run(DocumentManager documentManager) {
-
-		SVGDocument document = documentManager.getSVGDocument();
-
-		AbstractElement sheet =
-			(AbstractElement)document.getElementById(DocumentManager.DOCUMENT_SHEET);
-
-		if (sheet == null) {
-			System.err.println("no sheet found");
-			return null;
-		}
-
+	public Element createSVG(
+		Document    document, 
+		double []   geo2screen,
+		Dimension   xenv
+	) {
 		LayerViewPanel layerViewPanel = pluginContext.getLayerViewPanel();
 
 		Viewport vp = layerViewPanel.getViewport();
 		
-		Dimension xenv = layerViewPanel.getSize(null);
+		xenv = layerViewPanel.getSize(xenv);
 
-		double geo2screen = vp.getScale();
+		if (geo2screen != null)
+			geo2screen[0] = vp.getScale();
 
 		// setup the SVG generator ...
 		Document doc = USE_BATIK_DOM ? null : createDocument();
@@ -216,10 +201,26 @@ implements   DocumentManager.DocumentModifier
 			}
 		}
 
-		// do the rendering
-		layerViewPanel.repaint();
-		long renderStartTime = System.currentTimeMillis();
-		layerViewPanel.paintComponent(svgGenerator);
+		long renderStartTime, renderStopTime;
+
+		{ final Graphics2D     g2d   = svgGenerator;
+			final LayerViewPanel lvp   = layerViewPanel;
+			ThreadQueue          queue = rms.getDefaultRendererThreadQueue();
+
+			OpenJumpRenderingSync sync = new OpenJumpRenderingSync(
+				new Runnable() {
+					public void run() {
+						// flush cached images
+						lvp.repaint();
+						lvp.paintComponent(g2d);
+					}
+				});
+
+			// do the rendering
+			renderStartTime = System.currentTimeMillis();
+			sync.run(queue, true);
+			renderStopTime = System.currentTimeMillis();
+		}
 
 		// restore the previous image caching behavior
 		for (int i = 0; i < N; ++i) {
@@ -231,7 +232,6 @@ implements   DocumentManager.DocumentModifier
 			}
 		}
 
-		long renderStopTime = System.currentTimeMillis();
 		System.err.println("rendering took [secs]: " +
 			inSecs(renderStopTime-renderStartTime));
 
@@ -255,9 +255,7 @@ implements   DocumentManager.DocumentModifier
 			styleSheetSection = null;
 		}
 		
-		System.err.println("used memory before gc [MB]: " + inMegaBytes(usedMemory()));
 		gc();
-		System.err.println("used memory after gc [MB]: " + inMegaBytes(usedMemory()));
 
 		if (OPTIMIZE_MAP_SVG) {
 			System.err.println("Reordering paths...");
@@ -271,21 +269,19 @@ implements   DocumentManager.DocumentModifier
 			System.err.println("Optimization took [secs]: " + 
 				inSecs(optStopTime - optStartTime));
 
-			System.err.println("used memory before gc [MB]: " + inMegaBytes(usedMemory()));
 			gc();
-			System.err.println("used memory after gc [MB]: " + inMegaBytes(usedMemory()));
 		}
 
 		// Uncomment this if you want to see the reason why
 		// the bounding box of the map doesn't fit:
 		//root.setAttributeNS(null, "overflow", "visible");
-		root.setAttributeNS(null, "width",  String.valueOf(xenv.getWidth()));
-		root.setAttributeNS(null, "height", String.valueOf(xenv.getHeight()));
+		root.setAttributeNS(null, "width",  String.valueOf(xenv.width));
+		root.setAttributeNS(null, "height", String.valueOf(xenv.height));
 
 		root.setAttributeNS(null, "x", "0");
 		root.setAttributeNS(null, "y", "0");
 		
-
+		// import document if needed
 		if (doc != null) {
 			long importStartTime = System.currentTimeMillis();
 			if (document instanceof AbstractDocument) {
@@ -294,12 +290,58 @@ implements   DocumentManager.DocumentModifier
 			}
 			else 
 				root = (Element)document.importNode(root, true);
+
 			doc = null;
+
 			long importStopTime = System.currentTimeMillis();
 			System.err.println("importing DOM took [secs]: " +
 				inSecs(importStopTime-importStartTime));
 			gc();
 		}
+
+		return root;
+	}
+
+	/**
+	 * Creates a new DOM document using the default factory.
+	 * @return new DOM document or null if construction failed.
+	 */
+	public static final Document createDocument() {
+		try {
+			return DocumentBuilderFactory
+				.newInstance()
+				.newDocumentBuilder()
+				.newDocument();
+		} 
+		catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+
+	/**
+	 * implements the run() method of the DocumentModifier 
+	 * interface. The map is rendered to an SVG context
+	 * and added to the SVG document afterwards.
+	 */
+	public Object run(DocumentManager documentManager) {
+
+		SVGDocument document = documentManager.getSVGDocument();
+
+		AbstractElement sheet =
+			(AbstractElement)document.getElementById(DocumentManager.DOCUMENT_SHEET);
+
+		if (sheet == null) {
+			System.err.println("no sheet found");
+			return null;
+		}
+
+		double [] geo2screen = new double[1];
+
+		Dimension xenv = new Dimension();
+
+		Element root = createSVG(document, geo2screen, xenv);
 
 		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
 
@@ -321,7 +363,7 @@ implements   DocumentManager.DocumentModifier
 
 		// add the initial scale to beans
 
-		MapData mapData = new MapData(geo2screen);
+		MapData mapData = new MapData(geo2screen[0]);
 		documentManager.setData(id, mapData);
 
 		return null;
@@ -331,7 +373,11 @@ implements   DocumentManager.DocumentModifier
 	 * Triggers garbage collection once.
 	 */
 	private static final void gc() {
-		gc(1);
+		if (GC_CALLS > 0) {
+			System.err.println("used memory before gc [MB]: " + inMegaBytes(usedMemory()));
+			gc(GC_CALLS);
+			System.err.println("used memory after gc [MB]: " + inMegaBytes(usedMemory()));
+		}
 	}
 
 	/**

@@ -17,6 +17,7 @@ import org.apache.batik.dom.AbstractElement;
 import org.apache.batik.dom.util.XLinkSupport; 
 
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Element;
 
 import de.intevation.printlayout.beans.PreviewData;
 
@@ -31,8 +32,13 @@ import com.vividsolutions.jts.geom.Envelope;
 
 import java.awt.geom.NoninvertibleTransformException;
 
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
+
+import java.util.ArrayList;
+
 public class PreviewMapReplacer
-implements   DocumentManager.PostProcessor
+implements   DocumentManager.Processor
 {
 	public static final String PREFIX =
 		IncoreImageProtocolHandler.INCORE_IMAGE + 
@@ -62,6 +68,8 @@ implements   DocumentManager.PostProcessor
 
 		Envelope current = null;
 
+		ArrayList replacements = new ArrayList();
+
 		for (int N = images.getLength(), i = 0; i < N; ++i) {
 			AbstractElement image = (AbstractElement)images.item(i);
 
@@ -86,19 +94,39 @@ implements   DocumentManager.PostProcessor
 
 			PreviewData previewData = (PreviewData)data;
 
-			if (current == null)
-				current = vp.getEnvelopeInModelCoordinates();
+			Reference cache = previewData.fetchCache();
 
-			// zoom to spot
-			try {
-				vp.zoom(previewData.asEnvelope());
-			}
-			catch (NoninvertibleTransformException nite) {
-				continue;
-			}
+			Element root = cache != null
+				? (Element)cache.get()
+				: null;
 
-			// TODO: Do rendering here
+			if (root == null) { // not in cache
+
+				if (current == null)
+					current = vp.getEnvelopeInModelCoordinates();
+
+				// zoom to spot
+				try {
+					vp.zoom(previewData.asEnvelope());
+				}
+				catch (NoninvertibleTransformException nite) {
+					continue;
+				}
+
+				Map2SVG map2svg = new Map2SVG(pluginContext);
+
+				root = map2svg.createSVG(document, null, null);
+
+				previewData.storeCache(new SoftReference(root));
+			}
+			else { // not in cache
+				System.err.println("found in cache");
+				root = (Element)document.importNode(root, true, true);
+			}
+			replacements.add(new Object[] { parent, root, image });
 		}
+
+		images = null;
 
 		if (current != null) // restore original spot
 			try {
@@ -106,6 +134,15 @@ implements   DocumentManager.PostProcessor
 			}
 			catch (NoninvertibleTransformException nite) {
 			}
+
+		for (int i = replacements.size()-1; i >= 0; --i) {
+			Object [] what = (Object [])replacements.get(i);
+			Element p = (Element)what[0];
+			Element n = (Element)what[1];
+			Element o = (Element)what[2];
+			p.replaceChild(n, o);
+		}
+		replacements.clear();
 		 
 		return document;
 	}

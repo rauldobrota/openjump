@@ -193,7 +193,7 @@ public class DocumentManager
 	 * e.g. elements before the document is send to its sink 
 	 * (printer, file, etc.).
 	 */
-	public interface PostProcessor {
+	public interface Processor {
 		AbstractDocument postProcess(
 			AbstractDocument document, 
 			DocumentManager  documentManager);
@@ -269,7 +269,7 @@ public class DocumentManager
 	 * is sent to a sink.
 	 * @param postProcessor the processor to add
 	 */
-	public void addPostProcessor(PostProcessor postProcessor) {
+	public void addPostProcessor(Processor postProcessor) {
 		if (postProcessor == null)
 			throw new IllegalArgumentException();
 
@@ -289,7 +289,7 @@ public class DocumentManager
 	 * is sent to a sink.
 	 * @param postProcessor the processor to remove
 	 */
-	public void removePostProcessor(PostProcessor postProcessor) {
+	public void removePostProcessor(Processor postProcessor) {
 		if (postProcessor == null)
 			throw new IllegalArgumentException();
 
@@ -820,7 +820,7 @@ public class DocumentManager
 
 		if (postProcessors != null) {
 			for (int N = postProcessors.size(), i = 0; i < N; ++i)
-				newDocument = ((PostProcessor)postProcessors.get(i))
+				newDocument = ((Processor)postProcessors.get(i))
 					.postProcess(newDocument, this);
 		}
 

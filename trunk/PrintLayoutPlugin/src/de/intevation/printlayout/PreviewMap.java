@@ -38,6 +38,8 @@ import de.intevation.printlayout.beans.PreviewData;
 
 import de.intevation.printlayout.batik.IncoreImageProtocolHandler;
 
+import de.intevation.printlayout.util.OpenJumpRenderingSync;
+
 /**
  * Instances of this class are used to convert the
  * content of OJ's LayerViewPanel to an preview image.
@@ -90,7 +92,7 @@ implements   DocumentManager.DocumentModifier
 			return null;
 		}
 
-		LayerViewPanel layerViewPanel = pluginContext.getLayerViewPanel();
+		final LayerViewPanel layerViewPanel = pluginContext.getLayerViewPanel();
 
 		Viewport vp = layerViewPanel.getViewport();
 		
@@ -106,34 +108,14 @@ implements   DocumentManager.DocumentModifier
 			xenv.width, xenv.height,
 			BufferedImage.TYPE_INT_RGB);
 
-		Graphics2D g2d = bitmap.createGraphics();
+		final Graphics2D g2d = bitmap.createGraphics();
 
-		final int [] lock = { 0 };
-
-		ThreadQueue.Listener l = new ThreadQueue.Listener() {
-			public void allRunningThreadsFinished() {
-				synchronized (lock) { 
-					lock[0] = 1;
-					lock.notify(); 
+		OpenJumpRenderingSync sync = new OpenJumpRenderingSync(
+			new Runnable() {
+				public void run() {
+					layerViewPanel.paintComponent(g2d);
 				}
-			}
-		};
-
-		q.add(l);
-
-		// do the rendering
-		//layerViewPanel.repaint();
-		layerViewPanel.paintComponent(g2d);
-
-		try {
-			synchronized (lock) { 
-				int i = 10;
-				while (lock[0] == 0 && --i > 0)
-					lock.wait(100); 
-			} 
-		}
-		catch (InterruptedException ie) {}
-		q.remove(l);
+			});
 
 		g2d.dispose();
 

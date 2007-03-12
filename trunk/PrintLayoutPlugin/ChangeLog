@@ -1,3 +1,53 @@
+2007-03-12  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
+
+	Implemented a preview map replacement.
+	TODO: Improve the rendering sync. OpenJUMP is _totally_ broken by
+	design and implementation here. 
+
+	* src/de/intevation/printlayout/util/OpenJumpRenderingSync.java:
+		New. This is an attempt to synchronize to the rendering. But
+		OpenJUMP lacks a clear concept to do this right! Tampering
+		around with the rendering thread queue is the most successful way
+		but its broken too. It is possible to register event handlers
+		to get informend when the rendering is done. But sometimes
+		they are called too early. Furthermore there is an extra
+		thread queue that deals with the database and WMS	layers.
+		You cannot synchronize to this because it has private access.
+		Result: You will not see them in the map because they
+		took longer to get rendered ...
+		Other approaches (like registering a LayerViewPanelListener)
+		failed miserably because the event firing is not thread safe
+		and evil concurrency exceptions are thrown.
+		So a busy wait is done against the public thread queue 
+		when larger maps are drawn. Preview rendering is synced
+		by event handlers. :-/
+
+	* src/de/intevation/printlayout/beans/PreviewData.java:
+		Stores a weak (soft) reference to an already generated map DOM.
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		Renamed interface PostProcessor to Processor because 
+		its not so 'post' at all.
+
+	* src/de/intevation/printlayout/Map2SVG.java:
+		- Uses OpenJumpRenderingSync for rendering sync
+		- garbage collections is no controlled with the 
+		  system property "de.intevation.printlayout.gc.calls".
+			If set to an positive integer N value this results
+			in calling the gc N times. It defaults to zero because
+			doing gc may flush the weakly cached DOM SVG maps.
+
+	* src/de/intevation/printlayout/PreviewMapReplacer.java:
+		Steps through the bookmarked positions, zooms to
+		them generate the SVG maps. At the end all images
+		are replaced by the SVG maps. Generated SVG maps
+		are cache with a weak reference (soft actually)
+		in the PreviewData to avoid needless regeneration
+		all the time.
+
+	* src/de/intevation/printlayout/PreviewMap.java:
+		Uses OpenJumpRenderingSync for rendering sync
+
 2007-03-11  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
 
 	Add a replacement mechanism for the preview maps.
