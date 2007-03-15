@@ -43,9 +43,10 @@ import org.apache.batik.dom.svg.SVGDOMImplementation;
 
 import java.awt.Shape;
 
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+
+
 
 public class PathCompactor
 {
@@ -69,8 +70,8 @@ public class PathCompactor
 		return pathElement;
 	}
 
-	private static Rectangle2D getBoundingBox(Element path) {
 
+	private static Shape elementToShape(Element path) {
 		AWTPathProducer handler = new AWTPathProducer();
 		PathParser parser = new PathParser();
 		parser.setPathHandler(handler);
@@ -94,8 +95,7 @@ public class PathCompactor
 					pe.printStackTrace();
 				}
 		}
-		
-		return shape.getBounds2D();
+		return shape;
 	}
 
 	public static void reorder(final Document document) {
@@ -146,7 +146,7 @@ public class PathCompactor
 				int P = paths.size();
 				if (P > 0) {
 					System.err.println("Paths found: "+ P);
-					overlapSorter.ensureCapacity(P);
+					overlapSorter.prepareSpatialIndex(P);
 					System.err.println("Figure out number of types");
 					for (int j = 0; j < P; ++j) {
 						if (((j+1) % 10000) == 0)
@@ -162,8 +162,7 @@ public class PathCompactor
 						if (type == null)
 							types.put(type = typeKey, typeKey);
 
-						Rectangle2D bounds = getBoundingBox(path);
-						overlapSorter.add(bounds, path, type);
+						overlapSorter.add(elementToShape(path), path, type);
 					}
 					System.err.println("Sorting in done. types: " + types.size());
 					System.err.println("Building spatial index");
@@ -174,6 +173,8 @@ public class PathCompactor
 
 					final DocumentFragment fragment =
 						document.createDocumentFragment();
+
+					final int [] newGroups = new int[1];
 
 					overlapSorter.topological(new OverlapSorter.Visitor() {
 
@@ -192,6 +193,7 @@ public class PathCompactor
 								fragment.appendChild(group);
 								lastElementAttributes  = type;
 								lastGroup = group;
+								++newGroups[0];
 							}
 							else
 								group = lastGroup;
@@ -200,6 +202,8 @@ public class PathCompactor
 							group.appendChild(path);
 						}
 					});
+
+					System.err.println("Built new groups: " + newGroups[0]);
 
 					int R = remove.size();
 					if (R > 0) {

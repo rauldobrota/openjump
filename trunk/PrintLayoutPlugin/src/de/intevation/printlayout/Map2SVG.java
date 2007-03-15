@@ -223,9 +223,15 @@ implements   DocumentManager.DocumentModifier
 				while (locked[0] && i-- > 0)
 					locked.wait(6000);
 			}
+			do {
+				Thread.sleep(1000);
+			}
+			while (queue.getRunningThreads() > 0);
 		}
 		catch (InterruptedException ie) {
 		}
+
+	
 
 		long renderStopTime = System.currentTimeMillis();
 
@@ -233,6 +239,8 @@ implements   DocumentManager.DocumentModifier
 		for (int i = 0; i < N; ++i) {
 			Layer    layer    = (Layer)layers.get(i);		
 			Renderer renderer = rms.getRenderer(layer);
+			if (renderer.isRendering())
+				renderer.cancel();
 			if (renderer instanceof LayerRenderer) {
 				LayerRenderer layerRenderer = (LayerRenderer)renderer;
 				layerRenderer.setMaxFeatures(oldMaxFeaures[i]);

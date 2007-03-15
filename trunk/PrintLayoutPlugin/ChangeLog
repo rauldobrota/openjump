@@ -1,3 +1,23 @@
+2007-03-15  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
+
+	Using JTS for spatial indexing in SVG optimizer.
+
+	* src/de/intevation/printlayout/pathcompact/AABB.java:
+		Removed. Using com.vividsolutions.jts.index.strtree.STRtree now.
+
+	* src/de/intevation/printlayout/pathcompact/ElementAttributes.java:
+		equals() checks for identity before doing the more costly
+		comparison of the attributes.
+
+	* src/de/intevation/printlayout/pathcompact/OverlapSorter.java:
+		- Uses STRtree as spatial index instead of AABB.Tree
+		- Do a second level intersection test with the convex hulls
+		  of the geometries. Slows down the over all intersection
+			tests a bit but it improves the result (lesser new groups).
+
+	* src/de/intevation/printlayout/pathcompact/PathCompactor.java:
+		Adjusted.
+
 2007-03-12  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
 
 	Another attempt to get in sync with the rendering.

@@ -12,52 +12,90 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.Iterator;
 import java.util.TreeSet;
-import java.util.Collections;
 
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.PathIterator;
+import java.awt.geom.QuadCurve2D;
+import java.awt.geom.CubicCurve2D;
+
+import java.awt.Shape;
 
 import org.w3c.dom.Element;
 
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+
+import com.vividsolutions.jts.index.strtree.STRtree;
+
+import com.vividsolutions.jts.index.ItemVisitor;
+
+
 public final class OverlapSorter
 {
-	private AABB.Tree spatial;
+	private STRtree spatial;
 
-	private ArrayList entries;
+	private Entry previous;
 
 	private static final class Entry 
-	extends                    AABB.Box
 	implements                 Comparable
 	{
+		private Envelope          envelope;
+		private Geometry          hull;
+		private Entry             previous;
+
+
 		private Element           object;
 		private ElementAttributes type;
 		private int               number;
 
-		private ArrayList         children;
-		private int               numParents;
+		private int               numChildren;
+		private ArrayList         parents;
 
-		Entry(Rectangle2D box, Element object, ElementAttributes type, int number) {
-			super(box);
-			this.object = object;
-			this.type   = type;
-			this.number = number;
+		Entry(
+			Rectangle2D       box, 
+			Geometry          hull,
+			Element           object, 
+			ElementAttributes type, 
+			Entry             previous
+		) {
+			this.envelope = new Envelope(
+				box.getMinX(), box.getMaxX(), 
+				box.getMinY(), box.getMaxY());
+
+			this.hull     = hull;
+			this.object   = object;
+			this.type     = type;
+			this.previous = previous;
+
+			number = previous != null
+				? previous.number + 1
+				: 0;
 		}
 
-		void addParent()  {
-			++numParents;
+		void addParent(Entry parent)  {
+			if (parents == null)
+				parents = new ArrayList(20);
+			parents.add(parent);
 		}
 
-		boolean removeParent() {
-			return --numParents <= 0;
+		void addChild()  {
+			++numChildren;
 		}
 
-		void addChild(Entry entry)  {
-			if (children == null)
-				children = new ArrayList(5);
-			children.add(entry);
+		boolean removeChild() {
+			return --numChildren <= 0;
 		}
 
 		boolean hasParents() {
-			return numParents > 0;
+			return parents != null && !parents.isEmpty();
+		}
+
+		int numParents() {
+			return parents != null 
+				? parents.size()
+				: 0;
 		}
 
 		void clear() {
@@ -65,24 +103,32 @@ public final class OverlapSorter
 			type   = null;
 		}
 
-		void releaseChildren(TreeMap free) {
-			if (children != null) {
-				for (Iterator i = children.iterator(); i.hasNext();) {
-					Entry child = (Entry)i.next();
-					if (child.removeParent()) {
-						TreeSet list = (TreeSet)free.get(child.type);
+		void releaseParents(TreeMap free) {
+			if (parents != null) {
+				for (Iterator i = parents.iterator(); i.hasNext();) {
+					Entry parent = (Entry)i.next();
+					if (parent.removeChild()) {
+						TreeSet list = (TreeSet)free.get(parent.type);
 						if (list == null)
-							free.put(child.type, list = new TreeSet());
-						list.add(child);
+							free.put(parent.type, list = new TreeSet());
+						list.add(parent);
 					}
 				}
-				children.clear();
-				children = null;
+				parents.clear();
+				parents = null;
 			}
 		}
 
+		public int numChildren() {
+			return numChildren;
+		}
+
+		public boolean hasChildren() {
+			return numChildren > 0;
+		}
+
 		public boolean equals(Object other) {
-			return number == ((Entry)other).number;
+			return compareTo(other) == 0;
 		}
 
 		public int hashCode() {
@@ -90,78 +136,120 @@ public final class OverlapSorter
 		}
 
 		public int compareTo(Object other) {
-			Entry e = (Entry)other;
-			int diff = number - e.number;
 
+			int diff = number - ((Entry)other).number;
+			
 			if (diff < 0) return -1;
 			if (diff > 0) return +1;
 			return 0;
 		}
 	}
 
+	private static final void addRectangle2D(
+		Rectangle2D     r, 
+		GeometryFactory factory,
+		ArrayList       list
+	) {
+		list.add(factory.createPoint(new Coordinate(r.getMinX(), r.getMinY())));
+		list.add(factory.createPoint(new Coordinate(r.getMinX(), r.getMaxY())));
+		list.add(factory.createPoint(new Coordinate(r.getMaxX(), r.getMaxY())));
+		list.add(factory.createPoint(new Coordinate(r.getMaxX(), r.getMinY())));
+	}
+
+	public static Geometry getConvexHull(Shape shape) {
+
+		ArrayList list = new ArrayList(512);
+
+		float [] data = new float[6];
+		PathIterator pi = shape.getPathIterator(null);
+
+		GeometryFactory factory = new GeometryFactory();
+
+		float x = 0f;
+		float y = 0f;
+
+		while (!pi.isDone()) {
+			switch (pi.currentSegment(data)) {
+				case PathIterator.SEG_CLOSE:
+					break;
+				case PathIterator.SEG_CUBICTO:
+					CubicCurve2D cubic = new CubicCurve2D.Float(
+						x, y, data[0], data[1], data[2], data[3], data[4], data[5]);
+					addRectangle2D(cubic.getBounds2D(), factory, list);
+					x = data[4]; y = data[5];
+					break;
+				case PathIterator.SEG_QUADTO:
+					QuadCurve2D quad = new QuadCurve2D.Float(
+						x, y, data[0], data[1], data[2], data[3]);
+					addRectangle2D(quad.getBounds2D(), factory, list);
+					x = data[2]; y = data[3];
+					break;
+				case PathIterator.SEG_LINETO:
+				case PathIterator.SEG_MOVETO:
+					Coordinate coord = new Coordinate(x = data[0], y = data[1]);
+					list.add(factory.createPoint(coord));
+					break;
+			}
+
+			pi.next();
+		}
+
+		return factory.buildGeometry(list).convexHull();
+	}
+
 	public OverlapSorter() {
-		spatial = new AABB.Tree();
 	}
 
-	public void ensureCapacity(int N) {
-		if (entries == null) entries = new ArrayList(N);
-		else                 entries.ensureCapacity(N);
+	public void prepareSpatialIndex(int N) {
+		spatial = new STRtree();
 	}
 
-	public void add(Rectangle2D bbox, Element object, ElementAttributes type) {
+	public void add(Shape shape, Element object, ElementAttributes type) {
 
-		Entry entry = new Entry(bbox, object, type, entries.size());
-		entries.add(entry);
+		Rectangle2D b = shape.getBounds2D();
+		Geometry    h = getConvexHull(shape);
+
+		Entry entry = new Entry(b, h, object, type, previous);
+		spatial.insert(entry.envelope, entry);
+		previous = entry;
 	}
 
 	public void buildSpatialIndex() {
-		Collections.shuffle(entries);
-		for (int i = 0, N = entries.size(); i < N; ++i) {
-			Entry entry = (Entry)entries.get(i);
-			spatial.insert(entry, entry);
-			if (((i+1) % 10000) == 0)
-				System.err.println((i+1) + " in index");
-		}
-		entries.clear();
+		spatial.build();
 	}
 
 	public void performOverlapTest() {
 
-		// walk all leaves of the tree
-		spatial.walkAll(new AABB.Tree.QueryCallback() {
+		final int [] count = new int[1];
 
-			int count;
+		for (Entry e = previous; e != null; e = e.previous) {
 
-			public boolean found(AABB.Tree.Node node, int intersectionTyp) {
+			final Entry entry = e;
 
-				final Entry entry = (Entry)node.getData();
+			// find all intersecting leaves
+			spatial.query(e.envelope, new ItemVisitor() {
 
-				// find all intersecting leaves
-				spatial.query(entry, new AABB.Tree.QueryCallback() {
+				public void visitItem(Object data) {
 
-					public boolean found(AABB.Tree.Node node, int intersectionTyp) {
+					Entry other = (Entry)data;
 
-						Entry other = (Entry)node.getData();
-
-						// if entry was inserted earlier it has to be rendered earlier
-						if (entry.number < other.number) {
-							entry.addChild(other);
-							other.addParent();
-						}
-						else if (other.number == entry.number) {
-							if ((++count % 10000) == 0)
-								System.err.println("intersected: " + count);
-						}
-						return true;
+					// if entry was inserted earlier it has to be rendered earlier
+					if (other.number < entry.number 
+					&& !entry.type.equals(other.type)
+					&& entry.hull.intersects(other.hull)) {
+						other.addParent(entry);
+						entry.addChild();
 					}
-				}); // spatial query
-				return true;
-			}
-		}); // walk all
-	}
+					else if (other.number == entry.number) {
+						if ((++count[0] % 10000) == 0)
+							System.err.println("intersected: " + count[0]);
+					}
+				} // visitItem
+			}); // spatial query
+		}; // for all entries
 
-	public void clear() {
-		spatial.clear();
+		// not needed any more
+		spatial = null;
 	}
 
 	public interface Visitor {
@@ -172,48 +260,58 @@ public final class OverlapSorter
 
 		final TreeMap free = new TreeMap();
 
-		// find all of top level
-		spatial.walkAll(new AABB.Tree.QueryCallback() {
-			public boolean found(AABB.Tree.Node node, int intersectionTyp) { 
-				Entry entry = (Entry)node.getData();
-				if (!entry.hasParents()) {
-					TreeSet list = (TreeSet)free.get(entry.type);
-					if (list == null)
-						free.put(entry.type, list = new TreeSet());
-					list.add(entry);
-				}
-				return true;
-			}
-		});
+		Entry entry = previous;
 
-    // PriorityQueue would be better but its only in Java >= 1.5
+		// find all of top level
+		for (entry = previous; entry != null;) {
+			if (!entry.hasChildren()) {
+				TreeSet list = (TreeSet)free.get(entry.type);
+				if (list == null)
+					free.put(entry.type, list = new TreeSet());
+				list.add(entry);
+			}
+			Entry p = entry.previous;
+			entry.previous = null;
+			entry = p;
+		}
+
+		previous = null;
+
 		TreeSet current; 
 
 		for (;;) {
-			int max = 0; // zero prevents empty list from getting max
-
+			int max = Integer.MIN_VALUE;
 			current = null;
 
-			// find longest list
+			// find the list covering the most objects
 			for (Iterator i = free.values().iterator(); i.hasNext();) {
 				TreeSet list = (TreeSet)i.next();
-				int L = list.size();
-				if (L > max) { max = L; current = list; }
+
+				int sum = 0;
+				for (Iterator j = list.iterator(); j.hasNext();)
+					sum += ((Entry)j.next()).numParents();
+				
+				if (sum >= max) { 
+					// if same parents count only if new one is longer
+					if (sum == max && current != null && current.size() >= list.size())
+						continue;
+					current = list; 
+					max = sum; 
+				}
 			}
 
-			if (current == null)
+			if (current == null || current.isEmpty())
 				break;
 
+			// flush the list
 			while (!current.isEmpty()) {
-				Entry entry = (Entry)current.first();
+				entry = (Entry)current.first();
 				current.remove(entry);
-				entry.releaseChildren(free);
+				entry.releaseParents(free);
 				visitor.visit(entry.object, entry.type);
 				entry.clear();
 			}
 		}
-
-		clear();
-	}
+	} // topological
 }
 // end of file

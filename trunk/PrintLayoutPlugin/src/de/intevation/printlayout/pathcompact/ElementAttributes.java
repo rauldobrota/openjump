@@ -80,6 +80,15 @@ implements   Comparable
 	public int compareTo(Object o) {
 		ElementAttributes other = (ElementAttributes)o;
 
+		if (pairs == null)
+			System.err.println("That should not happen: pairs == null");
+
+		if (other == null)
+			System.err.println("That should not happen: other == null");
+
+		if (other.pairs == null)
+			System.err.println("That should not happen: other.pairs == null");
+
 		int diff = pairs.length - other.pairs.length;
 
 		if (diff < 0) return -1;
@@ -95,7 +104,7 @@ implements   Comparable
 	}
 
 	public boolean equals(Object other) {
-		return compareTo((ElementAttributes)other) == 0;
+		return this == other || compareTo((ElementAttributes)other) == 0;
 	}
 
 	public void attributize(Element element) {
