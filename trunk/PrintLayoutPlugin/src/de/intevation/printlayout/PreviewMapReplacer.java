@@ -40,6 +40,13 @@ import java.util.ArrayList;
 public class PreviewMapReplacer
 implements   DocumentManager.Processor
 {
+	/**
+	 * If the system property de.intevation.no.preview.caching
+	 * is set to true the generated SVG map is not stored for caching.
+	 */
+	public static final boolean NO_PREVIEW_CACHING =
+		Boolean.getBoolean("de.intevation.printlayout.no.preview.caching");
+
 	public static final String PREFIX =
 		IncoreImageProtocolHandler.INCORE_IMAGE + 
 		':' + 
@@ -66,7 +73,7 @@ implements   DocumentManager.Processor
 		LayerViewPanel layerViewPanel = pluginContext.getLayerViewPanel();
 		Viewport vp = layerViewPanel.getViewport();
 
-		Envelope current = null;
+		Envelope first = null;
 
 		ArrayList replacements = new ArrayList();
 
@@ -102,24 +109,29 @@ implements   DocumentManager.Processor
 
 			if (root == null) { // not in cache
 
-				if (current == null)
-					current = vp.getEnvelopeInModelCoordinates();
+				Envelope current = vp.getEnvelopeInModelCoordinates();
 
-				// zoom to spot
-				try {
-					vp.zoom(previewData.asEnvelope());
-				}
-				catch (NoninvertibleTransformException nite) {
-					continue;
-				}
+				if (first == null)
+					first = current;
+
+				Envelope env = previewData.asEnvelope();
+
+				if (!env.equals(current)) // zoom to spot
+					try {
+						vp.zoom(env);
+					}
+					catch (NoninvertibleTransformException nite) {
+						continue;
+					}
 
 				Map2SVG map2svg = new Map2SVG(pluginContext);
 
 				root = map2svg.createSVG(document, null, null);
 
-				previewData.storeCache(new SoftReference(root));
+				if (!NO_PREVIEW_CACHING)
+					previewData.storeCache(new SoftReference(root));
 			}
-			else { // not in cache
+			else { // found in cache
 				System.err.println("found in cache");
 				root = (Element)document.importNode(root, true, true);
 			}
@@ -128,9 +140,9 @@ implements   DocumentManager.Processor
 
 		images = null;
 
-		if (current != null) // restore original spot
+		if (first != null) // restore original spot
 			try {
-				vp.zoom(current);
+				vp.zoom(first);
 			}
 			catch (NoninvertibleTransformException nite) {
 			}

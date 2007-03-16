@@ -1,3 +1,15 @@
+2007-03-16  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
+
+	Added a system property to turn off caching of preview SVG maps.
+
+	* src/de/intevation/printlayout/PreviewMapReplacer.java:
+		- Added system property "de.intevation.printlayout.no.preview.caching".
+		  If it is set to true the generated SVG of a preview map 
+			is not cached. Defaults to false, because caching is done
+			with a weak reference which is collect anyway if memory is short.
+		- Before zooming to a different spot on the map have a look
+		  if we are not already there.
+		
 2007-03-15  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
 
 	Using JTS for spatial indexing in SVG optimizer.
