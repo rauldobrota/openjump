@@ -440,6 +440,7 @@ public class ScaleSelectedItemsTool extends DragTool {
     }
     
     public void deactivate(MouseEvent e){
+    	super.deactivate();
     	this.cleanup((Graphics2D)getPanel().getGraphics());
     }
     
