@@ -106,7 +106,21 @@ public class QuasimodeTool extends DelegatingTool {
             setTool(e);
         }
     };
-
+    /*
+    * [sstein: 17.Mar2007] added the Listener, to be able to remove the listener 
+    * if the cursortool is deactivated. Otherwise the listener still exists and
+    * the mousepointer is "flickering" through all previously used mouse-tools
+    * The modifications (see also #activate and #deactivate) are proposed by Bob and Larry
+    */
+    private WindowAdapter windowListener = new WindowAdapter()
+    {
+        public void windowActivated(WindowEvent e) {
+			super.windowActivated(e);
+			setTool(new KeyEvent(panel, KeyEvent.KEY_PRESSED, 
+                0, 0, KeyEvent.VK_UNDEFINED, KeyEvent.CHAR_UNDEFINED));
+        }
+    };
+    
     private void setTool(KeyEvent e) {
         if (!mouseDown)
         {
@@ -149,13 +163,17 @@ public class QuasimodeTool extends DelegatingTool {
             //    key-up event.
             //So we're working around this by clearing the quasimode when the
             //WorkbenchFrame is activated (e.g. when a dialog is closed). [Jon Aquino]
-            frame.addWindowListener(new WindowAdapter() {
+            
+            //-- [sstein : ] deactivated and repalced by line above see comment 
+            //	             on windowListener above
+            frame.addWindowListener(windowListener);
+            /*frame.addWindowListener(new WindowAdapter() {
                 public void windowActivated(WindowEvent e) {
 					super.windowActivated(e);
 					setTool(new KeyEvent(panel, KeyEvent.KEY_PRESSED, 
                         0, 0, KeyEvent.VK_UNDEFINED, KeyEvent.CHAR_UNDEFINED));
                 }
-            });
+            });*/
         }
     }
 
@@ -176,6 +194,7 @@ public class QuasimodeTool extends DelegatingTool {
             super.deactivate();
             if (frame != null) {
                 frame.removeEasyKeyListener(keyListener);
+                frame.removeWindowListener(windowListener);
             }
         }
     }
