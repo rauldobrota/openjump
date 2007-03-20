@@ -20,6 +20,8 @@ import com.vividsolutions.jump.workbench.ui.renderer.Renderer;
 import com.vividsolutions.jump.workbench.ui.renderer.RenderingManager; 
 import com.vividsolutions.jump.workbench.ui.renderer.ThreadQueue;
 
+import com.vividsolutions.jump.workbench.ui.renderer.java2D.Java2DConverter;
+
 import com.vividsolutions.jump.workbench.ui.Viewport;
 
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
@@ -39,7 +41,6 @@ import org.apache.batik.svggen.SVGSyntax;
 import org.w3c.dom.svg.SVGDocument;
 
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 
 import java.awt.geom.Rectangle2D;
 
@@ -53,12 +54,16 @@ import de.intevation.printlayout.pathcompact.PathCompactor;
 
 import de.intevation.printlayout.util.ElementUtils;
 
+import de.intevation.printlayout.jump.PreciseJava2DConverter;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.CDATASection;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import java.lang.reflect.Method;
 
 /**
  * Instances of this class are used to convert the
@@ -126,6 +131,24 @@ implements   DocumentManager.DocumentModifier
 	 */
 	public Map2SVG(PlugInContext pluginContext) {
 		this.pluginContext = pluginContext;
+	}
+
+	/**
+	 * Trys to find out if the Viewport class has a
+	 * 'setJava2DConverter'.
+	 * @return the method, null if not found
+	 */
+	public static final Method getJava2DConverterSetter() {
+		try {
+			Method method = Viewport.class.getMethod(
+				"setJava2DConverter", new Class[] { Java2DConverter.class });
+			System.err.println("Viewport.setJava2DConverter() found");
+			return method;
+		}
+		catch (Exception e) {
+			System.err.println("Viewport.setJava2DConverter() not found");
+			return null;
+		}
 	}
 
 	public Element createSVG(
@@ -200,6 +223,23 @@ implements   DocumentManager.DocumentModifier
 			}
 		}
 
+		// look if we can use Viewport.getJava2DConverter()
+		Method setJava2DConverter = getJava2DConverterSetter();
+
+		Java2DConverter oldConverter = null;
+
+		if (setJava2DConverter != null) {
+			oldConverter = vp.getJava2DConverter();
+			try {
+				setJava2DConverter.invoke(
+					vp, new Object[] { new PreciseJava2DConverter(vp) });
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+				oldConverter = null;
+			}
+		}
+
 		long renderStartTime = System.currentTimeMillis();
 
 		ThreadQueue queue = rms.getDefaultRendererThreadQueue();
@@ -231,7 +271,15 @@ implements   DocumentManager.DocumentModifier
 		catch (InterruptedException ie) {
 		}
 
-	
+		// restore old converter
+		if (setJava2DConverter != null && oldConverter != null) {
+			try {
+				setJava2DConverter.invoke(vp, new Object [] { oldConverter });
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
 		long renderStopTime = System.currentTimeMillis();
 

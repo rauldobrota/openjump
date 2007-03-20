@@ -1,3 +1,21 @@
+2007-03-20  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
+
+	Added support for precise vertices in map import from GIS.
+
+	* src/de/intevation/printlayout/Map2SVG.java:
+		- Uses java.lang.reflect to figure out if the new
+		  ViewPort#setJava2DConverter method exists.
+		- If it does install a PreciseJava2DConverter
+		- do the rendering
+		- restore the old converter.
+
+	* src/de/intevation/printlayout/jump/PreciseJava2DConverter.java:
+		Added. A sub class of Java2DConverter that does not round
+		coordinates.
+
+	* src/de/intevation/printlayout/jump/PrecisePolygonShape.java:
+		Added. Polygon with holes with non-truncated vertices.
+
 2007-03-16  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
 
 	Added a system property to turn off caching of preview SVG maps.
