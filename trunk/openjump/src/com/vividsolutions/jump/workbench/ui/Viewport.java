@@ -97,6 +97,10 @@ public class Viewport implements Java2DConverter.PointConverter {
         return java2DConverter;
     }
 
+    public void setJava2DConverter(Java2DConverter converter) {
+        java2DConverter = converter;
+    }
+
     public ZoomHistory getZoomHistory() {
         return zoomHistory;
     }
