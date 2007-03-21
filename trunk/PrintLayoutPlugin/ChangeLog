@@ -1,5 +1,19 @@
 2007-03-21  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
 
+	Added a system property to decide if polygons are simplified
+	with guaranteed preserving the topology.
+
+	* src/de/intevation/printlayout/jump/SimplifyingJava2DConverter.java:
+		The system property "de.intevation.printlayout.simplify.preserve.topology"
+		is used to dicide if polygons are simplified with guaranteed
+		preserving the topology. If the property is set to "true" the
+		preserving is turned on. Preserving the topology is slow
+		and in most cases it should be okay to just simplify the shell
+		and the holes of a polygon with the much faster Douglas Peuker
+		line simplifier. Therefore its off by default.
+
+2007-03-21  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
+
 	Added support for data simplification during map import.
 
 	* src/de/intevation/printlayout/jump/SimplifyingJava2DConverter.java:
