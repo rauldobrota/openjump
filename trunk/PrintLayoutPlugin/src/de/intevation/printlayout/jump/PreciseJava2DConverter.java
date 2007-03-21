@@ -68,7 +68,7 @@ extends      Java2DConverter
 		return points;
 	}
 
- 	protected GeneralPath toPreciseShape(MultiLineString mls)
+ 	protected Shape toPreciseShape(MultiLineString mls)
 	throws NoninvertibleTransformException 
 	{
 		GeneralPath path = new GeneralPath();
@@ -80,25 +80,26 @@ extends      Java2DConverter
 		return path;
 	}
 
-	protected GeneralPath toPreciseShape(LineString lineString)
+	protected Shape coords2shape(Coordinate [] coords)
 	throws NoninvertibleTransformException 
 	{
-		Coordinate [] coords = lineString.getCoordinates();
-
 		GeneralPath shape = new GeneralPath();
-
-		if (coords.length == 0)
-			return shape;
 
 		Point2D viewPoint = toViewPoint(coords[0]);
 		shape.moveTo((float)viewPoint.getX(), (float)viewPoint.getY());
 
-		for (int i = 1; i < coords.length; i++) {
+		for (int i = 1; i < coords.length; ++i) {
 			viewPoint = toViewPoint(coords[i]);
 			shape.lineTo((float)viewPoint.getX(), (float)viewPoint.getY());
 		}
 
 		return shape;
+	}
+
+	protected Shape toPreciseShape(LineString lineString)
+	throws NoninvertibleTransformException 
+	{
+		return coords2shape(lineString.getCoordinates());
 	} 
 
   protected Shape toPreciseShape(GeometryCollection gc)

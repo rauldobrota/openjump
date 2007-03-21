@@ -55,6 +55,7 @@ import de.intevation.printlayout.pathcompact.PathCompactor;
 import de.intevation.printlayout.util.ElementUtils;
 
 import de.intevation.printlayout.jump.PreciseJava2DConverter;
+import de.intevation.printlayout.jump.SimplifyingJava2DConverter;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -114,6 +115,19 @@ implements   DocumentManager.DocumentModifier
 			Integer.getInteger("de.intevation.printlayout.gc.calls", 0)
 				.intValue());
 
+	public static final Double SIMPLIFY_TOLERANCE = getToleranceFromProperties();
+
+	private static final Double getToleranceFromProperties() {
+		try {
+			String s = System.getProperty(
+				"de.intevation.printlayout.simplify.tolerance");
+			return s != null ? new Double(Math.abs(Double.parseDouble(s))) : null;
+		}
+		catch (NumberFormatException nfe) {
+			return null;
+		}
+	}
+
 	/**
 	 * The plugin context is need to access the LayerViewPanel.
 	 */
@@ -155,6 +169,15 @@ implements   DocumentManager.DocumentModifier
 		Document    document, 
 		double []   geo2screen,
 		Dimension   xenv
+	) {
+		return createSVG(document, geo2screen, xenv, null);
+	}
+
+	public Element createSVG(
+		Document    document, 
+		double []   geo2screen,
+		Dimension   xenv,
+		Double      tolerance
 	) {
 		LayerViewPanel layerViewPanel = pluginContext.getLayerViewPanel();
 
@@ -231,8 +254,11 @@ implements   DocumentManager.DocumentModifier
 		if (setJava2DConverter != null) {
 			oldConverter = vp.getJava2DConverter();
 			try {
-				setJava2DConverter.invoke(
-					vp, new Object[] { new PreciseJava2DConverter(vp) });
+				Java2DConverter converter = tolerance != null
+					? new SimplifyingJava2DConverter(vp, tolerance.doubleValue())
+					: new PreciseJava2DConverter(vp);
+
+				setJava2DConverter.invoke(vp, new Object[] { converter });
 			}
 			catch (Exception e) {
 				e.printStackTrace();
@@ -404,7 +430,7 @@ implements   DocumentManager.DocumentModifier
 
 		Dimension xenv = new Dimension();
 
-		Element root = createSVG(document, geo2screen, xenv);
+		Element root = createSVG(document, geo2screen, xenv, SIMPLIFY_TOLERANCE);
 
 		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
 

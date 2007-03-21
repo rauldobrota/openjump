@@ -1,3 +1,20 @@
+2007-03-21  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
+
+	Added support for data simplification during map import.
+
+	* src/de/intevation/printlayout/jump/SimplifyingJava2DConverter.java:
+		Added. Uses JTS simplification to generalize JTS geometries
+
+	* src/de/intevation/printlayout/PreviewMapReplacer.java,
+		src/de/intevation/printlayout/Map2SVG.java:
+		If system property "de.intevation.printlayout.simplify.tolerance"
+		if set to a positive decimal value it is use as a simplification
+		tolerance in the model coordinate system. TODO: make it depened
+		from paper size and current scale.
+		
+	* src/de/intevation/printlayout/jump/PreciseJava2DConverter.java:
+		Fixed some return types.
+
 2007-03-20  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
 
 	Added support for precise vertices in map import from GIS.

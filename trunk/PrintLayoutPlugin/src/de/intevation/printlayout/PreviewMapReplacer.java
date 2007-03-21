@@ -126,7 +126,8 @@ implements   DocumentManager.Processor
 
 				Map2SVG map2svg = new Map2SVG(pluginContext);
 
-				root = map2svg.createSVG(document, null, null);
+				root = map2svg.createSVG(
+					document, null, null, Map2SVG.SIMPLIFY_TOLERANCE);
 
 				if (!NO_PREVIEW_CACHING)
 					previewData.storeCache(new SoftReference(root));
