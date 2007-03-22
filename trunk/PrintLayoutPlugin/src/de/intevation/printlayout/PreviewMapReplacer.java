@@ -77,6 +77,8 @@ implements   DocumentManager.Processor
 
 		ArrayList replacements = new ArrayList();
 
+		double [] paperSize = documentManager.getPaperSize();
+
 		for (int N = images.getLength(), i = 0; i < N; ++i) {
 			AbstractElement image = (AbstractElement)images.item(i);
 
@@ -127,7 +129,11 @@ implements   DocumentManager.Processor
 				Map2SVG map2svg = new Map2SVG(pluginContext);
 
 				root = map2svg.createSVG(
-					document, null, null, Map2SVG.SIMPLIFY_TOLERANCE);
+					document, 
+					null, 
+					null, 
+					paperSize,
+					Map2SVG.SIMPLIFY_TOLERANCE);
 
 				if (!NO_PREVIEW_CACHING)
 					previewData.storeCache(new SoftReference(root));

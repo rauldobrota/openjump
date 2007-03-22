@@ -315,15 +315,21 @@ public class DocumentManager
 		return svgCanvas.getSVGDocument();
 	}
 
+	public double [] getPaperSize() {
+		return getPaperSize(null);
+	}
+
 	/**
 	 * stores the paper size from the document sheet into the size
 	 * array.
 	 * @param size two dimensional array containing width and height
+	 * @return the size
 	 */
-	public void getPaperSize(double [] size) {
+	public double [] getPaperSize(double [] size) {
 		SVGDocument document = svgCanvas.getSVGDocument();
-		if (document != null)
-			getPaperSize(document, size);
+		return document != null
+			? getPaperSize(document, size)
+			: size;
 	}
 
 	/**
@@ -332,14 +338,17 @@ public class DocumentManager
 	 * @param document the svg document
 	 * @param size two dimensional array containing width and height
 	 */
-	public static void getPaperSize(SVGDocument document, double [] size) {
+	public static double [] getPaperSize(SVGDocument document, double [] size) {
 
 		AbstractElement sheet =
 			(AbstractElement)document.getElementById(DOCUMENT_SHEET);
 
+		if (size == null)
+			size = new double[2];
+
 		if (sheet == null) {
 			System.err.println("sheet not found");
-			return;
+			return size;
 		}
 
 		try {
@@ -350,6 +359,8 @@ public class DocumentManager
 			size[0] = 210d;
 			size[1] = 297d;
 		}
+
+		return size;
 	}
 
 	/**

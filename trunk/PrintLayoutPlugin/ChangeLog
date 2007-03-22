@@ -1,3 +1,24 @@
+2007-03-23  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
+
+	Map simplification parameter now works in terms of paper size [mm].
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		added a convenience getPaperSize() method that do not need
+		a double array as parameter.
+
+	* src/de/intevation/printlayout/Map2SVG.java:
+		map simplification now interprets 
+		"de.intevation.printlayout.simplify.tolerance" in terms
+		of paper size [mm] and calculates the real simplify tolerance 
+		by multiplying the inverse map scale. It has to be divided
+		by 10 to match. Why?
+
+	* src/de/intevation/printlayout/PreviewMapReplacer.java:
+		Adjusted to use new semantic of simplify tolerance.
+		
+	* src/de/intevation/printlayout/pathcompact/ElementAttributes.java:
+		Removed needless null reference checks. left over from debugging.
+
 2007-03-22  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
 
 	Added a system property to limit the number of joined paths in SVG 
@@ -17,7 +38,7 @@
 
 	* src/de/intevation/printlayout/jump/SimplifyingJava2DConverter.java:
 		The system property "de.intevation.printlayout.simplify.preserve.topology"
-		is used to dicide if polygons are simplified with guaranteed
+		is used to decide if polygons are simplified with guaranteed
 		preserving the topology. If the property is set to "true" the
 		preserving is turned on. Preserving the topology is slow
 		and in most cases it should be okay to just simplify the shell

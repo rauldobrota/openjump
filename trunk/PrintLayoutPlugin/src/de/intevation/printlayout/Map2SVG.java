@@ -166,27 +166,28 @@ implements   DocumentManager.DocumentModifier
 	}
 
 	public Element createSVG(
-		Document    document, 
-		double []   geo2screen,
-		Dimension   xenv
-	) {
-		return createSVG(document, geo2screen, xenv, null);
-	}
-
-	public Element createSVG(
-		Document    document, 
-		double []   geo2screen,
-		Dimension   xenv,
-		Double      tolerance
+		Document  document, 
+		double [] geo2screen,
+		double [] screen2paper,
+		double [] paperSize,
+		Double    tolerance
 	) {
 		LayerViewPanel layerViewPanel = pluginContext.getLayerViewPanel();
 
 		Viewport vp = layerViewPanel.getViewport();
-		
-		xenv = layerViewPanel.getSize(xenv);
 
-		if (geo2screen != null)
-			geo2screen[0] = vp.getScale();
+		Dimension xenv = layerViewPanel.getSize(null);
+
+		if (geo2screen == null)
+			geo2screen = new double[1];
+
+		geo2screen[0] = vp.getScale();
+
+		if (paperSize != null) {
+			if (screen2paper == null)
+				screen2paper = new double[1];
+			screen2paper[0] = fitToPaper(xenv, paperSize);
+		}
 
 		// setup the SVG generator ...
 		Document doc = USE_BATIK_DOM ? null : createDocument();
@@ -254,9 +255,19 @@ implements   DocumentManager.DocumentModifier
 		if (setJava2DConverter != null) {
 			oldConverter = vp.getJava2DConverter();
 			try {
-				Java2DConverter converter = tolerance != null
-					? new SimplifyingJava2DConverter(vp, tolerance.doubleValue())
-					: new PreciseJava2DConverter(vp);
+				Java2DConverter converter;
+				
+				if (tolerance != null && paperSize != null) {
+					double invScale = 1d/(geo2screen[0]*screen2paper[0]);
+
+					double t = tolerance.doubleValue()*invScale*(1d/10d);
+
+					System.err.println("simplify tolerance: " + t);
+
+					converter = new SimplifyingJava2DConverter(vp, t);
+				}
+				else
+					converter = new PreciseJava2DConverter(vp);
 
 				setJava2DConverter.invoke(vp, new Object[] { converter });
 			}
@@ -335,7 +346,8 @@ implements   DocumentManager.DocumentModifier
 
 		// adding the style sheet section
 		if (styleSheetSection != null) {
-			Element defs = ElementUtils.getElementById(root, SVGSyntax.ID_PREFIX_GENERIC_DEFS);
+			Element defs = ElementUtils.getElementById(
+				root, SVGSyntax.ID_PREFIX_GENERIC_DEFS);
 			Element style = (doc != null ? doc : document).createElementNS(
 				SVGSyntax.SVG_NAMESPACE_URI, SVGSyntax.SVG_STYLE_TAG);
 			style.setAttributeNS(null, SVGSyntax.SVG_TYPE_ATTRIBUTE, "text/css");
@@ -426,21 +438,25 @@ implements   DocumentManager.DocumentModifier
 			return null;
 		}
 
-		double [] geo2screen = new double[1];
+		double [] geo2screen   = new double[1];
+		double [] screen2paper = new double[1];
 
-		Dimension xenv = new Dimension();
+		double [] paperSize = documentManager.getPaperSize();
 
-		Element root = createSVG(document, geo2screen, xenv, SIMPLIFY_TOLERANCE);
+		Element root = createSVG(
+			document, 
+			geo2screen, 
+			screen2paper,
+			paperSize,
+			SIMPLIFY_TOLERANCE);
 
 		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
 
 		AbstractElement xform =
 			(AbstractElement)document.createElementNS(svgNS, "g");
 
-		double scale2paper = fitToPaper(documentManager, xenv);
-
 		xform.setAttributeNS(
-			null, "transform", "scale(" + scale2paper + ")");
+			null, "transform", "scale(" + screen2paper[0] + ")");
 
 		String id = documentManager.uniqueObjectID();
 
@@ -506,14 +522,11 @@ implements   DocumentManager.DocumentModifier
 	}
 
 	private static double fitToPaper(
-		DocumentManager documentManager,
-		Dimension        env
+		Dimension env,
+		double [] paperSize
 	) {
-		double [] paper = new double[2];
-		documentManager.getPaperSize(paper);
-
-		double s1 = paper[0]/env.getWidth();
-		double s2 = paper[1]/env.getHeight();
+		double s1 = paperSize[0]/env.getWidth();
+		double s2 = paperSize[1]/env.getHeight();
 
 		return Math.min(s1, s2);
 	}
