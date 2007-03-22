@@ -33,6 +33,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.util.Stack;
 import java.util.ArrayList;
 import java.util.TreeMap;
+import java.util.Iterator;
 
 import org.apache.batik.parser.AWTPathProducer;
 import org.apache.batik.parser.PathParser;
@@ -50,6 +51,17 @@ import java.awt.geom.GeneralPath;
 
 public class PathCompactor
 {
+	/**
+	 * If the system property "de.intevation.printlayout.max.joined.paths"
+	 * is set to an integer value, the value is used to control the number
+	 * of paths that are joined into one. If the value lesser or equals 1
+	 * no limit is set and all possible joins are done. Else the
+	 * value determines the maximal number of joined paths. It defaults
+	 * to 250.
+	 */
+	public static final int MAX_JOINED_PATHS =
+		Integer.getInteger("de.intevation.printlayout.max.joined.paths", 250).intValue();
+
 	private static final Element pathGroup(Element group) {
 		int howMany = 0;
 		Element pathElement = null;
@@ -203,7 +215,9 @@ public class PathCompactor
 						}
 					});
 
-					System.err.println("Built new groups: " + newGroups[0]);
+					System.err.println(
+						"Built new groups: " + 
+						newGroups[0] + " avg: " + ((float)P/newGroups[0]));
 
 					int R = remove.size();
 					if (R > 0) {
@@ -292,24 +306,28 @@ public class PathCompactor
 			children = null;
 
 			for (int i = ranges.size()-1; i >= 0; --i) {
-				range = (ArrayList)ranges.get(i);
-				int R = range.size();
-				Element last = (Element)range.get(R-1);
-				for (int j = R-2; j >= 0; --j) {
+				ArrayList subRanges = (ArrayList)ranges.get(i);
+				for (Iterator s = split(subRanges, MAX_JOINED_PATHS, 2); s.hasNext();) {
+					range = (ArrayList)s.next();
+					int R = range.size();
+					Element last = (Element)range.get(R-1);
+					for (int j = R-2; j >= 0; --j) {
 
-					Element before = (Element)range.get(j);
+						Element before = (Element)range.get(j);
 
-					if (match(last, before)) {
-						chunks.add(last.getAttributeNS(null, "d").trim());
-						current.removeChild(last);
+						if (match(last, before)) {
+							chunks.add(last.getAttributeNS(null, "d").trim());
+							current.removeChild(last);
+						}
+						else
+							total += flushChunks(last, chunks, optimizer);
+
+						last = before;
 					}
-					else
-						total += flushChunks(last, chunks, optimizer);
-
-					last = before;
-				}
-				total += flushChunks(last, chunks, optimizer);
-				range.clear();
+					total += flushChunks(last, chunks, optimizer);
+					range.clear();
+				} // for all sub ranges
+				subRanges.clear();
 			} // for all ranges
 
 			ranges.clear();
@@ -335,6 +353,74 @@ public class PathCompactor
 			element.setAttributeNS(null, "d", optimizer.generate());
 			optimizer.clear();
 		}
+	}
+
+	/**
+	 * Splits list into a sequence of lists with
+	 * each list length at least 'atLeast' and maximum 'max'
+	 * elements.
+	 * @param list    the list to split
+	 * @param max     the maximum
+	 * @param atLeast them minimum size
+	 * @return an iterator over the splitted list.
+	 */
+	private static Iterator split(
+		final ArrayList list, 
+		final int       max, 
+		final int       atLeast
+	) {
+		if (max <= 1 || list.size() <= max) // do not split if small enough
+			return new Iterator() {
+				boolean send;
+
+				public boolean hasNext() {
+					return !send;
+				}
+
+				public Object next() {
+					send = true;
+					return list;
+				}
+
+				public void remove() {
+					throw new UnsupportedOperationException();
+				}
+			};
+
+		return new Iterator() {
+
+			int       count;
+			ArrayList current;
+
+			{ advance(); }
+
+			private void advance() {
+				int N = list.size();
+				if (count >= N)
+					current = null;
+				else {
+					int R = N-count;
+					int T = Math.min(R, Math.max(atLeast, Math.min(max, R)));
+					current = new ArrayList(T);
+					for (T += count; count < T; ++count)
+						current.add(list.get(count));
+				}
+			}
+
+			public boolean hasNext() {
+				return current != null;
+			}
+
+			public Object next() {
+				Object x = current;
+				advance();
+				return x;
+			}
+
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+		};
 	}
 
 	private static final int flushChunks(

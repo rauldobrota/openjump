@@ -1,3 +1,15 @@
+2007-03-22  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
+
+	Added a system property to limit the number of joined paths in SVG 
+	optimizations.
+
+	* src/de/intevation/printlayout/pathcompact/PathCompactor.java:
+		If the system property "de.intevation.printlayout.max.joined.paths"
+		is set to an integer value, the value is used to control the number
+		of paths that are joined into one. If the value lesser or equals 1
+		no limit is set and all possible joins are done. Else the	value 
+		determines the maximal number of joined paths. It defaults to 250.
+	
 2007-03-21  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
 
 	Added a system property to decide if polygons are simplified
