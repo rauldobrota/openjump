@@ -31,12 +31,10 @@
  */
 package com.vividsolutions.jump;
 
-//import java.util.Locale;
 import java.text.MessageFormat;
-import java.util.Hashtable;
+//import java.util.Hashtable;
 import java.util.ResourceBundle;
 import java.util.Locale;
-import java.lang.String;
 
 import com.vividsolutions.jump.workbench.JUMPWorkbench;
 
@@ -52,6 +50,8 @@ import org.apache.log4j.Logger;
  *
  * [2] HOWTO TRANSLATE MY PLUGIN AND GIVE THE ABILITY TO TRANSLATE IT
  *  Use theses methods to use your own *.properties files :
+ *  [Michael Michaud 2007-03-23] the 3 following methods have been deactivated
+ *  (I don't know who nor why)
  *  @see com.vividsolutions.jump.I18N#setPlugInRessource(String, String)
  *  @see com.vividsolutions.jump.I18N#get(String, String)
  *  @see com.vividsolutions.jump.I18N#getMessage(String, String, Object[])
@@ -60,6 +60,8 @@ import org.apache.log4j.Logger;
  *  @see com.vividsolutions.jump.workbench.ui.MenuNames
  *
  * Code example :
+ * [Michael Michaud 2007-03-23] the following code example is no more valid.
+ * It has to be changed
  * <code>
  * public class PrintPlugIn extends AbstractPlugIn
  *  {
@@ -70,9 +72,8 @@ import org.apache.log4j.Logger;
  *   I18N.setPlugInRessource(name, "org.agil.core.jump.plugin.print");
  *   context.getFeatureInstaller().addMainMenuItem(this,
  *                                                 new String[]
- *                                                 {MenuNames.TOOLS, 
- *   											   I18N.get(name, "print")}
- *                                                 , I18N.get(name, "print"), false, null, null);
+ *                                                 {MenuNames.TOOLS,I18N.get(name, "print")},
+ *                                                 I18N.get(name, "print"), false, null, null);
  * }
  * ...
  * </code>
@@ -89,153 +90,166 @@ import org.apache.log4j.Logger;
  * @see com.vividsolutions.jump.workbench.ui.VTextIcon text rotation)
  */
 public final class I18N {
-	private static Logger LOG = Logger.getLogger(I18N.class);
-	private static final class SingletonHolder {
-		static final I18N _singleton = new I18N();
-	  }
+    
+    private static final Logger LOG = Logger.getLogger(I18N.class);
+    
+    // [Michael Michaud 2007-03-23] removed SingletonHolder internal class
+    // 1 - getInstance is enough to guarantee I18N instance unicity
+    // 2 - I18N should not be instanciated as the class has only static methods
+    private static final I18N instance = new I18N();
+    
+    // use 'jump<locale>.properties' i18n mapping file
+    // STanner changed the place where are stored bundles. Now are in /language
+    // public static ResourceBundle rb = ResourceBundle.getBundle("com.vividsolutions.jump.jump");
+    public static ResourceBundle rb = ResourceBundle.getBundle("language/jump");
+    
+    // [Michael Michaud 2007-03-23] plugInsResourceBundle is deactivated because all the methods
+    // using it have been deactivated.
+    // public static Hashtable plugInsResourceBundle = new Hashtable();
+    
+    private I18N() {super();}
+    
+    public static I18N getInstance() 
+    {
+        //[Michael Michaud 2007-03-04] guarantee I18N instance unicity without
+        // creating a SingletonHolder inner class instance
+        return (instance == null)? new I18N() : instance;
+        // return SingletonHolder._singleton;
+    }
+    
+    /**
+     * Load file specified in command line (-i18n lang_country)
+     * (lang_country :language 2 letters + "_" + country 2 letters)
+     * Tries first to extract lang and country, and if only lang
+     * is specified, loads the corresponding resource bundle.
+     * @param langcountry
+     */
+    public static void loadFile(final String langcountry)
+    {
+        // [Michael Michaud 2007-03-04] handle the case where lang is the only
+        // variable instead of catching an ArrayIndexOutOfBoundsException
+        String[] lc = langcountry.split("_");
+        Locale locale = Locale.getDefault();
+        if (lc.length > 1) {
+            LOG.debug("lang:"+lc[0] + " " + "country:"+lc[1]);
+            locale = new Locale(lc[0], lc[1]);
+        }
+        else if (lc.length > 0) {
+            LOG.debug("lang:"+lc[0]);
+            locale = new Locale(lc[0]);
+        }
+        else {
+            LOG.debug(langcountry + " is an illegal argument to define lang [and country]");
+        }
+        rb = ResourceBundle.getBundle("language/jump", locale);
+    }
+    
+    /**
+     * Process text with the locale 'jump_<locale>.properties' file
+     * @param label
+     * @return i18n label
+     * [Michael Michaud 2007-03-23] If no resourcebundle is found, returns a default string
+     * which is the last part of the label
+     */
+    public static String get(final String label)
+    {
+       try {
+            return rb.getString(label);
+       } catch (java.util.MissingResourceException e) {
+           String[] labelpath = label.split("\\.");
+           LOG.warn("No translation and no default have been found for \"" +
+               label + "\" in the resource bundles !");
+           return labelpath[labelpath.length-1];
+        }
+    }
 
-	/*
-	 * * use 'jump<locale>.properties' i18n mapping file */
-	// STanner changed the place where are stored bundles. Now are in /language
-	// public static ResourceBundle rb = ResourceBundle.getBundle("com.vividsolutions.jump.jump");
-	public static ResourceBundle rb = ResourceBundle.getBundle("language/jump");
-	public static Hashtable plugInsResourceBundle = new Hashtable();
-
-	  private I18N() {}
-
-	  public static I18N getInstance() 
-	  {
-		return SingletonHolder._singleton;
-	  }
-	  
-	  /**
-	   * Load file specified in command line (-i18n lang_country)
-	   * (lang_country :language 2 letters + "_" + country 2 letters)
-	   * Tries first to extract lang and country, and if only lang
-	   * is specified, loads the corresponding resource bundle.
-	   * @param langcountry
-	   */
-	  public static void loadFile(String langcountry)
-	  {
-	  	String lang = langcountry.split("_")[0];
-		LOG.debug(lang);
-		
-		try {
-			String country = langcountry.split("_")[1];
-			LOG.debug(country);
-			Locale locale = new Locale(lang, country);		 	  	
-			rb = ResourceBundle.getBundle("language/jump", locale);
-		} catch (java.lang.ArrayIndexOutOfBoundsException e) {
-			LOG.debug(e.getMessage());
-			Locale locale = new Locale(lang);		 	  	
-			rb = ResourceBundle.getBundle("language/jump", locale);
-		}
-	  }
-	  
-	  /**
-	   * Process text with the locale 'jump_<locale>.properties' file
-	   * @param label
-	   * @return i18n label
-	   * If no resourcebundle is found, returns default string contained
-	   * inside com.vividsolutions.jump.jump
-	   */
-	  public static String get(String label)
-	  {
-	     try {
-	          return rb.getString(label);
-	     } catch (java.util.MissingResourceException e) {
-	         String default_translation=ResourceBundle.getBundle("com.vividsolutions.jump.jump").getString(label);
-	         LOG.debug(e.getMessage()+" default_value:"+ default_translation);
-	         return default_translation; 
-	      }
-	  }
-
-	  /**
-	   * Get the short signature for locale 
-	   * (letters extension :language 2 letters + "_" + country 2 letters)
-	   * @return string signature for locale
-	   */
-	  public static String getLocale()
-	  {
-	    return rb.getLocale().getLanguage()+"_"+rb.getLocale().getCountry();
-	  }
-		  
-	  /**
-	   * Get the short signature for language 
-	   * (letters extension :language 2 letters)
-	   * @return string signature for language
-	   */
-	  public static String getLanguage()
-	  {
-		if (JUMPWorkbench.I18N_SETLOCALE == "") {
-			// No locale has been specified at startup: choose default locale
-			return rb.getLocale().getLanguage();
-		}
-		else {
-	  	    return JUMPWorkbench.I18N_SETLOCALE.split("_")[0];
-		}
-	  }
-	  
-	  /**
-	   * Process text with the locale 'jump_<locale>.properties' file
-	   * If no resourcebundle is found, returns default string contained
-	   * inside com.vividsolutions.jump.jump
-	   * @param label with argument insertion : {0} 
-	   * @param objects
-	   * @return i18n label
-	   */
-	  public static String getMessage(String label, Object[] objects){
-	      try {
-	      MessageFormat mf = new MessageFormat(rb.getString(label));
-	      return mf.format(objects);
-	   } catch (java.util.MissingResourceException e) {
-	         String default_translation=ResourceBundle.getBundle("com.vividsolutions.jump.jump").getString(label);
-	         LOG.debug(e.getMessage()+" default_value:"+ default_translation);
-	         MessageFormat mf = new MessageFormat(default_translation);
-		     return mf.format(objects);
-	      }
-	  } 
-
-
-	/**
-	 * Process text with the locale 'pluginName_<locale>.properties' file
-	 * 
-	 * @param pluginName (path + name)
-	 * @param label
-	 * @return i18n label
-	 */
-	
-	/*
-	public static String get(String pluginName, String label)
-	{
-		if (LOG.isDebugEnabled()){
-		  LOG.debug(I18N.plugInsResourceBundle.get(pluginName)+" "+label
-				  + ((ResourceBundle)I18N.plugInsResourceBundle
-						  .get(pluginName))
-						  .getString(label));
-		}
-		  return ((ResourceBundle)I18N.plugInsResourceBundle
-					  .get(pluginName))
-					  .getString(label);
-	}
-	*/
-	  
-	/**
-	 * Process text with the locale 'pluginName_<locale>.properties' file
-	 * 
-	 * @param pluginName (path + name)
-	 * @param label with argument insertion : {0} 
-	 * @param objects
-	 * @return i18n label
-	 */
-	/*
-	public static String getMessage(String pluginName, String label, Object[] objects){
-		MessageFormat mf = new MessageFormat(((ResourceBundle)I18N.plugInsResourceBundle
-											  .get(pluginName))
-											  .getString(label));
-		return mf.format(objects);
-	}
-	*/
-
-
+    /**
+     * Get the short signature for locale 
+     * (letters extension :language 2 letters + "_" + country 2 letters)
+     * @return string signature for locale
+     */
+    public static String getLocale()
+    {
+      return rb.getLocale().getLanguage()+"_"+rb.getLocale().getCountry();
+    }
+    
+    /**
+     * Get the short signature for language 
+     * (letters extension :language 2 letters)
+     * @return string signature for language
+     */
+    public static String getLanguage()
+    {
+        if (JUMPWorkbench.I18N_SETLOCALE == "") {
+            // No locale has been specified at startup: choose default locale
+            return rb.getLocale().getLanguage();
+        }
+        else {
+            return JUMPWorkbench.I18N_SETLOCALE.split("_")[0];
+        }
+    }
+    
+    /**
+     * Process text with the locale 'jump_<locale>.properties' file
+     * If no resourcebundle is found, returns default string contained
+     * inside com.vividsolutions.jump.jump
+     * @param label with argument insertion : {0} 
+     * @param objects
+     * @return i18n label
+     */
+    public static String getMessage(final String label, final Object[] objects)
+    {
+        try {
+            final MessageFormat mformat = new MessageFormat(rb.getString(label));
+            return mformat.format(objects);
+        } catch (java.util.MissingResourceException e) {
+            final String[] labelpath = label.split("\\.");
+            LOG.warn(e.getMessage() + " no default value, the resource key is used: " +
+                     labelpath[labelpath.length-1]);
+            final MessageFormat mformat = new MessageFormat(labelpath[labelpath.length-1]);
+            return mformat.format(objects);
+        }
+    } 
+    
+    
+    /**
+     * Process text with the locale 'pluginName_<locale>.properties' file
+     * 
+     * @param pluginName (path + name)
+     * @param label
+     * @return i18n label
+     */
+    /*
+    public static String get(String pluginName, String label)
+    {
+        if (LOG.isDebugEnabled()){
+            LOG.debug(I18N.plugInsResourceBundle.get(pluginName)+" "+label
+                + ((ResourceBundle)I18N.plugInsResourceBundle
+                        .get(pluginName))
+                        .getString(label));
+        }
+        return ((ResourceBundle)I18N.plugInsResourceBundle
+                    .get(pluginName))
+                    .getString(label);
+    }
+    */
+    
+   /**
+    * Process text with the locale 'pluginName_<locale>.properties' file
+    * 
+    * @param pluginName (path + name)
+    * @param label with argument insertion : {0} 
+    * @param objects
+    * @return i18n label
+    */
+   /*
+    public static String getMessage(String pluginName, String label, Object[] objects)
+    {
+        MessageFormat mf = new MessageFormat(((ResourceBundle)I18N.plugInsResourceBundle
+                                            .get(pluginName))
+                                            .getString(label));
+        return mf.format(objects);
+    }
+    */
+ 
 }
