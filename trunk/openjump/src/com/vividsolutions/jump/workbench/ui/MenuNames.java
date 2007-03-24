@@ -52,11 +52,15 @@ public interface MenuNames {
 	public static String TOOLS_QA = I18N.get("ui.MenuNames.TOOLS.QA");
 	public static String TOOLS_JOIN = I18N.get("ui.MenuNames.TOOLS.JOIN");
 	public static String TOOLS_GENERALIZATION = I18N.get("ui.MenuNames.TOOLS.GENERALIZATION");
-	public static String TOOLS_PROGRAMMING =I18N.get("ui.MenuNames.TOOLS.PROGRAMMING");
+	//public static String TOOLS_PROGRAMMING =I18N.get("ui.MenuNames.TOOLS.PROGRAMMING");
 	public static String TOOLS_QUERIES =I18N.get("org.openjump.core.ui.plugin.queries.SimpleQuery.menu");
 	public static String WINDOW = I18N.get("ui.MenuNames.WINDOW");
 	public static String HELP = I18N.get("ui.MenuNames.HELP");
 	public static String PLUGINS = I18N.get("ui.MenuNames.PLUGINS");
+	
+    // Michael Michaud 2007-03-23
+    // New menu for plugin manager, beanshell console, scripts
+	public static String CUSTOMIZE = I18N.get("ui.MenuNames.CUSTOMIZE");
 	
 	//erwan début décembre 2005 --- SIGLE	
 	//Menu
