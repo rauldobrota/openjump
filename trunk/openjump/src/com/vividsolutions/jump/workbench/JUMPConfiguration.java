@@ -137,8 +137,8 @@ public class JUMPConfiguration implements Setup {
 
     private EditablePlugIn editablePlugIn = new EditablePlugIn(editingPlugIn);
 
-
-    private BeanShellPlugIn beanShellPlugIn = new BeanShellPlugIn();
+    // [Michael Michaud 2007-03-23] Moved BeanShellPlugIn initialization in OpenJUMPConfiguration
+    // private BeanShellPlugIn beanShellPlugIn = new BeanShellPlugIn();
 
 
     private LoadDatasetPlugIn loadDatasetPlugIn = new LoadDatasetPlugIn();
