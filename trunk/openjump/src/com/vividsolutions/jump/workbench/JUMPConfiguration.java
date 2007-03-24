@@ -603,10 +603,12 @@ public class JUMPConfiguration implements Setup {
         featureInstaller.addMainMenuItemWithJava14Fix(deleteSelectedItemsPlugIn, new String[] {MenuNames.EDIT},
                 deleteSelectedItemsPlugIn.getName(), false, null,
                 DeleteSelectedItemsPlugIn.createEnableCheck(workbenchContext));
-        featureInstaller.addMenuSeparator(MenuNames.EDIT); // ===================
+        //featureInstaller.addMenuSeparator(MenuNames.EDIT); // ===================
+        /*//--[sstein 24 march 2007] moved to new customize menu 
         featureInstaller.addMainMenuItemWithJava14Fix(optionsPlugIn, new String[] {MenuNames.EDIT}, optionsPlugIn
                 .getName()
                 + "...", false, null, null);
+        */
 		//-- VIEW        
         editingPlugIn.createMainMenuItem(new String[] { MenuNames.VIEW}, GUIUtil
                 .toSmallIcon(EditingPlugIn.ICON), workbenchContext);
@@ -690,7 +692,7 @@ public class JUMPConfiguration implements Setup {
         zoomBarPlugIn.createMainMenuItem(new String[] { MenuNames.VIEW}, null,
                 workbenchContext);
         //-- LAYER       
-        //-- [sstein: 23.02.2006 new in VividJump]
+        //-- [sstein: 23.02.2006 new sub method in VividJump]
         configLayer(workbenchContext, checkFactory, featureInstaller);
         
         //-- WINDOW
@@ -728,6 +730,12 @@ public class JUMPConfiguration implements Setup {
                 shortcutKeysPlugIn.getName() + "...", false, null, null);
         new FeatureInstaller(workbenchContext).addMainMenuItemWithJava14Fix(
                 new AboutPlugIn(), new String[]{MenuNames.HELP}, I18N.get("JUMPConfiguration.about"), false, null, null);
+    
+        //-- CUSTOMIZE
+        //-- [sstein: 24.03.2007 new menu]
+        featureInstaller.addMainMenuItemWithJava14Fix(optionsPlugIn, new String[] {MenuNames.CUSTOMIZE}, optionsPlugIn
+                .getName()
+                + "...", false, null, null);
     }
 
     //==== [sstein: 23.02.2006] ====== 
