@@ -8,6 +8,9 @@
  *  $Rev: 2509 $
  *  $Id$
  *  $Log$
+ *  Revision 1.3  2007/03/24 18:13:11  mentaer
+ *  changed to inherit AbstractPlugIn instead of StandardPirolPlugIn, subsequently changed also to normal logger
+ *
  *  Revision 1.2  2007/02/03 14:19:47  mentaer
  *  modified debug output for pirol stuff
  *
@@ -74,13 +77,13 @@
  */
 package de.fho.jump.pirol.plugins.EditAttributeByFormula;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import org.apache.log4j.Logger;
 
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.FeatureCollection;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.model.Layer;
+import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
@@ -90,8 +93,6 @@ import de.fho.jump.pirol.utilities.FormulaParsing.FormulaValue;
 import de.fho.jump.pirol.utilities.Properties.PropertiesHandler;
 import de.fho.jump.pirol.utilities.apiTools.FeatureCollectionTools;
 import de.fho.jump.pirol.utilities.attributes.AttributeInfo;
-import de.fho.jump.pirol.utilities.debugOutput.DebugUserIds;
-import de.fho.jump.pirol.utilities.debugOutput.PersonalLogger;
 import de.fho.jump.pirol.utilities.metaData.MetaInformationHandler;
 import de.fho.jump.pirol.utilities.plugIns.StandardPirolPlugIn;
 import de.fho.jump.pirol.utilities.settings.PirolPlugInSettings;
@@ -109,10 +110,15 @@ import de.fho.jump.pirol.utilities.settings.PirolPlugInSettings;
  * 
  * @version $Rev: 2509 $
  */
-public class EditAttributeByFormulaPlugIn extends StandardPirolPlugIn {
+//--[sstein 24.March.2007] changed to normal plugin - thus we do not need 
+//  to load and create the properties file
+//public class EditAttributeByFormulaPlugIn extends StandardPirolPlugIn {
+public class EditAttributeByFormulaPlugIn extends AbstractPlugIn {
 
     protected static PropertiesHandler storedFormulas = null;
     protected static final String storedFormulasFileName = "Formula.properties"; //$NON-NLS-1$
+    //[sstein 24.March.2007] added this logger instead using Personal logger
+    private static final Logger LOG = Logger.getLogger(EditAttributeByFormulaPlugIn.class);
     
     public void initialize(PlugInContext context) throws Exception {
 	    context.getFeatureInstaller().addMainMenuItemWithJava14Fix(this,
@@ -135,9 +141,12 @@ public class EditAttributeByFormulaPlugIn extends StandardPirolPlugIn {
                         .add(checkFactory.createSelectedLayersMustBeEditableCheck());
     }
     
+    /* //-- [sstein 24.March 2007] disabled since we make it to a 
+       //    normal plugin, not a StandardPirolPlugin
     public EditAttributeByFormulaPlugIn(){
-        super(new PersonalLogger(DebugUserIds.ALL));        
+        super(new PersonalLogger(DebugUserIds.ALL)); 
     }
+    */
     
     /**
      * @inheritDoc
@@ -161,13 +170,17 @@ public class EditAttributeByFormulaPlugIn extends StandardPirolPlugIn {
         
         if (layer==null){
             StandardPirolPlugIn.warnUser(context,I18N.get("pirol.plugIns.EditAttributeByFormulaPlugIn.no-layer-selected")); //$NON-NLS-1$
-            return this.finishExecution(context, false);
+            //--[sstein 24.March 2007]: disabled since I changed from StandardPirolPlugIn to AbstractPlugIn
+            return false;
+            //return this.finishExecution(context, false);
         } else if (!layer.isEditable()) {
             StandardPirolPlugIn.warnUser(context,I18N.get("pirol.plugIns.EditAttributeByFormulaPlugIn.layer-not-editable")); //$NON-NLS-1$
-            return this.finishExecution(context, false);
+            //--[sstein 24.March 2007] disabled since I changed from StandardPirolPlugIn to AbstractPlugIn
+            //return this.finishExecution(context, false);
+            return false;
         }
         
-        
+        /**
         try {
             EditAttributeByFormulaPlugIn.storedFormulas = new PropertiesHandler(EditAttributeByFormulaPlugIn.storedFormulasFileName);
             EditAttributeByFormulaPlugIn.storedFormulas.load();
@@ -176,7 +189,7 @@ public class EditAttributeByFormulaPlugIn extends StandardPirolPlugIn {
         } catch (IOException e1) {
             this.logger.printWarning(e1.getMessage());
         }
-        
+        **/
         EditAttributeByFormulaDialog dialog = new EditAttributeByFormulaDialog(context.getWorkbenchFrame(), 
         		I18N.get("pirol.plugIns.EditAttributeByFormulaPlugIn.specify-attribute-and-formula"), 
 				true, 
@@ -189,7 +202,9 @@ public class EditAttributeByFormulaPlugIn extends StandardPirolPlugIn {
         String formula = dialog.getFormula();
         
         if (!dialog.wasOkClicked() || formula==null || formula.length()==0 ){
-            return this.finishExecution(context, false);
+        	//--[sstein 24.March 2007]: disabled since I changed from StandardPirolPlugIn to AbstractPlugIn
+            //return this.finishExecution(context, false);
+        	return false;
         }
         
         
@@ -218,13 +233,16 @@ public class EditAttributeByFormulaPlugIn extends StandardPirolPlugIn {
             
             
         } catch (Exception e){
-            this.handleThrowable(e);
-            this.logger.printError(e.getMessage());
+        	//--[sstein 24.March 2007]: disabled since I changed from StandardPirolPlugIn to AbstractPlugIn
+            //this.handleThrowable(e);
+            LOG.debug(e.getMessage());
             e.printStackTrace();
-            return this.finishExecution(context, false);
+            //return this.finishExecution(context, false);
+            return false;
         }
-        
-        return this.finishExecution(context, true);
+        //--[sstein 24.March 2007]: disabled since I changed from StandardPirolPlugIn to AbstractPlugIn
+        //return this.finishExecution(context, true);
+        return false;
     }
 
 }
