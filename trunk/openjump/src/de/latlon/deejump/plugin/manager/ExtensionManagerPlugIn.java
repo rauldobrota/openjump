@@ -44,7 +44,8 @@ public class ExtensionManagerPlugIn extends ThreadedBasePlugIn {
     
     public void install( PlugInContext context ){
         context.getFeatureInstaller().addMainMenuItem(
-            this, MenuNames.TOOLS,
+            // [Michael Michaud 2007-03-23] Change MenuNames.TOOLS to MenuNames.CUSTOMIZE
+            this, MenuNames.CUSTOMIZE,
     		this.getName(), null,
     		null);
     }
