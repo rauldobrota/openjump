@@ -36,6 +36,7 @@ import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import java.util.Locale;
 
+import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;
 import com.vividsolutions.jump.workbench.JUMPWorkbench;
 
 import org.apache.log4j.Logger;
@@ -105,7 +106,8 @@ public final class I18N {
     
     // [Michael Michaud 2007-03-23] plugInsResourceBundle is deactivated because all the methods
     // using it have been deactivated.
-    // public static Hashtable plugInsResourceBundle = new Hashtable();
+    // [sstein] activated again since Pirol does use it
+    public static Hashtable plugInsResourceBundle = new Hashtable();
     
     private I18N() {super();}
     
