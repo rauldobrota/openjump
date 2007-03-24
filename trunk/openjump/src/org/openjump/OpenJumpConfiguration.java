@@ -14,6 +14,7 @@ import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
 import org.openjump.core.ccordsys.srid.EnsureAllLayersHaveSRIDStylePlugIn;
+import org.openjump.core.ui.plugin.customize.BeanToolsPlugIn;
 import org.openjump.core.ui.plugin.edit.ReplicateSelectedItemsPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectAllLayerItemsPlugIn;
 import org.openjump.core.ui.plugin.edit.SelectByTypePlugIn;
@@ -65,6 +66,7 @@ import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
+import com.vividsolutions.jump.workbench.ui.plugin.BeanShellPlugIn;
 
 import de.fho.jump.pirol.plugins.EditAttributeByFormula.EditAttributeByFormulaPlugIn;
 import de.latlon.deejump.plugin.SaveLegendPlugIn;
@@ -219,16 +221,21 @@ public class OpenJumpConfiguration{
 		
 		//-- [sstein] do this to avoid that the programming menu is created after 
 		//   MeasureM_FPlugIn is added to the tools menu
-		PlugInContext pc = new PlugInContext(workbenchContext, null, null, null, null);
+        // [Michael Michaud 2007-03-23] : put programming plugins in MenuNames.CUSTOMIZE menu
+		/*
+        PlugInContext pc = new PlugInContext(workbenchContext, null, null, null, null);
 		FeatureInstaller fi = pc.getFeatureInstaller();
 		JMenu menuTools = fi.menuBarMenu(MenuNames.TOOLS);
 		fi.createMenusIfNecessary(menuTools, new String[]{MenuNames.TOOLS_PROGRAMMING});
-		//---
-
-		//-- deeJUMP function by LAT/LON [05.08.2006 sstein]	
-		ExtensionManagerPlugIn extensionManagerPlugIn = new ExtensionManagerPlugIn();
+        */
+        
+		//-- deeJUMP function by LAT/LON [05.08.2006 sstein]
+        // [Michael Michaud 2007-03-23] move the plugin to the CUSTOMIZE menu (see here after)
+		/*
+        ExtensionManagerPlugIn extensionManagerPlugIn = new ExtensionManagerPlugIn();
 		extensionManagerPlugIn.install(new PlugInContext(workbenchContext, null, null, null, null));
-
+        */
+        
 		MeasureM_FPlugIn myFeetPlugIn = new MeasureM_FPlugIn();
 		myFeetPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
 
@@ -243,8 +250,21 @@ public class OpenJumpConfiguration{
 		
 		//-- Topology
 
-
-		
+        /***********************
+		 *  menu CUSTOMIZE [added byte Michael Michaud on 2007-03-04]
+		 **********************/
+        //-- deeJUMP function by LAT/LON [05.08.2006 sstein]	
+		ExtensionManagerPlugIn extensionManagerPlugIn = new ExtensionManagerPlugIn();
+		extensionManagerPlugIn.install(new PlugInContext(workbenchContext, null, null, null, null));
+        
+        //-- [michael michaud] move from JUMPConfiguration
+        BeanShellPlugIn beanShellPlugIn = new BeanShellPlugIn();
+        beanShellPlugIn.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+        
+        //-- [michael michaud] add Larry's BeanToolsPlugIn
+		BeanToolsPlugIn beanTools = new BeanToolsPlugIn();
+		beanTools.initialize(new PlugInContext(workbenchContext, null, null, null, null));
+        
 		/***********************
 		 *  menu WINDOW
 		 **********************/
