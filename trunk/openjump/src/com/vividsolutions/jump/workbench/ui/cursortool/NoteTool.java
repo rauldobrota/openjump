@@ -21,6 +21,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -34,19 +36,23 @@ import com.vividsolutions.jump.feature.FeatureDataset;
 import com.vividsolutions.jump.feature.FeatureSchema;
 import com.vividsolutions.jump.workbench.model.FeatureEventType;
 import com.vividsolutions.jump.workbench.model.Layer;
+import com.vividsolutions.jump.workbench.model.LayerManager;
 import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
 import com.vividsolutions.jump.workbench.model.UndoableCommand;
 import com.vividsolutions.jump.workbench.ui.EditTransaction;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
+import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.Viewport;
 import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 import com.vividsolutions.jump.workbench.ui.renderer.style.Style;
 import com.vividsolutions.jump.workbench.ui.snap.SnapToFeaturesPolicy;
 
-//To do: check Notes layer can be saved with a task
-//[Jon Aquino 2004-03-10]
+//Notes layer can now be saved with a task [LDB 12-15-2005]
+
 public class NoteTool extends NClickTool {
 
+    private LayerViewPanel panel;
+    
     private abstract class Mode {
 
         private Feature noteFeature;
@@ -75,8 +81,8 @@ public class NoteTool extends NClickTool {
                     .getFeatureSchema()) {
 
                 {
-                    setAttribute("CREATED", new Date());
-                    setAttribute("GEOMETRY", new GeometryFactory()
+                    setAttribute(NoteStyle.CREATED, new Date());
+                    setAttribute(NoteStyle.GEOMETRY, new GeometryFactory()
                             .createPoint(location));
                 }
             });
@@ -85,8 +91,8 @@ public class NoteTool extends NClickTool {
         public void commit(String text) {
             if (text.length() > 0) {
                 disableAutomaticInitialZooming();
-                getNoteFeature().setAttribute("MODIFIED", new Date());
-                getNoteFeature().setAttribute("TEXT", text);
+                getNoteFeature().setAttribute(NoteStyle.MODIFIED, new Date());
+                getNoteFeature().setAttribute(NoteStyle.TEXT, text);
                 EditTransaction transaction = new EditTransaction(
                         Collections.EMPTY_LIST, getName(), layer(),
                         isRollingBackInvalidEdits(), true, getPanel());
@@ -109,8 +115,8 @@ public class NoteTool extends NClickTool {
         public void commit(final String text) {
             final Date modifiedDate = new Date();
             final Date oldModifiedDate = (Date) getNoteFeature().getAttribute(
-                    "MODIFIED");
-            final String oldText = getNoteFeature().getString("TEXT");
+            		NoteStyle.MODIFIED);
+            final String oldText = getNoteFeature().getString(NoteStyle.TEXT);
             execute(new UndoableCommand(getName()) {
 
                 public void execute() {
@@ -125,28 +131,34 @@ public class NoteTool extends NClickTool {
 
         private void update(Feature noteFeature, String text,
                 Date modifiedDate, Layer layer) {
-            noteFeature.setAttribute("MODIFIED", modifiedDate);
-            noteFeature.setAttribute("TEXT", text);
+            noteFeature.setAttribute(NoteStyle.MODIFIED, modifiedDate);
+            noteFeature.setAttribute(NoteStyle.TEXT, text);
             layer.getLayerManager().fireFeaturesChanged(
                     Collections.singleton(noteFeature),
                     FeatureEventType.ATTRIBUTES_MODIFIED, layer);
         }
 
         public String initialText() {
-            return getNoteFeature().getString("TEXT");
+            return getNoteFeature().getString(NoteStyle.TEXT);
         }
     }
 
     public NoteTool() {
         super(1);
+        panel = getPanel();
         getSnapManager().addPolicies(
                 Collections.singleton(new SnapToFeaturesPolicy()));
-        textArea = createTextArea();
+        textArea = NoteStyle.createTextArea();
         textArea.addFocusListener(new FocusAdapter() {
 
             public void focusLost(FocusEvent e) {
-                removeTextAreaFromPanel();
-            }
+                if (panelContainsTextArea())
+                {
+                	boolean doit = (textArea.getText().trim().length() > 0);
+                	if (doit) getPanel().getLayerManager().getUndoableEditReceiver().startReceiving();
+                	removeTextAreaFromPanel();
+                	if (doit) getPanel().getLayerManager().getUndoableEditReceiver().stopReceiving();        }
+            	}
         });
     }
 
@@ -154,21 +166,16 @@ public class NoteTool extends NClickTool {
 
     private Mode mode;
 
-    public void deactivate() {
-        removeTextAreaFromPanel();
-        super.deactivate();
-    }
-
-    private static JTextArea createTextArea() {
-        return new JTextArea() {
-
-            {
-                setFont(new JLabel().getFont());
-                setLineWrap(true);
-                setWrapStyleWord(true);
-                setBorder(BorderFactory.createLineBorder(Color.lightGray));
-            }
-        };
+    public void deactivate() 
+    {
+        if (panelContainsTextArea())
+        {
+        	boolean doit = (textArea.getText().trim().length() > 0);
+        	if (doit) getPanel().getLayerManager().getUndoableEditReceiver().startReceiving();
+        	removeTextAreaFromPanel();
+        	if (doit) getPanel().getLayerManager().getUndoableEditReceiver().stopReceiving();        
+        	}
+    	super.deactivate();
     }
 
     public Cursor getCursor() {
@@ -178,16 +185,13 @@ public class NoteTool extends NClickTool {
     protected void gestureFinished() throws Exception {
         reportNothingToUndoYet();
         Feature noteFeatureAtClick = noteFeature(getModelDestination());
-        try {
-            if (panelContainsTextArea() && noteFeatureAtClick == null) { return; }
-        } finally {
-            removeTextAreaFromPanel();
-        }
+        removeTextAreaFromPanel();
         mode = mode(noteFeatureAtClick, getModelDestination());
-        //Ensure #addTextAreaToPanel is called *after* all the
-        //#removeTextAreaFromPanel calls [Jon Aquino 2004-03-05]
-        SwingUtilities.invokeLater(new Runnable() {
 
+        //Since focusLost will be called after gestureFinished() is called
+        //any testArea added here would be removed.
+        //However the invokeLater will be called after any other calls to removeTextAreaFromPanel()
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
                     addTextAreaToPanel(mode.location());
@@ -204,8 +208,8 @@ public class NoteTool extends NClickTool {
     }
 
     private Feature noteFeature(Coordinate click) {
-        return noteFeature(new Envelope(click, new Coordinate(click.x - WIDTH
-                / scale(), click.y + HEIGHT / scale())));
+        return noteFeature(new Envelope(click, new Coordinate(click.x - NoteStyle.WIDTH
+                / scale(), click.y + NoteStyle.HEIGHT / scale())));
     }
 
     private Feature noteFeature(Envelope envelope) {
@@ -230,9 +234,33 @@ public class NoteTool extends NClickTool {
         textArea.setText(mode.initialText());
         textArea.setBackground(layer().getBasicStyle().getFillColor());
         getPanel().add(textArea);
+        
+        textArea.addCaretListener(new CaretListener()
+        {
+        	public void caretUpdate(CaretEvent e)
+        	{
+        		JTextArea textArea = (JTextArea)e.getSource();
+        		int ht = textArea.getPreferredSize().height;
+        		int wt = textArea.getPreferredSize().width;
+        		if (ht < NoteStyle.HEIGHT) ht = NoteStyle.HEIGHT;
+        		if (wt < NoteStyle.WIDTH) wt = NoteStyle.WIDTH;
+        		int x = textArea.getBounds().x;
+        		int y = textArea.getBounds().y;
+                textArea.setBounds(x, y, wt, ht);
+        	}
+        });
+        
+		int ht = textArea.getPreferredSize().height;
+		int wt = textArea.getPreferredSize().width;
+		if (ht < NoteStyle.HEIGHT) ht = NoteStyle.HEIGHT;
+		if (wt < NoteStyle.WIDTH) wt = NoteStyle.WIDTH;
         textArea.setBounds((int) getPanel().getViewport().toViewPoint(location)
                 .getX(), (int) getPanel().getViewport().toViewPoint(location)
-                .getY(), WIDTH, HEIGHT);
+                .getY(), wt, ht);
+
+        //textArea.setBounds((int) getPanel().getViewport().toViewPoint(location)
+        //        .getX(), (int) getPanel().getViewport().toViewPoint(location)
+        //        .getY(), NoteStyle.WIDTH, NoteStyle.HEIGHT);
         textArea.requestFocus();
     }
 
@@ -241,7 +269,7 @@ public class NoteTool extends NClickTool {
     }
 
     private void removeTextAreaFromPanel() {
-        if (!panelContainsTextArea()) { return; }
+        if (!panelContainsTextArea()) {return;}
         mode.commit(textArea.getText().trim());
         getPanel().remove(textArea);
         getPanel().superRepaint();
@@ -251,98 +279,30 @@ public class NoteTool extends NClickTool {
         getPanel().setViewportInitialized(true);
     }
 
-    private static final int WIDTH = 80;
-
-    private static final int HEIGHT = 30;
-
-    private Layer layer() {
-        final String name = I18N.get("ui.cursortool.NoteTool.notes");
-        if (getPanel().getLayerManager().getLayer(name) != null) { return getPanel()
-                .getLayerManager().getLayer(name); }
-        return new Layer(name, Color.yellow.brighter().brighter(),
-                new FeatureDataset(new FeatureSchema() {
-
-                    {
-                        addAttribute("CREATED", AttributeType.DATE);
-                        addAttribute("MODIFIED", AttributeType.DATE);
-                        addAttribute("TEXT", AttributeType.STRING);
-                        addAttribute("GEOMETRY", AttributeType.GEOMETRY);
-                    }
-                }), getPanel().getLayerManager()) {
-
-            {
-                getLayerManager().deferFiringEvents(new Runnable() {
-
-                    public void run() {
-                        getBasicStyle().setAlpha(150);
-                        addStyle(createStyle());
-                        setDrawingLast(true);
-                    }
-                });
-                getLayerManager().addLayer(StandardCategoryNames.SYSTEM, this);
-            }
-
-            private Style createStyle() {
-                return new NoteStyle();
-            }
-        };
+     public Layer layer() {
+     	LayerManager layerManager = getPanel().getLayerManager();
+    	if (layerManager.getLayer(NoteStyle.NAME) != null) {
+    		return layerManager.getLayer(NoteStyle.NAME);
+    	}
+    	Layer noteLayer = new Layer(NoteStyle.NAME, Color.yellow.brighter().brighter(),
+    		new FeatureDataset(NoteStyle.createFeatureSchema()), layerManager);
+    	
+		boolean firingEvents = layerManager.isFiringEvents();
+		layerManager.setFiringEvents(false);
+		try {
+	    	noteLayer.addStyle(new NoteStyle());
+		} finally {
+			layerManager.setFiringEvents(firingEvents);
+		}    	
+		layerManager.addLayer(StandardCategoryNames.SYSTEM, noteLayer);
+    	return noteLayer;
     }
 
     public Icon getIcon() {
         return icon;
     }
 
-    public static class NoteStyle implements Style {
-
-        private JTextArea myTextArea = createTextArea();
-
-        private Layer layer;
-
-        public void paint(Feature f, Graphics2D g, Viewport viewport)
-                throws Exception {
-            paint(f, viewport.toViewPoint(f.getGeometry().getCoordinate()), g);
-        }
-
-        private void paint(Feature f, Point2D location, Graphics2D g) {
-            myTextArea.setText(f.getString("TEXT"));
-            myTextArea.setBounds(0, 0, WIDTH, HEIGHT);
-            Composite originalComposite = g.getComposite();
-            g.translate(location.getX(), location.getY());
-            try {
-                g.setComposite(AlphaComposite.getInstance(
-                        AlphaComposite.SRC_OVER, layer.getBasicStyle()
-                                .getAlpha() / 255f));
-                myTextArea.paint(g);
-            } finally {
-                g.setComposite(originalComposite);
-                g.translate(-location.getX(), -location.getY());
-            }
-        }
-
-        public void initialize(Layer layer) {
-            this.layer = layer;
-            myTextArea.setBackground(layer.getBasicStyle().getFillColor());
-        }
-
-        public Object clone() {
-            try {
-                return super.clone();
-            } catch (CloneNotSupportedException e) {
-                Assert.shouldNeverReachHere();
-                return null;
-            }
-        }
-
-        public void setEnabled(boolean enabled) {
-            throw new UnsupportedOperationException();
-        }
-
-        public boolean isEnabled() {
-            return true;
-        }
-
-    }
-
+ 
     protected Shape getShape() throws NoninvertibleTransformException {
         return null;
     }
