@@ -34,6 +34,8 @@
 package org.openjump.core.ui.plugin.edittoolbox.cursortools;
 
 import java.awt.Shape;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
@@ -49,6 +51,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.util.Assert;
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
+import com.vividsolutions.jump.workbench.ui.WorkbenchFrame;
 import com.vividsolutions.jump.workbench.ui.cursortool.AbstractCursorTool;
 import com.vividsolutions.jump.workbench.ui.cursortool.MultiClickTool;
 
@@ -69,6 +72,8 @@ public abstract class ConstrainedMultiClickTool extends AbstractCursorTool
     protected Coordinate tentativeCoordinate;
     protected boolean drawClosed = true;
     private ConstraintManager constraintManager;
+    private LayerViewPanel panel;
+    private WorkbenchFrame frame;
         
     public ConstrainedMultiClickTool()
     {
@@ -272,6 +277,12 @@ public abstract class ConstrainedMultiClickTool extends AbstractCursorTool
         }
     }
     
+    public void deactivate()
+    {
+    	super.deactivate();
+        if (frame != null) 
+            frame.removeEasyKeyListener(keyListener);    	
+    }
     protected Coordinate getIntersection(Coordinate p1, Coordinate p2, Coordinate p3, Coordinate p4)  //find intersection of two lines
     {
         Coordinate e = new Coordinate(0,0);
@@ -308,5 +319,33 @@ public abstract class ConstrainedMultiClickTool extends AbstractCursorTool
     {
         super.activate(layerViewPanel);
         constraintManager = new ConstraintManager(getWorkbench().getContext());
+        
+        //following added to handle Backspace key deletes last vertex
+        panel = layerViewPanel;
+        frame = AbstractCursorTool.workbenchFrame(panel);
+        
+        if (frame != null) 
+            frame.addEasyKeyListener(keyListener);
     }
+    
+    private KeyListener keyListener = new KeyListener() 
+    {
+        public void keyTyped(KeyEvent e) 
+        {
+        }
+
+        public void keyPressed(KeyEvent e) 
+        {
+        }
+
+        public void keyReleased(KeyEvent e) 
+        {
+        	if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
+        	{
+        		if (coordinates.size() > 1)
+        			coordinates.remove(coordinates.size() - 1);
+        		panel.repaint();
+        	}
+        }
+    };
 }

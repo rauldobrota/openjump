@@ -34,6 +34,8 @@
 package com.vividsolutions.jump.workbench.ui.cursortool;
 
 import java.awt.Shape;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
@@ -44,6 +46,8 @@ import java.util.List;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.util.Assert;
+import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
+import com.vividsolutions.jump.workbench.ui.WorkbenchFrame;
 
 
 /**
@@ -60,6 +64,8 @@ public abstract class MultiClickTool extends AbstractCursorTool {
     // set this to true if rubber band should be closed
     private boolean closeRing = false;
     private CoordinateListMetrics metrics = null;
+    private LayerViewPanel panel;
+    private WorkbenchFrame frame;
 
     public MultiClickTool() {
     }
@@ -233,4 +239,46 @@ public abstract class MultiClickTool extends AbstractCursorTool {
             coordinates.clear();
         }
     }
+    
+    //-- [sstein: 24Mar2007] added for to allow to cancel last vertex per backspace
+    public void deactivate()
+    {
+    	super.deactivate();
+        if (frame != null) 
+            frame.removeEasyKeyListener(keyListener);    	
+    }
+    
+    //-- [sstein: 24Mar2007] added for to allow to cancel last vertex per backspace
+    public void activate(LayerViewPanel layerViewPanel)
+    {
+        super.activate(layerViewPanel);
+        
+        //following added to handle Backspace key deletes last vertex
+        panel = layerViewPanel;
+        frame = AbstractCursorTool.workbenchFrame(panel);
+        
+        if (frame != null) 
+            frame.addEasyKeyListener(keyListener);
+    }
+    
+    private KeyListener keyListener = new KeyListener() 
+    {
+        public void keyTyped(KeyEvent e) 
+        {
+        }
+
+        public void keyPressed(KeyEvent e) 
+        {
+        }
+
+        public void keyReleased(KeyEvent e) 
+        {
+        	if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
+        	{
+        		if (coordinates.size() > 1)
+        			coordinates.remove(coordinates.size() - 1);
+        		panel.repaint();
+        	}
+        }
+    };
 }
