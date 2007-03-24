@@ -42,15 +42,14 @@ import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.io.datasource.DataSourceQuery;
 import com.vividsolutions.jump.workbench.model.Layer;
-import com.vividsolutions.jump.workbench.model.LayerManager;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
-import com.vividsolutions.jump.workbench.ui.LayerNamePanel;
 import com.vividsolutions.jump.workbench.ui.LayerNamePanelListener;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanelListener;
@@ -92,32 +91,22 @@ public class ShowFullPathPlugIn extends AbstractPlugIn
     {
         public void layerSelectionChanged()
         {
-        	LayerNamePanel lnp = gContext.getWorkbenchContext().getLayerNamePanel();
-        	if(lnp !=null){
-        		LayerManager lm = lnp.getLayerManager();
-        		if (lm != null){
-		            Collection layerCollection = (Collection) gContext.getWorkbenchContext().getLayerNamePanel().getLayerManager().getLayers();
-		            for (Iterator i = layerCollection.iterator(); i.hasNext();)
-		            {
-		                Layer layer = (Layer) i.next();
-		                if (layer.hasReadableDataSource())
-		                {
-		                	DataSourceQuery dsq = layer.getDataSourceQuery();			
-			                try{
-			                    	Map props = dsq.getDataSource().getProperties();
-			                    	String fname = dsq.getDataSource().getProperties().get("File").toString();  
-			                    	
-			                    	layer.setDescription(fname);
-			                }
-			                catch(Exception e){
-			                    	//System.out.println("ShowFullPathPlugIn: seems to be a database dataset?: " + layer.getDataSourceQuery().getDataSource().getClass() + "  " + e);			                		
-			                		layer.setDescription("database");
-			                		//exc eaten
-			                }                
-		                }
-		            }
-        		}
-        	}
+            Collection layerCollection = (Collection) gContext.getWorkbenchContext().getLayerNamePanel().getLayerManager().getLayers();
+            for (Iterator i = layerCollection.iterator(); i.hasNext();)
+            {
+                Layer layer = (Layer) i.next();
+                if (layer.hasReadableDataSource())
+                {
+                    DataSourceQuery dsq = layer.getDataSourceQuery();
+                    String fname = "";
+                    Object fnameObj = dsq.getDataSource().getProperties().get("File");
+                    if (fnameObj != null) fname = fnameObj.toString();
+                    //layer.setDescription(fname);
+                    
+                	Object archiveObj = layer.getBlackboard().get("ArchiveFileName");
+                	//if (archiveObj != null) layer.setDescription(archiveObj.toString());
+                }
+            }            
         }
     };
    
@@ -126,11 +115,20 @@ public class ShowFullPathPlugIn extends AbstractPlugIn
     {
         public void selectionChanged()
         {
-        	LayerViewPanel lvp=gContext.getWorkbenchContext().getLayerViewPanel();
-        	if (lvp != null){
-            	int numSel = gContext.getWorkbenchContext().getLayerViewPanel().getSelectionManager().getFeatureSelection().getSelectedItems().size();        
-            	gContext.getWorkbenchFrame().setTimeMessage(sNumberSelected + " " + numSel);
-        	}
+        	LayerViewPanel panel = gContext.getWorkbenchContext().getLayerViewPanel();
+        	if (panel == null) { return; } //[Jon Aquino 2005-08-04]
+        	Collection selectedFeatures = panel.getSelectionManager().getSelectedItems();
+        	int numSel = selectedFeatures.size();
+        	int numPts = 0;
+        	for (Iterator i = selectedFeatures.iterator(); i.hasNext();)
+        		numPts += ((Geometry)i.next()).getNumPoints();
+            
+            //LDB added the following to simulate 4D Draw Coordinates Panel
+            Envelope env = envelope(panel.getSelectionManager().getSelectedItems());
+            String sx = panel.format(env.getWidth());
+            String sy = panel.format(env.getHeight());
+            //gContext.getWorkbenchFrame().setTimeMessage(sNumberSelected + " " + numSel);
+            gContext.getWorkbenchFrame().setTimeMessage(sNumberSelected + " " +  numSel + " [" + sx + ", " + sy + "] " + numPts + " pts");
         }
         
         public void cursorPositionChanged(String x, String y)
@@ -143,7 +141,7 @@ public class ShowFullPathPlugIn extends AbstractPlugIn
             
         }
     };
-      
+            
     public void initialize(PlugInContext context) throws Exception
     {
     	gContext = context;
@@ -160,41 +158,28 @@ public class ShowFullPathPlugIn extends AbstractPlugIn
 //	    }));
 	    /**** original *********************************/
         context.getWorkbenchFrame().getDesktopPane().addContainerListener(
-                new ContainerListener()
+        new ContainerListener()
+        {
+            public void componentAdded(ContainerEvent e)
+            {                              
+                Component child = e.getChild();
+                if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
                 {
-                    public void componentAdded(ContainerEvent e)
-                    {                              
-                        Component child = e.getChild();
-                        if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
-                        {
-                        	LayerNamePanel lnp =((TaskFrame)child).getLayerNamePanel();                        	
-                        	if(lnp != null){ //can we use LayerListener instead??
-                        		((TaskFrame)child).getLayerNamePanel().addListener(layerNamePanelListener); 
-                        	}
-                            LayerViewPanel lvp = ((TaskFrame)child).getLayerViewPanel();
-                            if (lvp != null){                            	
-								lvp.addListener(layerViewPanelListener);
-                            }
-                    	}
-                    }
-                    
-                    public void componentRemoved(ContainerEvent e)
-                    {
-                        Component child = e.getChild();
-                        if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
-                        {
-                        	LayerNamePanel lnp =((TaskFrame)child).getLayerNamePanel();                        	
-                        	if(lnp != null){
-                        		((TaskFrame)child).getLayerNamePanel().removeListener(layerNamePanelListener); 
-                        	}
-                            LayerViewPanel lvp = ((TaskFrame)child).getLayerViewPanel();
-                            if (lvp != null){
-                            ((TaskFrame)child).getLayerViewPanel().removeListener(layerViewPanelListener);
-                            }
-                    	}
-                    }
-                });   	
-        
+                    ((TaskFrame)child).getLayerNamePanel().addListener(layerNamePanelListener);
+                    ((TaskFrame)child).getLayerViewPanel().addListener(layerViewPanelListener);                    
+            	}
+            }
+            
+            public void componentRemoved(ContainerEvent e)
+            {
+                Component child = e.getChild();
+                if (child.getClass().getName().equals("com.vividsolutions.jump.workbench.ui.TaskFrame"))
+                {
+                    ((TaskFrame)child).getLayerNamePanel().removeListener(layerNamePanelListener);
+                    ((TaskFrame)child).getLayerViewPanel().removeListener(layerViewPanelListener);
+            	}
+            }
+        });
     }
     
 //    //-- method by sstein adapted from Zoombar
@@ -223,7 +208,28 @@ public class ShowFullPathPlugIn extends AbstractPlugIn
 //    
     public boolean execute(PlugInContext context) throws Exception
     {
-        return true;
+        try
+        {
+            return true;
+        }
+        catch (Exception e)
+        {
+            context.getWorkbenchFrame().warnUser(I18N.get("org.openjump.core.ui.plugin.layer.AddSIDLayerPlugIn.Error-See-Output-Window"));
+            context.getWorkbenchFrame().getOutputFrame().createNewDocument();
+            context.getWorkbenchFrame().getOutputFrame().addText("ShowFullPathPlugIn Exception:" + e.toString());
+            return false;
+        }
+    }
+    
+    private Envelope envelope(Collection geometries) {
+        Envelope envelope = new Envelope();
+
+        for (Iterator i = geometries.iterator(); i.hasNext();) {
+            Geometry geometry = (Geometry) i.next();
+            envelope.expandToInclude(geometry.getEnvelopeInternal());
+        }
+
+        return envelope;
     }
     
 }
