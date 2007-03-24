@@ -85,6 +85,19 @@ public class FormulaEditingPanel extends JPanel implements ActionListener, Value
         this.setupUI();
     }
     
+    //-- [sstein] new constructor since we do not assume property-files
+    public FormulaEditingPanel(FeatureSchema featureSchema, NewAttributePanel newAttributePanel) {
+        super();
+        this.featureSchema = featureSchema;
+        this.attributeInfos = FeatureSchemaTools.getAttributesWithTypes(this.featureSchema, new AttributeType[]{AttributeType.DOUBLE, AttributeType.INTEGER});
+        
+        this.formulaField.setWrapStyleWord(true);
+        //this.storedFormulas = storedFormulas;
+        this.newAttributePanel = newAttributePanel;
+        
+        this.setupUI();
+    }
+    
     protected void setupUI(){
         this.setLayout(new BorderLayout());
         JPanel formulaAndOperators = new JPanel();
@@ -92,22 +105,25 @@ public class FormulaEditingPanel extends JPanel implements ActionListener, Value
         moreGenerousLayout.setVgap(15);
         formulaAndOperators.setLayout(moreGenerousLayout);
         
-        JPanel loadedForms = new JPanel();
-        loadedForms.setLayout(new BorderLayout());
-        loadedForms.add(new JLabel(I18N.get("pirol.plugIns.FormulaEditingPanel.load-formula")+" : "), BorderLayout.WEST); //$NON-NLS-1$
-        
-        String[] formulaNames = (String[])this.storedFormulas.keySet().toArray(new String[0]);
-        
-        for (int i=0; i<formulaNames.length; i++){
-            this.storedFormulasDropDown.addItem(formulaNames[i]);
+        //-- [sstein 23.March.2007] -- disable since we do not assume an existing file
+        JPanel loadedForms = null;
+        if (this.storedFormulas != null){
+        	loadedForms = new JPanel();
+	        loadedForms.setLayout(new BorderLayout());
+	        
+	        loadedForms.add(new JLabel(I18N.get("pirol.plugIns.FormulaEditingPanel.load-formula")+" : "), BorderLayout.WEST); //$NON-NLS-1$
+	        
+	        String[] formulaNames = (String[])this.storedFormulas.keySet().toArray(new String[0]);
+	        
+	        for (int i=0; i<formulaNames.length; i++){
+	            this.storedFormulasDropDown.addItem(formulaNames[i]);
+	        }
+	        this.storedFormulasDropDown.setSelectedItem(null);
+	        this.storedFormulasDropDown.addActionListener(this);
+	        
+	        loadedForms.add(this.storedFormulasDropDown, BorderLayout.CENTER);
+	        formulaAndOperators.add(loadedForms, BorderLayout.NORTH);
         }
-        this.storedFormulasDropDown.setSelectedItem(null);
-        this.storedFormulasDropDown.addActionListener(this);
-        
-        loadedForms.add(this.storedFormulasDropDown, BorderLayout.CENTER);
-        
-        formulaAndOperators.add(loadedForms, BorderLayout.NORTH);
-        
         formulaAndOperators.add(this.formulaField, BorderLayout.CENTER);
         
         JPanel mathSignsButtonPanel = new JPanel();
@@ -128,7 +144,12 @@ public class FormulaEditingPanel extends JPanel implements ActionListener, Value
         Box vbox = Box.createVerticalBox();
         
         Box hbox = Box.createHorizontalBox();
-        int sumOfWidthes = 0, wantedWidth = loadedForms.getPreferredSize().width;
+        int sumOfWidthes = 0;
+        //-- [sstein] new
+        int wantedWidth = 0; 
+        if (loadedForms != null){
+        	wantedWidth = loadedForms.getPreferredSize().width;
+        }
         for (int i=0; i<attributeInfos.length; i++){
             button = new JButton();
             button.setAction(new AddFormulaPartToTextArea_Action(attributeInfos[i].getUniqueAttributeName(), this.formulaField, FormulaEditingPanel.mathSigns, this.featureSchema));

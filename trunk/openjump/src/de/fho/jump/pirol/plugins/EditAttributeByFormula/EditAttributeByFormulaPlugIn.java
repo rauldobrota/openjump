@@ -8,6 +8,9 @@
  *  $Rev: 2509 $
  *  $Id$
  *  $Log$
+ *  Revision 1.4  2007/03/24 19:33:19  mentaer
+ *  changed ui, so that pirol formula propeties file is not assumed (used formulas are not stored)
+ *
  *  Revision 1.3  2007/03/24 18:13:11  mentaer
  *  changed to inherit AbstractPlugIn instead of StandardPirolPlugIn, subsequently changed also to normal logger
  *
@@ -76,6 +79,9 @@
  *
  */
 package de.fho.jump.pirol.plugins.EditAttributeByFormula;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
@@ -180,22 +186,40 @@ public class EditAttributeByFormulaPlugIn extends AbstractPlugIn {
             return false;
         }
         
-        /**
+
         try {
+        	//--[sstein 24.March 2007] currently the following line is useless
             EditAttributeByFormulaPlugIn.storedFormulas = new PropertiesHandler(EditAttributeByFormulaPlugIn.storedFormulasFileName);
-            EditAttributeByFormulaPlugIn.storedFormulas.load();
-        } catch (FileNotFoundException e1) {
-            this.logger.printWarning(e1.getMessage());
-        } catch (IOException e1) {
-            this.logger.printWarning(e1.getMessage());
-        }
+            //--[sstein 24.March 2007] disabled - we dont assume an existing file
+            //EditAttributeByFormulaPlugIn.storedFormulas.load();
+        } 
+        /* catch (FileNotFoundException e1) {
+            //this.logger.printWarning(e1.getMessage());
+        	this.LOG.warn(e1.getMessage());
+        } 
+        catch (IOException e1) {
+            //this.logger.printWarning(e1.getMessage());
+        	this.LOG.warn(e1.getMessage());
+        } 
         **/
+        catch (Exception e1) {
+            //this.logger.printWarning(e1.getMessage());
+        	this.LOG.warn(e1.getMessage());
+        }
+        
+        /* [sstein 24.March 2007] replaced - since we dont have stored formulas
         EditAttributeByFormulaDialog dialog = new EditAttributeByFormulaDialog(context.getWorkbenchFrame(), 
         		I18N.get("pirol.plugIns.EditAttributeByFormulaPlugIn.specify-attribute-and-formula"), 
 				true, 
 				I18N.get("pirol.plugIns.EditAttributeByFormulaPlugIn.editByFormula-explaining-text"), 
 				layer.getFeatureCollectionWrapper().getFeatureSchema(), 
 				EditAttributeByFormulaPlugIn.storedFormulas); //$NON-NLS-1$ //$NON-NLS-2$
+        */
+        EditAttributeByFormulaDialog dialog = new EditAttributeByFormulaDialog(context.getWorkbenchFrame(), 
+        		I18N.get("pirol.plugIns.EditAttributeByFormulaPlugIn.specify-attribute-and-formula"), 
+				true, 
+				I18N.get("pirol.plugIns.EditAttributeByFormulaPlugIn.editByFormula-explaining-text"), 
+				layer.getFeatureCollectionWrapper().getFeatureSchema()); 
         
         dialog.setVisible(true);
         

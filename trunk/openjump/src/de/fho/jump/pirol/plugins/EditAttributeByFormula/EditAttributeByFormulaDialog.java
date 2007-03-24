@@ -79,6 +79,19 @@ public class EditAttributeByFormulaDialog extends JDialog {
         this.setupUI();
     }
     
+    //[sstein 24.March 2007] new - since we dont have stored formulas
+    public EditAttributeByFormulaDialog(Frame parentFrame, String title, boolean modal, String text, FeatureSchema featureSchema)
+    	throws HeadlessException {
+    	super(parentFrame, title, modal);
+
+    	this.text = text;
+    	this.featureSchema = featureSchema;
+
+    	this.okCancelListener = new OKCancelListener(this);
+
+    	this.setupUI();
+    }
+    
     protected void setupUI(){
         JPanel content = new JPanel();
         GridBagLayout gridbagLayout = new GridBagLayout();
@@ -99,7 +112,13 @@ public class EditAttributeByFormulaDialog extends JDialog {
         c.gridy = gridy++;
         content.add(this.newAttrPanel, c);
         
-        this.formPanel = new FormulaEditingPanel(this.featureSchema, this.storedFormulas, this.newAttrPanel);
+        //[sstein 24.March 2007] we dont have stored formulas
+        if (this.storedFormulas != null){
+        	this.formPanel = new FormulaEditingPanel(this.featureSchema, this.storedFormulas, this.newAttrPanel);
+        }
+        else{
+        	this.formPanel = new FormulaEditingPanel(this.featureSchema, this.newAttrPanel);
+        }
         this.okCancelListener.addValueChecker(this.formPanel);
         c.gridy = gridy++;
         content.add(this.formPanel, c);
