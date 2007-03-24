@@ -184,6 +184,7 @@ public class SelectByTypePlugIn extends AbstractPlugIn
     public MultiEnableCheck createEnableCheck(final WorkbenchContext workbenchContext) 
     {
         EnableCheckFactory checkFactory = new EnableCheckFactory(workbenchContext);
-        return new MultiEnableCheck().add(checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck());
+        return new MultiEnableCheck().add(checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck())
+        		.add(checkFactory.createAtLeastNLayersMustExistCheck(1));
     }    
 }
