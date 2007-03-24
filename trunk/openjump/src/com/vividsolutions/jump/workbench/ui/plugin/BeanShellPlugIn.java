@@ -15,12 +15,16 @@ import com.vividsolutions.jump.workbench.ui.toolbox.ToolboxDialog;
 import com.vividsolutions.jump.workbench.ui.toolbox.ToolboxPlugIn;
 public class BeanShellPlugIn extends ToolboxPlugIn {
 	public void initialize(PlugInContext context) throws Exception {
-		createMainMenuItem(new String[]{MenuNames.TOOLS, MenuNames.TOOLS_PROGRAMMING}, null, context
+        // [Michael Michaud 2007-03-23]
+        // Moves MenuNames.TOOLS/MenuNames.TOOLS_PROGRAMMING to MenuNames.CUSTOMIZE
+		createMainMenuItem(new String[]{MenuNames.CUSTOMIZE}, null, context
 				.getWorkbenchContext());
 	}
 
 	public String getName() {
-		return "BeanShell";
+        // [Michael Michaud 2007-03-23] Rename BeanShell to BeanShell Console to differentiate
+        // from BeanShell scripts menus
+		return "BeanShell Console";
 	}
 
 	protected void initializeToolbox(ToolboxDialog toolbox) {
