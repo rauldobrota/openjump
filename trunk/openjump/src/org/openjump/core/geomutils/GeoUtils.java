@@ -118,7 +118,7 @@ public class GeoUtils
     public static Coordinate perpendicularVector(Coordinate v1, Coordinate v2, double dist, boolean toLeft) 
     {
     	//return perpendicular Coordinate vector from v1 of dist specified to left of v1-v2}
-    	Coordinate v3 = vectorBetween(v2,v1);
+    	Coordinate v3 = vectorBetween(v1,v2);
     	Coordinate v4 = new Coordinate();     	
     	if (toLeft)
     	{
@@ -220,7 +220,7 @@ public class GeoUtils
             for (i = m+1; i <= n; i++)
             {
                 t = theta(p[m], p[i]);
-                dist = distance(p[m], p[i]);
+                dist = p[m].distance(p[i]);
                 if ((t > v) || ((t == v) && (dist > vdist)))
                 {
                     if ((t < minAngle) || ((t == minAngle) && (dist > distMax)))
@@ -239,7 +239,19 @@ public class GeoUtils
                 {
                     newcoords.add(p[0],true);
                 }
-                return newcoords;
+                
+                LinearRing lr = new GeometryFactory().createLinearRing(newcoords.toCoordinateArray());
+                if (! clockwise(lr))
+                {
+                	CoordinateList newcoordsCW = new CoordinateList();
+                	for (int j = newcoords.size() - 1; j >=0; j--)
+                		newcoordsCW.add(newcoords.getCoordinate(j));
+                	return newcoordsCW;
+                }
+                else
+                {	
+                	return newcoords;
+                }
             }
         }
         return newcoords; //should never get here
@@ -269,8 +281,10 @@ public class GeoUtils
         
         if (VdotV == 0.0) //degenerate line (p0, p1 the same)
         {
-            return p0; //Dist(P0, R)
-        };
+        	coordOut.x = p0.x;
+        	coordOut.y = p0.y;
+            return coordOut; 
+        }
         
         t = (Xp0r * Xv + Yp0r * Yv) / VdotV; //Dot(VectorBetween(P0, R), V) / VdotV
         
@@ -286,33 +300,38 @@ public class GeoUtils
             Xp1r = Xr - X1;
             Yp1r = Yr - Y1;
             DistP1toR = Math.sqrt(Xp1r*Xp1r + Yp1r*Yp1r);
+            
             if (DistP1toR < DistP0toR) // Min( Dist(P0, R), Dist(P1, R) ))
             {
-                coordOut = p1;
+            	coordOut = new Coordinate(p1);
+            	coordOut.x = p1.x;
+            	coordOut.y = p1.y;
             }
             else
             {
-                coordOut = p0;
-            };
+            	coordOut = new Coordinate(p0);
+            	coordOut.x = p0.x;
+            	coordOut.y = p0.y;
+            }
         }
         return coordOut;
     }
-    
+
     public static Coordinate getClosestPointOnLine(Coordinate pt, Coordinate p0, Coordinate p1)
     {   //returns the nearest point from pt to the infinite line defined by p0-p1
         MathVector vpt = new MathVector(pt);
         MathVector vp0 = new MathVector(p0);
         MathVector vp1 = new MathVector(p1);
         MathVector v = vp0.vectorBetween(vp1);
-
         double vdotv = v.dot(v);
+        
         if (vdotv == 0.0) //degenerate line (ie: P0 = P1)
         {
             return p0;
         }
         else
         {
-            double t = vpt.vectorBetween(vp0).dot(v) / vdotv;
+            double t = vp0.vectorBetween(vpt).dot(v) / vdotv;
             MathVector vt = v.scale(t);
             vpt = vp0.add(vt);
             return vpt.getCoord();
@@ -437,6 +456,25 @@ public class GeoUtils
         {
             return true;
         }
+    }  
+
+    public static Coordinate intersect(Coordinate P1, Coordinate P2, Coordinate P3, Coordinate P4) //find intersection of two lines
+    {
+        Coordinate V = new Coordinate((P2.x - P1.x), (P2.y - P1.y));
+        Coordinate W = new Coordinate((P4.x - P3.x), (P4.y - P3.y));
+        double n = W.y * (P3.x - P1.x) - W.x * (P3.y - P1.y);
+        double d = W.y * V.x - W.x * V.y;
+        
+        if (d != 0.0)
+        {
+            double t1 = n / d;
+            Coordinate E = new Coordinate((P1.x + V.x * t1),(P1.y + V.y * t1));
+            return E;
+        }
+        else //lines are parallel; no intersection
+        {
+            return null;
+        }
     }
     
     public static Coordinate getIntersection(Coordinate p1, Coordinate p2, Coordinate p3, Coordinate p4)  //find intersection of two lines
@@ -471,21 +509,59 @@ public class GeoUtils
         return e;
     }   
     
+    public static Coordinate intersectSegments(Coordinate P1, Coordinate P2, Coordinate P3, Coordinate P4) 
+    {
+    	//find intersection of two line segment that meet the criteria expressed by onP1P2 & onP3P4
+        Coordinate V = new Coordinate((P2.x - P1.x), (P2.y - P1.y));
+        Coordinate W = new Coordinate((P4.x - P3.x), (P4.y - P3.y));
+        double n1 = W.y * (P3.x - P1.x) - W.x * (P3.y - P1.y);
+        double n2 = V.y * (P3.x - P1.x) - V.x * (P3.y - P1.y);
+        double d = W.y * V.x - W.x * V.y;
+        
+        if (d != 0.0)
+        {
+            double t1 = n1 / d;
+            double t2 = n2 / d;
+            Coordinate E = new Coordinate((P1.x + V.x * t1),(P1.y + V.y * t1));
+            double epsilon = 0.001;
+            double lowbound = 0.0-epsilon;
+            double hibound	 = 1.0+epsilon;
+            boolean onP1P2 = (t1 >= lowbound) && (t1 <= hibound);
+    		boolean onP3P4 = (t2 >= lowbound) && (t2 <= hibound);
+    		if (onP1P2 && onP3P4)
+    			return E;
+    		else
+    			return null; //the intersection point does not lie on one or both segments
+        }
+        else //lines are parallel; no intersection
+        {
+            return null;
+        }
+    }
+    
     public static Coordinate getCenter(Coordinate p1, Coordinate p2, Coordinate p3)
     {
-        double x = p1.x + ((p1.x - p2.x) / 2.0);
-        double y = p1.y + ((p1.y - p2.y) / 2.0);
+        double x = p1.x + ((p2.x - p1.x) / 2.0);
+        double y = p1.y + ((p2.y - p1.y) / 2.0);
         Coordinate p12 = new Coordinate(x, y);
-        p12 = rotPt(p12, p1, 90.0);
         
-        x = p1.x + ((p1.x - p2.x) / 2.0);
-        y = p1.y + ((p1.y - p2.y) / 2.0);
+        if (pointToRight(p3, p1, p2))
+        	p1 = rotPt(p1, p12, -90.0);
+        else
+        	p1 = rotPt(p1, p12, 90.0);
+        
+        x = p2.x + ((p3.x - p2.x) / 2.0);
+        y = p2.y + ((p3.y - p2.y) / 2.0);
         Coordinate p23 = new Coordinate(x, y);
-        p23 = rotPt(p23, p2, 90.0);
         
-        Coordinate center = getIntersection(p1, p12, p2, p23);
+        if (pointToRight(p1, p3, p2))
+        	p3 = rotPt(p3, p23, -90.0);
+        else
+        	p3 = rotPt(p3, p23, 90.0);
         
-        if (center.z != 0.0) //no intersection
+        Coordinate center = intersect(p1, p12, p3, p23);
+        
+        if (center == null) //no intersection; lines parallel
             return p2;
         else
             return center;
@@ -511,4 +587,212 @@ public class GeoUtils
         return newBitSet;
     }
     
+    public static LineString MakeRoundCorner(Coordinate A, Coordinate B, Coordinate C, Coordinate D, double r, boolean arcOnly)
+    {
+        MathVector Gv = new MathVector();
+        MathVector Hv;
+        MathVector Fv;
+        Coordinate E = intersect(A, B, C, D);	//vector solution
+        
+        if (E != null) //non-parallel lines
+        {
+            MathVector Ev = new MathVector(E);
+            
+            if (E.distance(B) > E.distance(A)) //find longest distance from intersection
+            {   //these equations assume B and D are closest to the intersection
+                //reverse points
+                Coordinate temp = A;
+                A = B;
+                B = temp;
+            }
+            
+            if (E.distance(D) > E.distance(C)) //find longest distance from intersection
+            {   //these equations assume B and D are closest to the intersection
+                //reverse points
+                Coordinate temp = C;
+                C = D;
+                D = temp;
+            }
+            
+            MathVector Av = new MathVector(A);
+            MathVector Cv = new MathVector(C);
+            double alpha = Ev.vectorBetween(Av).angleRad(Ev.vectorBetween(Cv)) / 2.0; //we only need the half angle
+            double h1 = Math.abs(r / Math.sin(alpha));  //from definition of sine solved for h
+            
+            if ((h1 * h1 - r * r) >= 0)
+            {
+                double d1 = Math.sqrt(h1 * h1 - r * r);	//pythagorean theorem}
+                double theta = Math.PI / 2.0 - alpha; //sum of triangle interior angles = 180 degrees
+                theta = theta * 2.0;		      //we only need the double angle}
+                //we now have the angles and distances needed for a vector solution: 
+                //we must find the points G and H by vector addition. 
+                //Gv = Ev.add(Av.vectorBetween(Ev).unit().scale(d1));
+                //Hv = Ev.add(Cv.vectorBetween(Ev).unit().scale(d1));
+                //Fv = Ev.add(Gv.vectorBetween(Ev).rotateRad(alpha).unit().scale(h1));
+                Gv = Ev.add(Ev.vectorBetween(Av).unit().scale(d1));
+                Hv = Ev.add(Ev.vectorBetween(Cv).unit().scale(d1));
+                Fv = Ev.add(Ev.vectorBetween(Gv).rotateRad(alpha).unit().scale(h1));
+                
+                if (Math.abs(Fv.distance(Hv) - Fv.distance(Gv)) > 1.0) //rotated the wrong dirction
+                {
+                    Fv = Ev.add(Ev.vectorBetween(Gv).rotateRad(-alpha).unit().scale(h1));
+                    theta = -theta;
+                }
+                
+                CoordinateList coordinates = new CoordinateList();
+                if (!arcOnly) coordinates.add(C);
+                Arc arc = new Arc(Fv.getCoord(), Hv.getCoord(), Math.toDegrees(theta));
+                LineString lineString = arc.getLineString();
+                coordinates.add(lineString.getCoordinates(), false);
+                if (!arcOnly) coordinates.add(A);
+                return new GeometryFactory().createLineString(coordinates.toCoordinateArray());
+            }
+        }
+       return null;
+    }
+ 
+    public static boolean geometriesEqual(Geometry geo1, Geometry geo2)
+    {
+    	if ((! (geo1 instanceof GeometryCollection)) &&
+    		(! (geo2 instanceof GeometryCollection)))
+    	    return geo1.equals(geo2);
+    	
+    	if ((! (geo1 instanceof GeometryCollection)) &&
+        	(  (geo2 instanceof GeometryCollection)))
+        	return false;
+        	
+    	if ((  (geo1 instanceof GeometryCollection)) &&
+            (! (geo2 instanceof GeometryCollection)))
+            	return false;
+            	
+    	//at this point both are instanceof GeometryCollection
+    	int numGeos1 = ((GeometryCollection)geo1).getNumGeometries();
+    	int numGeos2 = ((GeometryCollection)geo2).getNumGeometries();
+    	if (numGeos1 != numGeos2) return false;
+    	
+    	for (int index = 0; index < numGeos1; index++)
+    	{
+    		Geometry internalGeo1 = ((GeometryCollection)geo1).getGeometryN(index);
+    		Geometry internalGeo2 = ((GeometryCollection)geo2).getGeometryN(index);
+    		if (! geometriesEqual(internalGeo1, internalGeo2))
+    			return false;
+    	}
+    	
+    	return true;
+    };  
+    
+    public static double getDistanceFromPointToGeometry(Coordinate coord, Geometry geo)
+    {
+    	//will return distance to nearest edge of closed polys or GeometryCollections including holes
+    	//unlike jts which returns zero for any point inside a poly
+    	double closestDist = 999999999;
+    	
+    	for (int i = 0; i < geo.getNumGeometries(); i++)
+    	{
+    		double newDist;
+    		Geometry internalGeo = geo.getGeometryN(i);
+    		
+    		if (internalGeo instanceof Point)
+    		{
+    			newDist = coord.distance(internalGeo.getCoordinate());
+    			if (newDist < closestDist) closestDist = newDist;
+    		}
+    		
+    		else if (internalGeo instanceof LineString)
+    		{
+    			Coordinate[] coords = internalGeo.getCoordinates();
+    			for (int j = 0; j < coords.length - 1; j++)
+    			{
+    				newDist = GeoUtils.getDistance(coord, coords[j], coords[j + 1]);
+    				if (newDist < closestDist) closestDist = newDist; 
+    			}
+    		}
+    		
+    		else if (internalGeo instanceof Polygon)
+    		{
+    			Geometry newGeo = internalGeo.getBoundary();
+    			newDist = getDistanceFromPointToGeometry(coord, newGeo);
+    			if (newDist < closestDist) closestDist = newDist;
+    		}
+    		
+    		else if (internalGeo instanceof MultiPoint)
+    		{
+    			Coordinate[] coords = internalGeo.getCoordinates();
+    			for (int k = 0; k < coords.length; k++)
+    			{
+    				newDist = coord.distance(coords[k]);
+    				if (newDist < closestDist) closestDist = newDist;
+    			}
+    		}
+    		
+    		else //remaining geometry types are multi or collections
+    		{
+		    	for (int m = 0; m < internalGeo.getNumGeometries(); m++)
+		    	{
+	    			newDist = getDistanceFromPointToGeometry(coord, internalGeo.getGeometryN(m));
+	    			if (newDist < closestDist) closestDist = newDist;
+		    	}
+    		}
+    	}
+    	
+    	return closestDist;
+    }
+    
+    public static boolean geometryIsSegmentOf(Geometry geo1, Geometry geo2)
+    {
+    	//true if geo1 matches with a segment of geo2
+    	
+    	if (geo1.getNumPoints() > geo2.getNumPoints())
+    		return false;
+    	
+    	int numGeos1 = geo1.getNumGeometries();
+    	int numGeos2 = geo2.getNumGeometries();
+    	
+    	if ((numGeos1 == 1) && (numGeos2 == 1))
+    	{
+    		Coordinate[] coords1 = geo1.getCoordinates();
+    		Coordinate[] coords2 = geo2.getCoordinates();
+    		int i1 = 0;
+    		int i2 = 0;
+    		
+    		while (i2 < coords2.length)
+    		{
+    			if (coords1[0].equals2D(coords2[i2])) break;
+    			i2++;
+    		}
+    		
+    		if (i2 == coords2.length) return false;
+    		
+    		while ((i1 < coords1.length) && (i2 < coords2.length))
+    		{
+    			if (! coords1[i1].equals2D(coords2[i2])) return false;
+    			i1++;
+    			i2++;
+    		}
+    		
+    		return (i1 == coords1.length);
+    	}
+    	else
+    	{
+    		boolean foundMatch = false;
+    		
+	    	for (int i = 0; i < numGeos1; i++)
+	    	{
+	    		foundMatch = false;
+	    		
+	    		for (int j = 0; j < numGeos2; j++)
+	    		{
+	    			if (geometryIsSegmentOf(geo1.getGeometryN(i), geo2.getGeometryN(j)))
+	    			{
+	    				foundMatch = true;
+	    				break;
+	    			}
+	    		}
+	    		
+	    		if (! foundMatch) return false;
+	    	}
+	    	
+	    	return foundMatch;
+    	}
+    };  
 }
