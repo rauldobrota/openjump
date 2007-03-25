@@ -77,6 +77,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipEntry;
 
 import java.beans.XMLEncoder;
+import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 
 import java.awt.Graphics;
@@ -609,7 +610,12 @@ public class DocumentManager
 
 			ExtraData extra;
 
+			Thread thread = Thread.currentThread();
+
+			ClassLoader oldClassLoader = thread.getContextClassLoader();
+
 			try {
+				thread.setContextClassLoader(ExtraData.class.getClassLoader());
 				decoder =
 					new XMLDecoder(
 					zip.getInputStream(extraEntry));
@@ -621,6 +627,7 @@ public class DocumentManager
 					decoder.close();
 					decoder = null;
 				}
+				thread.setContextClassLoader(oldClassLoader);
 			}
 
 			// now the SVG document
@@ -720,12 +727,32 @@ public class DocumentManager
 			// first store the extra data
 			zip.putNextEntry(new ZipEntry("extra.xml"));
 
+			Thread thread = Thread.currentThread();
+
+			ClassLoader oldClassLoader = thread.getContextClassLoader();
+
 			XMLEncoder encoder = null;
+
 			try {
+       	thread.setContextClassLoader(ExtraData.class.getClassLoader());
+
 				encoder = new XMLEncoder(
 					new FilterOutputStream(zip) { 
 						public void close() throws IOException {} 
 					});
+
+				encoder.setExceptionListener(new ExceptionListener() {
+					public void exceptionThrown(Exception e) {
+						e.printStackTrace();
+					}
+				});
+
+				encoder.setPersistenceDelegate(
+					ExtraData.class, new ExtraData.PersistenceDelegate());
+
+				encoder.setPersistenceDelegate(
+					ExtraData.Entry.class, new ExtraData.Entry.PersistenceDelegate());
+
 				encoder.writeObject(extraData);
 			}
 			finally {
@@ -733,6 +760,8 @@ public class DocumentManager
 					encoder.close();
 					encoder = null;
 				}
+
+				thread.setContextClassLoader(oldClassLoader);
 			}
 
 			// now store the SVG document

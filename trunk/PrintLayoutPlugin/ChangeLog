@@ -1,3 +1,19 @@
+2007-03-25  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	Make storing/restoring of session data aware of the fact that
+	it is possible that a different class loader may be needed to
+	retreive the classes.
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		Set the thread context class loader to the class loader
+		of ExtraData before storing/restoring the extra datas.
+		Reinstall the original one afterwards.
+	
+	* src/de/intevation/printlayout/beans/ExtraData.java:
+		Do the serialization of ExtraData and ExtraData.Entry with
+		custom PersistenceDelegates. This makes the storage more
+		robust against possible API changes.
+
 2007-03-23  Sascha L. Teichmann  <sascha.teichmann@intevation.de> 
 
 	Map simplification parameter now works in terms of paper size [mm].

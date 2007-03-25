@@ -15,10 +15,16 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.EventListener;
+import java.util.Map;
+import java.util.Iterator;
 
 import org.apache.batik.dom.AbstractElement;
 
 import java.io.Serializable;
+
+import java.beans.DefaultPersistenceDelegate;
+import java.beans.Statement;   
+import java.beans.Encoder;   
 
 /**
  * Associative lookup between the id of on SVG element and
@@ -77,25 +83,43 @@ implements   Serializable
 		protected ArrayList removeListeners;
 		protected ArrayList changeListeners;
 
+		public static class PersistenceDelegate
+		extends             DefaultPersistenceDelegate
+		{
+			public PersistenceDelegate() {
+			}
+
+			protected void initialize(
+				Class   clazz, 
+				Object  oldInstance, 
+				Object  newInstance,
+				Encoder encoder
+			) {
+				super.initialize(clazz, oldInstance, newInstance, encoder);
+				Entry entry = (Entry)oldInstance;
+
+				if (entry.removeListeners != null)
+					for (int i = 0, N = entry.removeListeners.size(); i < N; ++i)
+						encoder.writeStatement(
+							new Statement(
+								oldInstance, 
+								"addRemoveListener", 
+								new Object [] { entry.removeListeners.get(i) }));
+
+				if (entry.changeListeners != null)
+					for (int i = 0, N = entry.changeListeners.size(); i < N; ++i)
+						encoder.writeStatement(
+							new Statement(
+								oldInstance, 
+								"addChangeListener", 
+								new Object [] { entry.changeListeners.get(i) }));
+
+			}
+		} // end of PersistenceDelegate
+
 		protected Object    data;
 
 		public Entry() {
-		}
-
-		public ArrayList getRemoveListeners() {
-			return removeListeners;
-		}
-
-		public void setRemoveListeners(ArrayList removeListeners) {
-			this.removeListeners = removeListeners;
-		}
-
-		public ArrayList getChangeListeners() {
-			return changeListeners;
-		}
-
-		public void setChangeListeners(ArrayList changeListeners) {
-			this.changeListeners = changeListeners;
 		}
 
 		public void setData(Object data) {
@@ -182,11 +206,37 @@ implements   Serializable
 			fireElementRemoved(source, element);
 			clear();
 		}
-	} // end of file
+	} // end of Entry
 
 	public ExtraData() {
 		id2entry = new HashMap();
 	}
+
+	public static class PersistenceDelegate
+	extends             DefaultPersistenceDelegate
+	{
+		public PersistenceDelegate() {
+		}
+
+		protected void initialize(
+			Class   clazz, 
+			Object  oldInstance, 
+			Object  newInstance,
+			Encoder encoder
+		) {
+			super.initialize(clazz, oldInstance, newInstance, encoder);
+			ExtraData extraData = (ExtraData)oldInstance;
+
+			for (Iterator e = extraData.id2entry.entrySet().iterator(); e.hasNext();) {
+				Map.Entry entry = (Map.Entry)e.next();
+				encoder.writeStatement(
+					new Statement(
+						oldInstance, 
+						"installEntry", 
+						new Object [] { entry.getKey(), entry.getValue() }));
+			}
+		}
+	} // end of PersistenceDelegate
 
 	public void remove(Object source, AbstractElement element) {
 		String id = element.getAttributeNS(null, "id");
@@ -206,12 +256,11 @@ implements   Serializable
 		}
 	}
 
-	public HashMap getID2Entry() {
-		return id2entry;
-	}
+	public void installEntry(String id, Entry entry) {
+		if (id == null || entry == null)
+			throw new IllegalArgumentException("id or entry == null");
 
-	public void setID2Entry(HashMap id2entry) {
-		this.id2entry = id2entry;
+		id2entry.put(id, entry);
 	}
 
 	public void setData(String id, Object data) {
