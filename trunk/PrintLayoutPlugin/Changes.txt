@@ -1,6 +1,27 @@
 General Changes of PrintLayout Plugin
 -------------------------------------
 
+Version 0.9.2 (2007-03-26)
+
+  Optimizations release.
+
+  * New: Legend objects.
+  * New: Vector (SVG-)optimization (reduces memory
+    consumption considerably, configurable)
+  * New: Preview map objects.
+  * New: Support of CSS for map style attributes (configurable)
+  * New: Clipping of geometries (configurable)
+  * New: Support for precise vertices in map import from GIS
+    (only relevant for OpenJUMP newer than 2007-03-20)
+  * New: Added polygon simplificaton with guaranteed preserving
+    of the topology (configurable)
+  * Fixed: Rendering bug for grouped objects.
+  * Fixed: Compaibility with PirolJUMP re-stablished.
+  * Else: Using JTS for spatial indexing in SVG optimizer.
+  * Else: Some changes to better support Java 1.6.
+  * Else: Some changes to better support Java 1.4.
+  * Else: Various code improvements.
+
 Version 0.9.1 (2007-03-01)
 
   Improvements release.

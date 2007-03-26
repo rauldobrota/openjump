@@ -1,5 +1,13 @@
 2007-03-26  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
 
+	Doing the 0.9.2 release.
+
+	* src/de/intevation/printlayout/InfoDialog.java: Version to 0.9.2.
+	* src/de/intevation/printlayout/resources/about.html: Version to 0.9.2.
+	* Changes.txt: Summarized changes for 0.9.2.
+
+2007-03-26  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
+
 	* HowTo-Release.txt: Adding item 8: announcement email.
 
 2007-03-25  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
