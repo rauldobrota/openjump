@@ -1,3 +1,7 @@
+2007-03-26  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
+
+	* HowTo-Release.txt: Adding item 8: announcement email.
+
 2007-03-25  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	Make storing/restoring of session data aware of the fact that

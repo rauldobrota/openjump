@@ -50,3 +50,5 @@ Guide for developers for creating a new release
    ftp> exit
 
 7. Create release "N.N.N" on SourceForge
+
+8. Send a announcement mail to jump-users@lists.jump-project.org
