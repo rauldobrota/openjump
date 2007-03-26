@@ -32,11 +32,10 @@
 package com.vividsolutions.jump;
 
 import java.text.MessageFormat;
-//import java.util.Hashtable;
+import java.util.Hashtable;
 import java.util.ResourceBundle;
 import java.util.Locale;
 
-import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;
 import com.vividsolutions.jump.workbench.JUMPWorkbench;
 
 import org.apache.log4j.Logger;
