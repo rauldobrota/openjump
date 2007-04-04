@@ -1,3 +1,18 @@
+2007-04-04  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
+	Doing export and post processing of inner SVG in background thread.
+	TODO: add some delays during map extraction to
+	ensure that all layers are in the SVG.
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		- added a new method processInnerDocumentInBackground()
+		  that isolates the inner SVG document in a DocumentModifier
+		  and starts a background thread afterwards to process this
+		  independent document. All exports (images, PDF, printing and SVG)
+		  are piped through this method.
+		- added some synchronization to reduce the probability of
+		  race conditions.
+		
 2007-03-26  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
 
 	Doing the 0.9.2 release.

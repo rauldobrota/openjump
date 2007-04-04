@@ -217,51 +217,69 @@ public class DocumentManager
 		String                   id,
 		ExtraData.ChangeListener listener
 	) {
-		extraData.addChangeListener(id, listener);
+		synchronized (extraData) {
+			extraData.addChangeListener(id, listener);
+		}
 	}
 
 	public void removeChangeListener(
 		String                   id,
 		ExtraData.ChangeListener listener
 	) {
-		extraData.removeChangeListener(id, listener);
+		synchronized (extraData) {
+			extraData.removeChangeListener(id, listener);
+		}
 	}
 
 	public void addRemoveListener(
 		String                   id,
 		ExtraData.RemoveListener listener
 	) {
-		extraData.addRemoveListener(id, listener);
+		synchronized (extraData) {
+			extraData.addRemoveListener(id, listener);
+		}
 	}
 
 	public void removeRemoveListener(
 		String                   id,
 		ExtraData.RemoveListener listener
 	) {
-		extraData.removeRemoveListener(id, listener);
+		synchronized (extraData) {
+			extraData.removeRemoveListener(id, listener);
+		}
 	}
 
 	public ExtraData.Entry getOrCreateEntry(String id) {
-		return extraData.getOrCreateEntry(id);
+		synchronized (extraData) {
+			return extraData.getOrCreateEntry(id);
+		}
 	}
 
 	public void setData(String id, Object data) {
-		extraData.setData(id, data);
+		synchronized (extraData) {
+			extraData.setData(id, data);
+		}
 	}
 
 	public Object getData(String id) {
-		return extraData.getData(id);
+		synchronized (extraData) {
+			return extraData.getData(id);
+		}
 	}
 
 	public boolean hasChangeListeners(String [] ids) {
-		for (int i = 0; i < ids.length; ++i)
-			if (extraData.hasChangeListeners(ids[i]))
-				return true;
-		return false;
+		synchronized (extraData) {
+			for (int i = 0; i < ids.length; ++i)
+				if (extraData.hasChangeListeners(ids[i]))
+					return true;
+			return false;
+		}
 	}
 
 	public boolean hasChangeListeners(String id) {
-		return extraData.hasChangeListeners(id);
+		synchronized (extraData) {
+			return extraData.hasChangeListeners(id);
+		}
 	}
 
 	/**
@@ -270,7 +288,7 @@ public class DocumentManager
 	 * is sent to a sink.
 	 * @param postProcessor the processor to add
 	 */
-	public void addPostProcessor(Processor postProcessor) {
+	public synchronized void addPostProcessor(Processor postProcessor) {
 		if (postProcessor == null)
 			throw new IllegalArgumentException();
 
@@ -290,7 +308,7 @@ public class DocumentManager
 	 * is sent to a sink.
 	 * @param postProcessor the processor to remove
 	 */
-	public void removePostProcessor(Processor postProcessor) {
+	public synchronized void removePostProcessor(Processor postProcessor) {
 		if (postProcessor == null)
 			throw new IllegalArgumentException();
 
@@ -533,61 +551,53 @@ public class DocumentManager
 	 * @param file destination.
 	 */
 	public void exportSVG(final File file) {
+		processInnerDocumentInBackground(
+			null,
+			new Processor() {
+				public AbstractDocument postProcess(
+					AbstractDocument document,
+					DocumentManager  documentManager
+				) {
+					try {
+						TransformerFactory factory     = TransformerFactory.newInstance();
+						Transformer        transformer = factory.newTransformer();
 
-		UpdateManager um = svgCanvas.getUpdateManager();
+						OutputStream outputStream = null;
+						StreamResult outputTarget;
 
-		if (um == null) {
-			System.err.println("before first rendering finished");
-			return;
-		}
+						if (file.getName().toLowerCase().endsWith("z")) {
+							outputTarget =  new StreamResult(
+								outputStream = new GZIPOutputStream(new FileOutputStream(file)));
+						}
+						else 
+							outputTarget = new StreamResult(file);
 
-		um.getUpdateRunnableQueue().invokeLater(new Runnable() {
-			public void run() {
-				exportSVGwithinUM(file);
-			}
-		});
-	}
+						DOMSource xmlSource = new DOMSource(document);
 
-	/**
-	 * helper method for exportSVG. It should be called in a UpdateManager.
-	 * @param file destination
-	 */
-	public void exportSVGwithinUM(File file) {
-		AbstractDocument innerSVG = isolateInnerDocument();
-
-		try {
-			TransformerFactory factory     = TransformerFactory.newInstance();
-			Transformer        transformer = factory.newTransformer();
-
-			StreamResult outputTarget = new StreamResult(file);
-			OutputStream outputStream = null;
-			if (file.getName().endsWith("z")) {
-				outputTarget =  new StreamResult(
-					outputStream = new GZIPOutputStream(new FileOutputStream(file)));
-			}
-			DOMSource    xmlSource    = new DOMSource(innerSVG);
-
-			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-			transformer.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, "");
-			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			transformer.setOutputProperty(
-				"{http://xml.apache.org/xslt}indent-amount", "2");
-			transformer.transform(xmlSource, outputTarget);
-			
-			if (outputStream != null) {
-				outputStream.close();
-			}
-		} 
-		catch (TransformerConfigurationException e) {
-			e.printStackTrace();
-		}
-		catch (TransformerException e) {
-			e.printStackTrace();
-		}
-		catch (IOException ioe) {
-			ioe.printStackTrace();
-		}
+						transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+						transformer.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, "");
+						transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+						transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+						transformer.setOutputProperty(
+							"{http://xml.apache.org/xslt}indent-amount", "2");
+						transformer.transform(xmlSource, outputTarget);
+						
+						if (outputStream != null) {
+							outputStream.close();
+						}
+					} 
+					catch (TransformerConfigurationException e) {
+						e.printStackTrace();
+					}
+					catch (TransformerException e) {
+						e.printStackTrace();
+					}
+					catch (IOException ioe) {
+						ioe.printStackTrace();
+					}
+					return document;
+				}
+			});
 	}
 
 	/**
@@ -858,13 +868,24 @@ public class DocumentManager
 			"0 0 " + sheet.getAttributeNS(null, "width") + 
 			" "    + sheet.getAttributeNS(null, "height"));   
 
-		if (postProcessors != null) {
-			for (int N = postProcessors.size(), i = 0; i < N; ++i)
-				newDocument = ((Processor)postProcessors.get(i))
-					.postProcess(newDocument, this);
-		}
-
 		return newDocument;
+	}
+
+	/**
+	 * Post processes a document through the pipe of
+	 * post processors.
+	 * @param document the document to post process
+	 * @return the post processed document
+	 */
+	protected AbstractDocument postProcess(AbstractDocument document) {
+		if (postProcessors != null) {
+			ArrayList ps;
+			// to make it a bit more race condition resistent
+			synchronized (this) { ps = new ArrayList(postProcessors); }
+			for (int N = ps.size(), i = 0; i < N; ++i)
+				document = ((Processor)ps.get(i)).postProcess(document, this);
+		}
+		return document;
 	}
 
 	/**
@@ -1160,35 +1181,67 @@ public class DocumentManager
 		final File       file,
 		final boolean    preserveAspectRatio
 	) {
-		modifyDocumentLater(new DocumentModifier() {
-			public Object run(DocumentManager documentManager) {
+		processInnerDocumentInBackground(
+			preserveAspectRatio ? null : "none",
+			new Processor() {
+				public AbstractDocument postProcess(
+					AbstractDocument document, 
+					DocumentManager  documentManager
+				) {
+					BufferedOutputStream out = null;
+					try {
+						out =
+							new BufferedOutputStream(
+							new FileOutputStream(file));
 
-				SVGDocument document = documentManager.getSVGDocument();
-
-				BufferedOutputStream out = null;
-				try {
-					out =
-						new BufferedOutputStream(
-						new FileOutputStream(file));
-
-					TranscoderOutput output = new TranscoderOutput(out);
-					TranscoderInput  input  = new TranscoderInput(
-						isolateInnerDocument(preserveAspectRatio ? null : "none"));
-					transcoder.transcode(input, output);
-				}
-				catch (TranscoderException te) {
-					te.printStackTrace();
-				}
-				catch (IOException ioe) {
-					ioe.printStackTrace();
-				}
-				finally {
-					if (out != null) {
-						try { out.flush(); } catch (IOException ioe) {}
-						try { out.close(); } catch (IOException ioe) {}
-						out = null;
+						TranscoderOutput output = new TranscoderOutput(out);
+						TranscoderInput  input  = new TranscoderInput(document);
+						transcoder.transcode(input, output);
 					}
+					catch (TranscoderException te) {
+						te.printStackTrace();
+					}
+					catch (IOException ioe) {
+						ioe.printStackTrace();
+					}
+					finally {
+						if (out != null) {
+							try { out.flush(); } catch (IOException ioe) {}
+							try { out.close(); } catch (IOException ioe) {}
+							out = null;
+						}
+					}
+					return document;
 				}
+			});
+	}
+
+	/**
+	 * Isolates the inner document and post processes it in a
+	 * background thread. The inner document is isolated within
+	 * a document modifier. After the isolation a background
+	 * thread is started to process the isolated document.
+	 * First all registered post processore are run and after
+	 * that the result of this is handed to the given post processor.
+	 * @param aspectRatio how should the aspect ratio be handled
+	 *                    during isolation of inner document.
+	 * @param backgroundProcessor the post processor run after the
+	 *                    registered post processors were run.
+	 */
+	public void processInnerDocumentInBackground(
+		final String    aspectRatio,
+		final Processor backgroundProcessor
+	) {
+		modifyDocumentLater(new DocumentModifier() {
+			public Object run(final DocumentManager documentManager) {
+				final AbstractDocument document =
+					documentManager.isolateInnerDocument(aspectRatio);
+				new Thread() {
+					public void run() {
+						AbstractDocument doc = documentManager.postProcess(document);
+						backgroundProcessor.postProcess(doc, documentManager);
+					}
+				}.start();
 				return null;
 			}
 		});
@@ -1198,71 +1251,72 @@ public class DocumentManager
 	 * prints the document of this manager.
 	 */
  	public void print() {
-		modifyDocumentLater(new DocumentModifier() {
-			public Object run(DocumentManager documentManager) {
-				SVGDocument document = documentManager.getSVGDocument();
-				final PrintTranscoder transcoder = new PrintTranscoder();
+		processInnerDocumentInBackground(
+			"none",
+			new Processor() {
+				public AbstractDocument postProcess(
+					AbstractDocument document,
+					DocumentManager  documentManager
+				) {
+					final PrintTranscoder transcoder = new PrintTranscoder();
 
-				TranscoderInput  input  = new TranscoderInput(
-					isolateInnerDocument("none"));
+					TranscoderInput  input  = new TranscoderInput(document);
 
-				transcoder.transcode(input, null);
+					transcoder.transcode(input, null);
 
-				PrinterJob job = PrinterJob.getPrinterJob();
-				PageFormat pageFomat = new PageFormat();
+					PrinterJob job = PrinterJob.getPrinterJob();
+					PageFormat pageFomat = new PageFormat();
 
-				double [] size = new double[2];
+					double [] size = documentManager.getPaperSize();
 
-				getPaperSize(size);
+					Paper paper = new Paper();
+					double width  = TypoUnits.mm2in(size[0])*72d;
+					double height = TypoUnits.mm2in(size[1])*72d;
+					paper.setSize(width, height);
 
-				// DIN A4: 210 mm × 297 mm 
-				Paper paper = new Paper();
-				double width  = TypoUnits.mm2in(size[0])*72d;
-				double height = TypoUnits.mm2in(size[1])*72d;
-				paper.setSize(width, height);
+					pageFomat.setPaper(paper);
 
-				pageFomat.setPaper(paper);
+					job.setPrintable(new Printable() {
+						public int print(Graphics g, PageFormat pf, int page) {
 
-				job.setPrintable(new Printable() {
-					public int print(Graphics g, PageFormat pf, int page) {
+							Graphics2D g2d = (Graphics2D)g;
 
-						Graphics2D g2d = (Graphics2D)g;
+							AffineTransform trans =
+								AffineTransform.getTranslateInstance(
+									-pf.getImageableX(),
+									-pf.getImageableY());
 
-						AffineTransform trans =
-							AffineTransform.getTranslateInstance(
-								-pf.getImageableX(),
-								-pf.getImageableY());
+							double sw = pf.getWidth()/pf.getImageableWidth();
+							double sh = pf.getHeight()/pf.getImageableHeight();
 
-						double sw = pf.getWidth()/pf.getImageableWidth();
-						double sh = pf.getHeight()/pf.getImageableHeight();
+							AffineTransform scale =
+								AffineTransform.getScaleInstance(sw, sh);
 
-						AffineTransform scale =
-							AffineTransform.getScaleInstance(sw, sh);
+							trans.concatenate(scale);
 
-						trans.concatenate(scale);
+							AffineTransform old = g2d.getTransform();
+							old.concatenate(trans);
+							g2d.setTransform(old);
 
-						AffineTransform old = g2d.getTransform();
-						old.concatenate(trans);
-						g2d.setTransform(old);
+							return transcoder.print(g2d, pf, page);
+						}
+					});
 
-						return transcoder.print(g2d, pf, page);
+					if (job.printDialog()) {
+						System.err.println("printing ...");
+						try {
+							job.print();
+						}
+						catch (PrinterException pe) {
+							pe.printStackTrace();
+						}
 					}
-				});
+					else
+						System.err.println("print cancelled");
 
-				if (job.printDialog()) {
-					System.err.println("printing ...");
-					try {
-						job.print();
-					}
-					catch (PrinterException pe) {
-						pe.printStackTrace();
-					}
+					return document;
 				}
-				else
-					System.err.println("print cancelled");
-				return null;
-			}
-		});
+			});
 	}          
 
 	/**
@@ -1270,11 +1324,13 @@ public class DocumentManager
 	 * @param file the destination of the pdf.
 	 */
 	public void exportPDF(final File file) {
-		modifyDocumentLater(new DocumentModifier() {
-			public Object run(DocumentManager documentManager) {
-				TranscoderInput input = new TranscoderInput(
-					isolateInnerDocument());
-
+		processInnerDocumentInBackground(
+			null,
+			new Processor() {
+			public AbstractDocument postProcess(
+				AbstractDocument document,
+				DocumentManager  documentManager
+			) {
 				OutputStream out = null;
 				try {
 					out =
@@ -1283,6 +1339,7 @@ public class DocumentManager
 
 					PDFTranscoder pdfTrancoder = new PDFTranscoder();
 						
+					TranscoderInput  input  = new TranscoderInput(document);
 					TranscoderOutput output = new TranscoderOutput(out);
 					pdfTrancoder.transcode(input, output);
 
@@ -1300,7 +1357,7 @@ public class DocumentManager
 						out = null;
 					}
 				}
-				return null;
+				return document;
 			}
 		});
 	}
