@@ -75,6 +75,9 @@ import java.lang.reflect.Method;
 public class Map2SVG
 implements   DocumentManager.DocumentModifier
 {
+	public static final String EXTRA_WAIT =
+		"de.intevation.printlayout.wait.map.svg";
+
 	/**
 	 * If the system property de.intevation.printlayout.no.map.clip
 	 * is set to true the generated SVG map is not clipped.
@@ -307,6 +310,15 @@ implements   DocumentManager.DocumentModifier
 		}
 		catch (InterruptedException ie) {
 		}
+
+		Integer extraWait = Options.getInstance().getInteger(EXTRA_WAIT);
+
+		if (extraWait != null) 
+			try {
+				Thread.sleep(Math.max(0, extraWait.intValue())*1000l);
+			}
+			catch (InterruptedException ie) {
+			}
 
 		// restore old converter
 		if (setJava2DConverter != null && oldConverter != null) {

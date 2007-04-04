@@ -1,5 +1,28 @@
 2007-04-04  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
+	Added optional delays in SVG map generation.
+
+	* src/de/intevation/printlayout/Map2SVG.java:
+		If the system property "de.intevation.printlayout.wait.map.svg"
+		is set to a positive integer value this is value used as a number
+		of seconds to sleep after the map generation call returns.
+		This may help with asynchron generated layers (WMS and DB).
+		This value is also looked up in the preferences.
+		
+	* src/de/intevation/printlayout/PreviewMapReplacer.java:
+		If the "de.intevation.printlayout.zoom.wait" is set to
+		is set to a positive integer value this is value used as a number
+		of seconds to sleep after the zoom call returns. This may
+		help the GUI to catch up before generating the map. 
+		
+	* src/de/intevation/printlayout/Options.java:
+		New. This class wraps the lookup of system properties
+		and/or the preferences. If a requested value is given
+		as a system property this value is used. Else a search
+		in the preferences is done.
+
+2007-04-04  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
+
 	Doing export and post processing of inner SVG in background thread.
 	TODO: add some delays during map extraction to
 	ensure that all layers are in the SVG.

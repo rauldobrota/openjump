@@ -40,6 +40,9 @@ import java.util.ArrayList;
 public class PreviewMapReplacer
 implements   DocumentManager.Processor
 {
+	public static final String EXTRA_ZOOM_WAIT =
+		"de.intevation.printlayout.extra.zoom.wait";
+
 	/**
 	 * If the system property de.intevation.no.preview.caching
 	 * is set to true the generated SVG map is not stored for caching.
@@ -78,6 +81,8 @@ implements   DocumentManager.Processor
 		ArrayList replacements = new ArrayList();
 
 		double [] paperSize = documentManager.getPaperSize();
+
+		Integer zoomWait = Options.getInstance().getInteger(EXTRA_ZOOM_WAIT);
 
 		for (int N = images.getLength(), i = 0; i < N; ++i) {
 			AbstractElement image = (AbstractElement)images.item(i);
@@ -121,6 +126,12 @@ implements   DocumentManager.Processor
 				if (!env.equals(current)) // zoom to spot
 					try {
 						vp.zoom(env);
+						if (zoomWait != null)
+							try {
+								Thread.sleep(Math.max(0, zoomWait.intValue())*1000l);
+							}
+							catch (InterruptedException ie) {
+							}
 					}
 					catch (NoninvertibleTransformException nite) {
 						continue;
@@ -150,6 +161,7 @@ implements   DocumentManager.Processor
 		if (first != null) // restore original spot
 			try {
 				vp.zoom(first);
+				// no need to wait here
 			}
 			catch (NoninvertibleTransformException nite) {
 			}
