@@ -183,8 +183,7 @@ public class ShapefileReader implements JUMPReader {
             mydbf.close();
             deleteTmpDbf(); // delete dbf file if it was decompressed
         }
-
-        System.gc();
+        //System.gc();
 
         return featureCollection;
     }
