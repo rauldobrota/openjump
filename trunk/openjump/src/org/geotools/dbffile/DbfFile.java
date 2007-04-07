@@ -244,7 +244,7 @@ public class DbfFile implements DbfConsts {
 
         switch (fielddef[wantedCol].fieldtype) {
         case 'C': //character
-            return rec.substring(start, end);
+            return rec.substring(start, end).intern();
 
         case 'F': //same as numeric, more or less
         case 'N': //numeric
@@ -281,7 +281,7 @@ public class DbfFile implements DbfConsts {
             return parseDate(rec.substring(start, end));
 
         default:
-            return rec.substring(start, end);
+            return rec.substring(start, end).intern();
         }
     }
 
