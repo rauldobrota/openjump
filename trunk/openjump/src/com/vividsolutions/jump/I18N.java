@@ -51,18 +51,18 @@ import org.apache.log4j.Logger;
  * [2] HOWTO TRANSLATE MY PLUGIN AND GIVE THE ABILITY TO TRANSLATE IT
  *  Use theses methods to use your own *.properties files :
  *  [Michael Michaud 2007-03-23] the 3 following methods have been deactivated
- *  (I don't know who nor why)
- *  @see com.vividsolutions.jump.I18N#setPlugInRessource(String, String)
- *  @see com.vividsolutions.jump.I18N#get(String, String)
- *  @see com.vividsolutions.jump.I18N#getMessage(String, String, Object[])
+ *  com.vividsolutions.jump.I18N#setPlugInRessource(String, String)
+ *  com.vividsolutions.jump.I18N#get(String, String)
+ *  com.vividsolutions.jump.I18N#getMessage(String, String, Object[])
+ *  you still can use plugInsResourceBundle (as in Pirol's plugin)
  *  
  *  And use jump standard menus
- *  @see com.vividsolutions.jump.workbench.ui.MenuNames
+ *  </pre>
  *
- * Code example :
- * [Michael Michaud 2007-03-23] the following code example is no more valid.
- * It has to be changed
- * <code>
+ * Code example : [Michael Michaud 2007-03-23 : the following code example
+ * is no more valid and has to be changed]
+ * 
+ * <pre>
  * public class PrintPlugIn extends AbstractPlugIn
  *  {
  *    private String name = "print";
@@ -76,18 +76,19 @@ import org.apache.log4j.Logger;
  *                                                 I18N.get(name, "print"), false, null, null);
  * }
  * ...
- * </code>
  * </pre>
  * 
+ * <pre>
  * TODO :I18N (1) Improve translations
  * TODO :I18N (2) Separate config (customization) and I18N
  * TODO :I18N (3) Explore and discuss about I18N integration and Jakarta Common Ressources
  * (using it as a ressource interface)
+ * </pre>
  * 
  * @author Basile Chandesris - <chandesris@pt-consulting.lu>
  * 
  * @see com.vividsolutions.jump.workbench.ui.MenuNames 
- * @see com.vividsolutions.jump.workbench.ui.VTextIcon text rotation)
+ * @see com.vividsolutions.jump.workbench.ui.VTextIcon text rotation
  */
 public final class I18N {
     
@@ -158,8 +159,7 @@ public final class I18N {
             return rb.getString(label);
        } catch (java.util.MissingResourceException e) {
            String[] labelpath = label.split("\\.");
-           LOG.warn("No translation and no default have been found for \"" +
-               label + "\" in the resource bundles !");
+           LOG.debug("No resource bundle or no translation found for the key : " + label);
            return labelpath[labelpath.length-1];
         }
     }

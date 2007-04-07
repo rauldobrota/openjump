@@ -101,7 +101,7 @@ public class BeanToolsPlugIn extends AbstractPlugIn {
             File beanShellDir = new File(beanShellDirName);
             String ancestors = ancestors(beanShellDir, file);
             String shellName = file.getName().substring(0, file.getName().length()-4);
-            JMenu menu = featureInstaller.menuBarMenu(I18N.get(MenuNames.CUSTOMIZE));
+            JMenu menu = featureInstaller.menuBarMenu(MenuNames.CUSTOMIZE);
             if (menu == null) {
                 menu = (JMenu) featureInstaller.installMnemonic(new JMenu(I18N.get(MenuNames.CUSTOMIZE)), featureInstaller.menuBar());
                 featureInstaller.menuBar().add(menu);
