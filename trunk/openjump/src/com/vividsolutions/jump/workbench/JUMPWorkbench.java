@@ -217,11 +217,12 @@ public class JUMPWorkbench {
 	 * setupClass is specified as a String to prevent it from being loaded
 	 * before we display the splash screen, in case setupClass takes a long time
 	 * to load.
-	 *
-	 * @param setupClass
-	 *                  the name of a class that implements Setup
-	 * @param splashWindow
-	 *                  a window to open until the workbench frame is displayed
+	 * @param args main application arguments
+	 * @param title application title
+	 * @param setup an object implementing the Setup interface
+	 *                 (e.g. JUMPConfiguration)
+	 * @param splashComponent
+	 *                  a component to open until the workbench frame is displayed
 	 * @param taskMonitor
 	 *                  notified of progress of plug-in loading
 	 */

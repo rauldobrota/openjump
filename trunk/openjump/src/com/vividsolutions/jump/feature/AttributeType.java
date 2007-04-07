@@ -102,7 +102,7 @@ public class AttributeType implements Serializable {
 
     /**
      * Converts a type name to an AttributeType.
-     * @param typename the name of the AttributeType to retrieve
+     * @param name the name of the AttributeType to retrieve
      * @return the corresponding AttributeType
      * @throws InvalidAttributeTypeException if the type name is unrecognized
      */

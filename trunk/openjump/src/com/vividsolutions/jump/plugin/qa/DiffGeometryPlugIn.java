@@ -176,9 +176,8 @@ public class DiffGeometryPlugIn
   /**
    * Sets the style for a diff geometry layer.
    * @param lyr
+   * @param fillColor
    * @param lineColor
-   * @param lineWidth
-   * @param vertexSize 0 if vertices are not to be shown
    */
   public static void setDiffGeometryStyle(Layer lyr, Color fillColor, Color lineColor)
   {

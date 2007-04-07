@@ -60,10 +60,9 @@ public class UniqueSegmentsExtracter
   }
 
   /**
-   * Creates a new counter, allowing control over
-   * whether zero-length segments are counted.
+   * Creates a new counter.
    *
-   * @param countZeroLengthSegments if <code>false</code>, zero-length segments will be ignored
+   * @param monitor
    */
   public UniqueSegmentsExtracter(TaskMonitor monitor) {
     this.monitor = monitor;

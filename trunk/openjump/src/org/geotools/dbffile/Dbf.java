@@ -40,7 +40,7 @@ public class Dbf implements DbfConsts{
     
     /**
      * Constructor, opens the file and reads the header infomation.
-     * @param file The file to be opened, includes path and .dbf
+     * @param url the url to be opened
      * @exception java.io.IOException If the file can't be opened.
      * @exception DbfFileException If there is an error reading header.
      */
@@ -283,7 +283,7 @@ public class Dbf implements DbfConsts{
     /**
      * Parses the record stored in the StringBuffer rec into a vector of
      * objects
-     * @param StringBuffer rec - the record to be parsed.
+     * @param rec the record to be parsed.
      */
     
     public Vector ParseRecord(StringBuffer rec){
@@ -341,9 +341,9 @@ public class Dbf implements DbfConsts{
     }
     /**
      * Fetches a part column of Integers from the database file.
-     * @param int col - the column to fetch
-     * @param int start - the row to start fetching from
-     * @param int end - the row to stop fetching at.
+     * @param col - the column to fetch
+     * @param start - the row to start fetching from
+     * @param end - the row to stop fetching at.
      * @exception java.io.IOException - on read error
      * @exception DbfFileException - column is not an Integer.
      */
@@ -391,7 +391,7 @@ public class Dbf implements DbfConsts{
     }
     /**
      * Fetches a column of Floats from the database file.
-     * @param int col - the column to fetch
+     * @param col - the column to fetch
      * @exception java.io.IOException - on read error
      * @exception DbfFileException - column is not an Integer.
      */
@@ -401,9 +401,9 @@ public class Dbf implements DbfConsts{
     }
     /**
      * Fetches a part column of Floats from the database file.
-     * @param int col - the column to fetch
-     * @param int start - the row to start fetching from
-     * @param int end - the row to stop fetching at.
+     * @param col - the column to fetch
+     * @param start - the row to start fetching from
+     * @param end - the row to stop fetching at.
      * @exception java.io.IOException - on read error
      * @exception DbfFileException - column is not an Integer.
      */
@@ -451,7 +451,7 @@ public class Dbf implements DbfConsts{
     }
     /**
      * Fetches a column of Strings from the database file.
-     * @param int col - the column to fetch
+     * @param col - the column to fetch
      * @exception java.io.IOException - on read error
      * @exception DbfFileException - column is not an Integer.
      */
@@ -461,9 +461,9 @@ public class Dbf implements DbfConsts{
     }
     /**
      * Fetches a part column of Strings from the database file.
-     * @param int col - the column to fetch
-     * @param int start - the row to start fetching from
-     * @param int end - the row to stop fetching at.
+     * @param col - the column to fetch
+     * @param start - the row to start fetching from
+     * @param end - the row to stop fetching at.
      * @exception java.io.IOException - on read error
      * @exception DbfFileException - column is not an Integer.
      */

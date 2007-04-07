@@ -110,8 +110,8 @@ public class Shapefile  {
     
     /**
      * Initialises a shapefile from disk.
-     * Use Shapefile(String) if you don't want to use LEDataInputStream directly (recomened)
-     * @param file A LEDataInputStream that conects to the shapefile to read
+     * Use Shapefile(String) if you don't want to use LEDataInputStream directly (recomended)
+     * @param geometryFactory the geometry factory to use to read the shapes
      */
     public GeometryCollection read(GeometryFactory geometryFactory) throws IOException,ShapefileException,Exception{
        EndianDataInputStream file = getInputStream();
@@ -156,7 +156,8 @@ public class Shapefile  {
     
     /**
      * Saves a shapefile to and output stream.
-     * @param file A LEDataInputStream that conects to the shapefile to read
+     * @param geometries geometry collection to write
+     * @param ShapeFileDimentions shapefile dimension
      */
        //ShapeFileDimentions =>    2=x,y ; 3=x,y,m ; 4=x,y,z,m
     public  void write(GeometryCollection geometries, int ShapeFileDimentions) throws IOException,Exception {

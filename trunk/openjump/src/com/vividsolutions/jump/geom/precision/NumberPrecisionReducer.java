@@ -44,7 +44,7 @@ public class NumberPrecisionReducer {
    * should be divided rather than multiplied. The negative sign
    * is carried through to the computed scale factor.
    * @param decimalPlaces
-   * @return
+   * @return the scale factor
    */
   public static double scaleFactorForDecimalPlaces(int decimalPlaces)
   {

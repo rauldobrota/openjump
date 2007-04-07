@@ -10,7 +10,7 @@ import com.vividsolutions.jump.parameter.ParameterListSchema;
 import org.postgresql.PGConnection;
 
 /**
- * A driver for supplying {@link OracleDSConnection}s
+ * A driver for supplying {@link PostgisDSConnection}s
  */
 public class PostgisDataStoreDriver
     implements DataStoreDriver

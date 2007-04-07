@@ -286,10 +286,10 @@ public class DbfFile implements DbfConsts {
     }
 
     /**
-            * Parses the record stored in the StringBuffer rec into a vector of
-            * objects
-            * @param StringBuffer rec - the record to be parsed.
-            */
+     * Parses the record stored in the StringBuffer rec into a vector of
+     * objects
+     * @param rec the record to be parsed.
+     */
     public Vector ParseRecord(StringBuffer rec) {
         Vector record = new Vector(numfields);
         String t;
@@ -376,24 +376,24 @@ public class DbfFile implements DbfConsts {
     }
 
     /**
-            * Fetches a column of Integers from the database file.
-            * @param int col - the column to fetch
-            * @exception java.io.IOException - on read error
-            * @exception DbfFileException - column is not an Integer.
-            */
+     * Fetches a column of Integers from the database file.
+     * @param col - the column to fetch
+     * @exception java.io.IOException - on read error
+     * @exception DbfFileException - column is not an Integer.
+     */
     public Integer[] getIntegerCol(int col)
         throws java.io.IOException, DbfFileException {
         return getIntegerCol(col, 0, last_rec);
     }
 
     /**
-            * Fetches a part column of Integers from the database file.
-            * @param int col - the column to fetch
-            * @param int start - the row to start fetching from
-            * @param int end - the row to stop fetching at.
-            * @exception java.io.IOException - on read error
-            * @exception DbfFileException - column is not an Integer.
-            */
+     * Fetches a part column of Integers from the database file.
+     * @param col - the column to fetch
+     * @param start - the row to start fetching from
+     * @param end - the row to stop fetching at.
+     * @exception java.io.IOException - on read error
+     * @exception DbfFileException - column is not an Integer.
+     */
     public Integer[] getIntegerCol(int col, int start, int end)
         throws java.io.IOException, DbfFileException {
         Integer[] column = new Integer[end - start];
@@ -446,24 +446,24 @@ public class DbfFile implements DbfConsts {
     }
 
     /**
-            * Fetches a column of Double from the database file.
-            * @param int col - the column to fetch
-            * @exception java.io.IOException - on read error
-            * @exception DbfFileException - column is not an Integer.
-            */
+     * Fetches a column of Double from the database file.
+     * @param col - the column to fetch
+     * @exception java.io.IOException - on read error
+     * @exception DbfFileException - column is not an Integer.
+     */
     public Double[] getFloatCol(int col)
         throws DbfFileException, java.io.IOException {
         return getFloatCol(col, 0, last_rec);
     }
 
     /**
-            * Fetches a part column of Double from the database file.
-            * @param int col - the column to fetch
-            * @param int start - the row to start fetching from
-            * @param int end - the row to stop fetching at.
-            * @exception java.io.IOException - on read error
-            * @exception DbfFileException - column is not an Integer.
-            */
+     * Fetches a part column of Double from the database file.
+     * @param col - the column to fetch
+     * @param start - the row to start fetching from
+     * @param end - the row to stop fetching at.
+     * @exception java.io.IOException - on read error
+     * @exception DbfFileException - column is not an Integer.
+     */
     public Double[] getFloatCol(int col, int start, int end)
         throws DbfFileException, java.io.IOException {
         Double[] column = new Double[end - start];
@@ -521,24 +521,24 @@ public class DbfFile implements DbfConsts {
     }
 
     /**
-            * Fetches a column of Strings from the database file.
-            * @param int col - the column to fetch
-            * @exception java.io.IOException - on read error
-            * @exception DbfFileException - column is not an Integer.
-            */
+     * Fetches a column of Strings from the database file.
+     * @param col - the column to fetch
+     * @exception java.io.IOException - on read error
+     * @exception DbfFileException - column is not an Integer.
+     */
     public String[] getStringCol(int col)
         throws DbfFileException, java.io.IOException {
         return getStringCol(col, 0, last_rec);
     }
 
     /**
-            * Fetches a part column of Strings from the database file.
-            * @param int col - the column to fetch
-            * @param int start - the row to start fetching from
-            * @param int end - the row to stop fetching at.
-            * @exception java.io.IOException - on read error
-            * @exception DbfFileException - column is not an Integer.
-            */
+     * Fetches a part column of Strings from the database file.
+     * @param int col - the column to fetch
+     * @param int start - the row to start fetching from
+     * @param int end - the row to stop fetching at.
+     * @exception java.io.IOException - on read error
+     * @exception DbfFileException - column is not an Integer.
+     */
     public String[] getStringCol(int col, int start, int end)
         throws DbfFileException, java.io.IOException {
         String[] column = new String[end - start];

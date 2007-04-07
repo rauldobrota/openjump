@@ -107,8 +107,8 @@ public class ColumnDescription {
      *  setTagAttribute('type','name');
      *</pre>
      *
-    * @param attname name of the XML attribute name
-     *@param attvalue its value
+    * @param attName name of the XML attribute name
+     *@param attValue its value
     **/
     public void setTagAttribute(String attName, String attValue) {
         attributeName = attName;
@@ -125,7 +125,7 @@ public class ColumnDescription {
      *  setTagAttribute('name');
      *</PRE>
      *
-    * @param attname name of the XML attribute name
+    * @param attName name of the XML attribute name
     **/
     public void setTagAttribute(String attName) {
         attributeName = attName;

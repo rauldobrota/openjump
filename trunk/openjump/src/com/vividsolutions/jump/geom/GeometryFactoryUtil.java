@@ -50,7 +50,7 @@ public class GeometryFactoryUtil {
      * input list which have the requested dimension.
      * The result is thus guaranteed to have the dimension requested.
      *
-     * @param geomList
+     * @param geom
      * @param dimension
      */
     public static Geometry buildGeometry(Geometry geom, int dimension) {

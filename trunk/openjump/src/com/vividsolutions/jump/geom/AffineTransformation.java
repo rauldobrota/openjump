@@ -383,7 +383,7 @@ public class AffineTransformation
    * @param y0
    * @param x1
    * @param y1
-   * @return
+   * @return this transformation, with an updated matrix 
    */
   public AffineTransformation setToReflectionBasic(double x0, double y0, double x1, double y1)
   {

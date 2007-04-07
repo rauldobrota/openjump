@@ -46,6 +46,9 @@ import com.vividsolutions.jump.coordsys.Planar;
  *  $Id$
  *  $Date$
  *  $Log$
+ *  Revision 1.2  2007/04/07 13:17:03  michaudm
+ *  52 javadoc tag warnings fixed
+ *
  *  Revision 1.1  2005/06/16 15:25:29  javamap
  *  *** empty log message ***
  *
@@ -85,7 +88,7 @@ public class UniversalTransverseMercator extends Projection {
   private int zone = -1;
 
   /**
-   * @param utmZone must be between 7 and 11
+   * @param zone must be between 7 and 11
    */
   public void setParameters(int zone) {
 

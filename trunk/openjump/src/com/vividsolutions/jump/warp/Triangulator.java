@@ -83,9 +83,10 @@ public class Triangulator {
      * the destination quadrilateral is split using the vector tips. In this way,
      * the vectors map the source Triangles to the destination Triangles.
      * @param datasetEnvelope the region to triangulate
-     * @param vectors vectors (2-point LineStrings) whose tails and tips split
+     * @param vectorLineStrings vectors (2-point LineStrings) whose tails and tips split
      * the "source quadrilateral" and "destination quadrilateral" into triangles
-     *@return    a map of source Triangles to destination Triangles
+     * @param monitor
+     * @return    a map of source Triangles to destination Triangles
      */
     public Map triangleMap(
         Envelope datasetEnvelope,

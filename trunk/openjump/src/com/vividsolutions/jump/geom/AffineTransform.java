@@ -55,7 +55,7 @@ public class AffineTransform implements CoordinateFilter {
     /**
      * Append a translation to the transform.
      *
-     * @param transPt the vector to translate by
+     * @param p the vector to translate by
      */
     public void translate(Coordinate p) {
         if (transPt == null) {

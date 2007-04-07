@@ -77,7 +77,7 @@ public class EnvelopeUtil {
     }
 
     /**
-     * @param minExtent the minimum buffer distance
+     * @param originalEnvelope the original envelope
      * @param extentFraction the buffer distance expressed as a fraction of the
      * average envelope extent
      */
