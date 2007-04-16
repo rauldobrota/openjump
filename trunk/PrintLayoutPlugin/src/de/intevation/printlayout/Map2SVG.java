@@ -82,55 +82,44 @@ implements   DocumentManager.DocumentModifier
 	 * If the system property de.intevation.printlayout.no.map.clip
 	 * is set to true the generated SVG map is not clipped.
 	 */
-	public static final boolean NO_MAP_CLIP =
-		Boolean.getBoolean("de.intevation.printlayout.no.map.clip");
-
+	public static final String NO_MAP_CLIP =
+		"de.intevation.printlayout.no.map.clip";
+	
+	
   /**
 	 * If the system property de.intevation.printlayout.optimize.map.svg
 	 * is set to true the generated SVG map is optimized.
 	 */
-	public static final boolean OPTIMIZE_MAP_SVG 
-		= Boolean.getBoolean("de.intevation.printlayout.optimize.map.svg");
-
+	public static final String OPTIMIZE_MAP_SVG =
+		"de.intevation.printlayout.optimize.map.svg";
+	
 	/**
 	 * The Batik DOM implemenmentation is slow.
 	 * Rendering and optimizing with the Java on board DOM is much faster.
 	 * Set this property if you want the Batik DOM.
 	 */
-	public static final boolean USE_BATIK_DOM
-		= Boolean.getBoolean("de.intevation.printlayout.optimize.map.batik.dom");
-
+	public static final String USE_BATIK_DOM =
+		"de.intevation.printlayout.optimize.map.batik.dom";
+	
 	/**
 	 * If the system property de.intevation.printlayout.use.css.map
 	 * is set to true the generated SVG style attributes are expressed as CSS.
 	 */
-	public static final boolean USE_CSS =
-		Boolean.getBoolean("de.intevation.printlayout.use.css.map");
-
+	public static final String USE_CSS =
+		"de.intevation.printlayout.use.css.map";
+	
 	/**
 	 * If the system property de.intevation.printlayout.gc.calls
 	 * is set to a positive integer N the garbage collection is called
 	 * N times after each memory critcal operation. Beware: This may prevent
 	 * caching of results. Therefore it is set to 0 by default.
 	 */
-	public static final int GC_CALLS =
-		Math.max(0,
-			Integer.getInteger("de.intevation.printlayout.gc.calls", 0)
-				.intValue());
+	public static final String GC_CALLS =
+		"de.intevation.printlayout.gc.calls";
 
-	public static final Double SIMPLIFY_TOLERANCE = getToleranceFromProperties();
-
-	private static final Double getToleranceFromProperties() {
-		try {
-			String s = System.getProperty(
-				"de.intevation.printlayout.simplify.tolerance");
-			return s != null ? new Double(Math.abs(Double.parseDouble(s))) : null;
-		}
-		catch (NumberFormatException nfe) {
-			return null;
-		}
-	}
-
+	public static final String SIMPLIFY_TOLERANCE =
+		"de.intevation.printlayout.simplify.tolerance";
+	
 	/**
 	 * The plugin context is need to access the LayerViewPanel.
 	 */
@@ -193,7 +182,9 @@ implements   DocumentManager.DocumentModifier
 		}
 
 		// setup the SVG generator ...
-		Document doc = USE_BATIK_DOM ? null : createDocument();
+		Document doc = Options.getInstance().getBoolean(USE_BATIK_DOM)
+			? null 
+			: createDocument();
 
 		SVGGeneratorContext ctx = SVGGeneratorContext.createDefault(
 			doc != null ? doc : document);
@@ -206,7 +197,7 @@ implements   DocumentManager.DocumentModifier
 
 		// use CSS?
     CDATASection styleSheetSection;
-		if (USE_CSS) {
+		if (Options.getInstance().getBoolean(USE_CSS)) {
     	styleSheetSection = (doc != null ? doc : document).createCDATASection(""); 
 			ctx.setStyleHandler(new StyleSheetHandler(styleSheetSection));
 		}
@@ -216,7 +207,7 @@ implements   DocumentManager.DocumentModifier
 		SVGGraphics2D svgGenerator;
 
 		// clip the map?
-		if (NO_MAP_CLIP)
+		if (Options.getInstance().getBoolean(NO_MAP_CLIP))
 			svgGenerator = new SVGGraphics2D(ctx, false);
 		else {
 			svgGenerator = new ClippingSVGGraphics2D(
@@ -370,7 +361,7 @@ implements   DocumentManager.DocumentModifier
 		
 		gc();
 
-		if (OPTIMIZE_MAP_SVG) {
+		if (Options.getInstance().getBoolean(OPTIMIZE_MAP_SVG)) {
 			System.err.println("Reordering paths...");
 			long optStartTime = System.currentTimeMillis();
 			PathCompactor.reorder(doc != null ? doc : document, root);
@@ -460,7 +451,7 @@ implements   DocumentManager.DocumentModifier
 			geo2screen, 
 			screen2paper,
 			paperSize,
-			SIMPLIFY_TOLERANCE);
+			Options.getInstance().getDouble(SIMPLIFY_TOLERANCE));
 
 		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
 
@@ -490,9 +481,11 @@ implements   DocumentManager.DocumentModifier
 	 * Triggers garbage collection once.
 	 */
 	private static final void gc() {
-		if (GC_CALLS > 0) {
+		Integer gcCalls = Options.getInstance().getInteger(GC_CALLS);
+		int gc_calls = gcCalls == null ? 0 : gcCalls.intValue();
+		if (gc_calls > 0) {
 			System.err.println("used memory before gc [MB]: " + inMegaBytes(usedMemory()));
-			gc(GC_CALLS);
+			gc(gc_calls);
 			System.err.println("used memory after gc [MB]: " + inMegaBytes(usedMemory()));
 		}
 	}

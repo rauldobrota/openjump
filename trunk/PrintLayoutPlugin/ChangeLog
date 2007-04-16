@@ -1,3 +1,14 @@
+2007-04-16  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	Use the Option singleton to get Map2SVGs options.
+
+	* src/de/intevation/printlayout/Options.java:
+		Added methods for boolean and double.
+
+	* src/de/intevation/printlayout/Map2SVG.java,
+	  src/de/intevation/printlayout/PreviewMapReplacer.java:
+	  	Used the Option singleton to get the options.
+		
 2007-04-04  Sascha L. Teichmann  <sascha.teichmann@intevation.de>
 
 	Added optional delays in SVG map generation.

@@ -38,6 +38,51 @@ public class Options
 			instance = new Options();
 		return instance;
 	}
+	
+	/**
+	 * Get boolean value for given key.
+	 * @param key the key to look for
+	 * @return the value, false if not found
+	 */
+	public boolean getBoolean(String key) {
+		return getBoolean(key, false);
+	}
+	
+	/**
+	 * Get boolean value for given key.
+	 * @param key the key to look for
+	 * @param def the default value
+	 * @return the value, def if not found
+	 */
+	public boolean getBoolean(String key, boolean def) {
+		boolean value = Boolean.getBoolean(key);
+
+		if (value)
+			return value;
+
+		Preferences prefs = Preferences.userNodeForPackage(getClass());
+
+		return prefs.getBoolean(key, false); 
+	}
+
+	/**
+	 * Stores an integer value into the system properties
+	 * and the preferences.
+	 * @param key the key
+	 * @param value the value
+	 */
+	public void putBoolean(String key, boolean value) {
+		System.setProperty(key, Boolean.toString(value));
+		Preferences prefs = Preferences.userNodeForPackage(getClass());
+		prefs.putBoolean(key, value);
+
+		try {
+			prefs.flush();
+		}
+		catch (BackingStoreException bse) {
+			bse.printStackTrace();
+		}
+	}
 
 	/**
 	 * Get integer value for given key.
@@ -86,6 +131,62 @@ public class Options
 			prefs.remove(key);
 		else
 			prefs.putInt(key, value.intValue());
+
+		try {
+			prefs.flush();
+		}
+		catch (BackingStoreException bse) {
+			bse.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Get double value for given key.
+	 * @param key the key to look for
+	 * @return the value, null if not found
+	 */
+	public Double getDouble(String key) {
+		return getDouble(key, null);
+	}
+
+	/**
+	 * Get double value for given key.
+	 * @param key the key to look for
+	 * @param def the default value
+	 * @return the value, def if not found
+	 */
+	public Double getDouble(String key, Double def) {
+		try {
+			String value = System.getProperty(key);
+
+			if (value != null)
+				return new Double(value.trim());
+
+			Preferences prefs = Preferences.userNodeForPackage(getClass());
+
+			return (value = prefs.get(key, null)) != null
+				? new Double(value.trim())
+				: def;
+		}
+		catch (NumberFormatException nfe) {
+			return def;
+		}
+	}
+
+	/**
+	 * Stores an integer value into the system properties
+	 * and the preferences.
+	 * @param key the key
+	 * @param value the value
+	 */
+	public void putDouble(String key, Double value) {
+		System.setProperty(key, value != null ? value.toString() : "");
+		Preferences prefs = Preferences.userNodeForPackage(getClass());
+
+		if (value == null)
+			prefs.remove(key);
+		else
+			prefs.putDouble(key, value.doubleValue());
 
 		try {
 			prefs.flush();
