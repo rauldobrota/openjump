@@ -55,14 +55,16 @@ public class Options
 	 * @return the value, def if not found
 	 */
 	public boolean getBoolean(String key, boolean def) {
-		boolean value = Boolean.getBoolean(key);
+		String value = System.getProperty(key);
 
-		if (value)
-			return value;
+		if (value != null)
+			return Boolean.valueOf(value.trim()).booleanValue();
 
 		Preferences prefs = Preferences.userNodeForPackage(getClass());
 
-		return prefs.getBoolean(key, false); 
+		return (value = prefs.get(key, null)) != null
+			? Boolean.valueOf(value.trim()).booleanValue() 
+			: def;
 	}
 
 	/**

@@ -1,3 +1,13 @@
+2007-04-17  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	Bug fix for boolean options
+
+	* src/de/intevation/printlayout/Options.java:
+		You cannot use Boolean.getBoolean() to check if a 
+		system property does exist or not. It returns false
+		if a property does not exist _or_ it is set to false.
+		Now using System.getProperty() for existence check first.
+
 2007-04-16  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	Use the Option singleton to get Map2SVGs options.
