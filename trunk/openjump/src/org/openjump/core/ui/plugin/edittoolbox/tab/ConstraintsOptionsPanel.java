@@ -286,7 +286,7 @@ public class ConstraintsOptionsPanel extends JPanel implements OptionsPanel {
         
         lengthPanel.add(lengthSubPanel,
                         new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
-                        GridBagConstraints.WEST, GridBagConstraints.NONE, 
+                        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, 
                         new Insets(0, 0, 0, 0), 0, 0));
         
         lengthSubPanel.add(lengthCheckBox,   
@@ -310,14 +310,13 @@ public class ConstraintsOptionsPanel extends JPanel implements OptionsPanel {
         
         incrementalAnglePanel.setLayout(incrementalAnglePanelGridBagLayout);
         incrementalAngleSubPanel.setLayout(incrementalAngleSubPanelGridBagLayout);
-//        jPanel4.setLayout(gridBagLayout3);
         numPartsTextField.setText("8");
         constrainIncrementalAngleCheckBox.setText(ConstrainAngleTo45DegreeIncrements);
         
         constraintsPanel.add(     incrementalAnglePanel,
                                   new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
                                   GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
-                                  new Insets(10, 10, 10, 10), 0, 0));
+                                  new Insets(10, 10, 10, 10), 0, 1));
         
         incrementalAnglePanel.add(incrementalAngleSubPanel,
                                   new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
@@ -340,17 +339,17 @@ public class ConstraintsOptionsPanel extends JPanel implements OptionsPanel {
         numPartsPostLabel.setText(parts);
         
         numPartsPanel.add(numPartsPreLabel,      
-                          new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, 
+                          new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, 
                           GridBagConstraints.WEST, GridBagConstraints.NONE, 
                           new Insets(0, 0, 0, 5), 0, 0));
         
         numPartsPanel.add(numPartsTextField, 
-                          new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, 
+                          new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, 
                           GridBagConstraints.CENTER, GridBagConstraints.NONE, 
                           new Insets(0, 0, 0, 5), 0, 0));
         
         numPartsPanel.add(numPartsPostLabel, 
-                          new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, 
+                          new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, 
                           GridBagConstraints.CENTER, GridBagConstraints.NONE, 
                           new Insets(0, 0, 0, 0), 0, 0));
         
