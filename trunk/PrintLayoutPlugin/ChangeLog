@@ -1,3 +1,17 @@
+2007-04-19  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	Added an option dialog to the plugin.
+
+	* src/de/intevation/printlayout/OptionDialog.java:
+		Added. The new option dialog.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		Installed the new dialog.
+
+	* src/de/intevation/printlayout/i18n/messages.properties,
+	  src/de/intevation/printlayout/i18n/messages_de.properties:
+	  	Messages for the option dialog.
+
 2007-04-17  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	Bug fix for boolean options

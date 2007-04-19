@@ -186,6 +186,7 @@ implements   PickingInteractor.PickingListener
 		JMenu viewMenu   = createMenu("LayoutFrame.View",   "&View");
 		JMenu insertMenu = createMenu("LayoutFrame.Insert", "&Insert");
 		JMenu infoMenu   = createMenu("LayoutFrame.Help",   "&Help");
+		JMenu optionMenu = createMenu("LayoutFrame.Option", "&Option");
 
 		ExportSVGAction    svgExportAction    = new ExportSVGAction();
 		PDFAction          pdfAction          = new PDFAction();
@@ -212,6 +213,7 @@ implements   PickingInteractor.PickingListener
 		                   addScaletextAction = new AddScaletextAction();
 		AboutDialogAction  aboutDialogAction  = new AboutDialogAction();
 		InfoDialogAction   infoDialogAction   = new InfoDialogAction();
+		OptionDialogAction optionDialogAction = new OptionDialogAction();
 
 		fileMenu.add(loadSessionAction);
 		fileMenu.add(saveSessionAction);
@@ -252,6 +254,8 @@ implements   PickingInteractor.PickingListener
 		addScalebarAction .setEnabled(false);
 		addScaletextAction.setEnabled(false);
 		
+		optionMenu.add(optionDialogAction);
+		
 		infoMenu.add(infoDialogAction);
 		infoMenu.add(aboutDialogAction);
 
@@ -261,6 +265,7 @@ implements   PickingInteractor.PickingListener
 		menubar.add(editMenu);
 		menubar.add(viewMenu);
 		menubar.add(insertMenu);
+		menubar.add(optionMenu);
 		menubar.add(infoMenu);
 
 		setJMenuBar(menubar);
@@ -1190,7 +1195,28 @@ implements   PickingInteractor.PickingListener
 			InfoDialog.showDialog(LayoutFrame.this, "resources/info.html");
 		}
 	}
+
+	private class OptionDialogAction extends AbstractAction {
+		OptionDialogAction() {
+			super(I18N.getString("LayoutFrame.OptionDialog"));
+		}
+		public void actionPerformed(ActionEvent ae) {
+			OptionDialog dialog = new OptionDialog(LayoutFrame.this);
+
+			dialog.addBooleanOption(Map2SVG.EXTRA_WAIT, 
+					I18N.getString("OptionDialog.Extra_Wait"));
+			dialog.addBooleanOption(Map2SVG.OPTIMIZE_MAP_SVG,
+					I18N.getString("OptionDialog.Optimize_Map"));
+			dialog.addBooleanOption(Map2SVG.USE_CSS,
+					I18N.getString("OptionDialog.Use_CSS"));
+			dialog.addDoubleOption(Map2SVG.SIMPLIFY_TOLERANCE,
+					I18N.getString("OptionDialog.SimplifyTolerance"));
+			dialog.addBooleanOption(PreviewMapReplacer.EXTRA_ZOOM_WAIT,
+					I18N.getString("OptionDialog.Extra_Zoom_Wait"));
 	
+			dialog.showDialog();
+		}
+	}
 
 	private class SwitchPaperSizeAction extends AbstractAction {
 		SwitchPaperSizeAction(String text, String actionCmd) {
