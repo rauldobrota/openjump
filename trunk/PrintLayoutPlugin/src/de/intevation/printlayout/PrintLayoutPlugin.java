@@ -43,6 +43,16 @@ extends      AbstractPlugIn
 implements   ThreadedPlugIn
 {
 	/**
+	 * This is the name of the plug in.
+	 */
+	public static final String PLUGIN_NAME = "Print/Layout";
+
+	/**
+	 * This is the current version of the plug in.
+	 */
+	public static final String PLUGIN_VERSION = "0.9.2";
+
+	/**
 	 * the black board of the plugin
 	 */
 	protected Blackboard blackboard;
@@ -77,7 +87,11 @@ implements   ThreadedPlugIn
 	 * @return 'Print/Layout'
 	 */
 	public String getName() {
-		return "Print/Layout";
+		return PLUGIN_NAME;
+	}
+
+	public static String getNameAndVersion() {
+		return PLUGIN_NAME + " - " + PLUGIN_VERSION;
 	}
 
 	/**

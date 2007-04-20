@@ -1,3 +1,33 @@
+2007-04-20  Ludwig Reiter  <sascha.teichmann@intevation.de>
+
+	Cleaned up package structure a bit, centralized plugin version
+
+	* src/de/intevation/printlayout/PrintLayoutPlugin.java:
+		Holds the version number in constant PLUGIN_VERSION.
+
+	* src/de/intevation/printlayout/InfoDialog.java,
+		src/de/intevation/printlayout/OptionDialog.java:
+		Removed.
+
+	* src/de/intevation/printlayout/ui/InfoDialog.java,
+		src/de/intevation/printlayout/ui/OptionDialog.java:
+		Readded in th ui package. The InfoDialog now
+		facilitate a template replacer to replace ${VARIABLES}
+		in the HTML pulled from the resources.
+		
+	* src/de/intevation/printlayout/resources/about.html:
+		Contains a ${PLUGIN_NAME_VERSION} variable now.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		- Adjusted to new package structure.
+		- Fill PLUGIN_NAME_VERSION  into about.html from 
+		  PrintLayoutPlugin if an about dialog is requested.
+
+	* HowTo-Release.txt:
+		Adjusted that only the PLUGIN_VERSION const in
+		PrintLayoutPlugin need to be updated when building
+		a release.
+
 2007-04-19  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	Added an option dialog to the plugin.

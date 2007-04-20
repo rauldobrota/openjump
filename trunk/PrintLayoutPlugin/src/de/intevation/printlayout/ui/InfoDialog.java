@@ -9,7 +9,7 @@
  * This program is free software under the LGPL (>=v2.1)
  * Read the file LICENSE.txt coming with the sources for details.
  */
-package de.intevation.printlayout;
+package de.intevation.printlayout.ui;
 
 import java.awt.Color;
 import java.awt.BorderLayout;
@@ -30,27 +30,32 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JEditorPane;
 
+import de.intevation.printlayout.PrintLayoutPlugin;
+
+import de.intevation.printlayout.util.Template;
+
 /**
  * JDialog listing the basic user mouse interactions.
  */
 public class InfoDialog extends JDialog {
 
-	public static String resource = "resources/info.html";
-	
-	/**
-	 * creates a dialog with the standard info text.
-	 * @param owner owner frame
-	 */
-	public InfoDialog(JFrame owner) {
-		this(owner, resource);
-	}
-	
 	/**
 	 * creates a dialog for a given resource.
 	 * @param owner owner frame
 	 * @param resource path to HTML resource file.
 	 */
 	public InfoDialog(JFrame owner, String resource) {
+		this(owner, resource, null);
+	}
+	
+	/**
+	 * creates a dialog for a given resource.
+	 * @param owner owner frame
+	 * @param resource path to HTML resource file.
+	 * @param tmpl a template replacer that replaces variables in the HTML.
+	 *        null permitted.
+	 */
+	public InfoDialog(JFrame owner, String resource, Template tmpl) {
 		super(owner);
 
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -69,7 +74,7 @@ public class InfoDialog extends JDialog {
 		south.add(dismissBtn);
 		add(south, BorderLayout.SOUTH);
 
-		setTitle("Print/Layout v0.9.2");
+		setTitle(PrintLayoutPlugin.getNameAndVersion());
 		InputStream is = InfoDialog.class.getResourceAsStream(
 				getLocalizedResource(resource));
 		if (is == null) {
@@ -98,6 +103,9 @@ public class InfoDialog extends JDialog {
 			}
 		}
 
+		if (tmpl != null)
+			text = tmpl.toString(text);
+
 		JEditorPane infoText = new JEditorPane("text/html", text);
 		infoText.setEditable(false);
 
@@ -107,11 +115,13 @@ public class InfoDialog extends JDialog {
 	} 
 
 	/**
-	 * static helper to create and show a standard info dialog
+	 * static helper to create and show a dialog for a
+	 * given HTML resource.
 	 * @param owner owner frame
+	 * @param resource path to HTML resource file.
 	 */
-	public static void showDialog(JFrame owner) {
-		InfoDialog dialog = new InfoDialog(owner);
+	public static void showDialog(JFrame owner, String resource) {
+		InfoDialog dialog = new InfoDialog(owner, resource);
 		dialog.setVisible(true);
 	}
 
@@ -120,9 +130,10 @@ public class InfoDialog extends JDialog {
 	 * given HTML resource.
 	 * @param owner owner frame
 	 * @param resource path to HTML resource file.
+	 * @param tmpl a template replacer for the HTML
 	 */
-	public static void showDialog(JFrame owner, String resource) {
-		InfoDialog dialog = new InfoDialog(owner, resource);
+	public static void showDialog(JFrame owner, String resource, Template tmpl) {
+		InfoDialog dialog = new InfoDialog(owner, resource, tmpl);
 		dialog.setVisible(true);
 	}
 

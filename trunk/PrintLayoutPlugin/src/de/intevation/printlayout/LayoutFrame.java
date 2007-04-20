@@ -87,12 +87,15 @@ import de.intevation.printlayout.util.FileFilter;
 import de.intevation.printlayout.util.PaperSizes;
 import de.intevation.printlayout.util.MatrixTools;
 import de.intevation.printlayout.util.ElementUtils;
+import de.intevation.printlayout.util.Template;
 
 import de.intevation.printlayout.beans.MapData;
 import de.intevation.printlayout.beans.ScaleUpdater;
 import de.intevation.printlayout.beans.ScaleBarUpdater;
 
 import de.intevation.printlayout.ui.JPEGParameterDialog;
+import de.intevation.printlayout.ui.OptionDialog;
+import de.intevation.printlayout.ui.InfoDialog;
 
 /**
  * Top level window containing the tool bar and the sheet panel.
@@ -867,6 +870,47 @@ implements   PickingInteractor.PickingListener
 	}
 
 	/**
+	 * Pops up an options dialog.
+	 */
+	protected void showOptionDialog() {
+		OptionDialog dialog = new OptionDialog(this);
+
+		dialog.addBooleanOption(Map2SVG.EXTRA_WAIT, 
+				I18N.getString("OptionDialog.Extra_Wait"));
+		dialog.addBooleanOption(Map2SVG.OPTIMIZE_MAP_SVG,
+				I18N.getString("OptionDialog.Optimize_Map"));
+		dialog.addBooleanOption(Map2SVG.USE_CSS,
+				I18N.getString("OptionDialog.Use_CSS"));
+		dialog.addDoubleOption(Map2SVG.SIMPLIFY_TOLERANCE,
+				I18N.getString("OptionDialog.SimplifyTolerance"));
+		dialog.addBooleanOption(PreviewMapReplacer.EXTRA_ZOOM_WAIT,
+				I18N.getString("OptionDialog.Extra_Zoom_Wait"));
+
+		dialog.showDialog();
+	}
+
+	/**
+	 * Pops up some usage information.
+	 */
+	public void showInfo() {
+		InfoDialog.showDialog(
+			LayoutFrame.this, 
+			"/de/intevation/printlayout/resources/info.html");
+	}
+
+	/**
+	 * Pops up an about dialog
+	 */
+	public void showAbout() {
+		Template tmpl = new Template();
+		tmpl.setVariable(
+			"PLUGIN_NAME_VERSION", PrintLayoutPlugin.getNameAndVersion());
+		InfoDialog.showDialog(
+			LayoutFrame.this, 
+			"/de/intevation/printlayout/resources/about.html", tmpl);
+	}
+
+	/**
 	 * called after layer reordering to update the actions
 	 */
 	private final DocumentManager.ModificationCallback UPDATE_LAYER_BUTTONS =
@@ -1178,7 +1222,7 @@ implements   PickingInteractor.PickingListener
 					I18N.getString("LayoutFrame.ShowAboutDialog", "&About...")));
 		}
 		public void actionPerformed(ActionEvent ae) {
-			InfoDialog.showDialog(LayoutFrame.this, "resources/about.html");
+			showAbout();
 		}
 	}
 
@@ -1192,7 +1236,7 @@ implements   PickingInteractor.PickingListener
 					KeyStroke.getKeyStroke("F1"));
 		}
 		public void actionPerformed(ActionEvent ae) {
-			InfoDialog.showDialog(LayoutFrame.this, "resources/info.html");
+			showInfo();
 		}
 	}
 
@@ -1201,20 +1245,7 @@ implements   PickingInteractor.PickingListener
 			super(I18N.getString("LayoutFrame.OptionDialog"));
 		}
 		public void actionPerformed(ActionEvent ae) {
-			OptionDialog dialog = new OptionDialog(LayoutFrame.this);
-
-			dialog.addBooleanOption(Map2SVG.EXTRA_WAIT, 
-					I18N.getString("OptionDialog.Extra_Wait"));
-			dialog.addBooleanOption(Map2SVG.OPTIMIZE_MAP_SVG,
-					I18N.getString("OptionDialog.Optimize_Map"));
-			dialog.addBooleanOption(Map2SVG.USE_CSS,
-					I18N.getString("OptionDialog.Use_CSS"));
-			dialog.addDoubleOption(Map2SVG.SIMPLIFY_TOLERANCE,
-					I18N.getString("OptionDialog.SimplifyTolerance"));
-			dialog.addBooleanOption(PreviewMapReplacer.EXTRA_ZOOM_WAIT,
-					I18N.getString("OptionDialog.Extra_Zoom_Wait"));
-	
-			dialog.showDialog();
+			showOptionDialog();
 		}
 	}
 

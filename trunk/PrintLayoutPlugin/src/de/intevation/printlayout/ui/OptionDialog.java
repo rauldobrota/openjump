@@ -9,7 +9,7 @@
  * This program is free software under the LGPL (>=v2.1)
  * Read the file LICENSE.txt coming with the sources for details.
  */
-package de.intevation.printlayout;
+package de.intevation.printlayout.ui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -30,6 +30,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JFormattedTextField;
 import javax.swing.JButton;
+
+import de.intevation.printlayout.Options;
+import de.intevation.printlayout.I18N;
 
 public class OptionDialog extends JDialog {
 
