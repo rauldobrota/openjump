@@ -1,5 +1,32 @@
 2007-04-20  Sascha Teichmann  <sascha.teichmann@intevation.de>
 
+	- Added option to turn on/off map simplification via option dialog.
+	- Readded the jump/* files to bring CVS back to sanity.
+
+	* src/de/intevation/printlayout/ui/OptionDialog.java:
+		Use pack() to finish layout.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		Add option for map simplification to option dialog
+
+	* src/de/intevation/printlayout/Map2SVG.java:
+		Added a system property 'de.intevation.printlayout.use.simplification'
+		to turn on/off map simplifiacation.
+
+	* src/de/intevation/printlayout/PreviewMapReplacer.java:
+		Adjusted to use the new flag.
+
+	* src/de/intevation/printlayout/i18n/messages.properties,
+		src/de/intevation/printlayout/i18n/messages_de.properties:
+		Added messages for new option.
+
+	* src/de/intevation/printlayout/jump/PreciseJava2DConverter.java,
+		src/de/intevation/printlayout/jump/PrecisePolygonShape.java,
+		src/de/intevation/printlayout/jump/SimplifyingJava2DConverter.java:
+		Readded. *lala* Oh Lord, won't you buy me some SVN? *lala*
+
+2007-04-20  Sascha Teichmann  <sascha.teichmann@intevation.de>
+
 	ATTENTION: Immediate commit to remove some CVS flaws!
 
 	* src/de/intevation/printlayout/jump/PreciseJava2DConverter.java,

@@ -144,7 +144,7 @@ implements   DocumentManager.Processor
 					null, 
 					null, 
 					paperSize,
-					Options.getInstance().getDouble(Map2SVG.SIMPLIFY_TOLERANCE));
+					Map2SVG.getSimplificationTolerance());
 
 				if (!NO_PREVIEW_CACHING)
 					previewData.storeCache(new SoftReference(root));

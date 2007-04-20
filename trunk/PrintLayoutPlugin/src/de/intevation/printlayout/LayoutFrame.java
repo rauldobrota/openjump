@@ -97,6 +97,8 @@ import de.intevation.printlayout.ui.JPEGParameterDialog;
 import de.intevation.printlayout.ui.OptionDialog;
 import de.intevation.printlayout.ui.InfoDialog;
 
+import de.intevation.printlayout.jump.SimplifyingJava2DConverter;
+
 /**
  * Top level window containing the tool bar and the sheet panel.
  */
@@ -887,8 +889,15 @@ implements   PickingInteractor.PickingListener
 
 		// only make option editable if call is supported
 		if (Map2SVG.supportsJava2DConverterSetter()) {
+
+			dialog.addBooleanOption(Map2SVG.USE_SIMPLIFICATION,
+					I18N.getString("OptionDialog.UseSimplification"));
+
 			dialog.addDoubleOption(Map2SVG.SIMPLIFY_TOLERANCE,
 					I18N.getString("OptionDialog.SimplifyTolerance"));
+
+			dialog.addBooleanOption(Map2SVG.PRESERVE_TOPOLOGY,
+					I18N.getString("OptionDialog.PreserveTopology"));
 		}
 
 		dialog.showDialog();

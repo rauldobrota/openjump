@@ -139,7 +139,7 @@ public class OptionDialog extends JDialog {
 	
 	public OptionDialog(JFrame frame) {
 		super(frame, I18N.getString("OptionDialog.Title"));
-		setSize(new Dimension(300, 300));
+		//setSize(new Dimension(300, 300));
 	}
 
 	public void addBooleanOption(String optionName, String description) {
@@ -186,6 +186,8 @@ public class OptionDialog extends JDialog {
 		setLayout(new BorderLayout());
 		add(panel, BorderLayout.CENTER);
 		add(buttonPanel, BorderLayout.SOUTH);
+
+		pack();
 
 		setVisible(true);
 	}

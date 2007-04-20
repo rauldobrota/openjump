@@ -117,8 +117,31 @@ implements   DocumentManager.DocumentModifier
 	public static final String GC_CALLS =
 		"de.intevation.printlayout.gc.calls";
 
+	/**
+	 * If the system property 'de.intevation.printlayout.simplify.tolerance'
+	 * is set to an positive value in mm of paper size this is used
+	 * as a tolerance value of simplification in map import. Defaults to 0.
+	 */
 	public static final String SIMPLIFY_TOLERANCE =
 		"de.intevation.printlayout.simplify.tolerance";
+
+	/**
+	 * If the system property 'de.intevation.printlayout.use.simplification'
+	 * is set to true the map is simplified with the tolerance of
+	 * 'de.intevation.printlayout.simplify.tolerance'. Defaults to false.
+	 */
+	public static final String USE_SIMPLIFICATION =
+		"de.intevation.printlayout.use.simplification";
+
+	/**
+	 * If the system property 'de.intevation.printlayout.simplify.preserve.topology'
+	 * is set to true then polygons are simplified with guaranteed preserving
+	 * the topology. This is slow and in most case it should be okay
+	 * to simplify the shell and the holes with the faster 
+	 * Douglas Peucker line simplifier. Defaults to false.
+	 */
+	public static final String PRESERVE_TOPOLOGY =
+		"de.intevation.printlayout.simplify.preserve.topology";
 	
 	/**
 	 * The plugin context is need to access the LayerViewPanel.
@@ -264,7 +287,8 @@ implements   DocumentManager.DocumentModifier
 
 					System.err.println("simplify tolerance: " + t);
 
-					converter = new SimplifyingJava2DConverter(vp, t);
+					boolean preserveTopology = Options.getInstance().getBoolean(PRESERVE_TOPOLOGY);
+					converter = new SimplifyingJava2DConverter(vp, t, preserveTopology);
 				}
 				else
 					converter = new PreciseJava2DConverter(vp);
@@ -427,6 +451,13 @@ implements   DocumentManager.DocumentModifier
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static final Double getSimplificationTolerance() {
+		Options options = Options.getInstance();
+		return options.getBoolean(USE_SIMPLIFICATION)
+			? options.getDouble(SIMPLIFY_TOLERANCE)
+			: null;
 	}
 
 
