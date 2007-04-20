@@ -1,5 +1,16 @@
 2007-04-20  Sascha Teichmann  <sascha.teichmann@intevation.de>
 
+	ATTENTION: Immediate commit to remove some CVS flaws!
+
+	* src/de/intevation/printlayout/jump/PreciseJava2DConverter.java,
+		src/de/intevation/printlayout/jump/PrecisePolygonShape.java,
+		src/de/intevation/printlayout/jump/SimplifyingJava2DConverter.java:
+		Issues CVS conflicts even if there are no diffs to the repro!
+		Very strange. I remove them for a commit and readd them afterwards.
+		Hope that helps.
+
+2007-04-20  Sascha Teichmann  <sascha.teichmann@intevation.de>
+
 	Improve options dialog a bit.
 
 	* src/de/intevation/printlayout/LayoutFrame.java:
