@@ -148,13 +148,19 @@ implements   DocumentManager.DocumentModifier
 		try {
 			Method method = Viewport.class.getMethod(
 				"setJava2DConverter", new Class[] { Java2DConverter.class });
-			System.err.println("Viewport.setJava2DConverter() found");
 			return method;
 		}
 		catch (Exception e) {
-			System.err.println("Viewport.setJava2DConverter() not found");
 			return null;
 		}
+	}
+
+	/**
+	 * Is the Viewport#setJava2DConverter(Java2DConverter) call supported?
+	 * @return true if call is supported, else false.
+	 */
+	public static final boolean supportsJava2DConverterSetter() {
+		return getJava2DConverterSetter() != null;
 	}
 
 	public Element createSVG(

@@ -1,4 +1,29 @@
-2007-04-20  Ludwig Reiter  <sascha.teichmann@intevation.de>
+2007-04-20  Sascha Teichmann  <sascha.teichmann@intevation.de>
+
+	Improve options dialog a bit.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		- Removed top level options menu. Start the options dialog 
+		  with an entry in the edit menu.
+		- Only add map simplification to options dialog
+		  if the ViewPort#setJava2DConverter() call is supported.
+
+	* src/de/intevation/printlayout/Map2SVG.java:
+		Added a method to check if ViewPort#setJava2DConverter()
+		is supported.
+		
+	* src/de/intevation/printlayout/Options.java:
+		Corrected a wrong spelled file name in header.
+
+	* src/de/intevation/printlayout/i18n/messages.properties,
+		src/de/intevation/printlayout/i18n/messages_de.properties:
+		Removed entry for option menu
+
+	* src/de/intevation/printlayout/ui/OptionDialog.java:
+		Commit changes in text field before fetching int or 
+		double values and make the result	more type robust.
+
+2007-04-20  Sascha Teichmann  <sascha.teichmann@intevation.de>
 
 	Cleaned up package structure a bit, centralized plugin version
 

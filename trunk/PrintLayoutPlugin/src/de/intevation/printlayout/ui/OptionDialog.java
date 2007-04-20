@@ -1,6 +1,6 @@
 /*
  * OptionDialog.java
- * ---------------
+ * -----------------
  * (c) 2007 by Intevation GmbH
  *
  * @author Sascha L. Teichmann (teichmann@intevation.de)
@@ -20,6 +20,8 @@ import java.awt.event.ActionListener;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import java.text.ParseException;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -74,10 +76,17 @@ public class OptionDialog extends JDialog {
 		}
 
 		protected void put() {
-			if (field != null) {
-				Options.getInstance().putInteger(
-						optionName, (Integer) field.getValue());
-			}
+			if (field != null)
+				try {
+					field.commitEdit();
+					Object value = field.getValue();
+					if (value instanceof Number)
+						Options.getInstance().putInteger(
+							optionName, new Integer(((Number)value).intValue()));
+				}
+				catch (ParseException pe) {
+					pe.printStackTrace();
+				}
 		}
 
 		protected JComponent createPanel() {
@@ -101,10 +110,17 @@ public class OptionDialog extends JDialog {
 		}
 
 		protected void put() {
-			if (field != null) {
-				Options.getInstance().putDouble(
-						optionName, (Double) field.getValue());
-			}
+			if (field != null)
+				try {
+					field.commitEdit();
+					Object value = field.getValue();
+					if (value instanceof Number)
+						Options.getInstance().putDouble(
+							optionName, new Double(((Number)value).doubleValue()));
+				}
+				catch (ParseException pe) {
+					pe.printStackTrace();
+				}
 		}
 
 		protected JComponent createPanel() {

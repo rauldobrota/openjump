@@ -189,7 +189,6 @@ implements   PickingInteractor.PickingListener
 		JMenu viewMenu   = createMenu("LayoutFrame.View",   "&View");
 		JMenu insertMenu = createMenu("LayoutFrame.Insert", "&Insert");
 		JMenu infoMenu   = createMenu("LayoutFrame.Help",   "&Help");
-		JMenu optionMenu = createMenu("LayoutFrame.Option", "&Option");
 
 		ExportSVGAction    svgExportAction    = new ExportSVGAction();
 		PDFAction          pdfAction          = new PDFAction();
@@ -204,6 +203,7 @@ implements   PickingInteractor.PickingListener
 										   ungroupAction      = new UngroupAction();
 											 upAction           = new UpAction();
 											 downAction         = new DownAction();
+		OptionDialogAction optionDialogAction = new OptionDialogAction();
 
 		RulerAction        rulerAction        = new RulerAction();
 
@@ -216,7 +216,6 @@ implements   PickingInteractor.PickingListener
 		                   addScaletextAction = new AddScaletextAction();
 		AboutDialogAction  aboutDialogAction  = new AboutDialogAction();
 		InfoDialogAction   infoDialogAction   = new InfoDialogAction();
-		OptionDialogAction optionDialogAction = new OptionDialogAction();
 
 		fileMenu.add(loadSessionAction);
 		fileMenu.add(saveSessionAction);
@@ -237,6 +236,8 @@ implements   PickingInteractor.PickingListener
 		editMenu.addSeparator();
 		editMenu.add(groupAction);
 		editMenu.add(ungroupAction);
+		editMenu.addSeparator();
+		editMenu.add(optionDialogAction);
 
 		removeAction  .setEnabled(false);
 		groupAction   .setEnabled(false);
@@ -257,8 +258,6 @@ implements   PickingInteractor.PickingListener
 		addScalebarAction .setEnabled(false);
 		addScaletextAction.setEnabled(false);
 		
-		optionMenu.add(optionDialogAction);
-		
 		infoMenu.add(infoDialogAction);
 		infoMenu.add(aboutDialogAction);
 
@@ -268,7 +267,6 @@ implements   PickingInteractor.PickingListener
 		menubar.add(editMenu);
 		menubar.add(viewMenu);
 		menubar.add(insertMenu);
-		menubar.add(optionMenu);
 		menubar.add(infoMenu);
 
 		setJMenuBar(menubar);
@@ -875,16 +873,23 @@ implements   PickingInteractor.PickingListener
 	protected void showOptionDialog() {
 		OptionDialog dialog = new OptionDialog(this);
 
-		dialog.addBooleanOption(Map2SVG.EXTRA_WAIT, 
+		dialog.addIntegerOption(Map2SVG.EXTRA_WAIT, 
 				I18N.getString("OptionDialog.Extra_Wait"));
+
+		dialog.addIntegerOption(PreviewMapReplacer.EXTRA_ZOOM_WAIT,
+				I18N.getString("OptionDialog.Extra_Zoom_Wait"));
+
 		dialog.addBooleanOption(Map2SVG.OPTIMIZE_MAP_SVG,
 				I18N.getString("OptionDialog.Optimize_Map"));
+
 		dialog.addBooleanOption(Map2SVG.USE_CSS,
 				I18N.getString("OptionDialog.Use_CSS"));
-		dialog.addDoubleOption(Map2SVG.SIMPLIFY_TOLERANCE,
-				I18N.getString("OptionDialog.SimplifyTolerance"));
-		dialog.addBooleanOption(PreviewMapReplacer.EXTRA_ZOOM_WAIT,
-				I18N.getString("OptionDialog.Extra_Zoom_Wait"));
+
+		// only make option editable if call is supported
+		if (Map2SVG.supportsJava2DConverterSetter()) {
+			dialog.addDoubleOption(Map2SVG.SIMPLIFY_TOLERANCE,
+					I18N.getString("OptionDialog.SimplifyTolerance"));
+		}
 
 		dialog.showDialog();
 	}
