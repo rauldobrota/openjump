@@ -873,7 +873,9 @@ implements   PickingInteractor.PickingListener
 	 * Pops up an options dialog.
 	 */
 	protected void showOptionDialog() {
-		OptionDialog dialog = new OptionDialog(this);
+		OptionDialog dialog = new OptionDialog(
+			this,
+			"/de/intevation/printlayout/resources/options_help.html");
 
 		dialog.addIntegerOption(Map2SVG.EXTRA_WAIT, 
 				I18N.getString("OptionDialog.Extra_Wait"));

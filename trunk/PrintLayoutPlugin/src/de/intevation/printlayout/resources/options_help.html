@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>Help for Options</title>
+</head>
+<body>
+<ul>
+  <li>
+  <b>Extra Wait:</b><br>
+  Database and WMS layers are rendered asynchronous. 
+  Due to a limitation in the *JUMP rendering engine it is
+  not easy to synchronize map imports when these kinds
+  of layers are used.<br>
+  Set this field to a postive number of seconds that
+  you want to wait after the 'officially' rendering
+  has ended. This may help to catch up with the asynchronous
+  rendered layers.
+  </li>
+  <li>
+  <b>Extra Zoom Wait:</b><br>
+  When using preview maps the plugin uses only simple
+  screen shots of the current map view which are placed
+  in the layout. If you are going to export the layout
+  (e.g. print it, store it to JPG or SVG) the map view
+  is zoomed back to the original positions and the real
+  map exports are done. This zooming around takes some
+  time. Set 'Extra Zoom Wait' parameter to a number
+  of seconds that will be waited before the map export
+  is done. That helps to get in sync with the GIS panel.
+  </li>
+  <li>
+  <b>Optimize Map:</b><br>
+  The SVG representation of the map coming from *JUMP
+  is not very smart formed in terms of SVG and uses
+  a lot of memory. If this option is enabled some
+  reorganisations are performed to improve this situation.
+  This is highly recommended even if it takes some time!
+  </li>
+  <li>
+  <b>Use CSS for map styling:</b><br>
+  If you import maps from *JUMP the graphical attributes
+  are normally stored right beside the geometries. If you
+  have a lot of equal styled features (e.g. with fill patterns)
+  it saves some resources if you enable this option. In this
+  case a class for each unique set of attributes is build and
+  the geometries only store references to this class.
+  </li>
+</ul>
+  <hr noshade>
+  <center>
+  <font color="blue">The following options are only available if you use a
+  newer version (after 03/21/2007) of OpenJUMP!</font>
+  </center>
+<ul>
+  <li>
+  <b>Use map simpilfication:</b><br>
+  Importing the raw geometries from GIS may result in a level of detail which
+  is potentially higher than needed in the print out. If you enable this
+  option you can simplify the geometries a bit before the import is done.
+  If you have e.g. a polygon with 5,000 vertices projected to a paper 
+  square of 1cm x 1cm it is very unlikely that you can see all the different 
+  vertices. Depending on the given simplification tolerance this also reduces the 
+  quantity of used memory. 
+  </li>
+  <li>
+  <b>Simplification tolerance:</b><br>
+  If you have turned on the map simplification this value is used as
+  the simplification tolerance in terms of paper size [mm]. If you 
+  e.g. decide that errors smaller than a quarter of a milli metre on 
+  the paper are acceptable for you layout set this to 0.25.
+  </li>
+  <li><b>Preserve polygon topology during simplification:</b><br>
+  If map simplification is on polygons are normally simplfied
+  with a fast algorithm that does not grant that the topologie
+  is preserved. This is no problem in common cases. If you experience
+  some problems with polygon simplification turn this option on. 
+  On the downside this slows down the simplification speed significantly!
+  </li>
+</ul>
+</body>
+</html>

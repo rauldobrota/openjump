@@ -1,3 +1,26 @@
+2007-04-21  Sascha Teichmann  <sascha.teichmann@intevation.de>
+
+	Help for options dialog.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		When opening the options dialog give name of help resource.
+
+	* src/de/intevation/printlayout/i18n/messages.properties,
+		src/de/intevation/printlayout/i18n/messages_de.properties:
+		Added message for help button in options dialog. Improved
+		some messages.
+
+	* src/de/intevation/printlayout/resources/options_help.html,
+		src/de/intevation/printlayout/resources/options_help_de.html:
+		New. English and german text of the help for the options dialog.
+
+	* src/de/intevation/printlayout/ui/InfoDialog.java:	
+		Embed JEditorPane in a JScrollPane to make info or help texts
+		scrollable.
+
+	* src/de/intevation/printlayout/ui/OptionDialog.java:
+		Added a help button.
+
 2007-04-20  Sascha Teichmann  <sascha.teichmann@intevation.de>
 
 	- Added option to turn on/off map simplification via option dialog.

@@ -136,10 +136,16 @@ public class OptionDialog extends JDialog {
 
 	protected Dimension TF_SIZE = new Dimension(50, 20);
 	protected ArrayList optionList = new ArrayList();
+
+	protected String    helpResource;
 	
 	public OptionDialog(JFrame frame) {
+		this(frame, null);
+	}
+
+	public OptionDialog(JFrame frame, String helpResource) {
 		super(frame, I18N.getString("OptionDialog.Title"));
-		//setSize(new Dimension(300, 300));
+		this.helpResource = helpResource;
 	}
 
 	public void addBooleanOption(String optionName, String description) {
@@ -180,6 +186,17 @@ public class OptionDialog extends JDialog {
 			}
 		});
 		
+		if (helpResource != null) {
+			JButton helpButton = new JButton(
+				I18N.getString("PropertiesDialog.Help"));
+			helpButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent ae) {
+					InfoDialog.showDialog(OptionDialog.this, helpResource);
+				}
+			});
+			buttonPanel.add(helpButton);
+		}
+
 		buttonPanel.add(okButton);
 		buttonPanel.add(cancelButton);
 		

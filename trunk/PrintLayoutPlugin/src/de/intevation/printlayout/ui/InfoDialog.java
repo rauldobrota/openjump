@@ -14,6 +14,7 @@ package de.intevation.printlayout.ui;
 import java.awt.Color;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Dialog;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -29,6 +30,7 @@ import javax.swing.JFrame;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JEditorPane;
+import javax.swing.JScrollPane;
 
 import de.intevation.printlayout.PrintLayoutPlugin;
 
@@ -41,12 +43,35 @@ public class InfoDialog extends JDialog {
 
 	/**
 	 * creates a dialog for a given resource.
+	 * @param owner owner dialog
+	 * @param resource path to HTML resource file.
+	 */
+	public InfoDialog(Dialog owner, String resource) {
+		this(owner, resource, null);
+	}
+
+	
+	/**
+	 * creates a dialog for a given resource.
+	 * @param owner owner dialog
+	 * @param resource path to HTML resource file.
+	 * @param tmpl a template replacer that replaces variables in the HTML.
+	 *        null permitted.
+	 */
+	public InfoDialog(Dialog owner, String resource, Template tmpl) {
+		super(owner);
+		initAndShow(resource, tmpl);
+	}
+
+	/**
+	 * creates a dialog for a given resource.
 	 * @param owner owner frame
 	 * @param resource path to HTML resource file.
 	 */
 	public InfoDialog(JFrame owner, String resource) {
 		this(owner, resource, null);
 	}
+
 	
 	/**
 	 * creates a dialog for a given resource.
@@ -57,6 +82,15 @@ public class InfoDialog extends JDialog {
 	 */
 	public InfoDialog(JFrame owner, String resource, Template tmpl) {
 		super(owner);
+		initAndShow(resource, tmpl);
+	}
+
+	/**
+	 * Loads the HTML resource and displays it.
+	 * @param resource the resource to load
+	 * @param tmpl the optional template replacer
+	 */
+	protected void initAndShow(String resource, Template tmpl) {
 
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setBackground(Color.WHITE);
@@ -109,10 +143,37 @@ public class InfoDialog extends JDialog {
 		JEditorPane infoText = new JEditorPane("text/html", text);
 		infoText.setEditable(false);
 
-		add(infoText, BorderLayout.CENTER);
+    JScrollPane scrollPane = new JScrollPane(infoText);
+
+		add(scrollPane, BorderLayout.CENTER);
 		setSize(400, 500);
+    //infoText.scrollToReference("#");
+    //scrollPane.scrollRectToVisible(new java.awt.Rectangle(0, 0, 400, 300));
 		
 	} 
+
+	/**
+	 * static helper to create and show a dialog for a
+	 * given HTML resource.
+	 * @param owner owner dialog
+	 * @param resource path to HTML resource file.
+	 */
+	public static void showDialog(Dialog owner, String resource) {
+		InfoDialog dialog = new InfoDialog(owner, resource);
+		dialog.setVisible(true);
+	}
+
+	/**
+	 * static helper to create and show a dialog for a
+	 * given HTML resource.
+	 * @param owner owner dialog
+	 * @param resource path to HTML resource file.
+	 * @param tmpl a template replacer for the HTML
+	 */
+	public static void showDialog(Dialog owner, String resource, Template tmpl) {
+		InfoDialog dialog = new InfoDialog(owner, resource, tmpl);
+		dialog.setVisible(true);
+	}
 
 	/**
 	 * static helper to create and show a dialog for a

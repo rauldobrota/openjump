@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>Hilfe zu den Einstellungen</title>
+</head>
+<body>
+<ul>
+  <li>
+  <b>Extra Wartezeit:</b><br>
+  Datenbank- und WMS-Layer werden asynchron dargestellt.
+  Aufgrund von internen Einschränkungen im Kern von *JUMP
+  ist es nicht ohne weiteres möglich, beim Gebrauch von
+  derartigen Layern den Import synchron abzuschliessen.<br>
+  Setzt man diesen Wert auf eine positive Ganzzahl, wird
+  diese als zusätzliche Wartezeit in Sekunden interpretiert, 
+  die nach dem eigentlichen Ende des Imports noch auf asynchrone
+  dargestellte Layer gewartet wird.
+  </li>
+  <li>
+  <b>Extra Zoom Wartezeit:</b><br>
+  Wenn man Voransichtskarten benutzt, werden beim Import
+  der Karten in das Layout-Fenster nur einfache Bildschirmfotos
+  des GIS-Fensters eingehängt. Wenn das Layout dann exportiert
+  werden soll (z.B. gedruckt, als Bild abgespeichert, etc.),
+  wird das GIS-Fenster wieder an die Positionen auf der Karte gezoomt,
+  an denen die Bildschirmfotos aufgenommen wurden. Erst dann wird 
+  der echte Karten-SVG-Import durchgeführt. Da das Zoomen asynchron
+  durchgeführt wird, kann diese Option benutzt werden, um eine
+  Anzahl an Sekunden anzugeben, die nach dem jeweiligen Zoomen
+  auf eine Position gewartet werden soll, bevor mit dem Karten-Import
+  begonnen wird.
+  </li>
+  <li>
+  <b>SVG-Karte optimieren:</b><br>
+  Die SVG-Version der Karte, so wie sie von *JUMP kommt, ist suboptimal.
+  Insbesondere verbraucht sie sehr viel Hauptspeicher. Wenn diese
+  Option eingeschaltet ist, werden nach dem Import einigen interne
+  Umstrukturierungen vorgenommen, die diese Situation verbessern.
+  Dies ist sehr zu empfehlen auch wenn es etwas Zeit in Anspruch nimmt!
+  </li>
+  <li>
+  <b>Styling der der Geometrien über CSS:</b><br>
+  Beim Import von Karten aus *JUMP in das Plug-In werden die
+  grafischen Attribute üblicherweise für jede Geometrie
+  einzeln erzeugt und gespeichert. Hat man allerdings viele
+  gleich attributierte Geometrien (z.B. mit Füllmustern) kann
+  es sich als sinnvoll erweisen, Klassen von Attributen zu erstellen,
+  so dass die einzelnen Geometrien nur noch Verweise auf diese
+  Klassen benötigen und nicht mehr die Attribute selbst.
+  Diese Option schaltet diese Klassenbildung ein.
+  </li>
+</ul>
+  <hr noshade>
+  <center>
+  <font color="blue">Die nachfolgenden Optionen stehen erst zur Verfügung,
+  wenn Sie ein neuere Version (nach 21-Mrz-2007) von OpenJUMP benutzen!</font>
+  </center>
+<ul>
+  <li>
+  <b>Karten beim Import vereinfachen:</b><br>
+  Beim Import der rohen Geometrien aus dem GIS kann es passieren,
+  dass ein höherer Detailgrad erreicht wird, als er für den Ausdruck benötigt
+  wird. Wird diese Option aktiviert, werden die Geometrien (Linien und
+  Polygone) vor dem Import generalisiert. Wenn man z.B. ein Polygon
+  mit 5.000 Vertices auf ein Quadrat der Größe 1cm x 1cm drucken möchte,
+  ist es unwahrscheinlich, dass noch alle Feinheiten wahrgenommen werden.
+  In Abhängigkeit von der gewählten Toleranz kann zudem der Speicherverbrauch
+  beachtlich gesenkt werden.
+  </li>
+  <li>
+  <b>Vereinfachungs-Toleranz:</b><br>
+  Wenn die Vereinfachung eingeschaltet ist, wird dieser Wert als
+  Fehlertoleranzwert in Papier-Millimetern genommen. Wenn man sich
+  z.B. dafür entscheidet, dass Abweichungen auf dem Papier kleiner
+  als ein Viertelmillimeter tolerierbar sind, kann man diesen Wert
+  auf 0,25 setzen.
+  </li>
+  <li><b>Beim Vereinfachen Polygon-Topologie erhalten:</b><br>
+  Ist die Vereinfachung eingeschaltet, wird standardmäßig ein
+  recht schneller Algorithmus zum Generalisieren der Polygone
+  benutzt. Dieser garantiert allerdings nicht, dass die Topolygie
+  immer erhalten bleicht. In der Regel stellt dies allerdings kein
+  Problem dar. Wenn Sie allerdings Probleme beim Import von
+  vereinfachten Polygonen bekommen sollten, aktivieren Sie bitte
+  diese Option. Es ist zu beachten, dass dadurch die Vereinfachung
+  signifikant(!) verlangsamt wird.
+  </li>
+</ul>
+</body>
+</html>
