@@ -1,5 +1,10 @@
 2007-04-24  Ludwig Reiter  <ludwig.reiter@intevation.de>
 	
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		small code cleanup.
+	
+2007-04-24  Ludwig Reiter  <ludwig.reiter@intevation.de>
+	
 	Print Border View installed.
 
 	* src/de/intevation/printlayout/tools/PrintBorderOverlay.java:

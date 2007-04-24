@@ -230,7 +230,6 @@ implements   PickingInteractor.PickingListener
 
 		RulerAction        rulerAction        = new RulerAction();
 		PrintBorderAction  printBorderAction  = new PrintBorderAction();
-		//PrintBorderOptionAction printOptionAction = new PrintBorderOptionAction();
 
 		ImportImageAction  imageImportAction  = new ImportImageAction();
 		ImportSVGAction    svgImportAction    = new ImportSVGAction();
@@ -273,7 +272,6 @@ implements   PickingInteractor.PickingListener
 		viewMenu.add(new JCheckBoxMenuItem(rulerAction));
 		printBorderMenuItem = new JCheckBoxMenuItem(printBorderAction);
 		viewMenu.add(printBorderMenuItem);
-		//viewMenu.add(printOptionAction);
 
 		insertMenu.add(addMapAction);
 		insertMenu.add(addPreviewAction);
@@ -1457,35 +1455,5 @@ implements   PickingInteractor.PickingListener
 			activateBorder(((JCheckBoxMenuItem)ae.getSource()).getState());
 		}
 	}
-
-	/*private class PrintBorderOptionAction extends AbstractAction {
-		PrintBorderOptionAction() {
-			super(I18N.getString("LayoutFrame.BorderOption", "Border Options..."));
-		}
-		public void actionPerformed(ActionEvent ae) {
-			OptionDialog dialog = new OptionDialog(LayoutFrame.this, null);
-			dialog.addDoubleOption(LEFT_BORDER, 
-				I18N.getString("OptionDialog.LeftBorder", "LeftBorder"));
-			dialog.addDoubleOption(BOTTOM_BORDER,
-				I18N.getString("OptionDialog.BottomBorder", "BottomBorder"));
-			dialog.addDoubleOption(RIGHT_BORDER,
-				I18N.getString("OptionDialog.RightBorder", "RightBorder"));
-			dialog.addDoubleOption(TOP_BORDER,
-				I18N.getString("OptionDialog.TopBorder","TopBorder"));
-			
-			dialog.addOkListener(new OptionDialog.OkListener() {
-				public void onOk() {
-					if (!LayoutFrame.this.printBorderMenuItem.getState())
-						return;
-			
-						
-					LayoutFrame.this.printerBorderOverlay.setPrintBorder(
-						LayoutFrame.this.getBorder());
-				}
-			});
-
-			dialog.showDialog();
-		}
-	}*/
 }
 // end of file
