@@ -1,3 +1,29 @@
+2007-04-24  Ludwig Reiter  <ludwig.reiter@intevation.de>
+	
+	Print Border View installed.
+
+	* src/de/intevation/printlayout/tools/PrintBorderOverlay.java:
+		Added. Overlay for the print border.
+	
+	* src/de/intevation/printlayout/DocumentManager.java:
+		Printing uses a pageFormat with changed
+		ImageableArea.
+	
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		Added a new Show Border action in view menu and
+		new options to the options dialog.
+		Observes the preferences and change the border, if
+		needed.
+	
+	* src/de/intevation/printlayout/Options.java:
+		With a PreferenceChangeListener you can observe
+		the preferences.
+
+	* src/de/intevation/printlayout/i18n/messages_de.properties,
+	  src/de/intevation/printlayout/i18n/messages.properties:
+	  	Added labels for the border options and the show border
+		action.
+
 2007-04-21  Sascha Teichmann  <sascha.teichmann@intevation.de>
 
 	Help for options dialog.
@@ -6,7 +32,7 @@
 		When opening the options dialog give name of help resource.
 
 	* src/de/intevation/printlayout/i18n/messages.properties,
-		src/de/intevation/printlayout/i18n/messages_de.properties:
+	src/de/intevation/printlayout/i18n/messages_de.properties:
 		Added message for help button in options dialog. Improved
 		some messages.
 

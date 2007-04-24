@@ -12,6 +12,7 @@
 package de.intevation.printlayout;
 
 import java.util.prefs.Preferences;
+import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.BackingStoreException;
 
 /**
@@ -196,6 +197,18 @@ public class Options
 		catch (BackingStoreException bse) {
 			bse.printStackTrace();
 		}
+	}
+
+	public void addPreferenceChangeListener(PreferenceChangeListener listener) {
+		Preferences prefs = Preferences.userNodeForPackage(getClass());
+		prefs.addPreferenceChangeListener(listener);
+	}
+	
+	public void removePreferenceChangeListener(
+			PreferenceChangeListener listener
+	) {
+		Preferences prefs = Preferences.userNodeForPackage(getClass());
+		prefs.removePreferenceChangeListener(listener);
 	}
 }
 // end of file
