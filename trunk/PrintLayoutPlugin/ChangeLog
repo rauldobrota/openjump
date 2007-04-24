@@ -1,4 +1,23 @@
 2007-04-24  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	print border view. (part 2)
+	Now it is possible to configure some lines which represent
+	the print border of the used printer. If a negative
+	border is choosen, then this line is not shown.
+
+	* src/de/intevation/printlayout/DocumentManager.java:
+		The imageable area of the paper is not changed, so there
+		is no need to call print with border Doubles.
+
+	* src/de/intevation/printlayout/LayoutFrame.java:
+		changed the print method. It is no longer called
+		with border Doubles.
+
+	* src/de/intevation/printlayout/tools/PrintBorderOverlay.java:
+		If a border value is negativ, the proper line is not shown. 
+		
+
+2007-04-24  Ludwig Reiter  <ludwig.reiter@intevation.de>
 	
 	* src/de/intevation/printlayout/LayoutFrame.java:
 		small code cleanup.

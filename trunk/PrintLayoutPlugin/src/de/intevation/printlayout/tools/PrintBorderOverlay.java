@@ -69,15 +69,7 @@ implements   Overlay
 
 	public void setPrintBorder(Double[] borderInCm) {
 		if (borderInCm == null
-				|| borderInCm.length != 4
-				|| borderInCm[0] == null
-				|| borderInCm[0].doubleValue() < 0
-				|| borderInCm[1] == null
-				|| borderInCm[1].doubleValue() < 0
-				|| borderInCm[2] == null
-				|| borderInCm[2].doubleValue() < 0
-				|| borderInCm[3] == null
-				|| borderInCm[3].doubleValue() < 0)
+				|| borderInCm.length != 4)
 			border = null;
 		else
 			border = borderInCm;
@@ -129,28 +121,43 @@ implements   Overlay
 		
 		double [] size = documentManager.getPaperSize();
 		
-		double leftBorder = border[0].doubleValue() * 10;
-		double bottomBorder = size[1] - border[1].doubleValue() * 10;
-		double rightBorder = size[0] - border[2].doubleValue() * 10;
-		double topBorder =  border[3].doubleValue() * 10;
-	
-		Point2D.Double p1 = new Point2D.Double(leftBorder, topBorder);
-		Point2D.Double p2 = new Point2D.Double(leftBorder, bottomBorder);
-		transformAndDraw(g2d, CTM, p1, p2);
+		
+		
+		
 
-		p1 = new Point2D.Double(leftBorder, bottomBorder);
-		p2 = new Point2D.Double(rightBorder , bottomBorder);
-		transformAndDraw(g2d, CTM, p1, p2);
-	
-		p1 = new Point2D.Double(rightBorder, topBorder);
-		p2 = new Point2D.Double(rightBorder, bottomBorder);
-		transformAndDraw(g2d, CTM, p1, p2);
+		if (checkNeedLine(border[0])) {
+			double leftBorder = border[0].doubleValue() * 10;
+			Point2D.Double p1 = new Point2D.Double(leftBorder, 0);
+			Point2D.Double p2 = new Point2D.Double(leftBorder, size[1]);
+			transformAndDraw(g2d, CTM, p1, p2); 
+		}
 
-		p1 = new Point2D.Double(leftBorder, topBorder);
-		p2 = new Point2D.Double(rightBorder, topBorder);
-		transformAndDraw(g2d, CTM, p1, p2);
+		if (checkNeedLine(border[1])) {
+			double bottomBorder = size[1] - border[1].doubleValue() * 10;
+			Point2D.Double p1 = new Point2D.Double(0, bottomBorder);
+			Point2D.Double p2 = new Point2D.Double(size[0], bottomBorder);
+			transformAndDraw(g2d, CTM, p1, p2);
+		}
+	
+		if (checkNeedLine(border[2])) {
+			double rightBorder = size[0] - border[2].doubleValue() * 10;
+			Point2D.Double p1 = new Point2D.Double(rightBorder, 0);
+			Point2D.Double p2 = new Point2D.Double(rightBorder, size[1]);
+			transformAndDraw(g2d, CTM, p1, p2);
+		}
+	
+		if (checkNeedLine(border[3])) {
+			double topBorder =  border[3].doubleValue() * 10;
+			Point2D.Double p1 = new Point2D.Double(0, topBorder);
+			Point2D.Double p2 = new Point2D.Double(size[0], topBorder);
+			transformAndDraw(g2d, CTM, p1, p2);
+		}
 	} // paint()
 
+	protected boolean checkNeedLine(Double d) {
+		return d != null && d.doubleValue() > 0;
+	}
+	
 	protected void transformAndDraw(
 			Graphics2D g2d, 
 			AffineTransform CTM, 

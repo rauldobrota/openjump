@@ -621,7 +621,7 @@ implements   PickingInteractor.PickingListener
 	 * starts printing.
 	 */
 	public void print() {
-		docManager.print(getBorder());
+		docManager.print();
 	}
 
 	/**

@@ -1250,11 +1250,7 @@ public class DocumentManager
 	/**
 	 * prints the document of this manager.
 	 */
- 	public void print() {
-		print(null);
-	}
-
-	public void print(final Double[] border) {
+	public void print() {
 		processInnerDocumentInBackground(
 			"none",
 			new Processor() {
@@ -1273,32 +1269,10 @@ public class DocumentManager
 
 					double [] size = documentManager.getPaperSize();
 
-					System.err.println("DEBUG: size[0]=" +size[0]+" size[1]=" + size[1]);
 					Paper paper = new Paper();
 					double width  = TypoUnits.mm2in(size[0])*72d;
 					double height = TypoUnits.mm2in(size[1])*72d;
 					paper.setSize(width, height);
-					if (border != null
-					&& border.length == 4
-					&& border[0] != null
-					&& border[0].doubleValue() >= 0
-					&& border[1] != null
-					&& border[1].doubleValue() >= 0
-					&& border[2] != null
-					&& border[2].doubleValue() >= 0
-					&& border[3] != null
-					&& border[3].doubleValue() >= 0) {
-						double x = TypoUnits.mm2in(border[0].doubleValue() * 10)*72d;
-						double y = TypoUnits.mm2in(border[3].doubleValue() * 10)*72d;
-						double areaWidth = 
-							Math.max(1, 
-									width - x - TypoUnits.mm2in(border[2].doubleValue() * 10)*72d);
-						double areaHeight =
-							Math.max(1,
-							height - y - TypoUnits.mm2in(border[1].doubleValue() *10)*72d);
-						paper.setImageableArea(x, y, areaWidth, areaHeight);
-					}
-
 					pageFormat.setPaper(paper);
 
 					job.setPrintable(new Printable() {
