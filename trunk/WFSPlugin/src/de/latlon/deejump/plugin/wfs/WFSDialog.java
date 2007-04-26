@@ -60,6 +60,7 @@ import de.latlon.deejump.ui.DeeJUMPException;
 import de.latlon.deejump.ui.ExtensibleComboBox;
 import de.latlon.deejump.ui.Messages;
 import de.latlon.deejump.util.data.JUMPFeatureFactory;
+import de.latlon.deejump.util.data.WFSClientHelper;
 
 /**
  * This dialog presents a graphical user interface to OGC Filter operations. It
@@ -248,157 +249,6 @@ public class WFSDialog extends JDialog {
         setSize( 450, 300 );
         setResizable( true );
 
-        // convenience panel
-        mainPanel = new JPanel();
-        setContentPane( mainPanel );
-        LayoutManager lm = new BoxLayout( mainPanel, BoxLayout.Y_AXIS );
-        mainPanel.setLayout( lm );
-
-        //combo box for WFS URLs
-        serverCombo = createServerCombo();
-        serverCombo.setPreferredSize( new Dimension( 260, 21 ) );
-        String txt = Messages.getString( "FeatureResearchDialog.wfsService" );
-        serverCombo.setBorder( BorderFactory.createTitledBorder( txt ) ); 
-        txt = Messages.getString( "FeatureResearchDialog.wfsServiceToolTip" );
-        serverCombo.setToolTipText( txt );
-        
-        mainPanel.add(serverCombo);
-        
-        // connect and capabilities button
-        
-        JButton connecButton = new JButton( Messages.getString( "FeatureResearchDialog.connect" ) );
-        connecButton.setAlignmentX( 0.5f );
-        connecButton.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e ) {
-                reinitService( (String) serverCombo.getSelectedItem() );
-            }
-        } );
-
-
-        capabilitiesButton = new JButton( "Capabilities..." );
-        capabilitiesButton.setEnabled( false );
-        capabilitiesButton.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e ) {
-                createXMLFrame( WFSDialog.this, wfService.getCapabilitesAsString());
-            }
-        } );
-        
-        JPanel p = new JPanel();
-        p.setLayout( new BoxLayout(p, BoxLayout.Y_AXIS ) );
-        p.setPreferredSize( this.getSize() );
-        
-        // version buttons
-        p.add( createVersionButtons( new String[]{ "1.0.0", "1.1.0" } ) );
-        
-        
-        JPanel innerPanel = new JPanel();
-        innerPanel.add( connecButton );
-        innerPanel.add( capabilitiesButton );
-        p.add( innerPanel );
-        
-        featureTypeCombo = createFeatureTypeCombo();
-        featureTypeCombo.setVisible( false );
-        p.add( featureTypeCombo );
-
-        final Dimension dim = new Dimension( 400, 670 );
-        final Dimension minDim = new Dimension( 400, 500 );
-
-        tabs = new JTabbedPane() {
-            public Dimension getPreferredSize() {
-                return dim;
-            }
-
-            public Dimension getMinimumSize() {
-                return minDim;
-            }
-        };
-
-        attributeResPanel = new PropertyCriteriaPanel( this, featureTypeCombo );
-        attributeResPanel.setEnabled( false );
-        tabs.add( Messages.getString( "FeatureResearchDialog.attributeSearch" ), attributeResPanel );
-
-        propertiesPanel = new PropertySelectionPanel( this );
-        tabs.add( "Properties", propertiesPanel );
-
-        spatialResPanel = new SpatialCriteriaPanel( this );
-        tabs.add( Messages.getString( "FeatureResearchDialog.spatialSearch" ), spatialResPanel );
-
-        tabs.add( Messages.getString( "FeatureResearchDialog.request" ), createRequestTextArea() );
-
-        //TODO i18n
-        tabs.add( Messages.getString( "FeatureResearchDialog.response" ), createrResponseTextArea() );
-
-        box = Box.createHorizontalBox();
-        box.setBorder( BorderFactory.createEmptyBorder( 20, 5, 10, 5 ));
-        okButton = new JButton( Messages.getString( "OK" ) );
-        //okButton.setAlignmentX(0.5f);
-        okButton.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e ) {
-                System.out.println("in jump modus it is set invisible....");
-                //setVisible( false );
-                setCanSearch( true );
-                
-            }
-        });
-        
-        okButton.setEnabled( false );
-        okButton.setFocusable( true );
-
-        cancelButton = new JButton( Messages.getString( "CANCEL" ) );
-
-        cancelButton.setAlignmentX( 0.5f );
-        cancelButton.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e ) {
-                setVisible( false );
-                setCanSearch( false );
-
-            }
-        } );
-
-        mainPanel.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
-        mainPanel.add( p );
-//        mainPanel.add( Box.createVerticalStrut( 10 ) );
-
-        //TODO externalize
-        final String showAdvanced = "Advanced";
-        final String hideAdvanced = "Hide Advanced Settings";
-
-        extrasButton = new JButton( showAdvanced );
-        extrasButton.setBounds( 260, 20, 80, 20 );
-        extrasButton.setAlignmentX( 0.5f );
-        extrasButton.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e ) {
-                String actComm = e.getActionCommand();
-                JButton b = (JButton) e.getSource();
-                if ( showAdvanced.equals( actComm ) ) {
-                    mainPanel.remove( box );
-                    //hmm, size is hard coded :-(
-                    setSize( 450, 800 );
-                    //pack(); //is not looking very nice
-                    mainPanel.add( tabs );
-                    mainPanel.add( box );
-                    b.setText( hideAdvanced );
-                    b.setActionCommand( hideAdvanced );
-                } else {
-                    mainPanel.remove( box );
-                    mainPanel.remove( tabs );
-                    setSize( 450, 300 );
-                    //pack();
-                    mainPanel.add( box );
-                    b.setText( showAdvanced );
-                    b.setActionCommand( showAdvanced );
-
-                }
-            }
-        } );
-
-        box.add( extrasButton );
-        box.add( new JLabel( "         " ) );//Box.createHorizontalStrut(20));
-        box.add( okButton );
-        box.add( new JLabel( "         " ) );//Box.createHorizontalStrut(20));
-        box.add( cancelButton );
-        mainPanel.add( Box.createVerticalStrut( 50 ) );
-        mainPanel.add( box );
     }
 
     private Component createVersionButtons( String[] versions ) {
@@ -889,20 +739,6 @@ public class WFSDialog extends JDialog {
                     System.exit( 0 );
                 }
             } );
-
-            rd.okButton.addActionListener( new ActionListener(){
-                public void actionPerformed( ActionEvent e ) {
-                       
-                    String resp  = null;
-                    try {
-                        resp = JUMPFeatureFactory.createResponsefromWFS( rd.getWfService().getGetFeatureURL() , rd.createRequest().toString() );
-                    } catch ( DeeJUMPException e1 ) {
-                        e1.printStackTrace();
-                        resp = e1.getMessage();
-                    }
-                    rd.responseTextArea.setText( resp );
-                }
-            });
 
             rd.cancelButton.addActionListener( new ActionListener(){
                 public void actionPerformed( ActionEvent e ) {

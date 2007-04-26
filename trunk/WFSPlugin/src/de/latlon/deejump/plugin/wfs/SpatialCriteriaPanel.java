@@ -111,7 +111,7 @@ class SpatialCriteriaPanel extends JPanel {
     private String selectedOperation = "Intersects";
         
     /**The parent dialog. Keep this reference to make matters simple */
-    private WFSDialog researchDialog;
+    private WFSPanel researchDialog;
 
     private JComboBox geomPropsCombo;
     
@@ -120,7 +120,7 @@ class SpatialCriteriaPanel extends JPanel {
      * 
      * @param rd the parent FeatureResearchDialog
      */
-    public SpatialCriteriaPanel(WFSDialog rd) {
+    public SpatialCriteriaPanel(WFSPanel rd) {
         super();
         this.researchDialog = rd;
         initGUI();

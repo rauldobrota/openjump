@@ -70,7 +70,7 @@ class PropertyCriteriaPanel extends JPanel {
     private ArrayList criteriaList = new ArrayList();
     
     /**The parent dialog. Keep this reference to make matters simple */
-    private WFSDialog researchDialog;
+    private WFSPanel researchDialog;
 
     protected JComboBox featureTypeCombo;
     
@@ -103,7 +103,7 @@ class PropertyCriteriaPanel extends JPanel {
      * Creates an AttributeResearchPanel.
      * @param rd the parent FeatureResearchDialog
      */
-    public PropertyCriteriaPanel( WFSDialog rd, JComboBox jcb) {
+    public PropertyCriteriaPanel( WFSPanel rd, JComboBox jcb) {
         super();
         this.researchDialog = rd;
         initGUI(jcb);

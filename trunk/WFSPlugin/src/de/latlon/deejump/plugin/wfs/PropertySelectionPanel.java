@@ -42,13 +42,13 @@ import org.deegree.model.feature.schema.PropertyType;
 public class PropertySelectionPanel extends JPanel {
 
     
-    private WFSDialog parentDialog;
+    private WFSPanel parentDialog;
 
     protected JList propertiesList;
 
     protected JComboBox geoPropsCombo; 
     
-    public PropertySelectionPanel( WFSDialog parentDialog ){
+    public PropertySelectionPanel( WFSPanel parentDialog ){
         super();
         this.parentDialog = parentDialog;
         initGUI();
@@ -176,6 +176,9 @@ public class PropertySelectionPanel extends JPanel {
 /* ********************************************************************
 Changes to this class. What the people have been up to:
 $Log$
+Revision 1.2  2007/04/26 13:14:59  taddei
+Major refactoring to use WFSPanel in a Frame (WFSFrame) and in a Dialog (WFSDialog, still to do).
+
 Revision 1.1  2007/04/26 09:19:26  taddei
 Added initial working version of classes and complementary files.
 

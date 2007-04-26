@@ -1,34 +1,11 @@
-/*----------------    FILE HEADER  ------------------------------------------
-
- Copyright (C) 2001-2005 by:
- lat/lon GmbH
- http://www.lat-lon.de
-
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
-
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
-
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
- Contact:
-
- Andreas Poth
- lat/lon GmbH
- Aennchenstra�e 19
- 53177 Bonn
- Germany
-
-
- ---------------------------------------------------------------------------*/
-
+/*
+ * (c) 2007 by lat/lon GmbH
+ *
+ * @author Ugo Taddei (taddei@latlon.de)
+ *
+ * This program is free software under the GPL (v2.0)
+ * Read the file LICENSE.txt coming with the sources for details.
+ */
 package de.latlon.deejump.util.data;
 
 import java.io.BufferedReader;
@@ -186,51 +163,7 @@ public class JUMPFeatureFactory {
         return createDeegreeFCfromWFS( serverUrl, ( (Marshallable) request ).exportAsXML() );
     }
 
-    public static String createResponsefromWFS( String serverUrl, String request ) throws DeeJUMPException {
-        LOG.info( "WFS GetFeature: " + serverUrl +  " -> " + request ); //$NON-NLS-1$ //$NON-NLS-2$
-        
-        HttpClient httpclient = new HttpClient();
-        PostMethod httppost = new PostMethod( serverUrl );
-        httppost.setRequestEntity( new StringRequestEntity( request ) );
-        
-        InputStream is = null;
-        try {
-            httpclient.executeMethod( httppost );
-            is = httppost.getResponseBodyAsStream();
 
-        } catch ( HttpException e ) {
-            String mesg = "Error opening connection with " + serverUrl; 
-            LOG.error( mesg, e );
-            throw new DeeJUMPException( mesg, e  );
-        } catch ( IOException e ) {
-            String mesg = "Error opening connection with " + serverUrl; 
-            LOG.error( mesg, e );
-            throw new DeeJUMPException( mesg, e  );
-        }
-
-        
-        InputStreamReader ireader = new InputStreamReader( is );
-//        BufferedReader br = new BufferedReader( ireader );
-//        StringBuffer sb = new StringBuffer( 50000 );
-        String s = null;
-        
-        try {
-            
-            s = inputStreamToString( is );
-            /*
-            while (( s = br.readLine() ) != null) {
-                sb.append( s );
-            }
-            s = sb.toString();
-            br.close();
-*/
-        } catch ( IOException e ) {
-            String mesg = "Error opening connection with " + serverUrl; 
-            LOG.error( mesg, e );
-            throw new DeeJUMPException( mesg, e  );
-        }
-        return s;
-    }
     
     /**
      * Creates a deegree <code>FeatureCollection</code> from a given GetFeature request to a
@@ -246,7 +179,7 @@ public class JUMPFeatureFactory {
      */
     public static org.deegree.model.feature.FeatureCollection createDeegreeFCfromWFS( String serverUrl, String request ) throws DeeJUMPException {
 
-        String s = createResponsefromWFS( serverUrl, request );
+        String s = WFSClientHelper.createResponsefromWFS( serverUrl, request );
         
         if ( s.indexOf( "<Exception>" ) >= 0 || s.indexOf( "<ServiceExceptionReport" ) >= 0 ) { //$NON-NLS-1$ //$NON-NLS-2$
             RuntimeException re = new RuntimeException( "Couldn't get data from WFS:\n" //$NON-NLS-1$
@@ -284,22 +217,6 @@ public class JUMPFeatureFactory {
         return newFeatCollec;
     }
 
-    private static String inputStreamToString( InputStream inputStream ) throws IOException{
-        InputStreamReader ireader = new InputStreamReader( inputStream );
-        BufferedReader br = new BufferedReader( ireader );
-        StringBuffer sb = new StringBuffer( 50000 );
-        String s = null;
-        
-            
-        while (( s = br.readLine() ) != null) {
-            sb.append( s );
-        }
-        s = sb.toString();
-        br.close();
-
-        return sb.toString();
-    }
-    
     /**
      * Creates a JUMP FeatureCollection from a deegree FeatureCollection [UT] and a specified
      * JUMP/JTS Geometry object. The new JUMP FeatureCollection returned will have the
