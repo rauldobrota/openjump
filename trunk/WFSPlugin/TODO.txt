@@ -1,0 +1,6 @@
+
+ - Plug-in
+ - Extension
+ - OptionsDialog: maxFeatCount, outputFormat
+ 
+ etc...
