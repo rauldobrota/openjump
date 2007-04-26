@@ -1,3 +1,25 @@
+2007-04-26  Ugo Taddei <taddei@latlon.de>
+	
+	Added initial working version of classes and complementary files.
+
+	* src/de/latlon/deejump/plugin/wfs/AbstractWFSWrapper.java
+	* src/de/latlon/deejump/plugin/wfs/PropertyCriteriaPanel.java   
+	* src/de/latlon/deejump/plugin/wfs/SpatialCriteriaPanel.java
+	* src/de/latlon/deejump/plugin/wfs/WFServiceWrapper_1_0_0.java
+	* src/de/latlon/deejump/plugin/wfs/MiniMenu.java
+	* src/de/latlon/deejump/plugin/wfs/PropertySelectionPanel.java
+	* src/de/latlon/deejump/plugin/wfs/WFSDialog.java
+	* src/de/latlon/deejump/plugin/wfs/WFServiceWrapper_1_1_0.java
+	* src/de/latlon/deejump/ui/DeeJUMPException.java
+	* src/de/latlon/deejump/ui/messages_de.properties
+	* src/de/latlon/deejump/ui/Messages.java  
+    * src/de/latlon/deejump/ui/ExtensibleComboBox.java                           
+	* src/de/latlon/deejump/ui/messages_fr.properties
+	* src/de/latlon/deejump/ui/messages.properties    
+    * src/de/latlon/deejump/util/data/JUMPFeatureFactory.java
+    
+	* TODO.txt: Incomplete List of todo's.
+		
 2007-04-25  Stephan Holl <stephan.holl@intevation.de>
 
 	* ChangeLog, README.txt: New. Initial Import of a 
