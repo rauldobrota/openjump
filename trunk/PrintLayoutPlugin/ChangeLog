@@ -1,5 +1,10 @@
 2007-04-27  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
 
+	* lib/batik-all.jar, lib/xml-apis-ext.jar, lib/xml-apis.jar:
+	removed. jar-files in openjump are now new enough.
+
+2007-04-27  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
+
 	* HowTo-Release.txt: Small fixes.
 
 2007-04-27  Sascha L. Teichmann <sascha.teichmann@intevation.de>
