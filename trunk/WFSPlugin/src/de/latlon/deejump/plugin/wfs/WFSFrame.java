@@ -35,12 +35,12 @@ public class WFSFrame extends JFrame {
     private WFSPanel wfsPanel;
 
     public WFSFrame( String[] wfsURLs ) {
-        super( "WFS" );
+        super( "WFSFrame v. " + WFSPanel.releaseVersion );
         setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
         initGUI( wfsURLs );
         setDefaultLookAndFeelDecorated( true );
         
-        setSize( 450, 300 );
+        setSize( 500, 300 );
     }
 
     private void initGUI(String[] wfsURLs) {
@@ -53,6 +53,8 @@ public class WFSFrame extends JFrame {
         add( this.wfsPanel );
         
         WFSPanelButtons buttons = new WFSPanelButtons( this, this.wfsPanel );
+        this.wfsPanel.controlButtons = buttons ;
+        
         buttons.okButton.addActionListener( new ActionListener(){
             public void actionPerformed( ActionEvent e ) {
                    
@@ -68,6 +70,10 @@ public class WFSFrame extends JFrame {
                 wfsPanel.setResposeText( resp );
             }
         });
+        buttons.okButton.setText( "Do GetFeature" );
+        buttons.okButton.setEnabled( false );
+        
+        buttons.cancelButton.setText( "Exit" );
         buttons.cancelButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 int i = JOptionPane
