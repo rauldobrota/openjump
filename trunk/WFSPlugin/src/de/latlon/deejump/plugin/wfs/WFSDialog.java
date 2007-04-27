@@ -76,6 +76,7 @@ import de.latlon.deejump.util.data.WFSClientHelper;
  */
 public class WFSDialog extends JDialog {
     
+    public static final String WFS_URL_LIST = "WFS_URL_LIST";
     
     /**
      * Whether the dialog has enough info to produce a search or it makes sense
@@ -100,6 +101,7 @@ public class WFSDialog extends JDialog {
     public WFSDialog( Frame owner, String title, String[] urls ) throws Exception {
 
         super( owner, title, true );
+        setTitle( "WFSPlugin v. " + WFSPanel.releaseVersion );
         setLocation( 0, 50 );
         //        setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         addWindowListener( new WindowAdapter() {
@@ -121,35 +123,32 @@ public class WFSDialog extends JDialog {
         
 //      setJMenuBar( new MiniMenu(  ) );
       
-          this.wfsPanel = new WFSPanel( Arrays.asList( wfsURLs ) );
-          
-          add( this.wfsPanel );
-          
-          WFSPanelButtons buttons = new WFSPanelButtons( this, this.wfsPanel );
-          buttons.okButton.addActionListener( new ActionListener() {
-              public void actionPerformed( ActionEvent e ) {
-                  System.out.println("in jump modus it is set invisible....");
-                  //setVisible( false );
-                  System.out.println("setCanSearch( true ); only makes sense in a dialog");
-                  //setCanSearch( true );
-                  
-              }
-          });
-          
-          buttons.cancelButton.addActionListener( new ActionListener() {
-              public void actionPerformed( ActionEvent e ) {
-                  setVisible( false );
-                  
-                  setCanSearch( false );
+        this.wfsPanel = new WFSPanel( Arrays.asList( wfsURLs ) );
+  
+        add( this.wfsPanel );
+  
+        WFSPanelButtons buttons = new WFSPanelButtons( this, this.wfsPanel );
+        this.wfsPanel.controlButtons = buttons;
+        buttons.okButton.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                setVisible( false );
+                setCanSearch( true );
 
-              }
-          } );
-          add( buttons );
-    
-            
+            }
+        } );
+
+        buttons.cancelButton.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                setVisible( false );
+
+                setCanSearch( false );
+
+            }
+        } );
+        add( buttons );
+
         setSize( 450, 300 );
         setResizable( true );
-
     }
 
     /**
@@ -193,6 +192,11 @@ public class WFSDialog extends JDialog {
                 e.printStackTrace();
             }
         }
+    }
+
+
+    public WFSPanel getWFSPanel() {
+        return this.wfsPanel;
     }
 
 }
