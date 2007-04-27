@@ -7,7 +7,7 @@
 	<property name="dist" location="dist" />
 	<property name="lib" location="lib" />
 
-	<property name="appname" value="wfsdialog" />
+	<property name="appname" value="wfsplugin" />
 
 	<path id="classpath">
 		<pathelement location="${build}" />
