@@ -133,7 +133,7 @@ class WFSPanelButtons extends JPanel {
                     wfsPanel.setTabsVisible( true );
 //                    remove( box );
                     //hmm, size is hard coded :-(
-                    parentWindow.setSize( 450, 900 );
+                    parentWindow.setSize( 500, 900 );
                     //pack(); //is not looking very nice
 //                    add( tabs );
 //                    add( box );
@@ -143,7 +143,7 @@ class WFSPanelButtons extends JPanel {
 //                    remove( box );
 //                    remove( tabs );
                     wfsPanel.setTabsVisible( false );
-                    parentWindow.setSize( 450, 300 );
+                    parentWindow.setSize( 500, 300 );
                     //pack();
 //                    add( box );
                     b.setText( showAdvanced );
@@ -170,6 +170,9 @@ class WFSPanelButtons extends JPanel {
 Changes to this class. What the people have been up to:
 
 $Log$
+Revision 1.2  2007/04/27 13:09:47  taddei
+changes regarding parent window size.
+
 Revision 1.1  2007/04/27 07:26:38  taddei
 Added class
 
