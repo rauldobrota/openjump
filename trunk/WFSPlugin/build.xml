@@ -33,11 +33,11 @@
 		<copy todir="${build}">
 			<fileset dir="${src}" excludes="**/*.java,**/*.class" />
 		</copy>
-		<jar jarfile="${lib}/${appname}.jar" basedir="${build}" />
+		<jar jarfile="${lib}/${appname}-${DSTAMP}.jar" basedir="${build}" />
 	</target>
 
 	<target name="dist" depends="compile" description="create the distribution">
-		<jar jarfile="${dist}/${appname}.jar" basedir="${build}" />
+		<jar jarfile="${dist}/${appname}-${DSTAMP}.jar" basedir="${build}" />
 	</target>
 
 	<target name="run" depends="compile" description="run the application like 'ant run -Dargs=http://your.wfs.host./wfsserver/wfs'">

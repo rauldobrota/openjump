@@ -1,3 +1,7 @@
+2007-04-27  Stephan Holl <stephan.holl@intevation.de>
+
+	* build.xml:  added timestamp to the final jar-files
+	
 2007-04-27  Ugo Taddei <taddei@latlon.de>
 	
 	* src/de/latlon/deejump/plugin/wfs/WFSPanelButtons.java: changes
