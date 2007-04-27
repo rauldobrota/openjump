@@ -15,21 +15,29 @@ ATTENTION: The next steps replace existing jar files. Be sure
 you don't get into trouble when you loose these files. Backups
 or a separate installation of OpenJump could help here.
 
-2. Remove the batik libraries coming with
+NOTE: OpenJUMP 1.2: You don't need to update batik, xml-apis and xml-apis-ext
+anymore, because the version included in OpenJUMP 1.2 is already sufficient.
+
+2 [OpenJump 1.0] Remove the batik libraries coming with
    OpenJump and replace them:
 
    rm -rf <where you installed OpenJump>/lib/batik
 
-3. Download these jar files and place them into
+3 [OpenJump 1.0] Download these jar files and place them into
    <where you installed OpenJump>/lib
 
-   http://jump-pilot.cvs.sourceforge.net/*checkout*/jump-pilot/PrintLayoutPlugin/lib/batik-all.jar
+   http://jump-pilot.cvs.sourceforge.net/*checkout*/jump-pilot/openjump/lib/batik/batik-all.jar
+   http://jump-pilot.cvs.sourceforge.net/*checkout*/jump-pilot/openjump/lib/xml-apis-ext.jar
+   http://jump-pilot.cvs.sourceforge.net/*checkout*/jump-pilot/openjump/lib/xml-apis.jar
+
+4 [OpenJump 1.0 and 1.2] Download these jar files and place them into
+   <where you installed OpenJump>/lib
+
    http://jump-pilot.cvs.sourceforge.net/*checkout*/jump-pilot/PrintLayoutPlugin/lib/js.jar
    http://jump-pilot.cvs.sourceforge.net/*checkout*/jump-pilot/PrintLayoutPlugin/lib/pdf-transcoder.jar
-   http://jump-pilot.cvs.sourceforge.net/*checkout*/jump-pilot/PrintLayoutPlugin/lib/xml-apis-ext.jar
-   http://jump-pilot.cvs.sourceforge.net/*checkout*/jump-pilot/PrintLayoutPlugin/lib/xml-apis.jar
 
-4. Only on Windows:
+
+5. Only on Windows, likely for OpenJUMP 1.0, maybe for other releases:
    You need to use the .bat start file and fix CLASSPATH there.
 
    The orginal openjump.bat adds all old batik jars

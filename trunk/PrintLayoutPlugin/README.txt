@@ -69,24 +69,10 @@ I - Install
 
           * First build the jar as descripted in b.
 
-          * copy the the jar into the the lib/ext directory of
+          * copy the jar into the the lib/ext directory of
             your OpenJump installation.
 
           * !!! LIBARY DEPENDENCIES !!!
 
-            Because there are bugs in the last release version
-            of Batik [1], the plugin comes with its own SVN version
-            of the libraries.
-
-            You have to remove the batik libraries coming with 
-            OpenJump and replace them.
-
-            cd <where you installed OpenJump>
-            cd lib
-            rm -r batik
-            cp <where you checked out the plugin sources>/lib/*.jar .
-
-
-References:
-
-[1] http://xmlgraphics.apache.org/batik/
+            Please read the file INSTALL.txt about the jar libraries
+            you need to install additionally.
