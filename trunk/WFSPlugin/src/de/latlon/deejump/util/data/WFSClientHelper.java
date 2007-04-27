@@ -127,7 +127,7 @@ public class WFSClientHelper {
         s = sb.toString();
         br.close();
 
-        return sb.toString();
+        return s;
     }
 }
 
@@ -135,6 +135,9 @@ public class WFSClientHelper {
 Changes to this class. What the people have been up to:
 
 $Log$
+Revision 1.2  2007/04/27 13:00:12  taddei
+minor change in returned object
+
 Revision 1.1  2007/04/26 13:14:29  taddei
 Added new classes.
 
