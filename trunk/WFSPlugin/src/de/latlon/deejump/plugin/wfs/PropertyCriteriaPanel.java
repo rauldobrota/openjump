@@ -64,7 +64,7 @@ class PropertyCriteriaPanel extends JPanel {
     protected String[] _attributeNames = new String[]{""}; //$NON-NLS-1$
     
     // will be NONE, BBOX, SEL_GEOM
-    private String spatialSearchCriteria = WFSDialog.NONE; 
+    private String spatialSearchCriteria = WFSPanel.NONE; 
     
     /**A list containing the criteria */
     private ArrayList criteriaList = new ArrayList();
@@ -122,7 +122,7 @@ class PropertyCriteriaPanel extends JPanel {
             public void actionPerformed( ActionEvent e ) {
                 QualifiedName ft = PropertyCriteriaPanel.this.researchDialog.getFeatureType();
                 String schema = PropertyCriteriaPanel.this.researchDialog.getWfService().getRawSchemaForFeatureType( ft.getAsString() );
-                WFSDialog.createXMLFrame( PropertyCriteriaPanel.this, schema );
+                WFSPanel.createXMLFrame( PropertyCriteriaPanel.this, schema );
             }
         });
         p.add( describeFTButton );
@@ -139,8 +139,11 @@ class PropertyCriteriaPanel extends JPanel {
         
         add( createCriteriaPanel() );        
         add( createCriteriaButtons() );
-        add( createLogicalButtons() );        
-        add( createSpatialButtons() );
+        JPanel innerPanel = new JPanel();
+        innerPanel.add( createLogicalButtons() );  
+        innerPanel.add( Box.createHorizontalStrut( 10 ) );  
+        innerPanel.add( createSpatialButtons() );
+        add( innerPanel );
         add( createEditableCheckBox());
     }
     
@@ -201,13 +204,13 @@ class PropertyCriteriaPanel extends JPanel {
         
         JRadioButton andButton = new JRadioButton( Messages.getString("AttributeResearchPanel.logicalAnd") );
         andButton.setBorder(
-                BorderFactory.createEmptyBorder(2,10,2,60));
+                BorderFactory.createEmptyBorder(2,10,2,10));
         andButton.setActionCommand(logicalRelationships[0]);
         andButton.doClick();
        
         JRadioButton orButton = new JRadioButton( Messages.getString("AttributeResearchPanel.logicalOr"));
         orButton.setBorder(
-                BorderFactory.createEmptyBorder(2,10,5,60));
+                BorderFactory.createEmptyBorder(2,10,5,10));
         orButton.setActionCommand(logicalRelationships[1]);
         
         ActionListener bal = new ActionListener() {
@@ -229,15 +232,15 @@ class PropertyCriteriaPanel extends JPanel {
         b.setAlignmentX( Component.LEFT_ALIGNMENT );
         b.setBorder(							
                 BorderFactory.createTitledBorder(Messages.getString("AttributeResearchPanel.logicalLink") ));
-        b.add(andButton);
-        b.add(orButton);
-
-        Box bb = Box.createHorizontalBox();
-        bb.add( Box.createHorizontalStrut( 20 ));
-        bb.add(b);
-        bb.add( Box.createHorizontalGlue());
         
-        return bb;
+        // add a bit of space
+        b.add( Box.createRigidArea( new Dimension(20,10) ) );
+        b.add(andButton);
+        b.add( Box.createRigidArea( new Dimension(20,10) ) );
+        b.add(orButton);
+        b.setPreferredSize( new Dimension(150, 100) );
+        
+        return b;
     }
     
     /** Creates buttons for adding and removing criteria and a panel for them */ 
@@ -320,13 +323,13 @@ class PropertyCriteriaPanel extends JPanel {
         //add(label);
 
         noCritButton = new JRadioButton( Messages.getString("AttributeResearchPanel.none") );
-        noCritButton.setActionCommand( WFSDialog.NONE );
+        noCritButton.setActionCommand( WFSPanel.NONE );
         noCritButton.doClick();        
         bboxCritButton = new JRadioButton( Messages.getString("AttributeResearchPanel.bbox"));
-        bboxCritButton.setActionCommand( WFSDialog.BBOX );
+        bboxCritButton.setActionCommand( WFSPanel.BBOX );
         bboxCritButton.setBounds(10,30,200, STD_HEIGHT);
         selecGeoButton = new JRadioButton( Messages.getString("AttributeResearchPanel.selectedGeometry") );
-        selecGeoButton.setActionCommand( WFSDialog.SELECTED_GEOM );
+        selecGeoButton.setActionCommand( WFSPanel.SELECTED_GEOM );
         
         ActionListener bal = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -352,13 +355,9 @@ class PropertyCriteriaPanel extends JPanel {
         b.add(noCritButton);
         b.add(bboxCritButton);
         b.add(selecGeoButton);
+        b.setPreferredSize( new Dimension(150, 100) );
         
-        Box bb = Box.createHorizontalBox();
-        bb.add( Box.createHorizontalStrut( 20 ));
-        bb.add(b);
-        bb.add( Box.createHorizontalGlue());
-        
-        return bb;
+        return b;
     }
 
 
@@ -377,7 +376,7 @@ class PropertyCriteriaPanel extends JPanel {
      * @return the start and end xml tags
      */
     public String[] getLogicalRelationshipTags(){
-        return WFSDialog.createStartStopTags( currentRelationship );     
+        return WFSPanel.createStartStopTags( currentRelationship );     
     }
     
     /**

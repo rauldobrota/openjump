@@ -92,21 +92,13 @@ public class WFSPanel extends JPanel {
 
     AbstractWFSWrapper wfService;
 
-    /**
-     * Whether the dialog has enough info to produce a search or it makes sense
-     * to carry on. For example, when the user closed (cancelled) the dialog.
-     */
-    private boolean canSearch = false;
-
     private JTextArea requestTextArea;
 
     private JTextArea responseTextArea;
 
     private JComboBox serverCombo;
 
-    private JButton okButton;
-
-    private JButton cancelButton;
+//    private JButton okButton;
 
     private JTabbedPane tabs;
 
@@ -115,8 +107,6 @@ public class WFSPanel extends JPanel {
 //    private JPanel mainPanel;
 
     private Box box;
-
-    private JButton extrasButton;
 
     // TODO remove dependency on JUMP/JTS use deegree Envelope
     /** The envelope of the current bounding box */
@@ -133,10 +123,13 @@ public class WFSPanel extends JPanel {
 
     protected String wfsVersion;
 
+    private WFSOptions options;
+
     public WFSPanel(List<String> urlList){
         super();
         setWFSList( urlList );
         initGUI();
+        this.options = new WFSOptions();
     }
 
     private void initGUI() {
@@ -229,6 +222,8 @@ public class WFSPanel extends JPanel {
 
         box = Box.createHorizontalBox();
         box.setBorder( BorderFactory.createEmptyBorder( 20, 5, 10, 5 ));
+        
+        /*
         okButton = new JButton( Messages.getString( "OK" ) );
         //okButton.setAlignmentX(0.5f);
         okButton.addActionListener( new ActionListener() {
@@ -258,9 +253,11 @@ public class WFSPanel extends JPanel {
 
             }
         } );
-
+*/
         add( tabs );
         tabs.setVisible( false );
+        
+        /*
 //        mainPanel.add( Box.createVerticalStrut( 10 ) );
 
         //TODO externalize
@@ -303,7 +300,7 @@ public class WFSPanel extends JPanel {
         box.add( cancelButton );
 //        add( Box.createVerticalStrut( 50 ) );
 //        add( box );
-        
+        */
         
 //        setMinimumSize( new Dimension( 400, 300 ) );
 //        setPreferredSize( new Dimension( 400, 600 ) );
@@ -383,7 +380,7 @@ public class WFSPanel extends JPanel {
     private JComboBox createFeatureTypeCombo() {
         String[] start = { "            " };
         JComboBox tmpFeatureTypeCombo = new JComboBox( start );
-        Dimension d = new Dimension( 400, 45 );
+        Dimension d = new Dimension( 300, 45 );
         tmpFeatureTypeCombo.setPreferredSize( d );
         tmpFeatureTypeCombo.setMaximumSize( d );
         
@@ -497,7 +494,7 @@ public class WFSPanel extends JPanel {
             featTypes = wfService.getFeatureTypes();
             featureTypeCombo.setModel( new javax.swing.DefaultComboBoxModel( featTypes ) );
 
-            okButton.setEnabled( true );
+//            okButton.setEnabled( true );
             capabilitiesButton.setEnabled( true );
             tabs.setEnabledAt( 1, true );
 
@@ -552,8 +549,7 @@ public class WFSPanel extends JPanel {
 
         StringBuffer sb = new StringBuffer( "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" );
 
-        final String outputFormat = "GML2";
-        //"text/xml; subtype=gml/3.1.1
+        final String outputFormat = options.getSelectedOutputFormat();
         
         System.out.println("output format is hard-coded...");
         System.out.println("FT namespace is missing in the xml");
@@ -587,7 +583,7 @@ public class WFSPanel extends JPanel {
 
         boolean includesSpatialClause = !NONE.equals( spatCrit );
         if ( includesSpatialClause && listSize > 0 ) {
-            sb.append( WFSDialog.createStartStopTags( "And" )[0] );
+            sb.append( WFSPanel.createStartStopTags( "And" )[0] );
         }
 
         if ( BBOX.equals( spatCrit ) ) {
@@ -598,7 +594,7 @@ public class WFSPanel extends JPanel {
 
         sb.append( attributeResPanel.getXmlElement() );
         if ( includesSpatialClause && listSize > 0 ) {
-            sb.append( WFSDialog.createStartStopTags( "And" )[1] );
+            sb.append( WFSPanel.createStartStopTags( "And" )[1] );
         }
 
         sb.append( filterTags[1] );
@@ -717,6 +713,14 @@ public class WFSPanel extends JPanel {
     
     public void setTabsVisible( boolean visible ){
         tabs.setVisible( visible );
+    }
+
+    public WFSOptions getOptions() {
+        return this.options;
+    }
+
+    public String getResponse() {
+        return this.responseTextArea.getText();
     }
     
 }

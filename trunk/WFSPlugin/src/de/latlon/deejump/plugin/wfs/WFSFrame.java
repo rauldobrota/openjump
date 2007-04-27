@@ -24,6 +24,7 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 import de.latlon.deejump.ui.DeeJUMPException;
 import de.latlon.deejump.ui.Messages;
@@ -39,26 +40,20 @@ public class WFSFrame extends JFrame {
         initGUI( wfsURLs );
         setDefaultLookAndFeelDecorated( true );
         
-        setSize( 400, 300 );
+        setSize( 450, 300 );
     }
 
     private void initGUI(String[] wfsURLs) {
         getContentPane().setLayout( new FlowLayout() );
-        this.wfsPanel = new WFSPanel( Arrays.asList( wfsURLs ) );
         
+//        setJMenuBar( new MiniMenu(  ) );
+        
+        this.wfsPanel = new WFSPanel( Arrays.asList( wfsURLs ) );
         
         add( this.wfsPanel );
         
-        add( createButtonsPanel() );
-    }
-
-    private Component createButtonsPanel() {
-        
-        Box box = Box.createHorizontalBox();
-        box.setBorder( BorderFactory.createEmptyBorder( 20, 5, 10, 5 ));
-        
-        JButton okButton = new JButton( Messages.getString( "OK" ) );
-        okButton.addActionListener( new ActionListener(){
+        WFSPanelButtons buttons = new WFSPanelButtons( this, this.wfsPanel );
+        buttons.okButton.addActionListener( new ActionListener(){
             public void actionPerformed( ActionEvent e ) {
                    
                 String resp  = null;
@@ -73,71 +68,23 @@ public class WFSFrame extends JFrame {
                 wfsPanel.setResposeText( resp );
             }
         });
-
-        okButton.setEnabled( true );
-        okButton.setFocusable( true );
-
-        JButton cancelButton = new JButton( Messages.getString( "CANCEL" ) );
-
-        cancelButton.setAlignmentX( 0.5f );
-        cancelButton.addActionListener( new ActionListener() {
+        buttons.cancelButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
-                System.out.println("setVisible( false ); only makes sense in a dialog");
-                //setVisible( false );
-                
-                System.out.println("setCanSearch( true ); only makes sense in a dialog");
-                //setCanSearch( true );
-                //setCanSearch( false );
-
-            }
-        } );
-
-        //TODO externalize
-        final String showAdvanced = "Advanced";
-        final String hideAdvanced = "Hide Advanced Settings";
-
-        JButton extrasButton = new JButton( showAdvanced );
-        extrasButton.setBounds( 260, 20, 80, 20 );
-        extrasButton.setAlignmentX( 0.5f );
-        extrasButton.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e ) {
-                String actComm = e.getActionCommand();
-                JButton b = (JButton) e.getSource();
-                if ( showAdvanced.equals( actComm ) ) {
-                    wfsPanel.setTabsVisible( true );
-//                    remove( box );
-                    //hmm, size is hard coded :-(
-                    setSize( 450, 900 );
-                    //pack(); //is not looking very nice
-//                    add( tabs );
-//                    add( box );
-                    b.setText( hideAdvanced );
-                    b.setActionCommand( hideAdvanced );
-                } else {
-//                    remove( box );
-//                    remove( tabs );
-                    wfsPanel.setTabsVisible( false );
-                    setSize( 450, 300 );
-                    //pack();
-//                    add( box );
-                    b.setText( showAdvanced );
-                    b.setActionCommand( showAdvanced );
-
+                int i = JOptionPane
+                            .showConfirmDialog( WFSFrame.this, 
+                                               "Really exit?", 
+                                               "Exit?", 
+                                               JOptionPane.OK_CANCEL_OPTION, 
+                                               JOptionPane.QUESTION_MESSAGE);
+                if( i == JOptionPane.OK_OPTION ){
+                    System.exit( 0 );
                 }
             }
-        } );
-
-        box.add( extrasButton );
-        box.add( new JLabel( "         " ) );//Box.createHorizontalStrut(20));
-        box.add( okButton );
-        box.add( new JLabel( "         " ) );//Box.createHorizontalStrut(20));
-        box.add( cancelButton );
-//        add( Box.createVerticalStrut( 50 ) );
-        add( box );
-        
-        return box;
+        });   
+        add( buttons );
     }
 
+    
     /**
      * Create the GUI and show it.  For thread safety,
      * this method should be invoked from the

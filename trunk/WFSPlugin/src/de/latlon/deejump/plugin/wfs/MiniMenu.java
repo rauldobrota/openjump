@@ -33,7 +33,7 @@ class MiniMenu extends JMenuBar {
     
     private String lastDirectory; 
     
-    public MiniMenu( final WFSDialog wfsDialog ) {
+    public MiniMenu( final WFSPanel wfsPanel ) {
         super();
         
         JMenu topMenu = new JMenu("File");
@@ -43,7 +43,7 @@ class MiniMenu extends JMenuBar {
         subMenu.addActionListener( new ActionListener(){
             public void actionPerformed( ActionEvent e ) {
                 try {
-                    saveTextToFile( wfsDialog.getRequestString() );
+                    saveTextToFile( wfsPanel.getRequest() );
                 } catch ( IOException e1 ) {
                     e1.printStackTrace();
                     JOptionPane.showMessageDialog( MiniMenu.this, 
@@ -59,7 +59,7 @@ class MiniMenu extends JMenuBar {
         subMenu.addActionListener( new ActionListener(){
             public void actionPerformed( ActionEvent e ) {
                 try {
-                    saveTextToFile( wfsDialog.getResponseString() );
+                    saveTextToFile( wfsPanel.getResponse() );
                 } catch ( IOException e1 ) {
                     e1.printStackTrace();
                     JOptionPane.showMessageDialog( MiniMenu.this, 
@@ -106,6 +106,9 @@ class MiniMenu extends JMenuBar {
 Changes to this class. What the people have been up to:
 
 $Log$
+Revision 1.2  2007/04/27 07:27:29  taddei
+More major refactoring to use WFSPanel the WFSFrame) and in the  WFSDialog. Also some GUI improvements.
+
 Revision 1.1  2007/04/26 09:19:26  taddei
 Added initial working version of classes and complementary files.
 
