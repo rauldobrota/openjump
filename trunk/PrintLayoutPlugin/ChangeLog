@@ -1,3 +1,16 @@
+2007-04-27  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	Description of the print border view options.
+
+	* src/de/intevation/printlayout/i18n/messages.properties,
+	  src/de/intevation/printlayout/i18n/messages_de.properties:
+	  	Added "[cm]" to the border options.
+
+	* src/de/intevation/printlayout/resources/options_help.html,
+	  src/de/intevation/printlayout/resources/options_help_de.html:
+	  	Add a short description of the print border view
+		options.
+
 2007-04-24  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	print border view. (part 2)
