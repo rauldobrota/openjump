@@ -1,5 +1,32 @@
 2007-04-27  Ugo Taddei <taddei@latlon.de>
 
+	* src/de/latlon/deejump/plugin/wfs/WFSPanelButtons.java: changes
+	regarding parent window size.
+
+	* src/de/latlon/deejump/plugin/wfs/WFSPanel.java: some code clean up.
+	minor GUI changes.
+
+	* src/de/latlon/deejump/plugin/wfs/WFSDialog.java: GUI changes.
+
+	* src/de/latlon/deejump/plugin/wfs/WFSDialog.java: minor
+	GUI changes, code clean up, removal of WFS list (used as key).
+
+	* src/de/latlon/deejump/plugin/wfs/AbstractWFSWrapper.java: added
+	wfs prefix.
+
+	New classes for OpenJUMP plug-in/extension:
+	* src/de/latlon/deejump/plugin/wfs/WFSLayer.java
+	* src/de/latlon/deejump/plugin/wfs/WFPlugin.java
+	* src/de/latlon/deejump/plugin/wfs/wfs.png
+	* src/de/latlon/deejump/plugin/DeeJUMPExtension.java
+
+	* src/de/latlon/deejump/plugin/util/data/WFSClientHelper.java: minor 
+	change in returned object
+
+	* build.xml: plug-in and extensions are now packaged in 'wfsplugin.jar'
+
+2007-04-27  Ugo Taddei <taddei@latlon.de>
+
 	* build.xml: clean-up
 	
 2007-04-27  Stephan Holl <stephan.holl@intevation.de>
