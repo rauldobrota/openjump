@@ -9,11 +9,6 @@
 
 	<property name="appname" value="wfsdialog" />
 
-	<property name="flatpath" value="." />
-
-	<property name="dir.main" value="." />
-	<property name="dir.libraries" value="${dir.main}/lib" />
-
 	<path id="classpath">
 		<pathelement location="${build}" />
 		<fileset dir="${lib}">
@@ -21,20 +16,8 @@
 		</fileset>
 	</path>
 
-
-	<target name="project">
-		<echo>
-WFS Plugin ant script
-Following target are available:
-- ant compile: as the name says
-- ant dist: create a distribution under the 'dist' directory
-- ant run -Dargs=http://your.wfs.host./wfsserver/wfs 
-		</echo>
-	</target>
 	<target name="init">
-		<!-- Create the time stamp -->
 		<tstamp />
-		<!-- Create the build directory structure used by compile -->
 		<mkdir dir="${build}" />
 		<mkdir dir="${dist}" />
 	</target>
@@ -43,7 +26,7 @@ Following target are available:
 		<!-- Compile the java code from ${src} into ${build} 
 		excludesfile="src/de/latlon/deejump/util/data/JUMPFeatureFactory.java"
 		-->
-		<javac srcdir="${src}" destdir="${build}">
+		<javac srcdir="${src}" destdir="${build}" debug="on" >
 			<classpath refid="classpath" />
 		</javac>
 		<!-- copy property files too -->
@@ -54,40 +37,18 @@ Following target are available:
 	</target>
 
 	<target name="dist" depends="compile" description="create the distribution">
-		<!-- Create the distribution directory 
-		<mkdir dir="${dist}/lib" />
--->
-		<!-- Put everything in ${build} into the DEMViewer-${DSTAMP}.jar file -->
-
 		<jar jarfile="${dist}/${appname}.jar" basedir="${build}" />
-		<!-- works like this too?
-<jar destfile="${deesource.jar}" basedir="${base.dir}/src"/>
--->
-
-		<echo>${classpath}</echo>
-		<echo>${flatpath}</echo>
-		<!-- TODO create a start up script -->
-
-		<echo file="${dist}/run.sh" append="false">
-#\!/bin/bash
-java ${classpath} -mx1024m ${build} $$*
-			</echo>
-
 	</target>
 
-	<!-- run the demo program.  To specify parameters to the program,
-	       define the demo.args property.  E.g:
-	          ant run -Dargs="url1 url2"
-	    -->
-	<!-- not working :-(			classpathref="classpath" fork="true"> -->
-	<target name="run" depends="compile" description="run the application">
-		<java classname="de.latlon.deejump.plugin.wfs.WFSFrame" classpath="lib/commons-codec-1.3.jar:lib/jaxen-1.1-beta-8.jar:lib/wfsdialog.jar:lib/commons-logging.jar:lib/commons-httpclient-2.0.2-deegreeversion.jar:lib/deegree2.jar:lib/jts-1.7.jar:lib/jump.jar:lib/log4j-1.2.9.jar" fork="true">
+	<target name="run" depends="compile" description="run the application like 'ant run -Dargs=http://your.wfs.host./wfsserver/wfs'">
+		<java classname="de.latlon.deejump.plugin.wfs.WFSFrame" 
+		fork="true"
+			classpathref="classpath" >
 			<arg line="${args}" />
 		</java>
 	</target>
 
 	<target name="clean" description="clean up">
-		<!-- Delete the ${build} and ${dist} directory trees -->
 		<delete dir="${build}" />
 		<delete dir="${dist}" />
 	</target>
