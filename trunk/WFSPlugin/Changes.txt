@@ -1,0 +1,13 @@
+Version 0.1.0 (2007-05-01)
+
+  This is the inital release.
+
+  Features:
+  - supports GetCapabilities, DescribeFeatureType, GetFeature (obviously)
+  - supports WFS Version 1.0.0
+  - supports GET and POST requests
+  - supports GML2 and GML3.1.1
+  - supports spatial operations 
+  - also runs as a standalone generic WFS-client for testing WFS-services
+  - best tested against Geoserver 1.5.0
+

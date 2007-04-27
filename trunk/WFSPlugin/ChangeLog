@@ -1,5 +1,11 @@
 2007-04-27  Stephan Holl <stephan.holl@intevation.de>
 
+	* README.txt, INSTALL.txt, Chandes.txt, HowToRelease.txt: New. useful information
+	about Installation, changes and Release-notes. Initial release
+	probably on monday, 20070501
+	
+2007-04-27  Stephan Holl <stephan.holl@intevation.de>
+
 	* build.xml:  added timestamp to the final jar-files
 	
 2007-04-27  Ugo Taddei <taddei@latlon.de>

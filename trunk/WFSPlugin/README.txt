@@ -20,8 +20,41 @@ I - Install
 
         export CVS_RSH=ssh
 
-        cvs -z3
-        -d:ext:developername@jump-pilot.cvs.sourceforge.net:/cvsroot/jump-pilot co -P WFSPlugin
+        cvs -z3 -d:ext:developername@jump-pilot.cvs.sourceforge.net:/cvsroot/jump-pilot co -P WFSPlugin
 
         (where developername is the respective login name)
+
+  b - build
+     
+      in a Unix (alike) environment
+
+        build the plugin:
+
+        cd etc
+        ant dist
+        
+        That should create a dist directory containing the jar file of
+        the plugin e.g:
+
+        cd ..
+        ls dist
+
+        wfsplugin-<YYYYMMDD>.jar
+
+  c - using the plugin
+
+      there are actually two ways 
+
+      - for development (unix alike) and as standalone generic
+        WFS-client:
+
+        ant run -Dargs=http://demo.intevation.de/geoserver/wfs
+
+      - the cooked jar version (unix alike):
+
+        * Make sure you have built the plugin as described in b
+
+        * Copy the jar-file into the ext/lib directory of your OpenJUMP 
+          installation (for additional jar-files please refer to the 
+          INSTALL.txt).
 
