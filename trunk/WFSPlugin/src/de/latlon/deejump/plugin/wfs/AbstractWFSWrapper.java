@@ -51,6 +51,8 @@ import de.latlon.deejump.ui.DeeJUMPException;
  */
 public abstract class AbstractWFSWrapper {
     
+    public static final String WFS_PREFIX = "wfs";
+    
     private static Logger LOG = Logger.getLogger( AbstractWFSWrapper.class );    
     
     protected String baseURL;
@@ -358,6 +360,9 @@ e.printStackTrace();
 Changes to this class. What the people have been up to:
 
 $Log$
+Revision 1.2  2007/04/27 13:07:12  taddei
+added wfs prefix.
+
 Revision 1.1  2007/04/26 09:19:26  taddei
 Added initial working version of classes and complementary files.
 
