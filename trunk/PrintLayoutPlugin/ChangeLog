@@ -1,3 +1,15 @@
+2007-04-27  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	Some typo fixes in help for options dialog
+
+	* src/de/intevation/printlayout/i18n/messages.properties,
+		src/de/intevation/printlayout/i18n/messages_de.properties:
+		Rand -> Druckrand, Border -> Printout border
+
+	* src/de/intevation/printlayout/resources/options_help.html,
+		src/de/intevation/printlayout/resources/options_help_de.html:
+		Fix typos.
+
 2007-04-27  Ludwig Reiter  <ludwig.reiter@intevation.de>
 
 	Description of the print border view options.
