@@ -28,7 +28,7 @@ public class WFSOptions {
 
     public WFSOptions(){
         this( 1000,
-              new String[] {"GML2", "GML 3 blah/txt/gml"},
+              new String[] {"GML2", "text/xml; subtype=gml/3.1.1"},
               new String[] {"GET", "POST"});
     }
     
