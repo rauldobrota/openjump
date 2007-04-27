@@ -11,7 +11,7 @@ Guide for developers for creating a new release
    Changes.txt
    which summarizes ChangeLog for normal users.
 
-3. Check in the three files together with ChangeLog.
+3. Check in the two files together with ChangeLog.
    See the last release information in ChangLog.
 
 4. $ cd etc
@@ -45,7 +45,7 @@ Guide for developers for creating a new release
    Use your e-mail address as the password for this login
    ftp> bin
    ftp> cd /incoming
-   ftp> put PrintLayoutPlugin-N.N.N
+   ftp> put PrintLayoutPlugin-N.N.N.zip
    ftp> exit
 
 7. Create release "N.N.N" on SourceForge
