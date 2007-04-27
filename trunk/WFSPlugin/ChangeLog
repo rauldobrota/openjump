@@ -1,3 +1,20 @@
+2007-04-27  Ugo Taddei <taddei@latlon.de>
+
+	More major refactoring to use WFSPanel the WFSFrame) and in the  
+	WFSDialog. Also some GUI improvements:
+
+	* src/de/latlon/deejump/plugin/wfs/MiniMenu.java
+	* src/de/latlon/deejump/plugin/wfs/PropertyCriteriaPanel.java
+	* src/de/latlon/deejump/plugin/wfs/WFSDialog.java
+	* src/de/latlon/deejump/plugin/wfs/WFSFrame.java
+	* src/de/latlon/deejump/plugin/wfs/WFSPanel.java
+
+	* src/de/latlon/deejump/plugin/wfs/WFSOptions.java: changed GML3
+	output format value.
+
+	Added class:
+	* src/de/latlon/deejump/plugin/wfs/WFSPanelButtons.java
+
 2007-04-26  Ugo Taddei <taddei@latlon.de>
 
 	Major refactoring to use WFSPanel in a Frame (WFSFrame) and in a 
