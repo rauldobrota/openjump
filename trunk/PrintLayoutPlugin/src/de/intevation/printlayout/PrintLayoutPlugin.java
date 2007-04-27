@@ -50,7 +50,7 @@ implements   ThreadedPlugIn
 	/**
 	 * This is the current version of the plug in.
 	 */
-	public static final String PLUGIN_VERSION = "0.9.2";
+	public static final String PLUGIN_VERSION = "1.0.0";
 
 	/**
 	 * the black board of the plugin

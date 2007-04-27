@@ -1,6 +1,20 @@
 General Changes of PrintLayout Plugin
 -------------------------------------
 
+Version 1.0.0 (2007-04-27)
+
+  The Grand release.
+
+  * New: Options dialog that offers a GUI for various user settings
+    that were only availble via command line before. This
+    includes a help page.
+  * New: Parameters to set print borders. These are visual
+    aids to not forget the limitations of your printer.
+  * New: Optional delays for SVG map creation to e.g.
+    catch asynchronous raster images.
+  * Internal improvements of SVG handling.
+  * Various code cleanups.
+
 Version 0.9.2 (2007-03-26)
 
   Optimizations release.
