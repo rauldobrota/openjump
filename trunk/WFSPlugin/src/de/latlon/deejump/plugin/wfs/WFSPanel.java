@@ -59,6 +59,9 @@ import de.latlon.deejump.ui.Messages;
  */
 public class WFSPanel extends JPanel {
 
+    //TODO put a props
+    static final String releaseVersion = "0.1.0";
+    
     // Constants for spatial search criteria type
     // also used by child panels
     /** Search uses no spatial criteria */
@@ -125,6 +128,8 @@ public class WFSPanel extends JPanel {
 
     private WFSOptions options;
 
+    WFSPanelButtons controlButtons;
+
     public WFSPanel(List<String> urlList){
         super();
         setWFSList( urlList );
@@ -134,9 +139,6 @@ public class WFSPanel extends JPanel {
 
     private void initGUI() {
 
-        // convenience panel
-//        mainPanel = new JPanel();
-//        setContentPane( mainPanel );
         LayoutManager lm = new BoxLayout( this, BoxLayout.Y_AXIS );
         setLayout( lm );
 
@@ -153,7 +155,6 @@ public class WFSPanel extends JPanel {
         add(serverCombo);
         
         // connect and capabilities button
-        
         JButton connecButton = new JButton( Messages.getString( "FeatureResearchDialog.connect" ) );
         connecButton.setAlignmentX( 0.5f );
         connecButton.addActionListener( new ActionListener() {
@@ -161,7 +162,6 @@ public class WFSPanel extends JPanel {
                 reinitService( (String) serverCombo.getSelectedItem() );
             }
         } );
-
 
         capabilitiesButton = new JButton( "Capabilities..." );
         capabilitiesButton.setEnabled( false );
@@ -173,7 +173,6 @@ public class WFSPanel extends JPanel {
         
         JPanel p = new JPanel();
         p.setLayout( new BoxLayout(p, BoxLayout.Y_AXIS ) );
-//        p.setPreferredSize( this.getSize() );
         
         // version buttons
         p.add( createVersionButtons( new String[]{ "1.0.0", "1.1.0" } ) );
@@ -192,7 +191,7 @@ public class WFSPanel extends JPanel {
         setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
         add( p );
         
-        final Dimension dim = new Dimension( 400, 670 );
+        final Dimension dim = new Dimension( 400, 570 );
         final Dimension minDim = new Dimension( 400, 500 );
 
         tabs = new JTabbedPane() {
@@ -223,85 +222,11 @@ public class WFSPanel extends JPanel {
         box = Box.createHorizontalBox();
         box.setBorder( BorderFactory.createEmptyBorder( 20, 5, 10, 5 ));
         
-        /*
-        okButton = new JButton( Messages.getString( "OK" ) );
-        //okButton.setAlignmentX(0.5f);
-        okButton.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e ) {
-                System.out.println("in jump modus it is set invisible....");
-                //setVisible( false );
-                System.out.println("setCanSearch( true ); only makes sense in a dialog");
-                //setCanSearch( true );
-                
-            }
-        });
         
-        okButton.setEnabled( false );
-        okButton.setFocusable( true );
-
-        cancelButton = new JButton( Messages.getString( "CANCEL" ) );
-
-        cancelButton.setAlignmentX( 0.5f );
-        cancelButton.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e ) {
-                System.out.println("setVisible( false ); only makes sense in a dialog");
-                //setVisible( false );
-                
-                System.out.println("setCanSearch( true ); only makes sense in a dialog");
-                //setCanSearch( true );
-                //setCanSearch( false );
-
-            }
-        } );
-*/
         add( tabs );
         tabs.setVisible( false );
         
-        /*
-//        mainPanel.add( Box.createVerticalStrut( 10 ) );
-
-        //TODO externalize
-        final String showAdvanced = "Advanced";
-        final String hideAdvanced = "Hide Advanced Settings";
-
-        extrasButton = new JButton( showAdvanced );
-        extrasButton.setBounds( 260, 20, 80, 20 );
-        extrasButton.setAlignmentX( 0.5f );
-        extrasButton.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e ) {
-                String actComm = e.getActionCommand();
-                JButton b = (JButton) e.getSource();
-                if ( showAdvanced.equals( actComm ) ) {
-                    remove( box );
-                    //hmm, size is hard coded :-(
-                    setSize( 450, 800 );
-                    //pack(); //is not looking very nice
-                    add( tabs );
-                    add( box );
-                    b.setText( hideAdvanced );
-                    b.setActionCommand( hideAdvanced );
-                } else {
-                    remove( box );
-                    remove( tabs );
-                    setSize( 450, 300 );
-                    //pack();
-                    add( box );
-                    b.setText( showAdvanced );
-                    b.setActionCommand( showAdvanced );
-
-                }
-            }
-        } );
-
-        box.add( extrasButton );
-        box.add( new JLabel( "         " ) );//Box.createHorizontalStrut(20));
-        box.add( okButton );
-        box.add( new JLabel( "         " ) );//Box.createHorizontalStrut(20));
-        box.add( cancelButton );
-//        add( Box.createVerticalStrut( 50 ) );
-//        add( box );
-        */
-        
+                
 //        setMinimumSize( new Dimension( 400, 300 ) );
 //        setPreferredSize( new Dimension( 400, 600 ) );
     }
@@ -343,15 +268,14 @@ public class WFSPanel extends JPanel {
                             new WFServiceWrapper_1_1_0( url ) :
                             new WFServiceWrapper_1_0_0( url );    
             refreshGUIs();
-            String ft = (String) featureTypeCombo.getSelectedItem();
         } catch ( Exception e ) {
 
             JOptionPane.showMessageDialog( this, "Could not connect to WFS server at '" + url
                                                  + "'\n" + e.getMessage(), "Error",
                                            JOptionPane.ERROR_MESSAGE );
 
+            this.controlButtons.okButton.setEnabled( false );
             e.printStackTrace();
-
         }
 
     }
@@ -369,7 +293,7 @@ public class WFSPanel extends JPanel {
                 }
             } );
             bg.add( b );
-            if( i == versions.length - 1 ){//last but not least is clicked 
+            if( i == 0 ){//first is clicked 
                 b.doClick();
             }
             p.add( b );
@@ -438,8 +362,8 @@ public class WFSPanel extends JPanel {
             }
         } );
 
-
-        JButton validateReq = new JButton( "validate i18n");//
+//TODO i18n
+        JButton validateReq = new JButton( "Validate request");//
 //                                        Messages.getString( "FeatureResearchDialog.createWFSRequest" ) );
 
         validateReq.addActionListener( new ActionListener() {
@@ -494,7 +418,7 @@ public class WFSPanel extends JPanel {
             featTypes = wfService.getFeatureTypes();
             featureTypeCombo.setModel( new javax.swing.DefaultComboBoxModel( featTypes ) );
 
-//            okButton.setEnabled( true );
+            controlButtons.okButton.setEnabled( true );
             capabilitiesButton.setEnabled( true );
             tabs.setEnabledAt( 1, true );
 
@@ -511,10 +435,8 @@ public class WFSPanel extends JPanel {
             featureTypeCombo.setModel( new javax.swing.DefaultComboBoxModel( new String[] {} ) );
             attributeResPanel.setFeatureTypeComboEnabled( false );
             tabs.setEnabledAt( 1, false );
-            System.out.println("setCanSearch( false ); is non-sense here");
-            //setCanSearch( false );
             capabilitiesButton.setEnabled( false );
-
+            controlButtons.okButton.setEnabled( false );
         }
 
         if ( featTypes != null && featTypes.length > 0 ) {
@@ -551,12 +473,12 @@ public class WFSPanel extends JPanel {
 
         final String outputFormat = options.getSelectedOutputFormat();
         
-        System.out.println("output format is hard-coded...");
-        System.out.println("FT namespace is missing in the xml");
+        System.out.println("FT namespace is missing in the xml??");
         
         sb.append( "<wfs:GetFeature xmlns:ogc=\"http://www.opengis.net/ogc\" " )
             .append("xmlns:gml=\"http://www.opengis.net/gml\" " )
-            .append("xmlns:wfs=\"http://www.opengis.net/wfs\" " )
+            .append("xmlns:wfs=\"http://www.opengis.net/wfs\" service=\"WFS\" " )
+            .append("version=\"").append( wfService.getServiceVersion() ).append( "\" " )
             .append("outputFormat=\"")
             .append( outputFormat )
             .append( "\">" )
@@ -706,9 +628,11 @@ public class WFSPanel extends JPanel {
     }
     
     public String getRequest(){
-        return requestTextArea.getText();
-        //or return the safe request?
-        //return createRequest().toString();
+        String t = requestTextArea.getText();
+        if( t == null || t.length() == 0 ){
+            t = createRequest().toString();
+        }
+        return t;
     }
     
     public void setTabsVisible( boolean visible ){
@@ -721,6 +645,19 @@ public class WFSPanel extends JPanel {
 
     public String getResponse() {
         return this.responseTextArea.getText();
+    }
+
+    public String getGMLGeometrySRS() {
+        return this.srs;
+    }
+
+    public void setEnvelope( Envelope env ) {
+        this.envelope = env;
+    }
+
+    public void setSelectedGMLGeometry( Geometry gmlGeom ) {
+        // TODO Auto-generated method stub
+        
     }
     
 }
