@@ -1,3 +1,7 @@
+2007-04-27  Stephan Holl <stephan.holl@intevation.de>
+
+	* lib/*: New. added required jars to lib/ to run WFSPlugin
+
 2007-04-27  Ugo Taddei <taddei@latlon.de>
 
 	More major refactoring to use WFSPanel the WFSFrame) and in the  
