@@ -55,12 +55,16 @@ import javax.swing.JMenuItem;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+import org.apache.log4j.Logger;
+
 /**
  * This OpenJUMP PlugIn adds the capability to launch a scripted file from the menu.
  * The original design is from ISA (Larry Becker - 2005)
  * Modified by Michaël Michaud in order to make hirarchical menus possible.
  */
 public class BeanToolsPlugIn extends AbstractPlugIn {
+	
+	private static final Logger LOG = Logger.getLogger(BeanToolsPlugIn.class);
     
     private String lastcmd = "";
     private String beanShellDirName;
@@ -68,8 +72,16 @@ public class BeanToolsPlugIn extends AbstractPlugIn {
     private FeatureInstaller featureInstaller;
     
     public void initialize(PlugInContext context) throws Exception {
-        beanShellDirName = context.getWorkbenchContext().getWorkbench().getPlugInManager()
-                                  .getPlugInDirectory().toString() +  File.separator + I18N.get("ui.plugin.customize.BeanToolsPlugIn.BeanTools");
+    	File plugInDirectory = context.getWorkbenchContext()
+    	                              .getWorkbench()
+    	                              .getPlugInManager()
+    	                              .getPlugInDirectory();
+    	if (null == plugInDirectory || !plugInDirectory.exists()) {
+    		LOG.debug("BeanTools plugin has not been initialized : the plugin directory is missing");
+    		return;
+    	}
+        beanShellDirName = plugInDirectory.getPath() +  File.separator +
+            I18N.get("ui.plugin.customize.BeanToolsPlugIn.BeanTools");
         File beanShellDir = new File(beanShellDirName);
         featureInstaller = context.getFeatureInstaller();
         taskMonitorManager = new TaskMonitorManager();
