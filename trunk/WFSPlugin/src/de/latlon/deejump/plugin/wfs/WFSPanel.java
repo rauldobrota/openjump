@@ -47,6 +47,7 @@ import com.vividsolutions.jts.geom.Envelope;
 
 import de.latlon.deejump.ui.ExtensibleComboBox;
 import de.latlon.deejump.ui.Messages;
+import de.latlon.deejump.ui.XMLEditorPane;
 
 /**
  * This is a panel which contains other basic GUIs for accessing Features of
@@ -184,7 +185,8 @@ public class WFSPanel extends JPanel {
         p.add( innerPanel );
         
         featureTypeCombo = createFeatureTypeCombo();
-        featureTypeCombo.setVisible( false );
+        //featureTypeCombo.setVisible( false );
+        featureTypeCombo.setEnabled( false );
         p.add( featureTypeCombo );
 
         //FIXME what's this???
@@ -253,11 +255,16 @@ public class WFSPanel extends JPanel {
     }    
 
     static void createXMLFrame( Component parent, String txt ) {
-
-        JTextArea ta = new JTextArea( txt, 20, 80 );
-        ta.setLineWrap( true );
-        JScrollPane sp = new JScrollPane( ta, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+        
+        //FIXME: this is still too slow...
+        
+        //JTextArea ta = new JTextArea( txt, 20, 80 );
+        XMLEditorPane xe = new XMLEditorPane(txt);
+//        ta.setLineWrap( true );
+        JScrollPane sp = new JScrollPane( xe, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                           JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
+        sp.setMaximumSize( new Dimension(600,400) );
+        sp.setPreferredSize( new Dimension(800,400) );
         JOptionPane.showMessageDialog( parent, sp ); 
     
     }
@@ -304,7 +311,7 @@ public class WFSPanel extends JPanel {
     private JComboBox createFeatureTypeCombo() {
         String[] start = { "            " };
         JComboBox tmpFeatureTypeCombo = new JComboBox( start );
-        Dimension d = new Dimension( 300, 45 );
+        Dimension d = new Dimension( 300, 60 );
         tmpFeatureTypeCombo.setPreferredSize( d );
         tmpFeatureTypeCombo.setMaximumSize( d );
         
@@ -313,7 +320,10 @@ public class WFSPanel extends JPanel {
             BorderFactory
                 .createTitledBorder( Messages.getString( "FeatureResearchDialog.featureType" ) );
         
-        tmpFeatureTypeCombo.setBorder( border );
+        Border border2 = BorderFactory.createEmptyBorder( 5, 2, 10, 2 );
+        
+        border2 = BorderFactory.createCompoundBorder( border2, border );
+        tmpFeatureTypeCombo.setBorder( border2 );
         tmpFeatureTypeCombo.addActionListener( new java.awt.event.ActionListener() {
             public void actionPerformed( java.awt.event.ActionEvent evt ) {
 
@@ -423,7 +433,7 @@ public class WFSPanel extends JPanel {
             tabs.setEnabledAt( 1, true );
 
             featureTypeCombo.setEnabled( true );
-            featureTypeCombo.setVisible( true );
+//            featureTypeCombo.setVisible( true );
             attributeResPanel.setFeatureTypeComboEnabled( true );
 
         } catch ( Exception e ) {
@@ -468,8 +478,13 @@ public class WFSPanel extends JPanel {
     
     /** Creates a GetFeature request by concatenation of xlm elements */
     private StringBuffer createRequest() {
-
-        StringBuffer sb = new StringBuffer( "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" );
+        
+        StringBuffer sb = new StringBuffer();
+        if( wfService == null ){//not inited yet
+            return sb;
+        }
+        
+        sb.append( "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" );
 
         final String outputFormat = options.getSelectedOutputFormat();
         
