@@ -94,25 +94,21 @@ class WFSPanelButtons extends JPanel {
         okButton.setFocusable( true );
 
         cancelButton = new JButton( Messages.getString( "CANCEL" ) );
-
         cancelButton.setAlignmentX( 0.5f );
         cancelButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
-                System.out.println("setVisible( false ); only makes sense in a dialog");
+                //FIXME: remove, if this is now done somewhere else
                 //setVisible( false );
-                
-                System.out.println("setCanSearch( true ); only makes sense in a dialog");
                 //setCanSearch( true );
-                //setCanSearch( false );
-
             }
         } );
 
         JButton optionsbutton = new JButton("Options");
         optionsbutton.addActionListener( new ActionListener(){
             public void actionPerformed( ActionEvent e ) {
+                WFSOptions opts = wfsPanel.getOptions();
                 JOptionPane.showMessageDialog(  parentWindow,
-                                                new WFSOptionsPanel(wfsPanel.getOptions()), 
+                                                new WFSOptionsPanel2(opts), 
                                                 "Options",
                                                 -1);
             }
@@ -170,6 +166,9 @@ class WFSPanelButtons extends JPanel {
 Changes to this class. What the people have been up to:
 
 $Log$
+Revision 1.3  2007/04/30 08:16:28  taddei
+removed handler of cancel button.
+
 Revision 1.2  2007/04/27 13:09:47  taddei
 changes regarding parent window size.
 
