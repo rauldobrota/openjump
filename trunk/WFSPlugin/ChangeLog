@@ -1,3 +1,9 @@
+2007-04-30  Stephan Holl <stephan.holl@intevation.de>
+
+	* build.properties: New. Define some variables to build against
+	OJ-jars.
+	* build.xml:  extended classpath für building
+
 2007-04-30  Ugo Taddei <taddei@latlon.de>
 
 	* src/de/latlon/deejump/wfs/WFSPlugin.java: add plugin as a menu,

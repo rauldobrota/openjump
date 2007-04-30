@@ -9,11 +9,18 @@
 
 	<property name="appname" value="wfsplugin" />
 
+    <!-- set global properties for this build -->
+    <property file="build.properties"/>
+    
+
 	<path id="classpath">
 		<pathelement location="${build}" />
 		<fileset dir="${lib}">
 			<include name="**/*.jar" />
 		</fileset>
+        <fileset dir="${openjumplib}">
+            <include name="**/*.jar"/>
+        </fileset>
 	</path>
 
 	<target name="init">
