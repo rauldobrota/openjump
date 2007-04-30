@@ -41,8 +41,6 @@ public class WFServiceWrapper_1_1_0 extends AbstractWFSWrapper {
     
     private static Logger LOG = Logger.getLogger( WFServiceWrapper_1_1_0.class );    
     
-    public static final String WFS_PREFIX = "wfs";
-    
     private WFSCapabilities wfsCapabilities;
     
     /**
