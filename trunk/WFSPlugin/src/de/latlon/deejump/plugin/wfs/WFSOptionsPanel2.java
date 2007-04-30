@@ -38,7 +38,7 @@ import sun.util.calendar.JulianCalendar;
 
 import com.sun.org.apache.xalan.internal.xsltc.dom.AbsoluteIterator;
 
-public class WFSOptionsPanel extends JPanel {
+public class WFSOptionsPanel2 extends JPanel {
 
     private WFSOptions options;
 
@@ -49,7 +49,7 @@ public class WFSOptionsPanel extends JPanel {
     private JComboBox outputFormatChooser;
     
     
-    public WFSOptionsPanel(WFSOptions options) {
+    public WFSOptionsPanel2(WFSOptions options) {
         super();
         if( options == null ) {
             throw new IllegalArgumentException("WFSOptions cannot be null.");
@@ -103,7 +103,7 @@ public class WFSOptionsPanel extends JPanel {
             final int ix = i; 
             rb.addActionListener( new ActionListener(){
                 public void actionPerformed(ActionEvent e) {
-                    WFSOptionsPanel.this.options.setSelectedProtocol( protocs[ix] );
+                    WFSOptionsPanel2.this.options.setSelectedProtocol( protocs[ix] );
                 }
             }); 
             bg.add( rb );
@@ -130,7 +130,7 @@ public class WFSOptionsPanel extends JPanel {
         outputFormatChooser.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JComboBox jcb = (JComboBox)e.getSource();
-                WFSOptionsPanel.this.options.setSelectedOutputFormat((String)jcb.getSelectedItem());
+                WFSOptionsPanel2.this.options.setSelectedOutputFormat((String)jcb.getSelectedItem());
             }
         });
         
@@ -148,7 +148,7 @@ public class WFSOptionsPanel extends JPanel {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 JOptionPane.showMessageDialog(new JFrame(),
-                        new WFSOptionsPanel(new WFSOptions()), "Options",
+                        new WFSOptionsPanel2(new WFSOptions()), "Options",
                         -1);
                 System.exit(0);
             }
