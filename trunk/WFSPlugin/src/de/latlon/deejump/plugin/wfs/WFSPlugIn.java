@@ -1,33 +1,11 @@
-/*----------------    FILE HEADER  ------------------------------------------
-
-Copyright (C) 2001-2005 by:
-lat/lon GmbH
-http://www.lat-lon.de
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-Contact:
-
-Andreas Poth
-lat/lon GmbH
-Aennchenstra�e 19
-53177 Bonn
-Germany
-
-
- ---------------------------------------------------------------------------*/
+/*
+ * (c) 2007 by lat/lon GmbH
+ *
+ * @author Ugo Taddei (taddei@latlon.de)
+ *
+ * This program is free software under the GPL (v2.0)
+ * Read the file LICENSE.txt coming with the sources for details.
+ */
 package de.latlon.deejump.plugin.wfs;
 
 import java.util.ArrayList;
@@ -64,6 +42,7 @@ import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.ThreadedBasePlugIn;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
+import com.vividsolutions.jump.workbench.ui.MenuNames;
 import com.vividsolutions.jump.workbench.ui.cursortool.editing.EditingPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
 
@@ -96,13 +75,24 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
 	}
 
     public void install( PlugInContext context ) throws Exception {
-
+        
+        //only active if there's a map panel
+        MultiEnableCheck mec = createEnableCheck(context.getWorkbenchContext()); 
+        
+        // crete toolbar button
         context.getWorkbenchContext().getWorkbench().getFrame().getToolBar().addPlugIn(
             getIcon(),
             this, 
-            createEnableCheck(context.getWorkbenchContext()),
+            mec,
             context.getWorkbenchContext()
         );        	
+        
+        // also create menu item
+        context.getFeatureInstaller().addMainMenuItem(this, 
+                                                      new String[] { MenuNames.LAYER }, 
+                                                      getName(),
+                                                      false, getIcon(), 
+                                                      mec);
     }
     
     public boolean execute(PlugInContext context) throws Exception {
