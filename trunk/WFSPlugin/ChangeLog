@@ -1,3 +1,25 @@
+2007-04-30  Ugo Taddei <taddei@latlon.de>
+
+	* src/de/latlon/deejump/wfs/WFSPlugin.java: add plugin as a menu,
+	updated header.
+	
+	* src/de/latlon/deejump/wfs/WFSPanelButtons.java: removed handler of 
+	cancel button.
+
+	* src/de/latlon/deejump/wfs/WFSPanel.java: uses XMLEditor; also minor
+	GUI changes.
+
+	* src/de/latlon/deejump/wfs/WFServiceWrapper_1_1_0.java: added prefix.
+
+	Refactoring (changes names because of old class and name conflict):
+
+	* src/de/latlon/deejump/wfs/WFSOptionsPanel.java: deleted
+	* src/de/latlon/deejump/wfs/WFSOptionsPanel2.java: added
+	
+	Added classes for XML pretty displaying:
+	* src/de/latlon/deejump/ui/XMLEditorPane.java
+	* src/de/latlon/deejump/ui/xml2html.xsl
+
 2007-04-27  Stephan Holl <stephan.holl@intevation.de>
 
 	* README.txt, INSTALL.txt, Chandes.txt, HowToRelease.txt: New. useful information
