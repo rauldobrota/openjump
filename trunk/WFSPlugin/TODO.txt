@@ -1,6 +1,46 @@
+##
+## WFSPlugin TODO
+##
 
- - Plug-in
+ - Plug-in                                      [DONE]
  - Extension
- - OptionsDialog: maxFeatCount, outputFormat
- 
- etc...
+ - OptionsDialog: maxFeatCount, outputFormat 
+ - Request-validation: make wfs 1.0.0 also a valid request (currently done
+   inside deegree, needs to be separated)
+ - parsing GetCaps for supported SRS in "spatial"-tab, EPSG:2393 "must"
+   be supported, also 2391, 2392, 2393, 2394 and 3067
+   -> fill the drop-down-box in "spatial"-tab accordingly
+ - parse different geometry-typenames 
+   (e.g.<xs:element minOccurs="0" name="the_geom" nillable="true"
+   type="gml:MultiPolygonPropertyType"></xs:element> or
+   <xs:element minOccurs="0" name="GEOLOC" nillable="true"
+   type="gml:GeometryAssociationType"></xs:element>
+   of DescribeFeatureType for usage in
+   Spatial filtering.
+ - 
+
+- NO WFS-T atm, only basic WFS.
+
+DEBUG:
+* fix reported error (probably not WFSPlugin-related - threading probs?!):
+  com.vividsolutions.jts.util.AssertionFailedException: Should never reach here
+    at com.vividsolutions.jts.util.Assert.shouldNeverReachHere(Assert.java:122)
+    at com.vividsolutions.jts.util.Assert.shouldNeverReachHere(Assert.java:111)
+    at com.vividsolutions.jump.workbench.model.LayerManager.fireLayerEvent(LayerManager.java:390)
+    at com.vividsolutions.jump.workbench.model.LayerManager.fireLayerChanged(LayerManager.java:419)
+    at com.vividsolutions.jump.workbench.model.LayerManager.fireLayerChanged(LayerManager.java:443)
+    at com.vividsolutions.jump.workbench.model.Category.add(Category.java:124)
+    at com.vividsolutions.jump.workbench.model.LayerManager.addLayerable(LayerManager.java:153)
+    at com.vividsolutions.jump.workbench.model.LayerManager.addLayer(LayerManager.java:134)
+    at de.latlon.deejump.plugin.wfs.WFSPlugIn.run(WFSPlugIn.java:216)
+    at com.vividsolutions.jump.workbench.ui.task.TaskMonitorManager$TaskWrapper.run(TaskMonitorManager.java:149)
+    at java.lang.Thread.run(Unknown Source)
+
+* Fix SRS-related problems 
+ java.lang.NullPointerException
+ at de.latlon.deejump.plugin.wfs.PropertySelectionPanel.getXmlElement(PropertySelectionPanel.java:160)
+ at de.latlon.deejump.plugin.wfs.WFSPanel.createRequest(WFSPanel.java:493)
+ at de.latlon.deejump.plugin.wfs.WFSPanel.getRequest(WFSPanel.java:633)
+ at de.latlon.deejump.plugin.wfs.WFSPlugIn.run(WFSPlugIn.java:163)
+ at com.vividsolutions.jump.workbench.ui.task.TaskMonitorManager$TaskWrapper.run(TaskMonitorManager.java:149)
+ at java.lang.Thread.run(Unknown Source)
