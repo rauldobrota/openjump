@@ -11,11 +11,15 @@
 package de.latlon.deejump.ui;
 
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 
+import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -26,6 +30,8 @@ import javax.xml.transform.stream.StreamResult;
 import org.deegree.framework.util.StringTools;
 import org.deegree.framework.xml.XMLFragment;
 import org.deegree.framework.xml.XSLTDocument;
+
+import de.latlon.deejump.plugin.wfs.WFSPanel;
 
 /**
  * This class extends a JEditorPanel in order to show XML text with proper
@@ -80,7 +86,14 @@ public class XMLEditorPane extends JEditorPane {
             return txt;
         }
     }
-
+    
+    public String getVisibleText(){
+            selectAll();
+            String t = getSelectedText(); 
+            select( 0, 0 );
+            return t;
+    }
+    
     /**
      *  this function is used only onside the class for testing purposes
      * @param txt
@@ -110,8 +123,20 @@ public class XMLEditorPane extends JEditorPane {
         
         JFrame jf = new JFrame();
         jf.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-        jf.getContentPane().add( new XMLEditorPane(txt) );
-        jf.setSize( 600, 500 );
+//        jf.getContentPane().setLayout( new FlowLayout() );
+        
+        final XMLEditorPane ep = new XMLEditorPane(txt); 
+        jf.getContentPane().add( ep );
+        
+        AbstractAction a = new AbstractAction( "Save" ){
+            public void actionPerformed( ActionEvent e ) {
+                  System.out.println(ep.getVisibleText());
+              }  
+          };
+        
+//        jf.getContentPane().add(  new JButton( a ) );
+        
+        jf.setSize( 600, 600 );
         jf.setVisible( true );
     }
     
