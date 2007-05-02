@@ -110,10 +110,10 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
         // get selected geometry(ies)        
         Collection geoCollec = lvPanel.getSelectionManager().getFeatureSelection().getSelectedItems();    
         // then make GML out of it
-        org.deegree.model.spatialschema.Geometry gmlGeom;
+        org.deegree.model.spatialschema.Geometry selectedGeom;
         
         try {
-            gmlGeom = getSelectedGeoAsGML( geoCollec, srs );
+            selectedGeom = getSelectedGeoAsGML( geoCollec, srs );
         } catch ( WorkbenchException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(context.getWorkbenchFrame(),
@@ -129,13 +129,12 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
 						
 		// sets set selected geometry
 		// this geometry is used for spatial filter operations
-		rd.getWFSPanel().setSelectedGMLGeometry( gmlGeom );
+		rd.getWFSPanel().setComparisonGeometry( selectedGeom );
 		rd.setVisible(true);
-		wfsUrl = rd.getWFSPanel().getWfService().getGetFeatureURL();
-		
-		if ( !rd.canSearch() ){
-		    return false;
-		}
+        if ( !rd.canSearch() ){
+            return false;
+        } 
+        wfsUrl = rd.getWFSPanel().getWfService().getGetFeatureURL();
 
 		return true;
     }    
@@ -219,6 +218,7 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
 	        layer.setEditable( editable );
 	        
 	        if( dataset.size() == JUMPFeatureFactory.getMaxFeatures() ){
+                //TODO i18n
 	            context.getWorkbenchFrame().warnUser( "Maximale Anzahl Geoobjekte erreicht: " + JUMPFeatureFactory.getMaxFeatures() );
 	        }
 	        
