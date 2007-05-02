@@ -154,23 +154,14 @@ class PropertyCriteriaPanel extends JPanel {
         criteriaListPanel.repaint();
         setHeadersEnabled(false);
         remCriteriaButton.setEnabled(false);
-/*
-        try {
-            researchDialog.attributeNames = researchDialog.wfService
-                .getFeatureProperties( (String)featureTypeCombo.getSelectedItem() );
-        } catch ( Exception e ) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog( AttributeResearchPanel.this, "Error loading schema: " + e.getMessage() );
-        }
-*/
     }
     /**Creates the panel where the criteria list will be shown*/
     private JComponent createCriteriaPanel(){
         JPanel criteriaPanel = new JPanel();
         criteriaPanel.setLayout(null);
-        criteriaPanel.setPreferredSize( new Dimension(360,175));
+        criteriaPanel.setPreferredSize( new Dimension(360,125));
         criteriaPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("AttributeResearchPanel.attributeBasedCriteria")));
-        criteriaPanel.setBounds(LEFT_MARGIN,70,360,175);
+        criteriaPanel.setBounds(LEFT_MARGIN,70,360,125);
         
         attLabel = new JLabel( Messages.getString("AttributeResearchPanel.attribute"));
         attLabel.setBounds(LEFT_MARGIN, 18, SECOND_COL - LEFT_MARGIN, STD_HEIGHT);
@@ -188,9 +179,9 @@ class PropertyCriteriaPanel extends JPanel {
         setHeadersEnabled(false);
         
         criteriaListPanel = new JPanel(){
-            public Dimension getPreferredSize(){return new Dimension(300,900);}
+            public Dimension getPreferredSize(){return new Dimension(300,400);}
         };
-        criteriaListPanel.setBounds(LEFT_MARGIN,40,360,490);
+        criteriaListPanel.setBounds(LEFT_MARGIN,40,360,400);
         criteriaListPanel.setOpaque(false);        
         criteriaListPanel.setLayout(null);
                 	
