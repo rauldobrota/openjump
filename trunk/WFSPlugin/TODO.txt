@@ -23,6 +23,7 @@
  - Save DescribeFeatureType
  - Use threading for getting caps and features (*IMPORTANT*)
  - Add menu to WFSFrame
+ - Click on OK sets response panel active?
  - Implement caching of Capabilities (?)
  - TODO: i18n code and update of i18n keys
  - Javadoc (last but not least!)
