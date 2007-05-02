@@ -67,7 +67,17 @@ public class WFSFrame extends JFrame {
                     e1.printStackTrace();
                     resp = e1.getMessage();
                 }
-                wfsPanel.setResposeText( resp );
+                
+                int arbitrarySize = 10000;
+                if( resp.length() < arbitrarySize ){
+                    wfsPanel.setResposeText( resp );  
+                } else {
+                    int i = JOptionPane.showConfirmDialog( WFSFrame.this, "The response is too large for the editor. Would you like to save it to a file?", "Question?",
+                                                   JOptionPane.YES_NO_OPTION);
+                    if( i == JOptionPane.YES_OPTION ){
+                        WFSPanel.saveTextToFile( WFSFrame.this, resp );
+                    }
+                }
             }
         });
         buttons.okButton.setText( "Do GetFeature" );
