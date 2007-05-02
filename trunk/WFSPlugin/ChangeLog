@@ -1,10 +1,16 @@
 2007-05-02  Ugo Taddei <taddei@latlon.de>
+	
+	* src/de/latlon/deejump/plugin/wfs/AbstractWFSWrapper.java: fixed URL 
+	problem when loading schema.
+	
+
+2007-05-02  Ugo Taddei <taddei@latlon.de>
 
 	Use now WFSFeatureType instead of QualifiedName:
-	* src/de/latlon/deejump/wfs/AbstractWFSWrapper.java
-	* src/de/latlon/deejump/wfs/WFServiceWrapper_1_0_0.java
-	* src/de/latlon/deejump/wfs/WFServiceWrapper_1_1_0.java
-	* src/de/latlon/deejump/wfs/WFSPanel.java	
+	* src/de/latlon/deejump/plugin/wfs/AbstractWFSWrapper.java
+	* src/de/latlon/deejump/plugin/wfs/WFServiceWrapper_1_0_0.java
+	* src/de/latlon/deejump/plugin/wfs/WFServiceWrapper_1_1_0.java
+	* src/de/latlon/deejump/plugin/wfs/WFSPanel.java	
 	
 	* src/de/latlon/deejump/wfs/SpatialCriteriaPanel.java: GUI work on i18n,
 	also uses WFSFeatureType, crs combo box is now functional
@@ -16,26 +22,26 @@
 2007-05-02  Ugo Taddei <taddei@latlon.de>
 
 	Spatial panel now uses i18n properties:
-	* src/de/latlon/deejump/wfs/SpatialCriteriaPanel.java 
+	* src/de/latlon/deejump/plugin/wfs/SpatialCriteriaPanel.java 
 	* src/de/latlon/deejump/ui/messages.properties
 	* src/de/latlon/deejump/ui/messages_de.properties
 
 
 2007-05-02  Ugo Taddei <taddei@latlon.de>
 
-	* src/de/latlon/deejump/wfs/PropertyCriteriaPanel.java: GUI fiddling.
+	* src/de/latlon/deejump/plugin/wfs/PropertyCriteriaPanel.java: GUI fiddling.
 
-	* src/de/latlon/deejump/wfs/WFSDialog.java: per default is the OK
+	* src/de/latlon/deejump/plugin/wfs/WFSDialog.java: per default is the OK
 	button disabled.
 
-	* src/de/latlon/deejump/wfs/WFSFrame.java: added code for saving
+	* src/de/latlon/deejump/plugin/wfs/WFSFrame.java: added code for saving
 	reponse, if it's too big and should not be put in text field.
 
-	* src/de/latlon/deejump/wfs/WFSPlugIn.java: renamed a variable.
+	* src/de/latlon/deejump/plugin/wfs/WFSPlugIn.java: renamed a variable.
 
 	Moved saveTextToFile() to WFSPanel:
-	* src/de/latlon/deejump/wfs/WFSPanel.java
-	* src/de/latlon/deejump/wfs/MiniMenu.java
+	* src/de/latlon/deejump/plugin/wfs/WFSPanel.java
+	* src/de/latlon/deejump/plugin/wfs/MiniMenu.java
 
 	* src/de/latlon/deejump/plugin/DeeJUMPExtension.java: added some
 	javadoc.
@@ -51,21 +57,21 @@
 
 2007-04-30  Ugo Taddei <taddei@latlon.de>
 
-	* src/de/latlon/deejump/wfs/WFSPlugin.java: add plugin as a menu,
+	* src/de/latlon/deejump/plugin/wfs/WFSPlugin.java: add plugin as a menu,
 	updated header.
 	
-	* src/de/latlon/deejump/wfs/WFSPanelButtons.java: removed handler of 
+	* src/de/latlon/deejump/plugin/wfs/WFSPanelButtons.java: removed handler of 
 	cancel button.
 
-	* src/de/latlon/deejump/wfs/WFSPanel.java: uses XMLEditor; also minor
+	* src/de/latlon/deejump/plugin/wfs/WFSPanel.java: uses XMLEditor; also minor
 	GUI changes.
 
-	* src/de/latlon/deejump/wfs/WFServiceWrapper_1_1_0.java: added prefix.
+	* src/de/latlon/deejump/plugin/wfs/WFServiceWrapper_1_1_0.java: added prefix.
 
 	Refactoring (changes names because of old class and name conflict):
 
-	* src/de/latlon/deejump/wfs/WFSOptionsPanel.java: deleted
-	* src/de/latlon/deejump/wfs/WFSOptionsPanel2.java: added
+	* src/de/latlon/deejump/plugin/wfs/WFSOptionsPanel.java: deleted
+	* src/de/latlon/deejump/plugin/wfs/WFSOptionsPanel2.java: added
 	
 	Added classes for XML pretty displaying:
 	* src/de/latlon/deejump/ui/XMLEditorPane.java
