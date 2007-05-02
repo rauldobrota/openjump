@@ -136,11 +136,11 @@ public class WFSDialog extends JDialog {
 
             }
         } );
-
+        buttons.okButton.setEnabled( false );
+        
         buttons.cancelButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 setVisible( false );
-
                 setCanSearch( false );
 
             }
