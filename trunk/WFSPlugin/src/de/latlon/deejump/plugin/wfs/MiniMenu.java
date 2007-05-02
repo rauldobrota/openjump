@@ -11,6 +11,7 @@ package de.latlon.deejump.plugin.wfs;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -31,8 +32,6 @@ import javax.swing.JOptionPane;
  */
 class MiniMenu extends JMenuBar {
     
-    private String lastDirectory; 
-    
     public MiniMenu( final WFSPanel wfsPanel ) {
         super();
         
@@ -42,15 +41,7 @@ class MiniMenu extends JMenuBar {
         topMenu.add(  subMenu  );
         subMenu.addActionListener( new ActionListener(){
             public void actionPerformed( ActionEvent e ) {
-                try {
-                    saveTextToFile( wfsPanel.getRequest() );
-                } catch ( IOException e1 ) {
-                    e1.printStackTrace();
-                    JOptionPane.showMessageDialog( MiniMenu.this, 
-                                                   e1.getMessage(), 
-                                                   "Error",
-                                                   JOptionPane.ERROR_MESSAGE );
-                }
+                WFSPanel.saveTextToFile( MiniMenu.this, wfsPanel.getRequest() );
             }
         } );
         
@@ -58,15 +49,7 @@ class MiniMenu extends JMenuBar {
         topMenu.add(  subMenu  );
         subMenu.addActionListener( new ActionListener(){
             public void actionPerformed( ActionEvent e ) {
-                try {
-                    saveTextToFile( wfsPanel.getResponse() );
-                } catch ( IOException e1 ) {
-                    e1.printStackTrace();
-                    JOptionPane.showMessageDialog( MiniMenu.this, 
-                                                   e1.getMessage(), 
-                                                   "Error",
-                                                   JOptionPane.ERROR_MESSAGE );
-                }
+                WFSPanel.saveTextToFile(  MiniMenu.this, wfsPanel.getResponse() );
             }
         } );
         
@@ -84,28 +67,15 @@ class MiniMenu extends JMenuBar {
         
         
     }
-    
-    private void saveTextToFile( String txt ) throws IOException{
-        
-        JFileChooser jfc = new JFileChooser();
-        int i = jfc.showSaveDialog( this );
-        if ( i == JFileChooser.APPROVE_OPTION ){
-            
-            FileWriter fw = new FileWriter( jfc.getSelectedFile() );
-            fw.write( txt );
-            fw.close();
-            lastDirectory = jfc.getSelectedFile().getParent();
-        } 
-        
-    }
-    
-    
 }
 
 /* ********************************************************************
 Changes to this class. What the people have been up to:
 
 $Log$
+Revision 1.3  2007/05/02 07:59:40  taddei
+Moved saveTextToFile() to WFSPanel
+
 Revision 1.2  2007/04/27 07:27:29  taddei
 More major refactoring to use WFSPanel the WFSFrame) and in the  WFSDialog. Also some GUI improvements.
 

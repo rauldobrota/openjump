@@ -16,10 +16,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -27,6 +31,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -62,7 +67,7 @@ public class WFSPanel extends JPanel {
 
     //TODO put a props
     static final String releaseVersion = "0.1.0";
-    
+
     // Constants for spatial search criteria type
     // also used by child panels
     /** Search uses no spatial criteria */
@@ -73,8 +78,10 @@ public class WFSPanel extends JPanel {
 
     /** Search uses a selected (GML) geometry as spatial criteria */
     public static final String SELECTED_GEOM = "SELECTED_GEOM";
-    
+
     private static List servers = new ArrayList();
+
+    private static File lastDirectory;
 
     /**
      * The standard geometry type name (used when getting schemata and creating
@@ -102,13 +109,13 @@ public class WFSPanel extends JPanel {
 
     private JComboBox serverCombo;
 
-//    private JButton okButton;
+    //    private JButton okButton;
 
     private JTabbedPane tabs;
 
     private JComboBox featureTypeCombo;
 
-//    private JPanel mainPanel;
+    //    private JPanel mainPanel;
 
     private Box box;
 
@@ -122,7 +129,7 @@ public class WFSPanel extends JPanel {
     private String srs = "EPSG:4326";
 
     private PropertySelectionPanel propertiesPanel;
-    
+
     private JButton capabilitiesButton;
 
     protected String wfsVersion;
@@ -131,7 +138,7 @@ public class WFSPanel extends JPanel {
 
     WFSPanelButtons controlButtons;
 
-    public WFSPanel(List<String> urlList){
+    public WFSPanel( List<String> urlList ) {
         super();
         setWFSList( urlList );
         initGUI();
@@ -149,12 +156,12 @@ public class WFSPanel extends JPanel {
         serverCombo.setPreferredSize( d );
         serverCombo.setMaximumSize( d );
         String txt = Messages.getString( "FeatureResearchDialog.wfsService" );
-        serverCombo.setBorder( BorderFactory.createTitledBorder( txt ) ); 
+        serverCombo.setBorder( BorderFactory.createTitledBorder( txt ) );
         txt = Messages.getString( "FeatureResearchDialog.wfsServiceToolTip" );
         serverCombo.setToolTipText( txt );
-        
-        add(serverCombo);
-        
+
+        add( serverCombo );
+
         // connect and capabilities button
         JButton connecButton = new JButton( Messages.getString( "FeatureResearchDialog.connect" ) );
         connecButton.setAlignmentX( 0.5f );
@@ -168,22 +175,21 @@ public class WFSPanel extends JPanel {
         capabilitiesButton.setEnabled( false );
         capabilitiesButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
-                createXMLFrame( WFSPanel.this, wfService.getCapabilitesAsString());
+                createXMLFrame( WFSPanel.this, wfService.getCapabilitesAsString() );
             }
         } );
-        
+
         JPanel p = new JPanel();
-        p.setLayout( new BoxLayout(p, BoxLayout.Y_AXIS ) );
-        
+        p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
+
         // version buttons
-        p.add( createVersionButtons( new String[]{ "1.0.0", "1.1.0" } ) );
-        
-        
+        p.add( createVersionButtons( new String[] { "1.0.0", "1.1.0" } ) );
+
         JPanel innerPanel = new JPanel();
         innerPanel.add( connecButton );
         innerPanel.add( capabilitiesButton );
         p.add( innerPanel );
-        
+
         featureTypeCombo = createFeatureTypeCombo();
         //featureTypeCombo.setVisible( false );
         featureTypeCombo.setEnabled( false );
@@ -192,7 +198,7 @@ public class WFSPanel extends JPanel {
         //FIXME what's this???
         setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
         add( p );
-        
+
         final Dimension dim = new Dimension( 400, 570 );
         final Dimension minDim = new Dimension( 400, 500 );
 
@@ -222,17 +228,15 @@ public class WFSPanel extends JPanel {
         tabs.add( Messages.getString( "FeatureResearchDialog.response" ), createrResponseTextArea() );
 
         box = Box.createHorizontalBox();
-        box.setBorder( BorderFactory.createEmptyBorder( 20, 5, 10, 5 ));
-        
-        
+        box.setBorder( BorderFactory.createEmptyBorder( 20, 5, 10, 5 ) );
+
         add( tabs );
         tabs.setVisible( false );
-        
-                
-//        setMinimumSize( new Dimension( 400, 300 ) );
-//        setPreferredSize( new Dimension( 400, 600 ) );
+
+        //        setMinimumSize( new Dimension( 400, 300 ) );
+        //        setPreferredSize( new Dimension( 400, 600 ) );
     }
-    
+
     // Gh 15.11.05
     private JComboBox createServerCombo() {
         // 
@@ -246,34 +250,43 @@ public class WFSPanel extends JPanel {
             public void itemStateChanged( ItemEvent e ) {
                 if ( e.getStateChange() == ItemEvent.SELECTED ) {
                     /*String selected = extensibleComboBox.getSelectedItem().toString();
-                    reinitService( selected );
+                     reinitService( selected );
                      */
                 }
             }
         } );
         return extensibleComboBox;
-    }    
+    }
 
-    static void createXMLFrame( Component parent, String txt ) {
-        
+    static void createXMLFrame( final Component parent, String txt ) {
+
         //FIXME: this is still too slow...
-        
+
         //JTextArea ta = new JTextArea( txt, 20, 80 );
-        XMLEditorPane xe = new XMLEditorPane(txt);
-//        ta.setLineWrap( true );
+        final XMLEditorPane xe = new XMLEditorPane( txt );
+        //        ta.setLineWrap( true );
         JScrollPane sp = new JScrollPane( xe, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                           JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
-        sp.setMaximumSize( new Dimension(600,400) );
-        sp.setPreferredSize( new Dimension(800,400) );
-        JOptionPane.showMessageDialog( parent, sp ); 
-    
+        sp.setMaximumSize( new Dimension( 600, 400 ) );
+        sp.setPreferredSize( new Dimension( 800, 400 ) );
+
+        JPanel p = new JPanel();
+        p.add( sp );
+
+        AbstractAction a = new AbstractAction( "Save" ) {
+            public void actionPerformed( ActionEvent e ) {
+                WFSPanel.saveTextToFile( parent, xe.getVisibleText() );
+            }
+        };
+        p.add( new JButton( a ) );
+        JOptionPane.showMessageDialog( parent, p );
+
     }
 
     private void reinitService( String url ) {
         try {
-            wfService = "1.1.0".equals( this.wfsVersion ) ? 
-                            new WFServiceWrapper_1_1_0( url ) :
-                            new WFServiceWrapper_1_0_0( url );    
+            wfService = "1.1.0".equals( this.wfsVersion ) ? new WFServiceWrapper_1_1_0( url )
+                                                         : new WFServiceWrapper_1_0_0( url );
             refreshGUIs();
         } catch ( Exception e ) {
 
@@ -289,18 +302,18 @@ public class WFSPanel extends JPanel {
 
     private Component createVersionButtons( String[] versions ) {
         JPanel p = new JPanel();
-        
+
         p.add( new JLabel( Messages.getString( "FeatureResearchDialog.version" ) ) );
         ButtonGroup bg = new ButtonGroup();
         for ( int i = 0; i < versions.length; i++ ) {
             final JRadioButton b = new JRadioButton( versions[i] );
-            b.addActionListener( new ActionListener(){
+            b.addActionListener( new ActionListener() {
                 public void actionPerformed( ActionEvent e ) {
-                    WFSPanel.this.wfsVersion = b.getText(); 
+                    WFSPanel.this.wfsVersion = b.getText();
                 }
             } );
             bg.add( b );
-            if( i == 0 ){//first is clicked 
+            if ( i == 0 ) {//first is clicked 
                 b.doClick();
             }
             p.add( b );
@@ -314,14 +327,11 @@ public class WFSPanel extends JPanel {
         Dimension d = new Dimension( 300, 60 );
         tmpFeatureTypeCombo.setPreferredSize( d );
         tmpFeatureTypeCombo.setMaximumSize( d );
-        
-        
-        Border border = 
-            BorderFactory
-                .createTitledBorder( Messages.getString( "FeatureResearchDialog.featureType" ) );
-        
+
+        Border border = BorderFactory.createTitledBorder( Messages.getString( "FeatureResearchDialog.featureType" ) );
+
         Border border2 = BorderFactory.createEmptyBorder( 5, 2, 10, 2 );
-        
+
         border2 = BorderFactory.createCompoundBorder( border2, border );
         tmpFeatureTypeCombo.setBorder( border2 );
         tmpFeatureTypeCombo.addActionListener( new java.awt.event.ActionListener() {
@@ -339,21 +349,22 @@ public class WFSPanel extends JPanel {
 
                 } catch ( Exception e ) {
                     e.printStackTrace();
-                    JOptionPane.showMessageDialog( WFSPanel.this,
-                                                   "Error loading schema: " + e.getMessage() );
+                    JOptionPane.showMessageDialog( WFSPanel.this, "Error loading schema: "
+                                                                  + e.getMessage() );
                 }
             }
         } );
 
         return tmpFeatureTypeCombo;
     }
-    
+
     private JComponent createRequestTextArea() {
 
         JPanel p = new JPanel();
-        p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
+//        p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
 
         requestTextArea = new JTextArea();
+        requestTextArea.setPreferredSize( new Dimension(400,475) );
         requestTextArea.setLineWrap( true );
         requestTextArea.setWrapStyleWord( true );
         requestTextArea.setBorder( BorderFactory.createEmptyBorder( 10, 10, 10, 10 ) );
@@ -372,33 +383,31 @@ public class WFSPanel extends JPanel {
             }
         } );
 
-//TODO i18n
-        JButton validateReq = new JButton( "Validate request");//
-//                                        Messages.getString( "FeatureResearchDialog.createWFSRequest" ) );
+        //TODO i18n
+        JButton validateReq = new JButton( "Validate request" );//
+        //                                        Messages.getString( "FeatureResearchDialog.createWFSRequest" ) );
 
         validateReq.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
-                
+
                 try {
                     XMLFragment xf = new XMLFragment();
-                    xf.load( new StringReader(requestTextArea.getText()), "dummy" );
+                    xf.load( new StringReader( requestTextArea.getText() ), "dummy" );
                     GetFeature.create( null, xf.getRootElement() );
                 } catch ( Exception ex ) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog( WFSPanel.this,
-                                                   ex.getMessage(), 
-                                                   "Error",
+                    JOptionPane.showMessageDialog( WFSPanel.this, ex.getMessage(), "Error",
                                                    JOptionPane.ERROR_MESSAGE );
                 }
             }
         } );
-        
+
         JPanel innerPanel = new JPanel();
         innerPanel.add( createReq );
         innerPanel.add( validateReq );
-        
+
         p.add( innerPanel );
-        
+
         return p;
     }
 
@@ -416,7 +425,7 @@ public class WFSPanel extends JPanel {
         p.add( jsp );
 
         return p;
-    }    
+    }
 
     /** Initializes the FeatureType combo box of the AttributeResearchPanel */
 
@@ -433,14 +442,15 @@ public class WFSPanel extends JPanel {
             tabs.setEnabledAt( 1, true );
 
             featureTypeCombo.setEnabled( true );
-//            featureTypeCombo.setVisible( true );
+            //            featureTypeCombo.setVisible( true );
             attributeResPanel.setFeatureTypeComboEnabled( true );
 
         } catch ( Exception e ) {
             e.printStackTrace();
             JOptionPane.showMessageDialog( this, "Could not connect to WFS server at '"
-                                                 + wfService.getBaseWfsURL() + "'\n" + e.getMessage(),
-                                           "Error", JOptionPane.ERROR_MESSAGE );
+                                                 + wfService.getBaseWfsURL() + "'\n"
+                                                 + e.getMessage(), "Error",
+                                           JOptionPane.ERROR_MESSAGE );
 
             featureTypeCombo.setModel( new javax.swing.DefaultComboBoxModel( new String[] {} ) );
             attributeResPanel.setFeatureTypeComboEnabled( false );
@@ -475,35 +485,35 @@ public class WFSPanel extends JPanel {
         }
 
     }
-    
+
     /** Creates a GetFeature request by concatenation of xlm elements */
     private StringBuffer createRequest() {
-        
+
         StringBuffer sb = new StringBuffer();
-        if( wfService == null ){//not inited yet
+        if ( wfService == null ) {//not inited yet
             return sb;
         }
-        
+
         sb.append( "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" );
 
         final String outputFormat = options.getSelectedOutputFormat();
-        
-        System.out.println("FT namespace is missing in the xml??");
+
+        System.out.println( "FT namespace is missing in the xml??" );
         
         sb.append( "<wfs:GetFeature xmlns:ogc=\"http://www.opengis.net/ogc\" " )
-            .append("xmlns:gml=\"http://www.opengis.net/gml\" " )
-            .append("xmlns:wfs=\"http://www.opengis.net/wfs\" service=\"WFS\" " )
-            .append("version=\"").append( wfService.getServiceVersion() ).append( "\" " )
-            .append("outputFormat=\"")
-            .append( outputFormat )
-            .append( "\">" )
-            .append( "<wfs:Query " );
+        .append("xmlns:gml=\"http://www.opengis.net/gml\" " )
+        .append("xmlns:wfs=\"http://www.opengis.net/wfs\" service=\"WFS\" " )
+        .append("version=\"" ).append(wfService.getServiceVersion() ).append("\" " )
+        .append("maxFeatures=\"" ).append( options.getMaxFeatures() ).append("\" " )
+        .append("outputFormat=\"" ).append(outputFormat ).append("\">" )
+        .append("<wfs:Query " );
 
         String ftName = (String) featureTypeCombo.getSelectedItem();
         QualifiedName ft = wfService.getQualiNameByFeatureTypeName( ftName );
 
         sb.append( "xmlns:" ).append( ft.getPrefix() ).append( "=\"" )
-        .append( ft.getNamespace() ).append("\" " ).append("typeName=\"" ).append( ftName ).append("\">" );
+        .append( ft.getNamespace() ).append("\" " ).append( "typeName=\"" )
+        .append(ftName ).append("\">" );
 
         sb.append( propertiesPanel.getXmlElement() );
 
@@ -553,21 +563,56 @@ public class WFSPanel extends JPanel {
         QualifiedName qn = getChosenGeoProperty();
 
         if ( envelope != null ) {
-            sb.append( "<ogc:BBOX>" ).append( "<ogc:PropertyName>" )
-                .append( ft.getPrefix() ).append(":" ).append(qn.getLocalName() )
-                .append("</ogc:PropertyName>" ).append("<gml:Box><gml:coord>" )
-                .append("<gml:X>" ).append(envelope.getMinX() ).append("</gml:X>" )
-                .append("<gml:Y>" ).append(envelope.getMinY() ).append("</gml:Y>" )
-                .append("</gml:coord><gml:coord>" ).append("<gml:X>" )
-                .append(envelope.getMaxX() ).append("</gml:X>" ).append("<gml:Y>" )
-                .append(envelope.getMaxY() ).append("</gml:Y>" )
-                .append("</gml:coord></gml:Box></ogc:BBOX>" );
+            sb.append( "<ogc:BBOX>" ).append( "<ogc:PropertyName>" ).append( ft.getPrefix() ).append(
+                                                                                                      ":" ).append(
+                                                                                                                    qn.getLocalName() ).append(
+                                                                                                                                                "</ogc:PropertyName>" ).append(
+                                                                                                                                                                                "<gml:Box><gml:coord>" ).append(
+                                                                                                                                                                                                                 "<gml:X>" ).append(
+                                                                                                                                                                                                                                     envelope.getMinX() ).append(
+                                                                                                                                                                                                                                                                  "</gml:X>" ).append(
+                                                                                                                                                                                                                                                                                       "<gml:Y>" ).append(
+                                                                                                                                                                                                                                                                                                           envelope.getMinY() ).append(
+                                                                                                                                                                                                                                                                                                                                        "</gml:Y>" ).append(
+                                                                                                                                                                                                                                                                                                                                                             "</gml:coord><gml:coord>" ).append(
+                                                                                                                                                                                                                                                                                                                                                                                                 "<gml:X>" ).append(
+                                                                                                                                                                                                                                                                                                                                                                                                                     envelope.getMaxX() ).append(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                  "</gml:X>" ).append(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                       "<gml:Y>" ).append(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           envelope.getMaxY() ).append(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "</gml:Y>" ).append(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             "</gml:coord></gml:Box></ogc:BBOX>" );
         }
 
         return sb;
     }
+
     private void setRequestText( String text ) {
         requestTextArea.setText( text.replaceAll( ">", ">\n" ) );
+    }
+
+    public static void saveTextToFile( Component compo, String txt ) {
+
+        JFileChooser jfc = new JFileChooser();
+        if ( lastDirectory != null ) {
+            jfc.setCurrentDirectory( lastDirectory );
+        }
+        int i = jfc.showSaveDialog( compo );
+        if ( i == JFileChooser.APPROVE_OPTION ) {
+            try {
+
+                FileWriter fw = new FileWriter( jfc.getSelectedFile() );
+                fw.write( txt );
+                fw.close();
+                lastDirectory = jfc.getSelectedFile().getParentFile();
+            } catch ( Exception e ) {
+                //TODO i18n
+                JOptionPane.showMessageDialog( compo, e.getMessage(), "Error!",JOptionPane.ERROR_MESSAGE );
+                e.printStackTrace();
+            }
+
+        }
+
     }
 
     /**
@@ -582,7 +627,7 @@ public class WFSPanel extends JPanel {
         String[] tags = new String[] { "<ogc:" + tagName + ">", "</ogc:" + tagName + ">" };
         return tags;
     }
-    
+
     public QualifiedName getChosenGeoProperty() {
         return geoProperty;
         /*QualifiedName[] qns = wfService.getGeometryProperties(this.getFeatureType().getAsString());
@@ -591,8 +636,8 @@ public class WFSPanel extends JPanel {
          qn = qns[0];
          }
          return qn;*/
-    }    
-    
+    }
+
     public void setGeoProperty( QualifiedName geoProp ) {
         this.geoProperty = geoProp;
     }
@@ -600,7 +645,7 @@ public class WFSPanel extends JPanel {
     public QualifiedName[] getGeoProperties() {
         return this.wfService.getGeometryProperties( (String) featureTypeCombo.getSelectedItem() );
     }
-    
+
     /**
      * Returns the currently chosen feature type
      * 
@@ -609,7 +654,7 @@ public class WFSPanel extends JPanel {
     public QualifiedName getFeatureType() {
         String s = (String) featureTypeCombo.getSelectedItem();
         return wfService.getQualiNameByFeatureTypeName( s );
-    }    
+    }
 
     public AbstractWFSWrapper getWfService() {
         return this.wfService;
@@ -624,7 +669,7 @@ public class WFSPanel extends JPanel {
     public Geometry getSelectedGeometry() {
         return this.selectedGeom;
     }
-    
+
     public void setGMLGeometrySRS( CoordinateSystem cs ) {
         //FIXME is this needed?
         //      this.srs = cs;
@@ -632,25 +677,25 @@ public class WFSPanel extends JPanel {
             ( (GeometryImpl) this.selectedGeom ).setCoordinateSystem( cs );
         }
     }
-    
+
     //GH 29.11.05
     public void setWFSList( List serverURLS ) {
         servers = serverURLS;
     }
-    
-    public void setResposeText( String txt ){
+
+    public void setResposeText( String txt ) {
         responseTextArea.setText( txt );
     }
-    
-    public String getRequest(){
+
+    public String getRequest() {
         String t = requestTextArea.getText();
-        if( t == null || t.length() == 0 ){
+        if ( t == null || t.length() == 0 ) {
             t = createRequest().toString();
         }
         return t;
     }
-    
-    public void setTabsVisible( boolean visible ){
+
+    public void setTabsVisible( boolean visible ) {
         tabs.setVisible( visible );
     }
 
@@ -670,9 +715,8 @@ public class WFSPanel extends JPanel {
         this.envelope = env;
     }
 
-    public void setSelectedGMLGeometry( Geometry gmlGeom ) {
-        // TODO Auto-generated method stub
-        
+    public void setComparisonGeometry( Geometry geom ) {
+        this.selectedGeom = geom;
     }
-    
+
 }
