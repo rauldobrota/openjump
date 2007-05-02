@@ -256,9 +256,9 @@ e.printStackTrace();
         try {
             //GMLSchema xsd = loadSchemaForFeatureType( featureTypeName );
             String rawXML = loadSchemaForFeatureType2( featureTypeName );
-            
+
             GMLSchemaDocument xsdDoc = new GMLSchemaDocument();
-            xsdDoc.load( new StringReader(rawXML), "dummy" );
+            xsdDoc.load( new StringReader(rawXML), "http://empty" );
             
             GMLSchema xsd = xsdDoc.parseGMLSchema(); 
             
@@ -361,6 +361,9 @@ e.printStackTrace();
 Changes to this class. What the people have been up to:
 
 $Log$
+Revision 1.4  2007/05/02 13:50:11  taddei
+fixed URL problem when loading schema.
+
 Revision 1.3  2007/05/02 13:27:11  taddei
 Use now WFSFeatureType instead of QualifiedName.
 
