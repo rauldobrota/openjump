@@ -1,5 +1,20 @@
 2007-05-02  Ugo Taddei <taddei@latlon.de>
 
+	Use now WFSFeatureType instead of QualifiedName:
+	* src/de/latlon/deejump/wfs/AbstractWFSWrapper.java
+	* src/de/latlon/deejump/wfs/WFServiceWrapper_1_0_0.java
+	* src/de/latlon/deejump/wfs/WFServiceWrapper_1_1_0.java
+	* src/de/latlon/deejump/wfs/WFSPanel.java	
+	
+	* src/de/latlon/deejump/wfs/SpatialCriteriaPanel.java: GUI work on i18n,
+	also uses WFSFeatureType, crs combo box is now functional
+
+	* lib/deegree2.jar: updated lib with version that supports EPSG 
+	2939{1,2,3,4} (the coord. sys. transforamtion hasn't been checked for
+	precision!).
+	
+2007-05-02  Ugo Taddei <taddei@latlon.de>
+
 	Spatial panel now uses i18n properties:
 	* src/de/latlon/deejump/wfs/SpatialCriteriaPanel.java 
 	* src/de/latlon/deejump/ui/messages.properties
