@@ -2,14 +2,10 @@
 ## WFSPlugin TODO
 ##
 
- - Plug-in                                      [DONE]
  - Extension
  - OptionsDialog: maxFeatCount, outputFormat 
  - Request-validation: make wfs 1.0.0 also a valid request (currently done
    inside deegree, needs to be separated)
- - parsing GetCaps for supported SRS in "spatial"-tab, EPSG:2393 "must"
-   be supported, also 2391, 2392, 2393, 2394 and 3067
-   -> fill the drop-down-box in "spatial"-tab accordingly
  - parse different geometry-typenames 
    (e.g.<xs:element minOccurs="0" name="the_geom" nillable="true"
    type="gml:MultiPolygonPropertyType"></xs:element> or
@@ -17,16 +13,20 @@
    type="gml:GeometryAssociationType"></xs:element>
    of DescribeFeatureType for usage in
    Spatial filtering.
- - fix NPE when hitting the OK-Button befor connecting to a server. 
  - Save request/response (?)
- - Save Capabilities
- - Save DescribeFeatureType
  - Use threading for getting caps and features (*IMPORTANT*)
  - Add menu to WFSFrame
  - Click on OK sets response panel active?
  - Implement caching of Capabilities (?)
  - TODO: i18n code and update of i18n keys
  - Javadoc (last but not least!)
+ - Fix: Validate-request-button in request-tab throughs error:
+   no protocol: dummy 
+ - Fix: changing EPSG-box by hand results in 2 "FIX ME" alert boxes
+ - Fix: changing EPSG-Box does not affect the query
+ - Fix: response-tab does not have any option here? only in
+   standalone-mode?
+ - Search-tab: disable edit-checkbox per default
  
 - NO WFS-T atm, only basic WFS.
 
