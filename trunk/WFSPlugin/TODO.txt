@@ -18,7 +18,13 @@
    of DescribeFeatureType for usage in
    Spatial filtering.
  - fix NPE when hitting the OK-Button befor connecting to a server. 
-
+ - Save request/response (?)
+ - Save Capabilities
+ - Save DescribeFeatureType
+ - Use threading for getting caps and features (*IMPORTANT*)
+ - Add menu to WFSFrame
+ - Implement caching of Capabilities (?)
+ 
 - NO WFS-T atm, only basic WFS.
 
 DEBUG:
