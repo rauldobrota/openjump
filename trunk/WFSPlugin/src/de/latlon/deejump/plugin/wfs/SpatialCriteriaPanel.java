@@ -26,6 +26,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
@@ -43,6 +44,7 @@ import org.deegree.model.filterencoding.OperationDefines;
 import org.deegree.model.filterencoding.PropertyName;
 import org.deegree.model.filterencoding.SpatialOperation;
 import org.deegree.model.spatialschema.Geometry;
+import org.deegree.model.spatialschema.GeometryImpl;
 
 import de.latlon.deejump.ui.Messages;
 
@@ -80,18 +82,21 @@ class SpatialCriteriaPanel extends JPanel {
     private String selectedOperation = "Intersects";
         
     /**The parent dialog. Keep this reference to make matters simple */
-    private WFSPanel researchDialog;
+    private WFSPanel wfsPanel;
 
     private JComboBox geomPropsCombo;
+
+
+    private JComboBox srsCombo;
     
     
     /** Create a SpatialResearchPanel.
      * 
      * @param rd the parent FeatureResearchDialog
      */
-    public SpatialCriteriaPanel(WFSPanel rd) {
+    public SpatialCriteriaPanel(WFSPanel panel) {
         super();
-        this.researchDialog = rd;
+        this.wfsPanel = panel;
         initGUI();
     }
     
@@ -146,20 +151,9 @@ class SpatialCriteriaPanel extends JPanel {
     }
         
     private JComponent createSRSCombo(){
-        //TODO crete a resources file for this
-        String[] srs = new String[]{
-                                    "4326",
-                                    "31466",
-                                    "31467",
-                                    "25833"
-/*"EPSG:4326",
-                "EPSG:31466",
-				"EPSG:31467",
-                "EPSG:25833"*/
-        		};
         
-        final JComboBox srsCombo = new JComboBox( srs );
-        
+        srsCombo = new JComboBox( new DefaultComboBoxModel(new String[0]) );
+        srsCombo.setEnabled( false );
         srsCombo.addItemListener(
             new ItemListener() {
                 public void itemStateChanged(ItemEvent e) {
@@ -171,7 +165,7 @@ class SpatialCriteriaPanel extends JPanel {
                         e1.printStackTrace();
                     }
                     
-                    researchDialog.setGMLGeometrySRS( cs );
+                    wfsPanel.setGMLGeometrySRS( cs );
 //                  FIXME this is not qut nice here, but JUMP is lacking 
                     //a mechanism for srs, anyway
                     String srs = (String)srsCombo.getSelectedItem();
@@ -199,7 +193,13 @@ class SpatialCriteriaPanel extends JPanel {
         add( p );
         return p;
     }
-        
+     
+    public void setCrs( String[] crs ){
+        this.srsCombo.setModel( new DefaultComboBoxModel(crs) );
+        srsCombo.setEnabled( true );
+
+    }
+    
     /**Creates a panel containing the radio buttons representaing the spatial operations*/
     private JComponent createOperationButtons() {
         JPanel b = new JPanel();
@@ -253,22 +253,6 @@ class SpatialCriteriaPanel extends JPanel {
             
             opsPanel.add( opButtons[i] );
             
-            //FIXME
-            /*
-            if( "Touches".equals( OP_NAMES[i] ) ||
-                    "Crosses".equals( OP_NAMES[i] ) ||
-                    "Equals".equals( OP_NAMES[i] ) ||
-                    "Overlaps".equals( OP_NAMES[i] )||
-                    "Beyond".equals( OP_NAMES[i] )
-                    ){
-                opButtons[i].setToolTipText( "Operation '" 
-                        + OP_NAMES[i] + "' is not implemented yet");  
-  
-                //	+ "' is too resource-consuming and has been turned off in this demo." );
-                
-                opButtons[i].setEnabled(false);
-            }
-            */
         }
         
         opButtons[0].doClick();
@@ -312,17 +296,21 @@ class SpatialCriteriaPanel extends JPanel {
             dist = beyondDistanceField.getDistance();
         }
         StringBuffer sb = new StringBuffer();
-        Geometry geometry = researchDialog.getSelectedGeometry();
+        Geometry geometry = wfsPanel.getSelectedGeometry();
         if (geometry == null){
             return sb;
         }
-        
+        try {
+            ((GeometryImpl)geometry).setCoordinateSystem( CRSFactory.create( (String)this.srsCombo.getSelectedItem() )  );
+        } catch ( UnknownCRSException e ) {
+            e.printStackTrace();
+        }
         
         //TODO when JUMP accepts more than one geo pro, should offer it in a combo
         // only that is returning the string only, need the wualified name here
 //        String geoProp = this.geomPropsCombo.getSelectedItem();
         
-        QualifiedName qn = this.researchDialog.getFeatureType();
+        QualifiedName qn = this.wfsPanel.getFeatureType();
         QualifiedName geoQn = (QualifiedName)geomPropsCombo.getSelectedItem();
         
         geoQn = new QualifiedName ( qn.getPrefix(), 
@@ -388,8 +376,4 @@ class SpatialCriteriaPanel extends JPanel {
         }
     }
 
-    public String _getGeomPropertyName(){
-        return (String)this.geomPropsCombo.getSelectedItem();
-    }
-    
 }
