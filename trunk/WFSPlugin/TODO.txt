@@ -17,7 +17,7 @@
    type="gml:GeometryAssociationType"></xs:element>
    of DescribeFeatureType for usage in
    Spatial filtering.
- - 
+ - fix NPE when hitting the OK-Button befor connecting to a server. 
 
 - NO WFS-T atm, only basic WFS.
 
