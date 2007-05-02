@@ -15,7 +15,13 @@ import de.latlon.deejump.plugin.wfs.WFSPlugIn;
 
 
 /**
- * ...
+ * General extension classes for installing deeJump plug-ins. This extension
+ * installs the follwoing plug-ins:
+ * <blockquote>
+ * - WFSPlugin
+ * </blockquote>
+ * 
+ * 
  * 
  * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei</a>
  * 
