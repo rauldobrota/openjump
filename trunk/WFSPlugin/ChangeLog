@@ -1,3 +1,25 @@
+2007-05-02  Ugo Taddei <taddei@latlon.de>
+
+	* src/de/latlon/deejump/wfs/PropertyCriteriaPanel.java: GUI fiddling.
+
+	* src/de/latlon/deejump/wfs/WFSDialog.java: per default is the OK
+	button disabled.
+
+	* src/de/latlon/deejump/wfs/WFSFrame.java: added code for saving
+	reponse, if it's too big and should not be put in text field.
+
+	* src/de/latlon/deejump/wfs/WFSPlugIn.java: renamed a variable.
+
+	Moved saveTextToFile() to WFSPanel:
+	* src/de/latlon/deejump/wfs/WFSPanel.java
+	* src/de/latlon/deejump/wfs/MiniMenu.java
+
+	* src/de/latlon/deejump/plugin/DeeJUMPExtension.java: added some
+	javadoc.
+
+	* src/de/latlon/deejump/ui/XMLEditorPane.java: added
+	getVisibleText().
+	
 2007-04-30  Stephan Holl <stephan.holl@intevation.de>
 
 	* build.properties: New. Define some variables to build against
