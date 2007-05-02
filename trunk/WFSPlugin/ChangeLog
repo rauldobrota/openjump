@@ -1,5 +1,13 @@
 2007-05-02  Ugo Taddei <taddei@latlon.de>
 
+	Spatial panel now uses i18n properties:
+	* src/de/latlon/deejump/wfs/SpatialCriteriaPanel.java 
+	* src/de/latlon/deejump/ui/messages.properties
+	* src/de/latlon/deejump/ui/messages_de.properties
+
+
+2007-05-02  Ugo Taddei <taddei@latlon.de>
+
 	* src/de/latlon/deejump/wfs/PropertyCriteriaPanel.java: GUI fiddling.
 
 	* src/de/latlon/deejump/wfs/WFSDialog.java: per default is the OK
@@ -24,7 +32,7 @@
 
 	* build.properties: New. Define some variables to build against
 	OJ-jars.
-	* build.xml:  extended classpath für building
+	* build.xml:  extended classpath fï¿½r building
 
 2007-04-30  Ugo Taddei <taddei@latlon.de>
 

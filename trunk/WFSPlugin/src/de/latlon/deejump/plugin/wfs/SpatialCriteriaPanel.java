@@ -55,39 +55,8 @@ import de.latlon.deejump.ui.Messages;
  */
 class SpatialCriteriaPanel extends JPanel {
     
-    /**Operation definitons (in Deutsch ;-). These are used in the tool tips */
-    public static final String[] OP_DEFINITONS = new String[]{
-            "Intersects (Vergleichgeometrie ber�hrt/schneidet �berpr�fte Geometrie, " +
-            "ist in dieser enthalten oder enth�lt sie)",
-            "Within (in Vergleichgeometrie enthalten)",
-            "DWithin (Vergleichgeometrie enth�lt �berpr�fte Geometrie mit einem " +
-            "definiertem Abstand zum Rand [Buffer] der Geometrie)",
-            "Contains (Vergleichgeometrie enth�lt �berpr�fte Geometrie)",
-            "Beyond (Vergleichgeometrie befindet sich im angegebenen Abstand zur " +
-            "�berpr�ften Geometrie)",
-            "Touches (Vergleichgeometrie ber�hrt �berpr�fte Geometrie)", 
-            "Crosses (Vergleichgeometrie schneidet �berpr�fte Geometrie)",
-            "Overlaps (Vergleichgeometrie �berlagert �berpr�fte Geometrie)",
-            "Equals (Vergleichgeometrie ist identisch mit �berpr�fter Geometrie)",
-            "Disjoint (Vergleichgeometrie ist verschieden von �berpr�fter Geometrie)",
-    };
-
-    /** Operation translations. Short form of the above, directly used in the buttons*/
-    public static final String[] OP_TRANSLATIONS = new String[]{
-            "(ber�hrt/schneidet/ist enthalten)",
-            "(ist enthalten)",
-            "(ist enthalten innerhalb Abstands)",
-            "(ist enthalten)",
-            "(im angegebenen Abstand)",
-            "(ber�hrt)", 
-            "(schneidet)",
-            "(�berlagert)",
-            "(ist identisch)",
-            "(ist verschieden)",
-    };
-                               
     /**Operation names as defined by the OGC*/
-    public static final String[] OP_NAMES = new String[]{
+    public static final String[] OPERATION_NAMES = new String[]{
             "Intersects",
             "Within",
             "DWithin",
@@ -243,7 +212,7 @@ class SpatialCriteriaPanel extends JPanel {
         opsPanel.setBorder( bo );
         opsFieldPanel.setBorder( bo );
         
-        LayoutManager lm2 = new GridLayout( OP_NAMES.length, 1);
+        LayoutManager lm2 = new GridLayout( OPERATION_NAMES.length, 1);
         opsPanel.setLayout( lm2 );
         opsFieldPanel.setLayout( lm2 );
         
@@ -257,20 +226,25 @@ class SpatialCriteriaPanel extends JPanel {
         ButtonGroup bg = new ButtonGroup();
         
                 
-        JRadioButton[] opButtons = new JRadioButton[ OP_NAMES.length ]; 
-        for (int i = 0; i < OP_NAMES.length; i++) {
-            opButtons[i] = new JRadioButton( OP_NAMES[i] );//+ " " + OP_TRANSLATIONS[i] );
-            opButtons[i].setToolTipText( OP_NAMES[i] );
-            opButtons[i].setActionCommand( OP_NAMES[i] );
+        JRadioButton[] opButtons = new JRadioButton[ OPERATION_NAMES.length ];
+        String simpleName = getClass().getSimpleName();  
+        for (int i = 0; i < OPERATION_NAMES.length; i++) {
+            String txt = simpleName + "." + OPERATION_NAMES[i];
+            String buttonTxt = Messages.getString( txt );
+            opButtons[i] = new JRadioButton( buttonTxt );
+            txt += ".descrip";
+            buttonTxt = Messages.getString( txt );
+            opButtons[i].setToolTipText( buttonTxt );
+            opButtons[i].setActionCommand( OPERATION_NAMES[i] );
             opButtons[i].addActionListener( bal );
             opButtons[i].setBounds( PropertyCriteriaPanel.LEFT_MARGIN + 10, (i*25) + 25, 270, 20);
             opButtons[i].setAlignmentX( Component.LEFT_ALIGNMENT );
 
             bg.add(opButtons[i]);
             
-            if ( "DWithin".equals( OP_NAMES[i] ) ){
+            if ( "DWithin".equals( OPERATION_NAMES[i] ) ){
                 opsFieldPanel.add( dWithinDistanceField );
-            } else if ( "Beyond".equals( OP_NAMES[i] ) ){
+            } else if ( "Beyond".equals( OPERATION_NAMES[i] ) ){
                 beyondDistanceField.setEnabled( false ); 
                 opsFieldPanel.add( beyondDistanceField);
             }else{
