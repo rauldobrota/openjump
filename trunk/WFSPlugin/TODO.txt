@@ -24,6 +24,8 @@
  - Use threading for getting caps and features (*IMPORTANT*)
  - Add menu to WFSFrame
  - Implement caching of Capabilities (?)
+ - TODO: i18n code and update of i18n keys
+ - Javadoc (last but not least!)
  
 - NO WFS-T atm, only basic WFS.
 
