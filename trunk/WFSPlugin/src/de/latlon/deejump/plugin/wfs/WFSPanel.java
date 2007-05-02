@@ -46,6 +46,7 @@ import org.deegree.framework.xml.XMLFragment;
 import org.deegree.model.crs.CoordinateSystem;
 import org.deegree.model.spatialschema.Geometry;
 import org.deegree.model.spatialschema.GeometryImpl;
+import org.deegree.ogcwebservices.wfs.capabilities.WFSFeatureType;
 import org.deegree.ogcwebservices.wfs.operation.GetFeature;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -338,15 +339,20 @@ public class WFSPanel extends JPanel {
             public void actionPerformed( java.awt.event.ActionEvent evt ) {
 
                 JComboBox combo = (JComboBox) evt.getSource();
-
+                String selectFt = (String) combo.getSelectedItem();
                 try {
-                    attributeNames = wfService.getProperties( (String) combo.getSelectedItem() );
+                    attributeNames = wfService.getProperties( selectFt );
 
                     attributeResPanel.refreshPanel();
                     geoProperties = getGeoProperties();
                     propertiesPanel.setProperties( attributeNames, geoProperties );
                     spatialResPanel.resetGeoCombo( geoProperties );
-
+                    
+                    ///hmmm repeated code...
+                    WFSFeatureType ft = wfService.getFeatureTypeByName( selectFt );
+                    //UT could dsupport other srrs, but not doing it now
+                    String[] crs = new String[]{ ft.getDefaultSRS().toString() };
+                    spatialResPanel.setCrs( crs );
                 } catch ( Exception e ) {
                     e.printStackTrace();
                     JOptionPane.showMessageDialog( WFSPanel.this, "Error loading schema: "
@@ -364,12 +370,11 @@ public class WFSPanel extends JPanel {
 //        p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
 
         requestTextArea = new JTextArea();
-        requestTextArea.setPreferredSize( new Dimension(400,475) );
         requestTextArea.setLineWrap( true );
         requestTextArea.setWrapStyleWord( true );
         requestTextArea.setBorder( BorderFactory.createEmptyBorder( 10, 10, 10, 10 ) );
         JScrollPane jsp = new JScrollPane( requestTextArea );
-
+        jsp.setPreferredSize( new Dimension(390,475) );
         p.add( jsp );
 
         JButton createReq = new JButton(
@@ -468,7 +473,12 @@ public class WFSPanel extends JPanel {
                 propertiesPanel.setProperties( attributeNames, geoProperties );
                 propertiesPanel.setEnabled( true );
                 spatialResPanel.resetGeoCombo( geoProperties );
-
+                
+                ///hmmm repeated code...
+                WFSFeatureType ft = wfService.getFeatureTypeByName( featTypes[0] );
+                //UT could dsupport other srrs, but not doing it now
+                String[] crs = new String[]{ ft.getDefaultSRS().toString() };
+                spatialResPanel.setCrs( crs );
             } catch ( Exception e ) {
 
                 e.printStackTrace();
@@ -493,13 +503,10 @@ public class WFSPanel extends JPanel {
         if ( wfService == null ) {//not inited yet
             return sb;
         }
-
         sb.append( "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" );
 
         final String outputFormat = options.getSelectedOutputFormat();
 
-        System.out.println( "FT namespace is missing in the xml??" );
-        
         sb.append( "<wfs:GetFeature xmlns:ogc=\"http://www.opengis.net/ogc\" " )
         .append("xmlns:gml=\"http://www.opengis.net/gml\" " )
         .append("xmlns:wfs=\"http://www.opengis.net/wfs\" service=\"WFS\" " )
@@ -509,7 +516,7 @@ public class WFSPanel extends JPanel {
         .append("<wfs:Query " );
 
         String ftName = (String) featureTypeCombo.getSelectedItem();
-        QualifiedName ft = wfService.getQualiNameByFeatureTypeName( ftName );
+        QualifiedName ft = wfService.getFeatureTypeByName( ftName ).getName();
 
         sb.append( "xmlns:" ).append( ft.getPrefix() ).append( "=\"" )
         .append( ft.getNamespace() ).append("\" " ).append( "typeName=\"" )
@@ -546,7 +553,6 @@ public class WFSPanel extends JPanel {
 
         sb.append( filterTags[1] );
         sb.append( "</wfs:Query></wfs:GetFeature>" );
-
         return sb;
     }
 
@@ -589,6 +595,7 @@ public class WFSPanel extends JPanel {
 
     private void setRequestText( String text ) {
         requestTextArea.setText( text.replaceAll( ">", ">\n" ) );
+        //requestTextArea.setText( text );
     }
 
     public static void saveTextToFile( Component compo, String txt ) {
@@ -653,7 +660,12 @@ public class WFSPanel extends JPanel {
      */
     public QualifiedName getFeatureType() {
         String s = (String) featureTypeCombo.getSelectedItem();
-        return wfService.getQualiNameByFeatureTypeName( s );
+        QualifiedName qn = null;
+        WFSFeatureType ft = wfService.getFeatureTypeByName( s );
+        if( ft != null ){
+            qn = ft.getName();
+        }
+        return qn;
     }
 
     public AbstractWFSWrapper getWfService() {
@@ -692,7 +704,7 @@ public class WFSPanel extends JPanel {
         if ( t == null || t.length() == 0 ) {
             t = createRequest().toString();
         }
-        return t;
+        return t.replaceAll( "\n", "" );
     }
 
     public void setTabsVisible( boolean visible ) {

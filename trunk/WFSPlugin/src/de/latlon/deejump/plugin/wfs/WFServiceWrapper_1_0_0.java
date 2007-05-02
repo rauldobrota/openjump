@@ -22,6 +22,7 @@ import org.deegree.framework.xml.XMLFragment;
 import org.deegree.framework.xml.XMLParsingException;
 import org.deegree.framework.xml.XMLTools;
 import org.deegree.ogcbase.CommonNamespaces;
+import org.deegree.ogcwebservices.wfs.capabilities.WFSFeatureType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -74,9 +75,10 @@ public class WFServiceWrapper_1_0_0 extends AbstractWFSWrapper {
         
         String[] fts = null;
         
-        featureTypeToQName = new HashMap();
+        featureTypeToQName = new HashMap<String, WFSFeatureType>();
         
         Element root = this.capsDoc.getRootElement();
+        
         try {
             List nodes = XMLTools.getNodes( root, 
                                            "wfs:FeatureTypeList/wfs:FeatureType", 
@@ -96,22 +98,13 @@ public class WFServiceWrapper_1_0_0 extends AbstractWFSWrapper {
                QualifiedName qualiName = XMLFragment.parseQualifiedName( node );
                ftList.add( name );
                
-               /* not needed?
-               String prefix = name.contains( ":" ) ? name.split( ":" )[0] : "" ;
-               String u = ((Node) n).lookupNamespaceURI( prefix );
+               URI uri = XMLTools.getNodeAsURI( (Node) n, 
+                                                "wfs:SRS/text()", 
+                                                CommonNamespaces.getNamespaceContext(), null );
+               WFSFeatureType wfsFt = 
+                   new WFSFeatureType(qualiName,null, null, null, uri,null,null,null,null,null);
                
-               System.out.println(prefix + " x " + u);
-               
-               URI uri = null;
-               if( u != null ){
-                    try {
-                        uri = new URI(u);
-                    } catch ( URISyntaxException e ) {
-                        e.printStackTrace();
-                    }
-               }*/
-               
-               featureTypeToQName.put( name, qualiName );
+               featureTypeToQName.put( qualiName.getPrefix() + ":" + qualiName.getLocalName(), wfsFt );
                
             }
             fts = ftList.toArray( new String[ ftList.size() ] );
@@ -172,7 +165,7 @@ public class WFServiceWrapper_1_0_0 extends AbstractWFSWrapper {
         } else {
             String url = "http://www.refractions.net:8080/geoserver/wfs/GetCapabilities";
             //url = "file:///home/taddei/Desktop/test_caps.xml";
-            url = "http://demo.intevation.de/geoserver/wfs";
+//            url = "http://demo.intevation.de/geoserver/wfs";
             
             AbstractWFSWrapper wfs = new WFServiceWrapper_1_0_0( url );
             
@@ -207,6 +200,9 @@ public class WFServiceWrapper_1_0_0 extends AbstractWFSWrapper {
 Changes to this class. What the people have been up to:
 
 $Log$
+Revision 1.2  2007/05/02 13:27:11  taddei
+Use now WFSFeatureType instead of QualifiedName.
+
 Revision 1.1  2007/04/26 09:19:26  taddei
 Added initial working version of classes and complementary files.
 

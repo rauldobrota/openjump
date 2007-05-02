@@ -100,32 +100,21 @@ public class WFServiceWrapper_1_1_0 extends AbstractWFSWrapper {
         String[] fts = null;
         
         WFSFeatureType[] featTypes = wfsCapabilities.getFeatureTypeList().getFeatureTypes();
-        featureTypeToQName = new HashMap();
+        featureTypeToQName = new HashMap<String,WFSFeatureType>();
         fts = new String[ featTypes.length ];
         for ( int i = 0; i < fts.length; i++ ) {
-            
             QualifiedName qn = featTypes[i].getName();
             String prefixedName = qn.getAsString();
             fts[i] = prefixedName;
-            
-            featureTypeToQName.put( prefixedName, qn );
+            //well, putting prefix + : + simple name
+            // should consider to put simple name only!
+            featureTypeToQName.put( qn.getPrefix() + ":" + qn.getLocalName(), 
+                                    featTypes[i] );
         }
         
         return fts;
     }
 
-   
-
-        
-    
-   
-/*
-    
-
-    public String getWfsURL() {
-        return this.wfsURL;
-    }
-*/
     public String[] getFeatureTypes() {
         if ( featureTypes == null ){
 //            Document doc = getWfsCapabilitiesDoc( wfsURL );

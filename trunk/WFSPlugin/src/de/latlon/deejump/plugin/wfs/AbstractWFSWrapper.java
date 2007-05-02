@@ -37,6 +37,7 @@ import org.deegree.model.feature.schema.GMLSchema;
 import org.deegree.model.feature.schema.GMLSchemaDocument;
 import org.deegree.model.feature.schema.PropertyType;
 import org.deegree.ogcwebservices.OWSUtils;
+import org.deegree.ogcwebservices.wfs.capabilities.WFSFeatureType;
 import org.xml.sax.SAXException;
 
 import de.latlon.deejump.ui.DeeJUMPException;
@@ -58,7 +59,7 @@ public abstract class AbstractWFSWrapper {
     protected String baseURL;
     
     //should  use WFSFeatureType
-    protected Map featureTypeToQName;
+    protected Map<String, WFSFeatureType> featureTypeToQName;
     
     /**
      * Maps a feature type to its schem. Geometry property is not held here!
@@ -160,7 +161,7 @@ public abstract class AbstractWFSWrapper {
         if( descrFtUrl == null ){
             throw new RuntimeException( "Service does not have a DescribeFeatureType operation accessible by HTTP GET or POST." );
         }
-        QualifiedName ft = getQualiNameByFeatureTypeName( featureType );
+        QualifiedName ft = getFeatureTypeByName( featureType ).getName();
 
         String serverReq = getDescribeTypeURL( ft );
         
@@ -207,7 +208,7 @@ e.printStackTrace();
         if( descrFtUrl == null ){
             throw new RuntimeException( "Service does not have a DescribeFeatureType operation accessible by HTTP GET or POST." );
         }
-        QualifiedName ft = getQualiNameByFeatureTypeName( featureType );
+        QualifiedName ft = getFeatureTypeByName( featureType ).getName();
 
         String serverReq = getDescribeTypeURL( ft );
         
@@ -294,8 +295,8 @@ e.printStackTrace();
         return (String[])propsList.toArray( new String[ propsList.size() ] );
     }
 
-    public QualifiedName getQualiNameByFeatureTypeName( String ftName ){
-        return (QualifiedName)featureTypeToQName.get( ftName );
+    public WFSFeatureType getFeatureTypeByName( String ftName ){
+        return (WFSFeatureType)featureTypeToQName.get( ftName );
     }
     
     /**
@@ -360,6 +361,9 @@ e.printStackTrace();
 Changes to this class. What the people have been up to:
 
 $Log$
+Revision 1.3  2007/05/02 13:27:11  taddei
+Use now WFSFeatureType instead of QualifiedName.
+
 Revision 1.2  2007/04/27 13:07:12  taddei
 added wfs prefix.
 
