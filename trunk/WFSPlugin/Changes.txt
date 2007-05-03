@@ -1,3 +1,21 @@
+Version 0.2.0 (2007-05-03)
+
+  This release includes major bugfixes and some new features:
+  
+  New Features:
+  - supports now WFS 1.0.0 and 1.1.0 (deegree WFS)
+  - Capabilities and DescribeFeatureType are shown as syntax-highlighted 
+    text and saveable to a file
+  - using the plugin in standalone mode GetFeature-Response is saveable to
+    a file
+  - EPSG-SRS-Support for 239{1,2,3,4} (needs an updated deegree2.jar)
+  - parsing of the supported SRS and update the GUI accordingly
+  - updated I18N-support for the WFSDialog
+  - updated Javadoc comments
+  - updated build-script
+  - added some needed jars
+  - number of bug-fixes and GUI improvements
+
 Version 0.1.0 (2007-05-01)
 
   This is the inital release.

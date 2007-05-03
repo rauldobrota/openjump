@@ -67,7 +67,7 @@ import de.latlon.deejump.ui.XMLEditorPane;
 public class WFSPanel extends JPanel {
 
     //TODO put a props
-    static final String releaseVersion = "0.1.0";
+    static final String releaseVersion = "0.2.0";
 
     // Constants for spatial search criteria type
     // also used by child panels

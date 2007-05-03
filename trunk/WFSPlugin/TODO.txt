@@ -2,8 +2,8 @@
 ## WFSPlugin TODO
 ##
 
- - Extension
  - OptionsDialog: maxFeatCount, outputFormat 
+   Fix: MaxFeatureCount does not work yet
  - Request-validation: make wfs 1.0.0 also a valid request (currently done
    inside deegree, needs to be separated)
  - parse different geometry-typenames 
@@ -26,7 +26,8 @@
  - Fix: changing EPSG-Box does not affect the query
  - Fix: response-tab does not have any option here? only in
    standalone-mode?
- - Search-tab: disable edit-checkbox per default
+ - Search-tab: disable edit-checkbox per default and add it to
+   option-dialog
  
 - NO WFS-T atm, only basic WFS.
 
