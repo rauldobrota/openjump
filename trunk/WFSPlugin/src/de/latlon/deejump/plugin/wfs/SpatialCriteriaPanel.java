@@ -117,9 +117,6 @@ class SpatialCriteriaPanel extends JPanel {
         
         //FIXME is the user allowed to input own geometry???
         String[] gg = new String[0]; 
-        /*String[]{
-                "GEOM",
-                "Geometry"};*/
         
         geomPropsCombo = new JComboBox( gg );
         
@@ -154,6 +151,8 @@ class SpatialCriteriaPanel extends JPanel {
         
         srsCombo = new JComboBox( new DefaultComboBoxModel(new String[0]) );
         srsCombo.setEnabled( false );
+        //UT nothing happens if user selects combo
+        /*
         srsCombo.addItemListener(
             new ItemListener() {
                 public void itemStateChanged(ItemEvent e) {
@@ -184,8 +183,9 @@ class SpatialCriteriaPanel extends JPanel {
                 }
             }
         );
-
-        srsCombo.setEditable( true );
+        */
+        //UT combo is not editable. There should be one SRS to rule them all
+//        srsCombo.setEditable( true );
         
         JPanel p = new JPanel();
         p.add( new JLabel( Messages.getString("SpatialResearchPanel.srs")) );
