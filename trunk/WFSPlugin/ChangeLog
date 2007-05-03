@@ -1,3 +1,21 @@
+2007-05-03  Ugo Taddei <taddei@latlon.de>
+
+	* src/de/latlon/deejump/plugin/wfs/WFSPanel.java: added getTabs() and done
+	validation of requests in two steps (XML and then deegree-based GetFeature)
+	
+	* src/de/latlon/deejump/plugin/wfs/WFSOptionsPanel2.java: maxFeatures text
+	field has now a change listener.
+
+	* src/de/latlon/deejump/plugin/wfs/WFSFrame.java: when clicking on the OK
+	button, the response tab gets selected (to show the response).
+	
+	* src/de/latlon/deejump/plugin/wfs/WFSDialog.java: now removes the response
+	tab from the wfsPanel (response tab is not used for the dialog, i.e. in the
+	plugin)
+	
+	* src/de/latlon/deejump/plugin/wfs/SpatialCriteriaPanel.java: combo box is
+	not editable anymore (thus doesn't create messages dialogs with errors)
+
 2007-05-03  Stephan Holl <stephan.holl@intevation.de>
 
 	* Changes.txt, src/de/latlon/deejump/plugin/wfs/WFSPanel.java: Updated
@@ -25,11 +43,11 @@
 	* src/de/latlon/deejump/plugin/wfs/WFServiceWrapper_1_1_0.java
 	* src/de/latlon/deejump/plugin/wfs/WFSPanel.java	
 	
-	* src/de/latlon/deejump/wfs/SpatialCriteriaPanel.java: GUI work on i18n,
+	* src/de/latlon/deejump/plugin/wfs/SpatialCriteriaPanel.java: GUI work on i18n,
 	also uses WFSFeatureType, crs combo box is now functional
 
 	* lib/deegree2.jar: updated lib with version that supports EPSG 
-	2939{1,2,3,4} (the coord. sys. transforamtion hasn't been checked for
+	2939{1,2,3,4} (the coord. sys. transformation hasn't been checked for
 	precision!).
 	
 2007-05-02  Ugo Taddei <taddei@latlon.de>
