@@ -14,6 +14,8 @@ import java.awt.FlowLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -64,6 +66,11 @@ public class WFSOptionsPanel2 extends JPanel {
         
         maxFeaturesField = new JFormattedTextField();
         maxFeaturesField.setColumns(4);
+        maxFeaturesField.addPropertyChangeListener( "value", new PropertyChangeListener(){
+            public void propertyChange( PropertyChangeEvent evt ) {
+                options.setMaxFeatures( ((Integer)evt.getNewValue()).intValue() );
+            }
+        });
         JPanel dummy = new JPanel();
         dummy.add( new JLabel("Max number of Features:"));
         dummy.add( maxFeaturesField );
