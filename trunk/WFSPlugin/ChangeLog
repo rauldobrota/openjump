@@ -1,5 +1,7 @@
 2007-05-03  Ugo Taddei <taddei@latlon.de>
 
+	* TODO.txt: updated
+
 	* src/de/latlon/deejump/plugin/wfs/WFSPanel.java: added getTabs() and done
 	validation of requests in two steps (XML and then deegree-based GetFeature)
 	
