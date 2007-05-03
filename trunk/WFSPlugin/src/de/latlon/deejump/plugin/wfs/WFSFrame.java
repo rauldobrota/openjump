@@ -70,6 +70,7 @@ public class WFSFrame extends JFrame {
                 
                 int arbitrarySize = 10000;
                 if( resp.length() < arbitrarySize ){
+                    wfsPanel.getTabs().setSelectedIndex( 4 );
                     wfsPanel.setResposeText( resp );  
                 } else {
                     int i = JOptionPane.showConfirmDialog( WFSFrame.this, "The response is too large for the editor. Would you like to save it to a file?", "Question?",
