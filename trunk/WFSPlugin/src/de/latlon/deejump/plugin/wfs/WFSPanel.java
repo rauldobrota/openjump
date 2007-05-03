@@ -258,7 +258,11 @@ public class WFSPanel extends JPanel {
         } );
         return extensibleComboBox;
     }
-
+    
+    JTabbedPane getTabs(){
+        return this.tabs;
+    }
+    
     static void createXMLFrame( final Component parent, String txt ) {
 
         //FIXME: this is still too slow...
@@ -394,13 +398,23 @@ public class WFSPanel extends JPanel {
 
         validateReq.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
-
+                
+                String reqTxt = requestTextArea.getText();
+                if( reqTxt == null || reqTxt.length() == 0 ){
+                    return;
+                }
                 try {
+                    
+                    //simple test for well-formedness
                     XMLFragment xf = new XMLFragment();
-                    xf.load( new StringReader( requestTextArea.getText() ), "dummy" );
-                    GetFeature.create( null, xf.getRootElement() );
+                    xf.load( new StringReader( reqTxt ), "http://empty" );
+
+                    if( "1.1.0".equals( wfService.getServiceVersion() ) ){
+                        // use deegree to validate request
+                        GetFeature.create( null, xf.getRootElement() );
+                    } 
                 } catch ( Exception ex ) {
-                    ex.printStackTrace();
+                    ex.printStackTrace();                                       //TODO i18n
                     JOptionPane.showMessageDialog( WFSPanel.this, ex.getMessage(), "Error",
                                                    JOptionPane.ERROR_MESSAGE );
                 }
