@@ -3,9 +3,10 @@
 ##
 
  - OptionsDialog: maxFeatCount, outputFormat 
-   Fix: MaxFeatureCount does not work yet
+   Fix: MaxFeatureCount does not work yet [DONE: bug fixed]
  - Request-validation: make wfs 1.0.0 also a valid request (currently done
-   inside deegree, needs to be separated)
+   inside deegree, needs to be separated) [DONE: 1.0 request are only checked 
+   for well-formedness]
  - parse different geometry-typenames 
    (e.g.<xs:element minOccurs="0" name="the_geom" nillable="true"
    type="gml:MultiPolygonPropertyType"></xs:element> or
@@ -16,21 +17,25 @@
  - Save request/response (?)
  - Use threading for getting caps and features (*IMPORTANT*)
  - Add menu to WFSFrame
- - Click on OK sets response panel active?
+ - Click on OK sets response panel active? [DONE]
  - Implement caching of Capabilities (?)
  - TODO: i18n code and update of i18n keys
  - Javadoc (last but not least!)
  - Fix: Validate-request-button in request-tab throughs error:
-   no protocol: dummy 
- - Fix: changing EPSG-box by hand results in 2 "FIX ME" alert boxes
- - Fix: changing EPSG-Box does not affect the query
+   no protocol: dummy [DONE: please test]
+ - Fix: changing EPSG-box by hand results in 2 "FIX ME" alert boxes [DONE: 
+ please test]
+ - Fix: changing EPSG-Box does not affect the query [DONE: combo box is read 
+	 only; also, only one default srs is supported]
  - Fix: response-tab does not have any option here? only in
-   standalone-mode?
+   standalone-mode? [DONE: in JUMP - dialog mode - response tab is not shown; 
+   please test]
  - Search-tab: disable edit-checkbox per default and add it to
    option-dialog
  
-- NO WFS-T atm, only basic WFS.
+- NO WFS-T atm, only basic WFS. [Please remove this. This is not a to do :-]
 
+ - UT: this should be fixed by now
 DEBUG:
 * fix reported error (probably not WFSPlugin-related - threading probs?!):
   com.vividsolutions.jts.util.AssertionFailedException: Should never reach here
@@ -46,6 +51,7 @@ DEBUG:
     at com.vividsolutions.jump.workbench.ui.task.TaskMonitorManager$TaskWrapper.run(TaskMonitorManager.java:149)
     at java.lang.Thread.run(Unknown Source)
 
+ - UT: this should be fixed by now
 * Fix SRS-related problems 
  java.lang.NullPointerException
  at de.latlon.deejump.plugin.wfs.PropertySelectionPanel.getXmlElement(PropertySelectionPanel.java:160)
