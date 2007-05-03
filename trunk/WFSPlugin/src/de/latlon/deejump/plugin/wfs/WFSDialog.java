@@ -121,10 +121,11 @@ public class WFSDialog extends JDialog {
         
         getContentPane().setLayout( new FlowLayout() );
         
-//      setJMenuBar( new MiniMenu(  ) );
-      
         this.wfsPanel = new WFSPanel( Arrays.asList( wfsURLs ) );
-  
+        
+        // remove response tab from dialog
+        this.wfsPanel.getTabs().removeTabAt( 4 );
+        
         add( this.wfsPanel );
   
         WFSPanelButtons buttons = new WFSPanelButtons( this, this.wfsPanel );
