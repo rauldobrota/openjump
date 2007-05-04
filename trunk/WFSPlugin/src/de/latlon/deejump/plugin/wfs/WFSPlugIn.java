@@ -34,6 +34,7 @@ import com.vividsolutions.jump.io.datasource.DataSourceQuery;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.WorkbenchException;
+import com.vividsolutions.jump.workbench.model.LayerEventType;
 import com.vividsolutions.jump.workbench.model.LayerManager;
 import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
 import com.vividsolutions.jump.workbench.plugin.EnableCheck;
@@ -201,11 +202,21 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
             //TODO fix this "query to come...", "dataSourceQuery"
             DataSourceQuery wfsDSQuery = new DataSourceQuery( ds, "query to come...",
                                                               "dataSourceQuery");
-*/           
+*/
+            // fix for threading problem:
+            // don't allow event fireing
+            layerManager.setFiringEvents( false );
+            
+            // silently add layer 
             layerManager.addLayer(  StandardCategoryNames.SYSTEM, layer);
                                          /*.setDataSourceQuery(wfsDSQuery)
                                                   .setFeatureCollectionModified(false);*/
-           	        
+           	//fire at will
+            layerManager.setFiringEvents( true );
+            
+            //fire!
+            layerManager.fireLayerChanged(layer, LayerEventType.METADATA_CHANGED);
+            
 	        //TODO set editable
 	        boolean editable = true;//rd.isEditable();
 	        //FIXME editing Plugin should always be available
