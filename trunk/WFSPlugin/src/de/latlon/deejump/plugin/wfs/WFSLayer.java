@@ -130,10 +130,6 @@ public class WFSLayer extends Layer {
         return this.geoPropertyName.getAsString();
     }
     
-    public boolean hasReadableDataSource() {
-         return true;
-    }
-
     public void setGeoPropertyName( QualifiedName geoPropertyName) {
         this.geoPropertyName = geoPropertyName;
     }
