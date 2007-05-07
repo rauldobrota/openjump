@@ -1,3 +1,8 @@
+2007-05-07  Ugo Taddei <taddei@latlon.de>
+
+	* src/de/latlon/deejump/plugin/wfs/WFSLayer.java: hasReadableDataSource()
+	is the super implementation (bug fix for NPE in ShowFullPathPlugIn).
+
 2007-05-04  Ugo Taddei <taddei@latlon.de>
 
 	* src/de/latlon/deejump/plugin/wfs/WFSPlugIn.java: fix threading problem
