@@ -1,3 +1,10 @@
+2007-05-08  Stephan Holl <stephan.holl@intevation.de>
+
+	* src/de/latlon/deejump/plugin/wfs/WFSPlugIn.java: 
+	 - disabled the menu-entry because it is incompatible with JUMP1.2
+	 - revert parts of former "assertion failed"-fix
+	* TODO.txt: updated remaining Tasks
+	
 2007-05-07  Ugo Taddei <taddei@latlon.de>
 
 	* src/de/latlon/deejump/plugin/wfs/WFSLayer.java: hasReadableDataSource()

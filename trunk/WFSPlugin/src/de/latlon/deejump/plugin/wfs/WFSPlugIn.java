@@ -43,7 +43,10 @@ import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.ThreadedBasePlugIn;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
-import com.vividsolutions.jump.workbench.ui.MenuNames;
+/* Disabled due to incompatibility to Vivid solutions JUMP1.2
+ * SH, 2007-05-08 
+ * import com.vividsolutions.jump.workbench.ui.MenuNames;
+*/
 import com.vividsolutions.jump.workbench.ui.cursortool.editing.EditingPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
 
@@ -89,11 +92,14 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
         );        	
         
         // also create menu item
-        context.getFeatureInstaller().addMainMenuItem(this, 
-                                                      new String[] { MenuNames.LAYER }, 
-                                                      getName(),
-                                                      false, getIcon(), 
-                                                      mec);
+        /* Disabled due to incompatibility to Vivid solutions JUMP1.2
+         * SH, 2007-05-08 
+         * context.getFeatureInstaller().addMainMenuItem(this, 
+         *                                             new String[] { MenuNames.LAYER }, 
+         *                                             getName(),
+         *                                             false, getIcon(), 
+         *                                             mec);
+         */
     }
     
     public boolean execute(PlugInContext context) throws Exception {
@@ -205,18 +211,28 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
 */
             // fix for threading problem:
             // don't allow event fireing
-            layerManager.setFiringEvents( false );
-            
-            // silently add layer 
-            layerManager.addLayer(  StandardCategoryNames.SYSTEM, layer);
-                                         /*.setDataSourceQuery(wfsDSQuery)
-                                                  .setFeatureCollectionModified(false);*/
-           	//fire at will
-            layerManager.setFiringEvents( true );
-            
-            //fire!
-            layerManager.fireLayerChanged(layer, LayerEventType.METADATA_CHANGED);
-            
+            /* Disabled due to some rather strange behaviour in OJ1.2b
+             * when adding a WFS-Layer with opened system-tab inside the
+             * layerlist.
+             * 
+             * layerManager.setFiringEvents( false );
+            */ 
+             // silently add layer 
+             layerManager.addLayer(  StandardCategoryNames.SYSTEM, layer);
+                                         //.setDataSourceQuery(wfsDSQuery)
+                                         //         .setFeatureCollectionModified(false);
+
+             /* Disabled due to some rather strange behaviour in OJ1.2b
+             * when adding a WFS-Layer with opened system-tab inside the
+             * layerlist.
+             * 
+           	 * //fire at will
+             * layerManager.setFiringEvents( true );
+             * 
+             * //fire!
+             * layerManager.fireLayerChanged(layer, LayerEventType.METADATA_CHANGED);
+            */
+                 
 	        //TODO set editable
 	        boolean editable = true;//rd.isEditable();
 	        //FIXME editing Plugin should always be available

@@ -3,7 +3,7 @@
 ##
 
  - OptionsDialog: outputFormat, migrate edit-checkbox in options dialog 
- - parse different geometry-typenames 
+ - parse different geometry-typenames correct 
    (e.g.<xs:element minOccurs="0" name="the_geom" nillable="true"
    type="gml:MultiPolygonPropertyType"></xs:element> or
    <xs:element minOccurs="0" name="GEOLOC" nillable="true"
@@ -13,24 +13,9 @@
  - Save request/response(?), rearrange the save button beside OK-button
  - Use threading for getting caps and features (*IMPORTANT*)
  - Add menu to WFSFrame
- - Click on OK sets response panel active? [DONE-> I cannot see that]
- - Implement caching of Capabilities (?)
+ - Implement caching of Capabilities (?) (SH: no)
  - TODO: i18n code and update of i18n keys
  - Javadoc (last but not least!)
-
- - UT: this should be fixed by now
- - SH: No, its still there with OJ1.2b
-DEBUG:
-* fix reported error (probably not WFSPlugin-related - threading probs?!):
-  com.vividsolutions.jts.util.AssertionFailedException: Should never reach here
-    at com.vividsolutions.jts.util.Assert.shouldNeverReachHere(Assert.java:122)
-    at com.vividsolutions.jts.util.Assert.shouldNeverReachHere(Assert.java:111)
-    at com.vividsolutions.jump.workbench.model.LayerManager.fireLayerEvent(LayerManager.java:390)
-    at com.vividsolutions.jump.workbench.model.LayerManager.fireLayerChanged(LayerManager.java:419)
-    at com.vividsolutions.jump.workbench.model.LayerManager.fireLayerChanged(LayerManager.java:443)
-    at com.vividsolutions.jump.workbench.model.Category.add(Category.java:124)
-    at com.vividsolutions.jump.workbench.model.LayerManager.addLayerable(LayerManager.java:153)
-    at com.vividsolutions.jump.workbench.model.LayerManager.addLayer(LayerManager.java:134)
-    at de.latlon.deejump.plugin.wfs.WFSPlugIn.run(WFSPlugIn.java:216)
-    at com.vividsolutions.jump.workbench.ui.task.TaskMonitorManager$TaskWrapper.run(TaskMonitorManager.java:149)
-    at java.lang.Thread.run(Unknown Source)
+ - Add EPSG:3067 to deegree2.jar
+   # ETRS89 / ETRS-TM35FIN (requires EPSG 6.11.1, avail. in proj4-4.5.0)
+   # <3067> +proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs  <>
