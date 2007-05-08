@@ -1,5 +1,9 @@
 2007-05-08  Stephan Holl <stephan.holl@intevation.de>
 
+	* TODO.txt: updated remaining tasks after Jukkas review
+	
+2007-05-08  Stephan Holl <stephan.holl@intevation.de>
+
 	* src/de/latlon/deejump/plugin/wfs/WFSPlugIn.java: 
 	 - disabled the menu-entry because it is incompatible with JUMP1.2
 	 - revert parts of former "assertion failed"-fix
