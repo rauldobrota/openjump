@@ -9,15 +9,24 @@
    <xs:element minOccurs="0" name="GEOLOC" nillable="true"
    type="gml:GeometryAssociationType"></xs:element>
    of DescribeFeatureType for usage in
-   Spatial filtering.
+   Spatial filtering. [*DONE*]
+   
  - Save request/response(?), rearrange the save button beside OK-button
- - Use threading for getting caps and features (*IMPORTANT*)
+ 
+ - Use threading for getting caps and features (*IMPORTANT*) [*Partially DONE; 
+ 	please close issue*]
+ 	
  - TODO: i18n code and update of i18n keys
- - Review the size of advanced-tab, it is broken in Finland
+ - Review the size of advanced-tab, it is broken in Finland [*DONE: this should 
+ 	be fixed, please check again*]
+ 	
  - Remove Get/Post request from Options-tab (unneeded). 
+ 
  - clear Request-window after succesful GetFeature, because opening
    WFSPlugin next time will only request the request produced in the tab.
-   This could leed to wrong names when changing featuretype-names.
+   This could leed to wrong names when changing featuretype-names. [*DONE 
+   together with a number of other UI fixes*]
+   
  - Javadoc (last but not least!)
  - Add EPSG:3067 to deegree2.jar
    # ETRS89 / ETRS-TM35FIN (requires EPSG 6.11.1, avail. in proj4-4.5.0)
