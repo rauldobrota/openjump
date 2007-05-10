@@ -13,6 +13,7 @@ package de.latlon.deejump.ui;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
@@ -30,6 +31,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.deegree.framework.util.StringTools;
 import org.deegree.framework.xml.XMLFragment;
 import org.deegree.framework.xml.XSLTDocument;
+import org.xml.sax.SAXException;
 
 import de.latlon.deejump.plugin.wfs.WFSPanel;
 
@@ -51,7 +53,7 @@ public class XMLEditorPane extends JEditorPane {
      * @param txt
      */
     public XMLEditorPane( String txt ) {
-        super( "text/html", toCleanHtml(txt) );
+        super( "text/html", txt );
     }
 
     /**
@@ -63,13 +65,18 @@ public class XMLEditorPane extends JEditorPane {
         
         if( xslt == null ){
             xslt = new XSLTDocument();
+            final String filename = "xml2html.xsl";
+            try {
+                xslt.load( XMLEditorPane.class.getResource( filename ) );
+            } catch ( Exception e ) {
+                e.printStackTrace();
+                return null;
+            } 
+
         }
         try {
-            final String filename = "xml2html.xsl";
-            xslt.load( XMLEditorPane.class.getResource( filename ) );
             XMLFragment xml = new XMLFragment();
-            xml.load( new StringReader( txt ), 
-                      XMLEditorPane.class.getResource( filename ).toString() );
+            xml.load( new StringReader( txt ), "http://dummy"  );
 
             StringWriter sw = new StringWriter();
 
@@ -87,10 +94,15 @@ public class XMLEditorPane extends JEditorPane {
         }
     }
     
+    public void setText( String txt ){
+        super.setText( toCleanHtml( txt ) );
+        setCaretPosition( 0 );
+    }
+    
     public String getVisibleText(){
             selectAll();
             String t = getSelectedText(); 
-            select( 0, 0 );
+            select( 0, 0 );//deselect
             return t;
     }
     
