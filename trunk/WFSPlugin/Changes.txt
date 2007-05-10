@@ -1,3 +1,22 @@
+Version 0.3.0 (2007-05-10)
+
+  This release includes major bugfixes
+  
+  Fixes:
+  - Assertion Failed error in OpenJUMP 1.2b (now runs with OpenJUMP 1.0.1
+    and 1.2b)
+  - fix for compatibility to Vivid Solutions JUMP1.2
+  - fixes for a number of NullPointerExceptions
+  - no editable SRS-combo-box anymore (which throwed exceptions when
+    editing stuff inside
+  - fix maxFeature-Option
+  - Response-tab removed in Plugin-mode, only available as standalone tool
+  - reads gml:GeometryAssociationProperty from 2.1.2 schemas now
+  -
+
+  New Features:
+  - Implements threading for dataloading
+  
 Version 0.2.0 (2007-05-03)
 
   This release includes major bugfixes and some new features:

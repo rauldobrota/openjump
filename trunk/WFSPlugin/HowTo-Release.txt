@@ -24,7 +24,7 @@ Guide for developers for creating a new release
    $ cvs -d:pserver:anonymous@jump-pilot.cvs.sourceforge.net:/cvsroot/jump-pilot login
    (just hit return)
    $ cvs -z3
-   -d:pserver:anonymous@jump-pilot.cvs.sourceforge.net:/cvsroot/jump-pilot export co WFSPlugin
+   -d:pserver:anonymous@jump-pilot.cvs.sourceforge.net:/cvsroot/jump-pilot co WFSPlugin
 
    (check whether the anonymous CVS is in sync with the master CVS.
    The following command should not result anything, ie. files are
@@ -44,7 +44,7 @@ Guide for developers for creating a new release
    Use your e-mail address as the password for this login
    ftp> bin
    ftp> cd /incoming
-   ftp> put WFSPlugin-N.N.N
+   ftp> put WFSPlugin-N.N.N.zip
    ftp> exit
 
 7. Create release "N.N.N" on SourceForge
