@@ -1,3 +1,7 @@
+2007-05-10  Stephan Holl <stephan.holl@intevation.de>
+
+	* TODO.txt: updated remaining tasks, its getting lighter...
+	
 2007-05-10  Ugo Taddei <taddei@latlon.de>
 
 	* src/de/latlon/deejump/plugin/wfs/WFSFrame.java: Now uses a thread for
