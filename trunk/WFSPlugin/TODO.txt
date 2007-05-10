@@ -16,4 +16,6 @@
  - Add EPSG:3067 to deegree2.jar
    # ETRS89 / ETRS-TM35FIN (requires EPSG 6.11.1, avail. in proj4-4.5.0)
    # <3067> +proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs  <>
+ - Make the advanced-tabs still work, even if DescrivbeFeatureType fails.
+   This is extremely usefull for debuggin.
 
