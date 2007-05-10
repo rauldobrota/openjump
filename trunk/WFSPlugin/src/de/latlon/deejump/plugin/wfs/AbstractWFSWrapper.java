@@ -128,7 +128,6 @@ public abstract class AbstractWFSWrapper {
             +  getServiceVersion() + "&TYPENAME=" 
             + typename.getPrefix() + ":" + typename.getLocalName()  
             + "&NAMESPACE=xmlns(" + typename.getPrefix()+"="+typename.getNamespace()+")";
-        
         return url;
     }
 
@@ -211,7 +210,7 @@ e.printStackTrace();
         QualifiedName ft = getFeatureTypeByName( featureType ).getName();
 
         String serverReq = getDescribeTypeURL( ft );
-        
+        System.out.println( "serverReq: " + serverReq );
         String httpProtocolMethod = isGet ? "HTTP_GET" : "HTTP_POST" ;
         
         LOG.debug( "Using " + httpProtocolMethod + " to get feature type description from " + descrFtUrl + serverReq);
@@ -228,7 +227,7 @@ e.printStackTrace();
         } 
         
         //only input here what's after the '?'
-        httpMethod.setQueryString( serverReq.split( "\\?" )[1] );
+//        httpMethod.setQueryString( serverReq.split( "\\?" )[1] );
         try {
             httpClient.executeMethod(httpMethod);
             GMLSchemaDocument xsdDoc = new GMLSchemaDocument();
@@ -236,10 +235,10 @@ e.printStackTrace();
             
             return DOMPrinter.nodeToString( xsdDoc.getRootElement(), null );
         } catch ( Exception e ) {
-e.printStackTrace();            
+            e.printStackTrace();            
             String mesg = "Error fetching FeatureType description";
             LOG.error( mesg + " for " + featureType + " from " 
-                       + uri + " using " + descrFtUrl + serverReq);
+                       + uri + " using " + serverReq);
             throw new DeeJUMPException( mesg,e);
         } 
         
@@ -285,8 +284,10 @@ e.printStackTrace();
         FeatureType[] fts = schema.getFeatureTypes();
         for ( int i = 0; i < fts.length; i++ ) {
             PropertyType[] props = fts[i].getProperties();
+            
             for ( int j = 0; j < props.length; j++ ) {
-                if( !(props[j].getType() == Types.GEOMETRY) ){
+                if( !(props[j].getType() == Types.GEOMETRY || props[j].getType()  == 10014) ){
+                    System.out.println("got: " + props[j].getName() );
                     propsList.add(  props[j].getName().getAsString() );
                 }
             }
@@ -304,7 +305,7 @@ e.printStackTrace();
      * @param propNames
      * @return
      */
-    protected QualifiedName[] guessGeomProperty( GMLSchema schema ){
+    protected QualifiedName[] guessGeomProperty2( GMLSchema schema ){
 
         QualifiedName[] geoPropNames = null;
         List tmpList = new ArrayList( 20 );
@@ -314,7 +315,7 @@ e.printStackTrace();
         for ( int i = 0; i < fts.length; i++ ) {
             PropertyType[] props = fts[i].getProperties();
             for ( int j = 0; j < props.length; j++ ) {
-                
+
                 if( props[j].getType() == Types.GEOMETRY ){
                     tmpList.add( props[j].getName() );
                     
@@ -324,8 +325,35 @@ e.printStackTrace();
 
         geoPropNames = 
             (QualifiedName[])tmpList.toArray( new QualifiedName[ tmpList.size() ] );
+        
         return geoPropNames;
     }
+    
+    protected static QualifiedName[] guessGeomProperty( GMLSchema schema ){
+
+        QualifiedName[] geoPropNames = null;
+        List tmpList = new ArrayList( 20 );
+        
+        FeatureType[] fts = schema.getFeatureTypes();
+        for ( int i = 0; i < fts.length; i++ ) {
+            PropertyType[] props = fts[i].getProperties();
+            for ( int j = 0; j < props.length; j++ ) {
+                //System.out.println(Types.get(  props[j].getType(), 0));
+                if( props[j].getType() == Types.GEOMETRY || props[j].getType() == 10014 ){
+
+                    tmpList.add( props[j].getName() );
+                    
+                }
+            }
+        }
+
+        geoPropNames = 
+            (QualifiedName[])tmpList.toArray( new QualifiedName[ tmpList.size() ] );
+        
+        System.out.println(tmpList);
+        
+        return geoPropNames;
+    }    
     
     public QualifiedName[] getGeometryProperties(String featureType) {
         return (QualifiedName[])this.geoProperties.get( featureType );
@@ -361,6 +389,9 @@ e.printStackTrace();
 Changes to this class. What the people have been up to:
 
 $Log$
+Revision 1.5  2007/05/10 07:36:45  taddei
+Added hack for reading gml:GeometryAssociationProperty from 2.1.2 schemas
+
 Revision 1.4  2007/05/02 13:50:11  taddei
 fixed URL problem when loading schema.
 
