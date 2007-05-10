@@ -19,12 +19,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import de.latlon.deejump.ui.DeeJUMPException;
 import de.latlon.deejump.ui.Messages;
@@ -34,6 +36,8 @@ public class WFSFrame extends JFrame {
 
     private WFSPanel wfsPanel;
 
+    private Thread loaderThread;
+    
     public WFSFrame( String[] wfsURLs ) {
         super( "WFSFrame v. " + WFSPanel.releaseVersion );
         setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
@@ -53,8 +57,9 @@ public class WFSFrame extends JFrame {
         add( this.wfsPanel );
         
         WFSPanelButtons buttons = new WFSPanelButtons( this, this.wfsPanel );
-        this.wfsPanel.controlButtons = buttons ;
-        
+        this.wfsPanel.controlButtons = buttons;
+        buttons.okButton.setAction( new GetFeatureAction() );
+        /*
         buttons.okButton.addActionListener( new ActionListener(){
             public void actionPerformed( ActionEvent e ) {
                    
@@ -81,6 +86,7 @@ public class WFSFrame extends JFrame {
                 }
             }
         });
+        */
         buttons.okButton.setText( "Do GetFeature" );
         buttons.okButton.setEnabled( false );
         
@@ -129,6 +135,55 @@ public class WFSFrame extends JFrame {
         return servers;
     }
 
+    private void load(){
+        final String resp;
+        String tmp = null;
+        try {
+            tmp = 
+                WFSClientHelper.createResponsefromWFS( wfsPanel.getWfService().getGetFeatureURL() , 
+                                                       wfsPanel.getRequest() );
+        } catch ( DeeJUMPException e1 ) {
+            e1.printStackTrace();
+            tmp = e1.getMessage();
+        }
+        resp = tmp;
+        int arbitrarySize = 10000;
+        if( resp.length() < arbitrarySize ){
+            
+            Thread worker = new Thread(){
+                @Override
+                public void run() {
+                  wfsPanel.getTabs().setSelectedIndex( 4 );
+                  wfsPanel.setResposeText( resp );  
+                }
+            };
+            SwingUtilities.invokeLater( worker );
+//            wfsPanel.getTabs().setSelectedIndex( 4 );
+//            wfsPanel.setResposeText( resp );  
+        } else {
+            int i = JOptionPane.showConfirmDialog( WFSFrame.this, "The response is too large for the editor. Would you like to save it to a file?", "Question?",
+                                           JOptionPane.YES_NO_OPTION);
+            if( i == JOptionPane.YES_OPTION ){
+                WFSPanel.saveTextToFile( WFSFrame.this, resp );
+            }
+        }
+    }
+    
+    class GetFeatureAction extends AbstractAction implements Runnable {
+        public void actionPerformed( ActionEvent e ) {
+            System.out.println(213);
+            if( loaderThread != null ){
+                return;
+            }
+            loaderThread = new Thread( this );
+            loaderThread.start();
+        }
+        public void run() {
+            load();
+            loaderThread = null;
+        }
+    }
+    
     /**
      * @param args
      */
