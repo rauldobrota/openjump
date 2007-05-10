@@ -67,7 +67,7 @@ import de.latlon.deejump.ui.XMLEditorPane;
 public class WFSPanel extends JPanel {
 
     //TODO put a props
-    static final String releaseVersion = "0.2.0";
+    static final String releaseVersion = "0.3.0";
 
     // Constants for spatial search criteria type
     // also used by child panels
@@ -104,7 +104,8 @@ public class WFSPanel extends JPanel {
 
     AbstractWFSWrapper wfService;
 
-    private JTextArea requestTextArea;
+    //private JTextArea requestTextArea;
+    private RequestTextArea requestTextArea;
 
     private JTextArea responseTextArea;
 
@@ -138,6 +139,8 @@ public class WFSPanel extends JPanel {
     private WFSOptions options;
 
     WFSPanelButtons controlButtons;
+
+    private XMLEditorPane xmlPane;
 
     public WFSPanel( List<String> urlList ) {
         super();
@@ -177,6 +180,7 @@ public class WFSPanel extends JPanel {
         capabilitiesButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 createXMLFrame( WFSPanel.this, wfService.getCapabilitesAsString() );
+
             }
         } );
 
@@ -211,6 +215,16 @@ public class WFSPanel extends JPanel {
             public Dimension getMinimumSize() {
                 return minDim;
             }
+            
+            public void setEnabled( boolean e ){
+                super.setEnabled( e );
+                attributeResPanel.setEnabled( e );
+                propertiesPanel.setEnabled( e );
+                propertiesPanel.setEnabled( e );
+                spatialResPanel.setEnabled( e );
+                requestTextArea.setEnabled( e );
+                responseTextArea.setEnabled( e );
+            }
         };
 
         attributeResPanel = new PropertyCriteriaPanel( this, featureTypeCombo );
@@ -222,12 +236,15 @@ public class WFSPanel extends JPanel {
 
         spatialResPanel = new SpatialCriteriaPanel( this );
         tabs.add( Messages.getString( "FeatureResearchDialog.spatialSearch" ), spatialResPanel );
-
-        tabs.add( Messages.getString( "FeatureResearchDialog.request" ), createRequestTextArea() );
+        
+        requestTextArea = new RequestTextArea(this);
+        
+        tabs.add( Messages.getString( "FeatureResearchDialog.request" ), requestTextArea );
 
         //TODO i18n
-        tabs.add( Messages.getString( "FeatureResearchDialog.response" ), createrResponseTextArea() );
-
+        tabs.add( Messages.getString( "FeatureResearchDialog.response" ), createResponseTextArea() );
+        tabs.setEnabled( false );
+        
         box = Box.createHorizontalBox();
         box.setBorder( BorderFactory.createEmptyBorder( 20, 5, 10, 5 ) );
 
@@ -263,14 +280,19 @@ public class WFSPanel extends JPanel {
         return this.tabs;
     }
     
-    static void createXMLFrame( final Component parent, String txt ) {
+    void createXMLFrame( final Component parent, String txt ) {
 
         //FIXME: this is still too slow...
 
-        //JTextArea ta = new JTextArea( txt, 20, 80 );
-        final XMLEditorPane xe = new XMLEditorPane( txt );
+        //final XMLEditorPane xe = new XMLEditorPane( txt );
+        if ( xmlPane == null ){
+            xmlPane = new XMLEditorPane( txt );
+        } else {
+            xmlPane.setText( txt );
+        }
+        
         //        ta.setLineWrap( true );
-        JScrollPane sp = new JScrollPane( xe, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+        JScrollPane sp = new JScrollPane( xmlPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                           JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
         sp.setMaximumSize( new Dimension( 600, 400 ) );
         sp.setPreferredSize( new Dimension( 800, 400 ) );
@@ -280,12 +302,12 @@ public class WFSPanel extends JPanel {
 
         AbstractAction a = new AbstractAction( "Save" ) {
             public void actionPerformed( ActionEvent e ) {
-                WFSPanel.saveTextToFile( parent, xe.getVisibleText() );
+                WFSPanel.saveTextToFile( parent, xmlPane.getVisibleText() );
             }
         };
         p.add( new JButton( a ) );
         JOptionPane.showMessageDialog( parent, p );
-
+        
     }
 
     private void reinitService( String url ) {
@@ -357,6 +379,7 @@ public class WFSPanel extends JPanel {
                     //UT could dsupport other srrs, but not doing it now
                     String[] crs = new String[]{ ft.getDefaultSRS().toString() };
                     spatialResPanel.setCrs( crs );
+                    requestTextArea.setRequestText( "" );
                 } catch ( Exception e ) {
                     e.printStackTrace();
                     JOptionPane.showMessageDialog( WFSPanel.this, "Error loading schema: "
@@ -368,69 +391,7 @@ public class WFSPanel extends JPanel {
         return tmpFeatureTypeCombo;
     }
 
-    private JComponent createRequestTextArea() {
-
-        JPanel p = new JPanel();
-//        p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
-
-        requestTextArea = new JTextArea();
-        requestTextArea.setLineWrap( true );
-        requestTextArea.setWrapStyleWord( true );
-        requestTextArea.setBorder( BorderFactory.createEmptyBorder( 10, 10, 10, 10 ) );
-        JScrollPane jsp = new JScrollPane( requestTextArea );
-        jsp.setPreferredSize( new Dimension(390,475) );
-        p.add( jsp );
-
-        JButton createReq = new JButton(
-                                         Messages.getString( "FeatureResearchDialog.createWFSRequest" ) );
-        createReq.setBounds( 260, 20, 80, 20 );
-        createReq.setAlignmentX( 0.5f );
-        createReq.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e ) {
-                setRequestText( createRequest().toString() );
-                tabs.setSelectedIndex( 3 );
-            }
-        } );
-
-        //TODO i18n
-        JButton validateReq = new JButton( "Validate request" );//
-        //                                        Messages.getString( "FeatureResearchDialog.createWFSRequest" ) );
-
-        validateReq.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e ) {
-                
-                String reqTxt = requestTextArea.getText();
-                if( reqTxt == null || reqTxt.length() == 0 ){
-                    return;
-                }
-                try {
-                    
-                    //simple test for well-formedness
-                    XMLFragment xf = new XMLFragment();
-                    xf.load( new StringReader( reqTxt ), "http://empty" );
-
-                    if( "1.1.0".equals( wfService.getServiceVersion() ) ){
-                        // use deegree to validate request
-                        GetFeature.create( null, xf.getRootElement() );
-                    } 
-                } catch ( Exception ex ) {
-                    ex.printStackTrace();                                       //TODO i18n
-                    JOptionPane.showMessageDialog( WFSPanel.this, ex.getMessage(), "Error",
-                                                   JOptionPane.ERROR_MESSAGE );
-                }
-            }
-        } );
-
-        JPanel innerPanel = new JPanel();
-        innerPanel.add( createReq );
-        innerPanel.add( validateReq );
-
-        p.add( innerPanel );
-
-        return p;
-    }
-
-    private JComponent createrResponseTextArea() {
+    private JComponent createResponseTextArea() {
 
         JPanel p = new JPanel();
         p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
@@ -471,15 +432,19 @@ public class WFSPanel extends JPanel {
                                                  + e.getMessage(), "Error",
                                            JOptionPane.ERROR_MESSAGE );
 
-            featureTypeCombo.setModel( new javax.swing.DefaultComboBoxModel( new String[] {} ) );
+            featureTypeCombo.setModel( new javax.swing.DefaultComboBoxModel( new String[0] ) );
             attributeResPanel.setFeatureTypeComboEnabled( false );
             tabs.setEnabledAt( 1, false );
             capabilitiesButton.setEnabled( false );
             controlButtons.okButton.setEnabled( false );
+            
+            tabs.setEnabled( false );
+            
         }
 
         if ( featTypes != null && featTypes.length > 0 ) {
             try {
+                
                 attributeNames = wfService.getProperties( featTypes[0] );
                 attributeResPanel.setEnabled( true );
                 geoProperties = wfService.getGeometryProperties( featTypes[0] );
@@ -490,16 +455,19 @@ public class WFSPanel extends JPanel {
                 
                 ///hmmm repeated code...
                 WFSFeatureType ft = wfService.getFeatureTypeByName( featTypes[0] );
-                //UT could dsupport other srrs, but not doing it now
+                //UT could support other srs, but not doing it now
                 String[] crs = new String[]{ ft.getDefaultSRS().toString() };
                 spatialResPanel.setCrs( crs );
+                
+                tabs.setEnabled( true );
             } catch ( Exception e ) {
-
+                tabs.setEnabled( false );
                 e.printStackTrace();
+                featureTypeCombo.setModel( new javax.swing.DefaultComboBoxModel( new String[0] ) );
 
                 attributeResPanel.setEnabled( false );
                 propertiesPanel.setEnabled( false );
-
+                controlButtons.okButton.setEnabled( false );
                 JOptionPane.showMessageDialog( this, "Could not get DescribeFeatureType for '"
                                                      + featTypes[0] + "' from WFS server at '"
                                                      + wfService.getBaseWfsURL() + "'\n"
@@ -511,7 +479,7 @@ public class WFSPanel extends JPanel {
     }
 
     /** Creates a GetFeature request by concatenation of xlm elements */
-    private StringBuffer createRequest() {
+    private StringBuffer concatenateRequest() {
 
         StringBuffer sb = new StringBuffer();
         if ( wfService == null ) {//not inited yet
@@ -608,8 +576,7 @@ public class WFSPanel extends JPanel {
     }
 
     private void setRequestText( String text ) {
-        requestTextArea.setText( text.replaceAll( ">", ">\n" ) );
-        //requestTextArea.setText( text );
+        requestTextArea.setRequestText( text );
     }
 
     public static void saveTextToFile( Component compo, String txt ) {
@@ -711,16 +678,24 @@ public class WFSPanel extends JPanel {
 
     public void setResposeText( String txt ) {
         responseTextArea.setText( txt );
+        responseTextArea.setCaretPosition( 0 );
     }
 
     public String getRequest() {
         String t = requestTextArea.getText();
         if ( t == null || t.length() == 0 ) {
-            t = createRequest().toString();
+            t = concatenateRequest().toString();
         }
         return t.replaceAll( "\n", "" );
     }
 
+    public String createRequest() {
+        String t = concatenateRequest().toString();
+        return t.replaceAll( "\n", "" );
+    }
+
+
+    
     public void setTabsVisible( boolean visible ) {
         tabs.setVisible( visible );
     }

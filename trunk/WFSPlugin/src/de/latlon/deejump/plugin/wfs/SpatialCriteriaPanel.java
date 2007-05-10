@@ -22,6 +22,7 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -86,9 +87,9 @@ class SpatialCriteriaPanel extends JPanel {
 
     private JComboBox geomPropsCombo;
 
-
     private JComboBox srsCombo;
     
+    private AbstractButton[] opButtons;
     
     /** Create a SpatialResearchPanel.
      * 
@@ -138,7 +139,6 @@ class SpatialCriteriaPanel extends JPanel {
             }
         );
 */
-        geomPropsCombo.setEditable( true );
         
         JPanel p = new JPanel();
         p.add( new JLabel(Messages.getString("SpatialResearchPanel.geometryName") ) );
@@ -226,7 +226,7 @@ class SpatialCriteriaPanel extends JPanel {
         ButtonGroup bg = new ButtonGroup();
         
                 
-        JRadioButton[] opButtons = new JRadioButton[ OPERATION_NAMES.length ];
+        opButtons = new JRadioButton[ OPERATION_NAMES.length ];
         String simpleName = getClass().getSimpleName();  
         for (int i = 0; i < OPERATION_NAMES.length; i++) {
             String txt = simpleName + "." + OPERATION_NAMES[i];
@@ -375,5 +375,18 @@ class SpatialCriteriaPanel extends JPanel {
             this.geomPropsCombo.addItem( geometryProperties[i] );            
         }
     }
-
+    
+    public void setEnabled(boolean enabled){
+        super.setEnabled( enabled );
+        if( !enabled ){
+            resetGeoCombo( new QualifiedName[0] );
+            setCrs( new String[0] );
+        }
+        this.srsCombo.setEnabled( enabled );
+        this.geomPropsCombo.setEnabled( enabled );
+        for ( AbstractButton b : opButtons ) {
+            b.setEnabled( enabled );
+        }
+    }
+    
 }

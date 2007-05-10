@@ -18,6 +18,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -97,6 +98,10 @@ class PropertyCriteriaPanel extends JPanel {
     protected JCheckBox editableCheckBox;
 
     private JRadioButton bboxCritButton;
+
+    private AbstractButton andButton;
+
+    private JRadioButton orButton;
     
     
     /**
@@ -118,11 +123,12 @@ class PropertyCriteriaPanel extends JPanel {
         JPanel p = new JPanel();
         //TODO i18n
         describeFTButton = new JButton("DescribeFeatureType");
+        describeFTButton.setEnabled( false );
         describeFTButton.addActionListener( new ActionListener(){
             public void actionPerformed( ActionEvent e ) {
                 QualifiedName ft = PropertyCriteriaPanel.this.researchDialog.getFeatureType();
                 String schema = PropertyCriteriaPanel.this.researchDialog.getWfService().getRawSchemaForFeatureType( ft.getAsString() );
-                WFSPanel.createXMLFrame( PropertyCriteriaPanel.this, schema );
+                researchDialog.createXMLFrame( PropertyCriteriaPanel.this, schema );
             }
         });
         p.add( describeFTButton );
@@ -144,7 +150,7 @@ class PropertyCriteriaPanel extends JPanel {
         innerPanel.add( Box.createHorizontalStrut( 10 ) );  
         innerPanel.add( createSpatialButtons() );
         add( innerPanel );
-        add( createEditableCheckBox());
+//        add( createEditableCheckBox());
     }
     
     public void refreshPanel() {
@@ -153,7 +159,6 @@ class PropertyCriteriaPanel extends JPanel {
         criteriaListPanel.revalidate();
         criteriaListPanel.repaint();
         setHeadersEnabled(false);
-        remCriteriaButton.setEnabled(false);
     }
     /**Creates the panel where the criteria list will be shown*/
     private JComponent createCriteriaPanel(){
@@ -193,13 +198,13 @@ class PropertyCriteriaPanel extends JPanel {
     /**Creates the And/Or radio buttons, their button group and a panel for them*/
     private JComponent createLogicalButtons() {
         
-        JRadioButton andButton = new JRadioButton( Messages.getString("AttributeResearchPanel.logicalAnd") );
+        andButton = new JRadioButton( Messages.getString("AttributeResearchPanel.logicalAnd") );
         andButton.setBorder(
                 BorderFactory.createEmptyBorder(2,10,2,10));
         andButton.setActionCommand(logicalRelationships[0]);
         andButton.doClick();
        
-        JRadioButton orButton = new JRadioButton( Messages.getString("AttributeResearchPanel.logicalOr"));
+        orButton = new JRadioButton( Messages.getString("AttributeResearchPanel.logicalOr"));
         orButton.setBorder(
                 BorderFactory.createEmptyBorder(2,10,5,10));
         orButton.setActionCommand(logicalRelationships[1]);
@@ -419,9 +424,18 @@ class PropertyCriteriaPanel extends JPanel {
     }
     
     public void setEnabled(boolean enabled){
+        super.setEnabled( enabled );
+        describeFTButton.setEnabled( enabled );
         newCriteriaButton.setEnabled( enabled );
         remCriteriaButton.setEnabled( enabled );
+        andButton.setEnabled( enabled );
+        orButton.setEnabled( enabled );
         
+        noCritButton.setEnabled( enabled );
+        bboxCritButton.setEnabled( enabled );
+        selecGeoButton.setEnabled( enabled );
+        
+        refreshPanel();
     }
     public void setFeatureTypeComboEnabled(boolean enabled){
         featureTypeCombo.setEnabled( enabled );
