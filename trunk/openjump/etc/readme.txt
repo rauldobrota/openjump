@@ -104,36 +104,48 @@ Original development team of JUMP was:
 - Martin Davis, Jon Aquino, Alan Chang from Vividsolutions (www.vividsolutions.com)
 - David Blasby and Paul Ramsey from Refractions Research Inc (www.refractions.net) 
 
-OpenJUMP regular (and past) contributors are (non exaustive list!):
-- Jonathan Aquino, 
+OpenJUMP regular (*and past) contributors are (non exaustive list!):
+- Jonathan Aquino*, 
 - Landon Blake (Sunburned Surveyor),
 - Erwan Bocher,
-- Basile Chandesris,
 - Joe Desbonet,
 - Michael Michaud,
-- Axel Orth,
-- Ole Rahn,
-- Ezequias Rodrigues da Rocha
 - Stefan Steiniger,
 - Ugo Taddei, 
 - Steve Tanner,
+- Uwe Dallüge,
+
+* past contributors
+- Axel Orth*,
+- Ole Rahn*,
+- Basile Chandesris*,
+- Ezequias Rodrigues da Rocha*,
+
 Projects and Companies
-- Larry Becker and Integrated Systems Analysts, Inc.
-  for providing their Jump ISA tools code.
+- Larry Becker and Robert Littlefield (SkyJUMP team)
+  partly at Integrated Systems Analysts, Inc.
+  for providing their Jump ISA tools code and numerous other improvements
 - Pirol Project from University of Applied Sciences Osnabrück
   for providing the attribute editor
-- Lat/Lon for providing some plugins and functionality
-  developed for deeJUMP
-- VividSolutions Inc. for support and answering the never ending stream of questions, especially:
-  Martin Davis
+  (contact: Malte Weller)
+- Lat/Lon GmbH (deeJUMP team)
+  for providing some plugins and functionality (i.e. WFS and WMS Plugins)
+  contact: Stephan Holl/Markus Müller/Ugo Taddei
+- VividSolutions Inc. 
+  for support and answering the never ending stream of questions, especially:
+  Martin Davis (now at Refractions Inc.)
   David Zwiers
+- Intevation GmbH
+  for collaborative PlugIn development (Print Layout PlugIn)
+  contact: Jan Oliver Wagner
 
 Translation contributors are:
-- French: Basile Chandesris, Erwan Bocher, Steve Tanner
-- Spanish: Steve Tanner, Fco Lavin
+- French: Basile Chandesris, Erwan Bocher, Steve Tanner, Michaël Michaud
+- Spanish: Steve Tanner, Fco Lavin, Nacho Uve
 - German: Florian Rengers, Stefan Steiniger
-- Portuguese (brazilian): Ezequias Rodrigues da Rocha
+- Portuguese (brazilian): Ezequias Rodrigues da Rocha, Cristiano das Neves Almeida
 - Finnish: Jukka Rahkonnen
+- English: Landon Blake
 
 others:
 - L. Paul Chew for providing the Delauney triangulation algorithm to create the Voronoi edges
