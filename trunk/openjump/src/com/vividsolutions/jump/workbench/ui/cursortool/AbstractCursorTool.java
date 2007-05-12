@@ -51,6 +51,7 @@ import com.vividsolutions.jump.workbench.ui.snap.SnapPolicy;
 import com.vividsolutions.jump.workbench.ui.snap.SnapToFeaturesPolicy;
 import com.vividsolutions.jump.workbench.ui.snap.SnapToGridPolicy;
 import com.vividsolutions.jump.workbench.ui.snap.SnapToVerticesPolicy;
+import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -224,11 +225,15 @@ public abstract class AbstractCursorTool implements CursorTool {
 		this.panel.addListener(layerViewPanelListener);
 
 		if (configuringSnapping && !snappingConfigured) {
-			//Must wait until now because #getWorkbench needs the panel to be
-			// set. [Jon Aquino]
-			getSnapManager().addPolicies(
-					createStandardSnappingPolicies(getWorkbench()
-							.getBlackboard()));
+            //Must wait until now because #getWorkbench needs the panel to be set. [Jon Aquino]
+            //getSnapManager().addPolicies(
+            //createStandardSnappingPolicies(getWorkbench().getBlackboard()));
+            
+            //fix bug 1713295 - change blackboard to PersistentBlackboard.
+			//Snap options have been broken since PersistentBlackboard has
+			//replaced blackboard in InstallGridPlugIn [Michael Michaud 2007-05-12]
+            getSnapManager().addPolicies(createStandardSnappingPolicies(
+                PersistentBlackboardPlugIn.get(getWorkbench().getContext())));
 			snappingConfigured = true;
 		}
 	}
