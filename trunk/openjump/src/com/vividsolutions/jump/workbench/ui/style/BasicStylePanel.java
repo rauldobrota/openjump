@@ -366,7 +366,7 @@ public class BasicStylePanel extends JPanel {
 	            new Insets(2, 2, 2, 2), 0, 0));
 	    centerPanel.add(GUIUtil.createSyncdTextField(lineWidthSlider,
 	            SLIDER_TEXT_FIELD_COLUMNS),
-	        new GridBagConstraints(2, 18, 1, 1, 0.0, 0.0,
+	        new GridBagConstraints(2, 19, 1, 1, 0.0, 0.0,
 	            GridBagConstraints.WEST, GridBagConstraints.NONE,
 	            new Insets(2, 2, 2, 2), 0, 0));
 	    fillColorChooserPanel.addActionListener(new java.awt.event.ActionListener() {
