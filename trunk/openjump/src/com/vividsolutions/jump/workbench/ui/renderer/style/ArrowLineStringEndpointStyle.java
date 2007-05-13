@@ -157,7 +157,7 @@ public class ArrowLineStringEndpointStyle extends LineStringEndpointStyle {
 
     public static class FeathersEnd extends Feathers {
         public FeathersEnd() {
-            super(I18N.get("ui.renderer.style.ArrowLineStringEndpointStyle.end-feathers"), true, "FeathersEnd.gif");
+            super(I18N.get("ui.renderer.style.ArrowLineStringEndpointStyle.end-feathers"), false, "FeathersEnd.gif");
         }
     }
 
