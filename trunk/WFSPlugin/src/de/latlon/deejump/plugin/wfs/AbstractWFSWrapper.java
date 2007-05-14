@@ -320,9 +320,7 @@ public abstract class AbstractWFSWrapper {
         for ( int i = 0; i < fts.length; i++ ) {
             PropertyType[] props = fts[i].getProperties();
             for ( int j = 0; j < props.length; j++ ) {
-                //System.out.println(Types.get(  props[j].getType(), 0));
                 if( props[j].getType() == Types.GEOMETRY || props[j].getType() == 10014 ){
-System.out.println(props[j].getName() );
                     tmpList.add( props[j].getName() );
                     
                 }
@@ -331,8 +329,6 @@ System.out.println(props[j].getName() );
 
         geoPropNames = 
             (QualifiedName[])tmpList.toArray( new QualifiedName[ tmpList.size() ] );
-        
-        System.out.println(tmpList);
         
         return geoPropNames;
     }    
@@ -371,6 +367,9 @@ System.out.println(props[j].getName() );
 Changes to this class. What the people have been up to:
 
 $Log$
+Revision 1.8  2007/05/14 10:07:00  taddei
+removed println
+
 Revision 1.7  2007/05/14 09:05:23  taddei
 attempt to fix problem of DescribeFeatureType request not being loaded through the proxy.
 
