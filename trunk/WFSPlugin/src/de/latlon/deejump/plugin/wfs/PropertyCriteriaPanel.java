@@ -127,7 +127,7 @@ class PropertyCriteriaPanel extends JPanel {
         describeFTButton.addActionListener( new ActionListener(){
             public void actionPerformed( ActionEvent e ) {
                 QualifiedName ft = PropertyCriteriaPanel.this.researchDialog.getFeatureType();
-                String schema = PropertyCriteriaPanel.this.researchDialog.getWfService().getRawSchemaForFeatureType( ft.getAsString() );
+                String schema = PropertyCriteriaPanel.this.researchDialog.getWfService().getRawSchemaForFeatureType( ft.getLocalName() );
                 researchDialog.createXMLFrame( PropertyCriteriaPanel.this, schema );
             }
         });
