@@ -1,5 +1,10 @@
 2007-05-14  Ugo Taddei <taddei@latlon.de>
 
+	* src/de/latlon/deejump/plugin/util/data/WFSClientHelper.java: candidate fix
+	for proxy problem.
+
+2007-05-14  Ugo Taddei <taddei@latlon.de>
+
 	* src/de/latlon/deejump/plugin/wfs/WFPanel.java: rearrange the save button 
 	beside OK-button in GetCaps and DescribeFeatureType.
 	* src/de/latlon/deejump/plugin/wfs/WFSOptionsPanel2.java: disabled get/post
