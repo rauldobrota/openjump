@@ -16,6 +16,7 @@ import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
 import javax.swing.JList;
@@ -97,12 +98,14 @@ public class PropertySelectionPanel extends JPanel {
     
     private void resetGeoCombo( QualifiedName[] geoProps ) {
         geoPropsCombo.removeAllItems();
-        for ( int i = 0; i < geoProps.length; i++ ) {
-            
-            if( i == 0 ){
-                this.parentDialog.setGeoProperty( geoProps[i] );
+        if( geoProps != null ){
+            for ( int i = 0; i < geoProps.length; i++ ) {
+                
+                if( i == 0 ){
+                    this.parentDialog.setGeoProperty( geoProps[i] );
+                }
+                geoPropsCombo.addItem( geoProps[i] );
             }
-            geoPropsCombo.addItem( geoProps[i] );
         }
     }
 
@@ -129,7 +132,10 @@ public class PropertySelectionPanel extends JPanel {
 
         GMLSchema schema = 
             this.parentDialog.getWfService().getSchemaForFeatureType( ftQualiName.getPrefix() + ":" + ftQualiName.getLocalName() );
-            
+        
+        if( schema == null ){
+            return sb;
+        }
         FeatureType[] featTypes = schema.getFeatureTypes();
         
         if( featTypes.length < 1 ){
@@ -170,26 +176,16 @@ public class PropertySelectionPanel extends JPanel {
         return sb;          
     }
     
+    public void setEnabled( boolean enabled ){
+        super.setEnabled( enabled );
+        geoPropsCombo.setEnabled( enabled );
+        propertiesList.setEnabled( enabled );
+        
+        if( !enabled ){
+            propertiesList.removeAll();
+            geoPropsCombo.setModel( new DefaultComboBoxModel(new String[0]) );            
+        }
+        
+    }
+    
 }
-
-
-/* ********************************************************************
-Changes to this class. What the people have been up to:
-$Log$
-Revision 1.2  2007/04/26 13:14:59  taddei
-Major refactoring to use WFSPanel in a Frame (WFSFrame) and in a Dialog (WFSDialog, still to do).
-
-Revision 1.1  2007/04/26 09:19:26  taddei
-Added initial working version of classes and complementary files.
-
-Revision 1.1.2.3  2006/08/17 06:48:53  ut
-pre-release2 2.0
-
-Revision 1.1.2.2  2006/06/02 13:39:53  ut
-updates
-
-Revision 1.1.2.1  2006/05/31 10:04:35  ut
-deejump pre deegree day
-
-
-********************************************************************** */

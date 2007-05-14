@@ -316,7 +316,6 @@ public class WFSPanel extends JPanel {
                                                          : new WFServiceWrapper_1_0_0( url );
             refreshGUIs();
         } catch ( Exception e ) {
-
             JOptionPane.showMessageDialog( this, "Could not connect to WFS server at '" + url
                                                  + "'\n" + e.getMessage(), "Error",
                                            JOptionPane.ERROR_MESSAGE );
@@ -373,12 +372,13 @@ public class WFSPanel extends JPanel {
                     geoProperties = getGeoProperties();
                     propertiesPanel.setProperties( attributeNames, geoProperties );
                     spatialResPanel.resetGeoCombo( geoProperties );
-                    
                     ///hmmm repeated code...
                     WFSFeatureType ft = wfService.getFeatureTypeByName( selectFt );
-                    //UT could dsupport other srrs, but not doing it now
-                    String[] crs = new String[]{ ft.getDefaultSRS().toString() };
-                    spatialResPanel.setCrs( crs );
+                    if( ft != null ){
+                    //UT could support other srrs, but not doing it now
+                        String[] crs = new String[]{ ft.getDefaultSRS().toString() };
+                        spatialResPanel.setCrs( crs );
+                    }
                     requestTextArea.setRequestText( "" );
                 } catch ( Exception e ) {
                     e.printStackTrace();
@@ -412,7 +412,8 @@ public class WFSPanel extends JPanel {
     private void refreshGUIs() {
 
         String[] featTypes = null;
-
+        requestTextArea.setRequestText( "" );
+        responseTextArea.setText( "" );
         try {
             featTypes = wfService.getFeatureTypes();
             featureTypeCombo.setModel( new javax.swing.DefaultComboBoxModel( featTypes ) );
@@ -426,8 +427,7 @@ public class WFSPanel extends JPanel {
             attributeResPanel.setFeatureTypeComboEnabled( true );
 
         } catch ( Exception e ) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog( this, "Could not connect to WFS server at '"
+            JOptionPane.showMessageDialog( this, "Could not connect to WFS server at \n'"
                                                  + wfService.getBaseWfsURL() + "'\n"
                                                  + e.getMessage(), "Error",
                                            JOptionPane.ERROR_MESSAGE );
@@ -456,20 +456,29 @@ public class WFSPanel extends JPanel {
                 ///hmmm repeated code...
                 WFSFeatureType ft = wfService.getFeatureTypeByName( featTypes[0] );
                 //UT could support other srs, but not doing it now
-                String[] crs = new String[]{ ft.getDefaultSRS().toString() };
-                spatialResPanel.setCrs( crs );
-                
+                if( ft != null ){
+                    String[] crs = new String[]{ ft.getDefaultSRS().toString() };
+                    spatialResPanel.setCrs( crs );
+                }
                 tabs.setEnabled( true );
             } catch ( Exception e ) {
-                tabs.setEnabled( false );
                 e.printStackTrace();
-                featureTypeCombo.setModel( new javax.swing.DefaultComboBoxModel( new String[0] ) );
+                //this is necessary to turn tabs click area on
+                tabs.setEnabled( true );
+                //if something went wrong, disable all but req/response tabs
+                //featureTypeCombo.setModel( new javax.swing.DefaultComboBoxModel( new String[0] ) );
 
                 attributeResPanel.setEnabled( false );
                 propertiesPanel.setEnabled( false );
-                controlButtons.okButton.setEnabled( false );
+                spatialResPanel.setEnabled( false );
+                
+                requestTextArea.setEnabled( true );
+                responseTextArea.setEnabled( true );
+                
+                controlButtons.okButton.setEnabled( true );
+                
                 JOptionPane.showMessageDialog( this, "Could not get DescribeFeatureType for '"
-                                                     + featTypes[0] + "' from WFS server at '"
+                                                     + featTypes[0] + "' from WFS server at \n'"
                                                      + wfService.getBaseWfsURL() + "'\n"
                                                      + e.getMessage(), "Error",
                                                JOptionPane.ERROR_MESSAGE );
@@ -501,8 +510,13 @@ public class WFSPanel extends JPanel {
         QualifiedName ft = wfService.getFeatureTypeByName( ftName ).getName();
 
         sb.append( "xmlns:" ).append( ft.getPrefix() ).append( "=\"" )
-        .append( ft.getNamespace() ).append("\" " ).append( "typeName=\"" )
-        .append(ftName ).append("\">" );
+        .append( ft.getNamespace() ).append("\" " ).append( "typeName=\"" );
+        
+        String prefix = ft.getPrefix(); 
+        if( prefix != null && prefix.length() > 0 ){
+            sb.append( prefix ).append( ":" );
+        }
+        sb.append( ft.getLocalName() ).append("\">" );
 
         sb.append( propertiesPanel.getXmlElement() );
 

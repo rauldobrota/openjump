@@ -71,11 +71,10 @@ public class WFServiceWrapper_1_0_0 extends AbstractWFSWrapper {
     }
 
     private String[] extractFeatureTypes() {
-
         
         String[] fts = null;
         
-        featureTypeToQName = new HashMap<String, WFSFeatureType>();
+        ftNameToWfsFT = new HashMap<String, WFSFeatureType>();
         
         Element root = this.capsDoc.getRootElement();
         
@@ -96,7 +95,8 @@ public class WFServiceWrapper_1_0_0 extends AbstractWFSWrapper {
                                                      CommonNamespaces.getNamespaceContext() );
 
                QualifiedName qualiName = XMLFragment.parseQualifiedName( node );
-               ftList.add( name );
+               
+               ftList.add( qualiName.getLocalName() );
                
                URI uri = XMLTools.getNodeAsURI( (Node) n, 
                                                 "wfs:SRS/text()", 
@@ -104,7 +104,9 @@ public class WFServiceWrapper_1_0_0 extends AbstractWFSWrapper {
                WFSFeatureType wfsFt = 
                    new WFSFeatureType(qualiName,null, null, null, uri,null,null,null,null,null);
                
-               featureTypeToQName.put( qualiName.getPrefix() + ":" + qualiName.getLocalName(), wfsFt );
+               //putting the name as key, only
+               //ftNameToWfsFT.put( qualiName.getPrefix() + ":" + qualiName.getLocalName(), wfsFt );
+               ftNameToWfsFT.put( qualiName.getLocalName(), wfsFt );
                
             }
             fts = ftList.toArray( new String[ ftList.size() ] );
@@ -187,9 +189,7 @@ public class WFServiceWrapper_1_0_0 extends AbstractWFSWrapper {
             String[] featTypes = wfs.getFeatureTypes();
             for ( int i = 0; i < featTypes.length; i++ ) {
                 System.out.println( featTypes[i] );
-            }
-            
-            System.out.println(wfs.featureTypeToQName);
+            }            
             
         }
     }
@@ -200,6 +200,9 @@ public class WFServiceWrapper_1_0_0 extends AbstractWFSWrapper {
 Changes to this class. What the people have been up to:
 
 $Log$
+Revision 1.3  2007/05/14 08:50:53  taddei
+Fix for the problems of null prefixes and false namespaces of misbehaving WFS
+
 Revision 1.2  2007/05/02 13:27:11  taddei
 Use now WFSFeatureType instead of QualifiedName.
 

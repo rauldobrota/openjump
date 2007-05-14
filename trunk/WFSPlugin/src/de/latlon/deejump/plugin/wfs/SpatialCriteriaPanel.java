@@ -371,8 +371,10 @@ class SpatialCriteriaPanel extends JPanel {
 
     public void resetGeoCombo( QualifiedName[] geometryProperties ) {
         this.geomPropsCombo.removeAllItems();
-        for ( int i = 0; i < geometryProperties.length; i++ ) {
-            this.geomPropsCombo.addItem( geometryProperties[i] );            
+        if( geometryProperties != null ){
+            for ( int i = 0; i < geometryProperties.length; i++ ) {
+                this.geomPropsCombo.addItem( geometryProperties[i] );            
+            }
         }
     }
     

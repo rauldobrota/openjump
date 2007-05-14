@@ -43,7 +43,9 @@ import org.xml.sax.SAXException;
 import de.latlon.deejump.ui.DeeJUMPException;
 
 /**
- * TODO add documentation here
+ * Superclass that wraps the basic functionality of a (simple) WFS. This class 
+ * encapsulates the behaviour of a WFS, and allows subclasses to change behaviour
+ * according to WFS version. 
  *
  * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei</a>
  * @author last edited by: $Author$
@@ -58,8 +60,7 @@ public abstract class AbstractWFSWrapper {
     
     protected String baseURL;
     
-    //should  use WFSFeatureType
-    protected Map<String, WFSFeatureType> featureTypeToQName;
+    protected Map<String, WFSFeatureType> ftNameToWfsFT;
     
     /**
      * Maps a feature type to its schem. Geometry property is not held here!
@@ -72,7 +73,7 @@ public abstract class AbstractWFSWrapper {
     /**
      * Maps a feature type to its geometry!
      */
-    private Map geoProperties;
+    private Map<String, QualifiedName[]> geoPropsNameToQNames;
 
     private HttpClient httpClient;
     
@@ -107,7 +108,7 @@ public abstract class AbstractWFSWrapper {
         this.baseURL = baseUrl;
         this.featureTypeToSchema = new HashMap( 10 );
         this.featureTypeToSchemaXML = new HashMap( 10 );
-        this.geoProperties = new HashMap( 10 );
+        this.geoPropsNameToQNames = new HashMap<String, QualifiedName[]> ( 10 );
         createHttpClient();
         
     }
@@ -128,6 +129,7 @@ public abstract class AbstractWFSWrapper {
             +  getServiceVersion() + "&TYPENAME=" 
             + typename.getPrefix() + ":" + typename.getLocalName()  
             + "&NAMESPACE=xmlns(" + typename.getPrefix()+"="+typename.getNamespace()+")";
+        
         return url;
     }
 
@@ -189,7 +191,7 @@ public abstract class AbstractWFSWrapper {
             
             return xsdDoc.parseGMLSchema();
         } catch ( Exception e ) {
-e.printStackTrace();            
+            e.printStackTrace();            
             String mesg = "Error fetching FeatureType description";
             LOG.error( mesg + " for " + featureType + " from " 
                        + uri + " using " + descrFtUrl + serverReq);
@@ -199,20 +201,26 @@ e.printStackTrace();
     }
     
     protected String loadSchemaForFeatureType2(String featureType) throws DeeJUMPException {
-
+        
+        //unfortunately no time for moving this out of here
         boolean isGet = true;
         
         String descrFtUrl = createDescribeFTOnlineResource();
-        
+
         if( descrFtUrl == null ){
             throw new RuntimeException( "Service does not have a DescribeFeatureType operation accessible by HTTP GET or POST." );
         }
-        QualifiedName ft = getFeatureTypeByName( featureType ).getName();
+        
+        WFSFeatureType wfsFt = getFeatureTypeByName( featureType );
+        if ( wfsFt == null ){
+            return null;
+        }
+        
+        QualifiedName ft = wfsFt.getName();
 
         String serverReq = getDescribeTypeURL( ft );
-        System.out.println( "serverReq: " + serverReq );
         String httpProtocolMethod = isGet ? "HTTP_GET" : "HTTP_POST" ;
-        
+
         LOG.debug( "Using " + httpProtocolMethod + " to get feature type description from " + descrFtUrl + serverReq);
         
         HttpMethod httpMethod = createHttpMethod( httpProtocolMethod );//new GetMethod( serverUrl );
@@ -255,10 +263,11 @@ e.printStackTrace();
         try {
             //GMLSchema xsd = loadSchemaForFeatureType( featureTypeName );
             String rawXML = loadSchemaForFeatureType2( featureTypeName );
-
+            if( rawXML == null ){
+                return;
+            }
             GMLSchemaDocument xsdDoc = new GMLSchemaDocument();
             xsdDoc.load( new StringReader(rawXML), "http://empty" );
-            
             GMLSchema xsd = xsdDoc.parseGMLSchema(); 
             
             this.featureTypeToSchema.put( featureTypeName, xsd);
@@ -266,7 +275,7 @@ e.printStackTrace();
             
             QualifiedName[] geoProp = guessGeomProperty( xsd );
             
-            this.geoProperties.put( featureTypeName, geoProp );                 
+            this.geoPropsNameToQNames.put( featureTypeName, geoProp );                 
 
         } catch ( Exception e ) {
             e.printStackTrace();
@@ -275,29 +284,32 @@ e.printStackTrace();
 
     public String[] getProperties(String featureType) {
         
-        createSchemaForFeatureType( featureType );
-        
-        List propsList = new ArrayList();
-        
-        GMLSchema schema = (GMLSchema)this.featureTypeToSchema.get( featureType );
-        
-        FeatureType[] fts = schema.getFeatureTypes();
-        for ( int i = 0; i < fts.length; i++ ) {
-            PropertyType[] props = fts[i].getProperties();
+        List propsList = new ArrayList<String>();
+        try {
+            createSchemaForFeatureType( featureType );
             
-            for ( int j = 0; j < props.length; j++ ) {
-                if( !(props[j].getType() == Types.GEOMETRY || props[j].getType()  == 10014) ){
-                    System.out.println("got: " + props[j].getName() );
-                    propsList.add(  props[j].getName().getAsString() );
+            GMLSchema schema = (GMLSchema)this.featureTypeToSchema.get( featureType );
+            if( schema != null ){
+                FeatureType[] fts = schema.getFeatureTypes();
+                for ( int i = 0; i < fts.length; i++ ) {
+                    PropertyType[] props = fts[i].getProperties();
+                    for ( int j = 0; j < props.length; j++ ) {
+                        if( !(props[j].getType() == Types.GEOMETRY || props[j].getType()  == 10014) ){
+                            propsList.add(  props[j].getName().getAsString() );
+                        }
+                    }
                 }
             }
+        } catch ( Exception e ) {
+            e.printStackTrace();
+            propsList = new ArrayList<String>();
         }
         
         return (String[])propsList.toArray( new String[ propsList.size() ] );
     }
 
     public WFSFeatureType getFeatureTypeByName( String ftName ){
-        return (WFSFeatureType)featureTypeToQName.get( ftName );
+        return (WFSFeatureType)ftNameToWfsFT.get( ftName );
     }
     
     /**
@@ -340,7 +352,7 @@ e.printStackTrace();
             for ( int j = 0; j < props.length; j++ ) {
                 //System.out.println(Types.get(  props[j].getType(), 0));
                 if( props[j].getType() == Types.GEOMETRY || props[j].getType() == 10014 ){
-
+System.out.println(props[j].getName() );
                     tmpList.add( props[j].getName() );
                     
                 }
@@ -356,7 +368,7 @@ e.printStackTrace();
     }    
     
     public QualifiedName[] getGeometryProperties(String featureType) {
-        return (QualifiedName[])this.geoProperties.get( featureType );
+        return (QualifiedName[])this.geoPropsNameToQNames.get( featureType );
     }
     
     protected void createHttpClient(){
@@ -389,6 +401,9 @@ e.printStackTrace();
 Changes to this class. What the people have been up to:
 
 $Log$
+Revision 1.6  2007/05/14 08:50:53  taddei
+Fix for the problems of null prefixes and false namespaces of misbehaving WFS
+
 Revision 1.5  2007/05/10 07:36:45  taddei
 Added hack for reading gml:GeometryAssociationProperty from 2.1.2 schemas
 
