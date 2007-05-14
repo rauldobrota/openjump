@@ -140,64 +140,34 @@ public abstract class AbstractWFSWrapper {
     public String getRawSchemaForFeatureType( String featureType ){
         return (String)this.featureTypeToSchemaXML.get( featureType );
     }
-    
-    /**Gets a document containing a valid description feature type (schema; XSD). Code adapted
-     * from deegree viewer
-     * @param featureType the feature type whose description should be returned
-     * @return an XSD containing the type description 
-     * @throws DeeJUMPException 
-     * @throws IOException 
-     * @throws HttpException 
-     * @throws SAXException 
-     * @throws XMLException 
-     * @throws XMLParsingException 
-     * @throws XMLSchemaException 
-     * @throws Exception */
-    protected GMLSchema loadSchemaForFeatureType(String featureType) throws DeeJUMPException {
 
-        boolean isGet = true;
-        
+    protected String loadSchemaForFeatureType(String featureType) throws DeeJUMPException {
+
         String descrFtUrl = createDescribeFTOnlineResource();
-        
+
         if( descrFtUrl == null ){
             throw new RuntimeException( "Service does not have a DescribeFeatureType operation accessible by HTTP GET or POST." );
         }
-        QualifiedName ft = getFeatureTypeByName( featureType ).getName();
-
+        
+        WFSFeatureType wfsFt = getFeatureTypeByName( featureType );
+        if ( wfsFt == null ){
+            return null;
+        }
+        
+        QualifiedName ft = wfsFt.getName();
         String serverReq = getDescribeTypeURL( ft );
-        
-        String httpProtocolMethod = isGet ? "HTTP_GET" : "HTTP_POST" ;
-        
-        LOG.debug( "Using " + httpProtocolMethod + " to get feature type description from " + descrFtUrl + serverReq);
-        
-        HttpMethod httpMethod = createHttpMethod( httpProtocolMethod );//new GetMethod( serverUrl );
-        URI uri;
+  
         try {
-     
-            uri = new URI( getBaseWfsURL(), true );
-            httpMethod.setURI( uri );
-
-        } catch ( URIException e ) {
-            throw new DeeJUMPException(e);
-        } 
-        
-        //only input here what's after the '?'
-        httpMethod.setQueryString( serverReq.split( "\\?" )[1] );
-        try {
-            httpClient.executeMethod(httpMethod);
-            
             GMLSchemaDocument xsdDoc = new GMLSchemaDocument();
-            xsdDoc.load( new URL(serverReq ) );//httpMethod.getResponseBodyAsStream(), serverReq );
-            
-            return xsdDoc.parseGMLSchema();
+            xsdDoc.load( new URL(serverReq ) );
+            return DOMPrinter.nodeToString( xsdDoc.getRootElement(), null );
         } catch ( Exception e ) {
             e.printStackTrace();            
             String mesg = "Error fetching FeatureType description";
-            LOG.error( mesg + " for " + featureType + " from " 
-                       + uri + " using " + descrFtUrl + serverReq);
+            LOG.error( mesg + " for " + featureType + " using " + serverReq);
             throw new DeeJUMPException( mesg,e);
         } 
-        
+
     }
     
     protected String loadSchemaForFeatureType2(String featureType) throws DeeJUMPException {
@@ -262,7 +232,7 @@ public abstract class AbstractWFSWrapper {
         
         try {
             //GMLSchema xsd = loadSchemaForFeatureType( featureTypeName );
-            String rawXML = loadSchemaForFeatureType2( featureTypeName );
+            String rawXML = loadSchemaForFeatureType( featureTypeName );
             if( rawXML == null ){
                 return;
             }
@@ -401,6 +371,9 @@ System.out.println(props[j].getName() );
 Changes to this class. What the people have been up to:
 
 $Log$
+Revision 1.7  2007/05/14 09:05:23  taddei
+attempt to fix problem of DescribeFeatureType request not being loaded through the proxy.
+
 Revision 1.6  2007/05/14 08:50:53  taddei
 Fix for the problems of null prefixes and false namespaces of misbehaving WFS
 

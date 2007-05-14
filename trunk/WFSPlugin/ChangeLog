@@ -1,4 +1,9 @@
 2007-05-14  Ugo Taddei <taddei@latlon.de>
+	
+	* src/de/latlon/deejump/plugin/wfs/AbstractWFSWrapper.java: attempt to fix
+	problem of DescribeFeatureType request not being loaded through the proxy.
+
+2007-05-14  Ugo Taddei <taddei@latlon.de>
 
 	* src/de/latlon/deejump/plugin/wfs/WFSFrame.java: Removed 
 	println
@@ -7,9 +12,9 @@
 	misbehaving WFS:
 	* src/de/latlon/deejump/plugin/wfs/AbstractWFSWrapper.java,
 	* src/de/latlon/deejump/plugin/wfs/PropertySelectionPanel.java,
-	* src/de/latlon/deejump/plugin/wfs/SpatialCriteriaPanel.java
-	* src/de/latlon/deejump/plugin/wfs/WFServiceWrapper_1_0_0.java
-	* src/de/latlon/deejump/plugin/wfs/WFServiceWrapper_1_1_0.java
+	* src/de/latlon/deejump/plugin/wfs/SpatialCriteriaPanel.java,
+	* src/de/latlon/deejump/plugin/wfs/WFServiceWrapper_1_0_0.java,
+	* src/de/latlon/deejump/plugin/wfs/WFServiceWrapper_1_1_0.java,
 	* src/de/latlon/deejump/plugin/wfs/WFPanel.java
 
 	* src/de/latlon/deejump/plugin/wfs/RequestTextArea.java: Removed 
