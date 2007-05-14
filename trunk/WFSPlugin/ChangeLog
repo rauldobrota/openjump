@@ -1,5 +1,11 @@
 2007-05-14  Ugo Taddei <taddei@latlon.de>
 
+	* src/de/latlon/deejump/plugin/wfs/PropertyCriteriaPanel.java: 
+	DescribeFeatType button is working again (schema key is now 
+	ft.getLocalName()).
+	
+2007-05-14  Ugo Taddei <taddei@latlon.de>
+
 	* src/de/latlon/deejump/plugin/util/data/WFSClientHelper.java: candidate fix
 	for proxy problem.
 
