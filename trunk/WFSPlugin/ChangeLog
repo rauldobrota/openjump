@@ -1,4 +1,14 @@
 2007-05-14  Ugo Taddei <taddei@latlon.de>
+
+	* src/de/latlon/deejump/plugin/wfs/WFPanel.java: rearrange the save button 
+	beside OK-button in GetCaps and DescribeFeatureType.
+	* src/de/latlon/deejump/plugin/wfs/WFSOptionsPanel2.java: disabled get/post
+	buttons.
+	* src/de/latlon/deejump/plugin/wfs/AbstractWFSWrapper.java: removed println.
+	* lib/deegree2.jar: with support for EPSG:3067.
+	* TODO.txt: crossed out what's been done.
+
+2007-05-14  Ugo Taddei <taddei@latlon.de>
 	
 	* src/de/latlon/deejump/plugin/wfs/AbstractWFSWrapper.java: attempt to fix
 	problem of DescribeFeatureType request not being loaded through the proxy.
