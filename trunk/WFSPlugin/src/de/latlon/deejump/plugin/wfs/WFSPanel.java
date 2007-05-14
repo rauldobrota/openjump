@@ -297,17 +297,13 @@ public class WFSPanel extends JPanel {
         sp.setMaximumSize( new Dimension( 600, 400 ) );
         sp.setPreferredSize( new Dimension( 800, 400 ) );
 
-        JPanel p = new JPanel();
-        p.add( sp );
-
-        AbstractAction a = new AbstractAction( "Save" ) {
-            public void actionPerformed( ActionEvent e ) {
-                WFSPanel.saveTextToFile( parent, xmlPane.getVisibleText() );
-            }
-        };
-        p.add( new JButton( a ) );
-        JOptionPane.showMessageDialog( parent, p );
-        
+        String[] opts = new String[]{ "Close and Save", "OK" };
+        int i = JOptionPane.showOptionDialog( parent, sp,"Capabilities", JOptionPane.YES_NO_OPTION, 
+                                      JOptionPane.PLAIN_MESSAGE, null, opts, opts[1] );
+       
+        if( i == 0 ){ // save our capabilities!
+            WFSPanel.saveTextToFile( parent, xmlPane.getVisibleText() );
+        } 
     }
 
     private void reinitService( String url ) {
