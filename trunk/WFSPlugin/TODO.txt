@@ -2,20 +2,24 @@
 ## WFSPlugin TODO
 ##
 
- - OptionsDialog: outputFormat, migrate edit-checkbox in options dialog 
+ - OptionsDialog: outputFormat, migrate edit-checkbox in options dialog [*DONE:
+  Note that this check box is no longer available. User has to use OpenJUMP for
+  this*]
    
  - rearrange the save button beside OK-button in GetCaps and
-   DescribeFeatureType
+   DescribeFeatureType [*DONE*]
  
  - i18n code and update of i18n keys
  	
- - Remove Get/Post request from Options-tab (unneeded). 
+ - Remove Get/Post request from Options-tab (unneeded). [*DONE*]
  
  - Javadoc (last but not least!)
  
  - Add EPSG:3067 to deegree2.jar
    # ETRS89 / ETRS-TM35FIN (requires EPSG 6.11.1, avail. in proj4-4.5.0)
    # <3067> +proj=utm +zone=35 +ellps=GRS80 +units=m +no_defs  <>
+   [*DONE: in libs*]
+   
  - Make the advanced-tabs still work, even if DescrivbeFeatureType fails.
-   This is extremely usefull for debuggin.
+   This is extremely usefull for debuggin. [*DONE*]
 
