@@ -103,7 +103,12 @@ public class WFSOptionsPanel2 extends JPanel {
         final String selProtoc = options.getSelectedProtocol();
         
         for (int i = 0; i < protocs.length; i++) {
+            
             JRadioButton rb = new JRadioButton( protocs[i] );
+            
+            //disabling protocol buttons! this feature isn't implemented
+            rb.setEnabled( false );
+
             if( selProtoc.equals( protocs[i] ) ) {
                 rb.setSelected(true);
             }
