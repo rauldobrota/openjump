@@ -171,7 +171,6 @@ public class WFSFrame extends JFrame {
     
     class GetFeatureAction extends AbstractAction implements Runnable {
         public void actionPerformed( ActionEvent e ) {
-            System.out.println(213);
             if( loaderThread != null ){
                 return;
             }

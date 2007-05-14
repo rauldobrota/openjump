@@ -101,7 +101,6 @@ class RequestTextArea extends JPanel {
             public void actionPerformed( ActionEvent e ) {
                 setRequestText( wfsPanel.createRequest() );
                 requestTextArea.setCaretPosition( 0 );
-                System.out.println(2222);
             }
         } );
         return createReqButton;
@@ -139,6 +138,9 @@ class RequestTextArea extends JPanel {
 Changes to this class. What the people have been up to:
 
 $Log$
+Revision 1.2  2007/05/14 08:49:02  taddei
+Removed println
+
 Revision 1.1  2007/05/10 07:36:34  taddei
 Added
 
