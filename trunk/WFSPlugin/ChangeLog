@@ -1,3 +1,7 @@
+2007-05-15  Stephan Holl <stephan.holl@intevation.de>
+
+	* TODO.txt: updates, new ideas for further development
+	
 2007-05-15  Ugo Taddei <taddei@latlon.de>
 
 	* src/de/latlon/deejump/plugin/util/data/WFSClientHelper.java: check if
