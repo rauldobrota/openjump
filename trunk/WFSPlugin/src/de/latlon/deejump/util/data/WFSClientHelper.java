@@ -78,15 +78,27 @@ public class WFSClientHelper {
         String proxyUser = System.getProperty( "proxyUser" );
         String proxyPasswd = System.getProperty( "proxyPassword" );
         String proxyHost = System.getProperty( "proxyHost" );
-        int proxyPort = Integer.valueOf( System.getProperty( "proxyPort" ) ).intValue();
+        String port = System.getProperty( "proxyPort" );
+        
+        int proxyPort = 80;
+        try {
+            proxyPort = Integer.valueOf( port ).intValue();
+        } catch ( Exception e ) {
+            e.printStackTrace();
+        }
         
 System.out.println("Proxy settings: host='"+ proxyHost + "' port='"+ proxyPort+"' " 
                    +" user='"+ proxyUser + "' pw='"+ proxyPasswd+"'");
-                   
-        httpclient.getHostConfiguration().setProxy(proxyHost,  proxyPort );
-        httpclient.getState().setCredentials( new AuthScope(proxyHost,proxyPort), 
-                                              new UsernamePasswordCredentials(proxyUser,proxyPasswd));
-       
+        if( proxyHost != null ){
+            httpclient.getHostConfiguration().setProxy(proxyHost,  proxyPort );
+            
+            if( proxyUser != null ){
+                httpclient.getState()
+                    .setCredentials( new AuthScope( proxyHost, proxyPort ), 
+                                     new UsernamePasswordCredentials( proxyUser, proxyPasswd) );
+            }
+        }
+  
         PostMethod httppost = new PostMethod( serverUrl );
         httppost.setRequestEntity( new StringRequestEntity( request ) );
         
@@ -150,6 +162,9 @@ System.out.println("Proxy settings: host='"+ proxyHost + "' port='"+ proxyPort+"
 Changes to this class. What the people have been up to:
 
 $Log$
+Revision 1.4  2007/05/15 08:04:46  taddei
+check if user and prox host are null, before settign them.
+
 Revision 1.3  2007/05/14 12:35:09  taddei
 candidate fix for proxy problem.
 
