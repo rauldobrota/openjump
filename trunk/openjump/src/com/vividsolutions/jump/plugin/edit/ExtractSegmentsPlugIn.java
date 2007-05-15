@@ -33,6 +33,7 @@ package com.vividsolutions.jump.plugin.edit;
 
 import java.awt.Color;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 
 import java.util.*;
@@ -46,6 +47,7 @@ import com.vividsolutions.jump.workbench.ui.plugin.*;
 import com.vividsolutions.jump.feature.*;
 import com.vividsolutions.jts.util.*;
 import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.operation.linemerge.LineMerger;
 import com.vividsolutions.jump.geom.*;
 import com.vividsolutions.jump.task.*;
 import com.vividsolutions.jump.workbench.ui.*;
@@ -54,7 +56,7 @@ public class ExtractSegmentsPlugIn
     extends ThreadedBasePlugIn
 {
 
-  private static List toLineStrings(Collection segments)
+  private static Collection toLineStrings(Collection segments)
   {
     GeometryFactory fact = new GeometryFactory();
     List lineStringList = new ArrayList();
@@ -65,9 +67,22 @@ public class ExtractSegmentsPlugIn
     }
     return lineStringList;
   }
+  
+  private static Collection toMergedLineStrings(Collection segments)
+  {
+    GeometryFactory fact = new GeometryFactory();
+    LineMerger lineMerger = new LineMerger(); 
+    for (Iterator i = segments.iterator(); i.hasNext();) {
+      LineSegment seg = (LineSegment) i.next();
+      lineMerger.add(LineSegmentUtil.asGeometry(fact, seg));
+    }
+    return lineMerger.getMergedLineStrings();
+  }
 
   private MultiInputDialog dialog;
   private String layerName;
+  private boolean uniqueSegmentsOnly;
+  private boolean mergeResultingSegments;
   private int inputEdgeCount = 0;
   private int uniqueSegmentCount = 0;
 
@@ -108,17 +123,20 @@ public class ExtractSegmentsPlugIn
     FeatureCollection lineFC = layer.getFeatureCollectionWrapper();
     inputEdgeCount = lineFC.size();
 
-    UniqueSegmentsExtracter extracter = new UniqueSegmentsExtracter(monitor);
+    //UniqueSegmentsExtracter extracter = new UniqueSegmentsExtracter(monitor);
+    SegmentsExtracter extracter = new SegmentsExtracter(monitor);
     extracter.add(lineFC);
-    Collection uniqueFSList = extracter.getSegments();
+    Collection uniqueFSList = uniqueSegmentsOnly ? extracter.getSegments(1,1)
+                                                 : extracter.getSegments();
     uniqueSegmentCount = uniqueFSList.size();
-    List linestringList = toLineStrings(uniqueFSList);
+    Collection linestringList = mergeResultingSegments ? toMergedLineStrings(uniqueFSList)
+                                                       : toLineStrings(uniqueFSList);
 
     if (monitor.isCancelRequested()) return;
     createLayers(context, linestringList);
   }
 
-  private void createLayers(PlugInContext context, List linestringList)
+  private void createLayers(PlugInContext context, Collection linestringList)
          throws Exception
   {
 
@@ -149,13 +167,20 @@ public class ExtractSegmentsPlugIn
 
   private void setDialogValues(MultiInputDialog dialog, PlugInContext context) {
     dialog.setSideBarImage(new ImageIcon(getClass().getResource("ExtractSegments.png")));
-    dialog.setSideBarDescription(I18N.get("jump.plugin.edit.ExtractSegmentsPlugIn.Extracts-all-unique-line-segments-from-a-dataset")
-    );
-    JComboBox addLayerComboBox = dialog.addLayerComboBox(LAYER, context.getCandidateLayer(0), null, context.getLayerManager());
+    dialog.setSideBarDescription(I18N.get("jump.plugin.edit.ExtractSegmentsPlugIn.Extracts-all-unique-line-segments-from-a-dataset"));
+    JComboBox layerComboBox = dialog.addLayerComboBox(LAYER, context.getCandidateLayer(0), null, context.getLayerManager());
+    JCheckBox oneTimeCheckBox = dialog.addCheckBox(
+        I18N.get("jump.plugin.edit.ExtractSegmentsPlugIn.Remove-doubled-segments"),false);
+    JCheckBox mergeCheckBox = dialog.addCheckBox(
+        I18N.get("jump.plugin.edit.ExtractSegmentsPlugIn.Merge-resulting-segments"),false);
   }
 
   private void getDialogValues(MultiInputDialog dialog) {
     Layer layer = dialog.getLayer(LAYER);
     layerName = layer.getName();
+    uniqueSegmentsOnly = dialog.getBoolean(
+        I18N.get("jump.plugin.edit.ExtractSegmentsPlugIn.Remove-doubled-segments"));
+    mergeResultingSegments = dialog.getBoolean(
+        I18N.get("jump.plugin.edit.ExtractSegmentsPlugIn.Merge-resulting-segments"));
   }
 }

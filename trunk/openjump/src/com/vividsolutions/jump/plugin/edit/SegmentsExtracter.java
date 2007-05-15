@@ -42,24 +42,28 @@ import com.vividsolutions.jump.task.*;
 /**
  * Extracts the unique segments from a FeatureCollection.
  *
- * This class has been replaced by SegmentExtracter, which is able to return segments
- * occuring between minOccur and maxOccur times in the dataset [Michael Michaud 2007-05-15]
+ * Replace UniqueSegmentExtracter, adding the capability to return segments
+ * occuring between minOccur and maxOccur times in the dataset.
+ * Now, this class can do the same as FeatureSegmentCounter in JCS and should replace it
+ * [Michael Michaud 2007-05-15]
  *
- * @author Martin Davis
- * @version 1.0
+ * @author Martin Davis / Michael Michaud
+ * @version 1.1
  */
-public class UniqueSegmentsExtracter
+public class SegmentsExtracter
 {
   private static final GeometryFactory factory = new GeometryFactory();
 
   private Set segmentSet = new TreeSet();
-  private LineSegment querySegment = new LineSegment();
+  // Segments are added to a TreeMap (LineSegment is Comparable)
+  private Map segmentMap = new TreeMap();
+  // private LineSegment querySegment = new LineSegment();
   private boolean countZeroLengthSegments = true;
   private TaskMonitor monitor;
   private Geometry fence = null;
-//  private LineSegmentEnvelopeIntersector lineEnvInt;
+  // private LineSegmentEnvelopeIntersector lineEnvInt;
 
-  public UniqueSegmentsExtracter() {
+  public SegmentsExtracter() {
   }
 
   /**
@@ -67,7 +71,7 @@ public class UniqueSegmentsExtracter
    *
    * @param monitor
    */
-  public UniqueSegmentsExtracter(TaskMonitor monitor) {
+  public SegmentsExtracter(TaskMonitor monitor) {
     this.monitor = monitor;
   }
 
@@ -126,12 +130,43 @@ public class UniqueSegmentsExtracter
     LineSegment lineseg = new LineSegment(p0, p1);
     lineseg.normalize();
 
-    segmentSet.add(lineseg);
+    SegmentCount count = (SegmentCount) segmentMap.get(lineseg);
+    if (count == null) {
+      segmentMap.put(lineseg, new SegmentCount(1));
+    }
+    else {
+      count.increment();
+    }
+    
+    //segmentSet.add(lineseg);
   }
 
   public Collection getSegments()
   {
-    return segmentSet;
+        return segmentMap.keySet();
+  }
+  
+  public Collection getSegments(int minOccurs, int maxOccurs)
+  {
+      List segmentList = new ArrayList();
+      for (Iterator it = segmentMap.entrySet().iterator() ; it.hasNext() ; ) {
+          Map.Entry entry = (Map.Entry)it.next();
+          LineSegment ls = (LineSegment)entry.getKey();
+          int count = ((SegmentCount)entry.getValue()).getCount();
+          if (count>=minOccurs && count<=maxOccurs) {
+              segmentList.add(ls);
+          }
+      }
+      return segmentList;
+  }
+  
+  public class SegmentCount {
+    private int count = 0;
+    public SegmentCount(int value) {
+      this.count = value;
+    }
+    public int getCount() { return count; }
+    public void increment() {count++;}
   }
 
 }
