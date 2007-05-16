@@ -56,14 +56,19 @@ public class SISDBDSMetadata implements DataStoreMetadata {
 			//use geometry(extent()) to make sure a geometry is returned, not a BOX
 		CommandBuilder builder = new CommandBuilder(conn.getData());
 		//builder.appendLine("SELECT geometry(extent(${specifiedgeom}))");
-		builder.appendLine("SELECT ${EXTENT} FROM ${st} t");
+		
+		//to support all different adapters, let them specify the table to act upon,
+		//because some of them will want to use something like "SELECT xxx FROM DUAL"
+		//instead of "SELECT xxx FROM some_table"
+		//builder.appendLine("SELECT ${EXTENT} FROM ${st} t");
+		builder.appendLine("SELECT ${EXTENT} FROM ${EXTENT_TABLE} t");
 		
 			//The specified dataset name be in the form of schemaName.tableName
 			//so separate them and use them accordingly
 		DBColContext context = DBColContext.valueOf(datasetName);
 		Props props = builder.prepareProps(new CommandBuilder.FromItem(context,"t"));
-		props.add("EXTENT_GEOM",
-				"${t.geom[" + attributeName + "]}");
+		props.add("EXTENT_GEOM","${geom[" + attributeName + "]}");
+		props.add("EXTENT_GEOM_nq","${geom_nq[" + attributeName + "]}");
   	
   	String readCommand = props.subs(builder.toString());
   	

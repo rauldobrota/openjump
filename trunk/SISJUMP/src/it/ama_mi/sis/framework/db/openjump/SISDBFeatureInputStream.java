@@ -137,7 +137,9 @@ public class SISDBFeatureInputStream implements FeatureInputStream
 		DBColContext context = DBColContext.valueOf(query.getDatasetName());
 		Props props = builder.prepareProps(new CommandBuilder.FromItem(context,"t"));
 		props.add("BOXFILTER_GEOM",
-				"${t.geom[" + query.getGeometryAttributeName() + "]}");
+				"${geom[" + query.getGeometryAttributeName() + "]}");
+		props.add("BOXFILTER_GEOM_nq",
+				"${geom_nq[" + query.getGeometryAttributeName() + "]}");
 		
 		String readCommand = props.subs(builder.toString());
 		
