@@ -1,6 +1,20 @@
 2007-05-16  Ugo Taddei <taddei@latlon.de>
 
-	* src/de/latlon/deejump/plugin/util/data/WFSClientHelper.java: added logging
+	Externalisation of i18n:
+	* src/de/latlon/deejump/plugin/wfs/PropertyCriteriaPanel.java,
+	* src/de/latlon/deejump/plugin/wfs/PropertySelectionPanel.java,
+	* src/de/latlon/deejump/plugin/wfs/RequestTextArea.java,
+	* src/de/latlon/deejump/plugin/wfs/WFSFrame.java,
+	* src/de/latlon/deejump/plugin/wfs/WFSOptionsPanel2.java,
+	* src/de/latlon/deejump/plugin/wfs/WFSPanel.java,
+	* src/de/latlon/deejump/plugin/wfs/WFSPanelButtons.java
+	
+	* src/de/latlon/deejump/ui/messages.properties,
+	* src/de/latlon/deejump/ui/messages.properties: added i18n mesgs
+
+2007-05-16  Ugo Taddei <taddei@latlon.de>
+
+	* src/de/latlon/deejump/plugin/wfs/: added logging
 	output
 
 2007-05-15  Stephan Holl <stephan.holl@intevation.de>
