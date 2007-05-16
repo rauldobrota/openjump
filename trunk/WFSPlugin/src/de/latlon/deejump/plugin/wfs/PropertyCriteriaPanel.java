@@ -121,8 +121,7 @@ class PropertyCriteriaPanel extends JPanel {
         setLayout( lm );
 
         JPanel p = new JPanel();
-        //TODO i18n
-        describeFTButton = new JButton("DescribeFeatureType");
+        describeFTButton = new JButton(Messages.getString("AttributeResearchPanel.describeFeatType"));
         describeFTButton.setEnabled( false );
         describeFTButton.addActionListener( new ActionListener(){
             public void actionPerformed( ActionEvent e ) {

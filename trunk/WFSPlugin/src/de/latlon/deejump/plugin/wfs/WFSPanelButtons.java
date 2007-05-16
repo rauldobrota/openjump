@@ -102,21 +102,21 @@ class WFSPanelButtons extends JPanel {
                 //setCanSearch( true );
             }
         } );
-
-        JButton optionsbutton = new JButton("Options");
+        final String optionsTxt = Messages.getString( "WFSPanel.options" );
+        JButton optionsbutton = new JButton(optionsTxt);
         optionsbutton.addActionListener( new ActionListener(){
             public void actionPerformed( ActionEvent e ) {
                 WFSOptions opts = wfsPanel.getOptions();
                 JOptionPane.showMessageDialog(  parentWindow,
                                                 new WFSOptionsPanel2(opts), 
-                                                "Options",
+                                                optionsTxt,
                                                 -1);
             }
         });
         
         //TODO externalize
-        final String showAdvanced = "Advanced";
-        final String hideAdvanced = "Hide Advanced Settings";
+        final String showAdvanced =  Messages.getString( "WFSPanel.showAdvanced" );
+        final String hideAdvanced = Messages.getString( "WFSPanel.hideAdvanced" );
 
         JButton extrasButton = new JButton( showAdvanced );
         extrasButton.setBounds( 260, 20, 80, 20 );
@@ -166,6 +166,9 @@ class WFSPanelButtons extends JPanel {
 Changes to this class. What the people have been up to:
 
 $Log$
+Revision 1.4  2007/05/16 14:43:34  taddei
+Externalisation of i18n
+
 Revision 1.3  2007/04/30 08:16:28  taddei
 removed handler of cancel button.
 

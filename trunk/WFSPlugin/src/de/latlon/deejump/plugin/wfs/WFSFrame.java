@@ -59,44 +59,17 @@ public class WFSFrame extends JFrame {
         WFSPanelButtons buttons = new WFSPanelButtons( this, this.wfsPanel );
         this.wfsPanel.controlButtons = buttons;
         buttons.okButton.setAction( new GetFeatureAction() );
-        /*
-        buttons.okButton.addActionListener( new ActionListener(){
-            public void actionPerformed( ActionEvent e ) {
-                   
-                String resp  = null;
-                try {
-                    resp = 
-                        WFSClientHelper.createResponsefromWFS( wfsPanel.getWfService().getGetFeatureURL() , 
-                                                               wfsPanel.getRequest() );
-                } catch ( DeeJUMPException e1 ) {
-                    e1.printStackTrace();
-                    resp = e1.getMessage();
-                }
-                
-                int arbitrarySize = 10000;
-                if( resp.length() < arbitrarySize ){
-                    wfsPanel.getTabs().setSelectedIndex( 4 );
-                    wfsPanel.setResposeText( resp );  
-                } else {
-                    int i = JOptionPane.showConfirmDialog( WFSFrame.this, "The response is too large for the editor. Would you like to save it to a file?", "Question?",
-                                                   JOptionPane.YES_NO_OPTION);
-                    if( i == JOptionPane.YES_OPTION ){
-                        WFSPanel.saveTextToFile( WFSFrame.this, resp );
-                    }
-                }
-            }
-        });
-        */
-        buttons.okButton.setText( "Do GetFeature" );
+        
+        buttons.okButton.setText( Messages.getString( "WFSPanel.doGetFeature" ) );
         buttons.okButton.setEnabled( false );
         
-        buttons.cancelButton.setText( "Exit" );
+        buttons.cancelButton.setText( Messages.getString( "WFSPanel.exit" ) );
         buttons.cancelButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 int i = JOptionPane
                             .showConfirmDialog( WFSFrame.this, 
-                                               "Really exit?", 
-                                               "Exit?", 
+                                                Messages.getString( "WFSPanel.exitQuestion" ), 
+                                                Messages.getString( "WFSPanel.exitQuestion2" ), 
                                                JOptionPane.OK_CANCEL_OPTION, 
                                                JOptionPane.QUESTION_MESSAGE);
                 if( i == JOptionPane.OK_OPTION ){
@@ -161,7 +134,7 @@ public class WFSFrame extends JFrame {
 //            wfsPanel.getTabs().setSelectedIndex( 4 );
 //            wfsPanel.setResposeText( resp );  
         } else {
-            int i = JOptionPane.showConfirmDialog( WFSFrame.this, "The response is too large for the editor. Would you like to save it to a file?", "Question?",
+            int i = JOptionPane.showConfirmDialog( WFSFrame.this, Messages.getString( "WFSPanel.exit" ), "",
                                            JOptionPane.YES_NO_OPTION);
             if( i == JOptionPane.YES_OPTION ){
                 WFSPanel.saveTextToFile( WFSFrame.this, resp );

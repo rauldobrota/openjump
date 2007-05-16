@@ -62,8 +62,7 @@ class RequestTextArea extends JPanel {
     }
 
     private JComponent createValidationtButton() {
-        validateReq = new JButton( "Validate request" );//
-        //                                        Messages.getString( "FeatureResearchDialog.createWFSRequest" ) );
+        validateReq = new JButton( Messages.getString( "FeatureResearchDialog.validateRequest" ) );
 
         validateReq.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
@@ -83,8 +82,9 @@ class RequestTextArea extends JPanel {
                         GetFeature.create( null, xf.getRootElement() );
                     } 
                 } catch ( Exception ex ) {
-                    ex.printStackTrace();                                       //TODO i18n
-                    JOptionPane.showMessageDialog( wfsPanel, ex.getMessage(), "Error",
+                    ex.printStackTrace();                                       
+                    JOptionPane.showMessageDialog( wfsPanel, ex.getMessage(), 
+                                                   Messages.getString( "error"),
                                                    JOptionPane.ERROR_MESSAGE );
                 }
             }
@@ -138,6 +138,9 @@ class RequestTextArea extends JPanel {
 Changes to this class. What the people have been up to:
 
 $Log$
+Revision 1.3  2007/05/16 14:43:33  taddei
+Externalisation of i18n
+
 Revision 1.2  2007/05/14 08:49:02  taddei
 Removed println
 

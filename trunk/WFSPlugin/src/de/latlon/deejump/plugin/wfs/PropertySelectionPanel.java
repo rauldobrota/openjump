@@ -29,6 +29,8 @@ import org.deegree.model.feature.schema.FeatureType;
 import org.deegree.model.feature.schema.GMLSchema;
 import org.deegree.model.feature.schema.PropertyType;
 
+import de.latlon.deejump.ui.Messages;
+
 /**
  * ... 
  * 
@@ -60,7 +62,7 @@ public class PropertySelectionPanel extends JPanel {
         
         JPanel p = new JPanel();
         p.setLayout( new BoxLayout(p, BoxLayout.Y_AXIS ));
-        p.setBorder( BorderFactory.createTitledBorder( "Download Properties: " ) );
+        p.setBorder( BorderFactory.createTitledBorder( Messages.getString( "PropertySelectionPanel.downloadProps") ) );
 
         propertiesList = new JList();
         JScrollPane scrollPane = new JScrollPane( propertiesList );
@@ -84,7 +86,7 @@ public class PropertySelectionPanel extends JPanel {
         geoPropsCombo.setMinimumSize( dim );
         
         
-        geoPropsCombo.setBorder( BorderFactory.createTitledBorder( "Geometry Property: " ) );
+        geoPropsCombo.setBorder( BorderFactory.createTitledBorder( Messages.getString( "SpatialResearchPanel.geometryName") ) );
         
         add( geoPropsCombo );
         

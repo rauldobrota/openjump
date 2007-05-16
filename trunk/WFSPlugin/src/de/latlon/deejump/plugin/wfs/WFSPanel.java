@@ -175,7 +175,7 @@ public class WFSPanel extends JPanel {
             }
         } );
 
-        capabilitiesButton = new JButton( "Capabilities..." );
+        capabilitiesButton = new JButton( Messages.getString( "FeatureResearchDialog.capabilities" ) );
         capabilitiesButton.setEnabled( false );
         capabilitiesButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
@@ -232,7 +232,7 @@ public class WFSPanel extends JPanel {
         tabs.add( Messages.getString( "FeatureResearchDialog.attributeSearch" ), attributeResPanel );
 
         propertiesPanel = new PropertySelectionPanel( this );
-        tabs.add( "Properties", propertiesPanel );
+        tabs.add( Messages.getString( "FeatureResearchDialog.properties" ), propertiesPanel );
 
         spatialResPanel = new SpatialCriteriaPanel( this );
         tabs.add( Messages.getString( "FeatureResearchDialog.spatialSearch" ), spatialResPanel );
@@ -241,7 +241,7 @@ public class WFSPanel extends JPanel {
         
         tabs.add( Messages.getString( "FeatureResearchDialog.request" ), requestTextArea );
 
-        //TODO i18n
+
         tabs.add( Messages.getString( "FeatureResearchDialog.response" ), createResponseTextArea() );
         tabs.setEnabled( false );
         
@@ -297,8 +297,12 @@ public class WFSPanel extends JPanel {
         sp.setMaximumSize( new Dimension( 600, 400 ) );
         sp.setPreferredSize( new Dimension( 800, 400 ) );
 
-        String[] opts = new String[]{ "Close and Save", "OK" };
-        int i = JOptionPane.showOptionDialog( parent, sp,"Capabilities", JOptionPane.YES_NO_OPTION, 
+        String[] opts = new String[]{ Messages.getString( "closeAndSave" ),  
+                                      Messages.getString( "OK" ) };
+        
+        int i = JOptionPane.showOptionDialog( parent, sp,
+                                              Messages.getString( "FeatureResearchDialog.capabilities" ),
+                                              JOptionPane.YES_NO_OPTION, 
                                       JOptionPane.PLAIN_MESSAGE, null, opts, opts[1] );
        
         if( i == 0 ){ // save our capabilities!
@@ -604,7 +608,6 @@ public class WFSPanel extends JPanel {
                 fw.close();
                 lastDirectory = jfc.getSelectedFile().getParentFile();
             } catch ( Exception e ) {
-                //TODO i18n
                 JOptionPane.showMessageDialog( compo, e.getMessage(), "Error!",JOptionPane.ERROR_MESSAGE );
                 e.printStackTrace();
             }
