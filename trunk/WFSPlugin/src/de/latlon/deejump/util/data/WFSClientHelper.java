@@ -53,7 +53,8 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.log4j.Logger;
+import org.deegree.framework.log.ILogger;
+import org.deegree.framework.log.LoggerFactory;
 
 import de.latlon.deejump.ui.DeeJUMPException;
 
@@ -67,11 +68,11 @@ import de.latlon.deejump.ui.DeeJUMPException;
  */
 public class WFSClientHelper {
 
-    private static Logger LOG = Logger.getLogger( WFSClientHelper.class );    
+    private static ILogger LOG = LoggerFactory.getLogger( WFSClientHelper.class );    
     
     
     public static String createResponsefromWFS( String serverUrl, String request ) throws DeeJUMPException {
-        LOG.info( "WFS GetFeature: " + serverUrl +  " -> " + request ); //$NON-NLS-1$ //$NON-NLS-2$
+        LOG.logInfo( "WFS GetFeature: " + serverUrl +  " -> " + request ); //$NON-NLS-1$ //$NON-NLS-2$
         
         HttpClient httpclient = new HttpClient();
 
@@ -81,14 +82,18 @@ public class WFSClientHelper {
         String port = System.getProperty( "proxyPort" );
         
         int proxyPort = 80;
-        try {
-            proxyPort = Integer.valueOf( port ).intValue();
-        } catch ( Exception e ) {
-            e.printStackTrace();
+        if( port != null ){
+            try {
+                proxyPort = Integer.valueOf( port ).intValue();
+            } catch ( Exception e ) {
+                e.printStackTrace();
+                LOG.logDebug( "Cannot convert port into an integer: " + port );
+            }
         }
         
-System.out.println("Proxy settings: host='"+ proxyHost + "' port='"+ proxyPort+"' " 
+        LOG.logDebug( "Proxy settings: host='"+ proxyHost + "' port='"+ proxyPort+"' " 
                    +" user='"+ proxyUser + "' pw='"+ proxyPasswd+"'");
+        
         if( proxyHost != null ){
             httpclient.getHostConfiguration().setProxy(proxyHost,  proxyPort );
             
@@ -109,11 +114,11 @@ System.out.println("Proxy settings: host='"+ proxyHost + "' port='"+ proxyPort+"
 
         } catch ( HttpException e ) {
             String mesg = "Error opening connection with " + serverUrl; 
-            LOG.error( mesg, e );
+            LOG.logError( mesg, e );
             throw new DeeJUMPException( mesg, e  );
         } catch ( IOException e ) {
             String mesg = "Error opening connection with " + serverUrl; 
-            LOG.error( mesg, e );
+            LOG.logError( mesg, e );
             throw new DeeJUMPException( mesg, e  );
         }
 
@@ -135,7 +140,7 @@ System.out.println("Proxy settings: host='"+ proxyHost + "' port='"+ proxyPort+"
 */
         } catch ( IOException e ) {
             String mesg = "Error opening connection with " + serverUrl; 
-            LOG.error( mesg, e );
+            LOG.logError( mesg, e );
             throw new DeeJUMPException( mesg, e  );
         }
         return s;
@@ -162,6 +167,9 @@ System.out.println("Proxy settings: host='"+ proxyHost + "' port='"+ proxyPort+"
 Changes to this class. What the people have been up to:
 
 $Log$
+Revision 1.5  2007/05/16 12:15:17  taddei
+added logging output
+
 Revision 1.4  2007/05/15 08:04:46  taddei
 check if user and prox host are null, before settign them.
 
