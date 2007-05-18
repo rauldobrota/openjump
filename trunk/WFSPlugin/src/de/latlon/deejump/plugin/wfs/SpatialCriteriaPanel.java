@@ -325,7 +325,7 @@ class SpatialCriteriaPanel extends JPanel {
         // but not like this ;-)
         sb = spatialOp.toXML(); 
         if( "DWithin".equals(selectedOperation) || "Beyond".equals(selectedOperation) ){
-            String d = "<ogc:Distance unit='http://www.uomdict.com/uom.html#meters'>" + 
+            String d = "<ogc:Distance unit='http://www.uomdict.com/uom.html#meters' units='m'>" + 
             	dist + "</ogc:Distance>";
             String insert = "</ogc:" + selectedOperation + ">";
             int i = sb.indexOf(insert);            

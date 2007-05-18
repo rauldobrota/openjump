@@ -1,3 +1,9 @@
+2007-05-18  Stephan Holl <stephan.holl@intevation.de>
+
+	* src/de/latlon/deejump/plugin/wfs/SpatialCriteriaPanel.java:
+	temporary fix for DWithin-spatial filter (only works with metric
+	datasets)
+
 2007-05-16  Ugo Taddei <taddei@latlon.de>
 
 	Externalisation of i18n:
