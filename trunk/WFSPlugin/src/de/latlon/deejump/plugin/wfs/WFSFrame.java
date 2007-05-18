@@ -134,7 +134,7 @@ public class WFSFrame extends JFrame {
 //            wfsPanel.getTabs().setSelectedIndex( 4 );
 //            wfsPanel.setResposeText( resp );  
         } else {
-            int i = JOptionPane.showConfirmDialog( WFSFrame.this, Messages.getString( "WFSPanel.exit" ), "",
+            int i = JOptionPane.showConfirmDialog( WFSFrame.this, "Save to file?", "",
                                            JOptionPane.YES_NO_OPTION);
             if( i == JOptionPane.YES_OPTION ){
                 WFSPanel.saveTextToFile( WFSFrame.this, resp );
