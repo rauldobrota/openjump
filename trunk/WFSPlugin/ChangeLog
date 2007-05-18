@@ -1,3 +1,9 @@
+2007-05-18  Stephan Holl <stephan.holl@intevation.de>
+
+	* src/de/latlon/deejump/plugin/wfs/SpatialCriteriaPanel.java:
+	final fix, since the Distance-stuff is implemented in the recent
+	deegree2.jar.
+
 2007-05-16  Ugo Taddei <taddei@latlon.de>
 
 	* src/de/latlon/deejump/plugin/wfs/WFSFrame.java: fixed wrong string

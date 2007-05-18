@@ -320,10 +320,14 @@ class SpatialCriteriaPanel extends JPanel {
             new SpatialOperation( opType, 
                     new PropertyName( geoQn ),
                     geometry, dist);
-        
+
         // ad-hoc stuff -> will add this to deegree core
         // but not like this ;-)
         sb = spatialOp.toXML(); 
+/*
+ * This is not needed anymore since it is included in deegree somewhere,
+ * otherwise the request is wrong and it has doubled ogc:Distance-tags.
+ * SH: 18.05.2007
         if( "DWithin".equals(selectedOperation) || "Beyond".equals(selectedOperation) ){
             String d = "<ogc:Distance unit='http://www.uomdict.com/uom.html#meters' units='m'>" + 
             	dist + "</ogc:Distance>";
@@ -331,7 +335,7 @@ class SpatialCriteriaPanel extends JPanel {
             int i = sb.indexOf(insert);            
             sb.insert( i, d);
         }
-
+*/
         
         return sb;        	
     }
