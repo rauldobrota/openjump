@@ -1,5 +1,11 @@
 2007-05-18  Stephan Holl <stephan.holl@intevation.de>
 
+	* src/de/latlon/deejump/ui/messages_de.properties: updated
+	missing Language-files
+	* TODO.txt: added more ideas for future development
+
+2007-05-18  Stephan Holl <stephan.holl@intevation.de>
+
 	* src/de/latlon/deejump/plugin/wfs/SpatialCriteriaPanel.java:
 	final fix, since the Distance-stuff is implemented in the recent
 	deegree2.jar.

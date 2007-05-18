@@ -2,8 +2,6 @@
 ## WFSPlugin TODO
 ##
 
- - i18n code and update of i18n keys
- 	
  - Javadoc (last but not least!)
 
 ---------------------------------------
@@ -15,4 +13,4 @@
  - make (poorly configured) UMN MapServer-WFS also available
  - integrate WFS-T against geoserver/deegree
  - more general SRS-integration (in deegree)
-
+ - create user-documentation
