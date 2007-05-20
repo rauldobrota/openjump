@@ -33,6 +33,7 @@
 package com.vividsolutions.jump.workbench.ui.plugin.analysis;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -40,9 +41,12 @@ import javax.swing.JComboBox;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jump.I18N;
+import com.vividsolutions.jump.feature.AttributeType;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureCollection;
+import com.vividsolutions.jump.feature.FeatureDataset;
 import com.vividsolutions.jump.feature.FeatureDatasetFactory;
+import com.vividsolutions.jump.feature.FeatureSchema;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
@@ -54,17 +58,14 @@ import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
 
 public class UnionPlugIn extends AbstractPlugIn implements ThreadedPlugIn {
     private String LAYER = I18N.get("ui.plugin.analysis.UnionPlugIn.layer");
+    private String SELECTED_ONLY = I18N.get("ui.plugin.analysis.UnionPlugIn.selected-features-only");
+    private boolean useSelected = false;
     private MultiInputDialog dialog;
-
+    private JComboBox addLayerComboBox;
+    
     public UnionPlugIn() {
     }
 
-    private String categoryName = StandardCategoryNames.RESULT;
-
-    public void setCategoryName(String value) {
-      categoryName = value;
-    }
-    
     /*
       public void initialize(PlugInContext context) throws Exception {
         context.getFeatureInstaller().addMainMenuItem(
@@ -75,9 +76,13 @@ public class UnionPlugIn extends AbstractPlugIn implements ThreadedPlugIn {
     */
     public boolean execute(PlugInContext context) throws Exception {
     	//[sstein, 16.07.2006] put here again to load correct language
-        LAYER = I18N.get("ui.plugin.analysis.UnionPlugIn.layer");
+        //[mmichaud 2007-05-20] move to UnionPlugIn constructor to load the string only once
+        //LAYER = I18N.get("ui.plugin.analysis.UnionPlugIn.layer");
         //Unlike ValidatePlugIn, here we always call #initDialog because we want
         //to update the layer comboboxes. [Jon Aquino]
+        int n = context.getLayerViewPanel().getSelectionManager()
+		  .getFeaturesWithSelectedItems().size();
+        useSelected = (n > 0);
         initDialog(context);
         dialog.setVisible(true);
 
@@ -92,19 +97,42 @@ public class UnionPlugIn extends AbstractPlugIn implements ThreadedPlugIn {
         dialog = new MultiInputDialog(context.getWorkbenchFrame(), I18N.get("ui.plugin.analysis.UnionPlugIn.union"), true);
 
         //dialog.setSideBarImage(IconLoader.icon("Overlay.gif"));
-        dialog.setSideBarDescription(
-        		I18N.get("ui.plugin.analysis.UnionPlugIn.creates-a-new-layer-containing-the-union-of-all-the-features-in-the-input-layer"));
+        if (useSelected) {
+            dialog.setSideBarDescription(
+                I18N.get("ui.plugin.analysis.UnionPlugIn.creates-a-new-layer-containing-the-union-of-selected-features-in-the-input-layer"));
+        }
+        else {
+            dialog.setSideBarDescription(
+                I18N.get("ui.plugin.analysis.UnionPlugIn.creates-a-new-layer-containing-the-union-of-all-the-features-in-the-input-layer"));
+        }
         String fieldName = LAYER;
-        JComboBox addLayerComboBox = dialog.addLayerComboBox(fieldName, context.getCandidateLayer(0), null, context.getLayerManager());
+        if (useSelected) {
+            dialog.addLabel(SELECTED_ONLY);
+        }
+        else {
+            addLayerComboBox = dialog.addLayerComboBox(fieldName, context.getCandidateLayer(0), null, context.getLayerManager());
+        }
         GUIUtil.centreOnWindow(dialog);
     }
 
     public void run(TaskMonitor monitor, PlugInContext context)
         throws Exception {
-        FeatureCollection a = dialog.getLayer(LAYER).getFeatureCollectionWrapper();
+        FeatureCollection a;
+        Collection inputC;
+        if (useSelected) {
+            inputC = context.getLayerViewPanel()
+                            .getSelectionManager()
+                            .getFeaturesWithSelectedItems();
+            FeatureSchema featureSchema = new FeatureSchema();
+            featureSchema.addAttribute("GEOMETRY", AttributeType.GEOMETRY);
+		 	a = new FeatureDataset(inputC, featureSchema);
+        }
+        else {
+            a = dialog.getLayer(LAYER).getFeatureCollectionWrapper();
+        }
         FeatureCollection union = union(monitor, a);
-        context.getLayerManager().addCategory(categoryName);
-        context.addLayer(categoryName, I18N.get("ui.plugin.analysis.UnionPlugIn.union"), union);
+        context.getLayerManager().addCategory(StandardCategoryNames.RESULT);
+        context.addLayer(StandardCategoryNames.RESULT, I18N.get("ui.plugin.analysis.UnionPlugIn.union"), union);
     }
 
     private FeatureCollection union(TaskMonitor monitor, FeatureCollection fc) {
