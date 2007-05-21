@@ -1,3 +1,11 @@
+2007-05-21  Stephan Holl <stephan.holl@intevation.de>
+
+	* src/de/latlon/deejump/ui/messages_de.properties: updated
+	* src/de/latlon/deejump/plugin/wfs/WFSFrame.java: some i18N-issues
+	fixed
+	* src/de/latlon/deejump/plugin/wfs/WFSPlugIn.java: added another
+	default host to the drop-down-list.
+	
 2007-05-18  Stephan Holl <stephan.holl@intevation.de>
 
 	* src/de/latlon/deejump/ui/messages_de.properties: updated
