@@ -339,11 +339,13 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
 		
         
 		if(urlList == null){
-			urlList = new String[3];
+			urlList = new String[4];
               
             urlList[0] =  "http://demo.intevation.de/geoserver/wfs";
             urlList[1] =  "http://grumari:8080/services/ogcwebservice";
             urlList[2] =  "http://www.refractions.net:8080/geoserver/wfs/GetCapabilities";
+            urlList[3] =  "http://localhost:1502?";
+            
         } 
 		
 		return urlList; 
