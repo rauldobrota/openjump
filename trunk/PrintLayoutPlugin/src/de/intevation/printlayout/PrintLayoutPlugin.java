@@ -13,10 +13,15 @@ package de.intevation.printlayout;
 
 import com.vividsolutions.jump.workbench.ui.MenuNames;
 
+import com.vividsolutions.jump.workbench.WorkbenchContext;
+
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.ThreadedPlugIn;
-import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
+import com.vividsolutions.jump.workbench.plugin.EnableCheck;
+
+import com.vividsolutions.jump.workbench.model.Category; 
+import com.vividsolutions.jump.workbench.model.LayerManager;
 
 import com.vividsolutions.jump.util.Blackboard;
 
@@ -31,9 +36,12 @@ import de.intevation.printlayout.batik.IncoreImageProtocolHandler;
 import org.apache.batik.util.ParsedURL;
 
 import javax.swing.JFrame;
+import javax.swing.JComponent;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
+import java.util.Iterator;
 
 /**
  * The plugin binding to OpenJump.
@@ -57,6 +65,28 @@ implements   ThreadedPlugIn
 	 */
 	protected Blackboard blackboard;
 
+	public static final class HasLayerableEnableCheck 
+	implements                EnableCheck
+	{
+		private WorkbenchContext context;
+
+		public HasLayerableEnableCheck(WorkbenchContext context) {
+			this.context = context;
+		}
+
+		public String check(JComponent component) {
+
+			LayerManager lm = context.getLayerManager();
+
+			if (lm != null)
+				for (Iterator i = lm.getCategories().iterator(); i.hasNext();)
+					if (((Category)i.next()).getLayerables().size() > 0)
+						return null;
+
+			return "At least 1 layer must exist";
+		}
+	}
+
 	/**
 	 * implements the initialize() method needed to
 	 * initialize the plugin.
@@ -65,14 +95,11 @@ implements   ThreadedPlugIn
 	public void initialize(PlugInContext context)
 	throws Exception
 	{
-		EnableCheckFactory check = 
-		  new EnableCheckFactory(context.getWorkbenchContext());
-
 		context
 			.getFeatureInstaller()
 			.addMainMenuItem(
 				this, new String[] { MenuNames.FILE }, getName(),
-				false, null, check.createAtLeastNLayersMustExistCheck(1));
+				false, null, new HasLayerableEnableCheck(context.getWorkbenchContext()));
 
 		blackboard = new Blackboard();
 

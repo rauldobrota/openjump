@@ -1,3 +1,13 @@
+2007-05-22  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	Enable Print/Layout menu item when there are Layerables.
+
+	* src/de/intevation/printlayout/PrintLayoutPlugin.java:
+		Check for Layerables instead of Layers in menu activation now.
+
+	* src/de/intevation/printlayout/tools/PrintBorderOverlay.java:
+		remove needless imports.
+
 2007-04-27  Jan-Oliver Wagner <jan-oliver.wagner@intevation.de>
 
 	Doing the 1.0.0 release.

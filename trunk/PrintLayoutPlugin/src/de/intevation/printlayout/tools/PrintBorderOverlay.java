@@ -13,28 +13,18 @@ package de.intevation.printlayout.tools;
 
 import org.apache.batik.swing.gvt.Overlay;
 
-import java.text.NumberFormat;
-
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.Font;
 import java.awt.Color;
 import java.awt.BasicStroke;
 
-import java.awt.font.FontRenderContext;
-import java.awt.font.TextLayout;
-
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.Line2D;
 
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGLocatable;
 import org.w3c.dom.svg.SVGMatrix;
-
-import java.util.ArrayList;
 
 import de.intevation.printlayout.util.MatrixTools;
 
