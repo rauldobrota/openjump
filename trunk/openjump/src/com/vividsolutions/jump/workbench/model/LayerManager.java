@@ -43,7 +43,10 @@ import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureCollection;
 import com.vividsolutions.jump.util.Blackboard;
 import com.vividsolutions.jump.util.Block;
+import com.vividsolutions.jump.workbench.ui.WorkbenchFrame;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
+import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
+import com.vividsolutions.jump.workbench.ui.LayerViewPanelProxy;
 import com.vividsolutions.jump.workbench.ui.renderer.style.BasicStyle;
 import com.vividsolutions.jump.workbench.ui.style.AbstractPalettePanel;
 
@@ -54,6 +57,8 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 
 import java.util.*;
+
+import javax.swing.JInternalFrame;
 
 /**
  * Registry of Layers in a Task.
@@ -617,9 +622,25 @@ public class LayerManager {
         return visibleLayers;
     }
 
-    // SIGLE start [obedel]
-    // To free the memory allocated for a layer
-    public void dispose(Layerable layerable) {
+   /**
+    * SIGLE [obedel] on 2005 then [mmichaud] on 2007-05-22
+    * To free the memory allocated for a layer
+    * Called by RemoveSelectedLayersPlugin
+    * @param layerViewPanel the layerViewPanel displaying this layerable
+    * @param layarable the layerable to remove
+    */
+    public void dispose(WorkbenchFrame frame, Layerable layerable) {
+        // removing all LayerRenderers for this Layer
+        JInternalFrame[] internalFrames = frame.getInternalFrames();
+        for (int i = 0 ; i < internalFrames.length ; i++) {
+            JInternalFrame internalFrame = internalFrames[i];
+            if (internalFrame instanceof LayerViewPanelProxy) {
+                ((LayerViewPanelProxy)internalFrame).getLayerViewPanel()
+                                                    .getRenderingManager()
+                                                    .removeLayerRenderer(layerable);
+            }
+            //layerViewPanel.getRenderingManager().removeLayerRenderer(layerable);
+        }
     	for (Iterator i = categories.iterator(); i.hasNext();) {
             Category c = (Category) i.next();
             // deleting the layer from the category
@@ -641,7 +662,6 @@ public class LayerManager {
             }
         }
     }
-    // SIGLE end
     
     public void dispose() {
         for (Iterator i = layerReferencesToDispose.iterator(); i.hasNext();) {
@@ -659,7 +679,7 @@ public class LayerManager {
         //#die to each to request that the resources be freed. [Jon Aquino]
         undoableEditReceiver.getUndoManager().discardAllEdits();
     }
-
+    
     
     public static int layerManagerCount() {
         return layerManagerCount;

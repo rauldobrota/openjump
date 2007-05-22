@@ -322,5 +322,16 @@ public class RenderingManager {
 	 */
 	public void setMaxFeatures(int maxFeatures) {
 		this.maxFeatures = maxFeatures;
-	}    
+	}
+    
+   /**
+    * Remove the LayerRenderer when a Layer is removed (helps to free the memory)
+    * Added on 2007-05-21 [Michael Michaud and Larry Becker]
+    * Called by LayerManager
+    * @param layer layer to remove
+    */
+    public void removeLayerRenderer(Object contentID){
+        contentIDToRendererMap.remove(contentID);
+    }
+    
 }

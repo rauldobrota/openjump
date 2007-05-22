@@ -46,26 +46,25 @@ public class RemoveSelectedLayersPlugIn extends AbstractPlugIn {
     }
 
     public boolean execute(PlugInContext context) throws Exception {
-        remove((Layerable[]) (context.getLayerNamePanel()).selectedNodes(
+        // Changed on 2007-05-21 to use the new LayerManager()[Michael Michaud]
+        remove(context, (Layerable[]) (context.getLayerNamePanel()).selectedNodes(
                 Layerable.class).toArray(new Layerable[] {  }));
-
+        System.gc();
         return true;
     }
 
-    public void remove(Layerable[] selectedLayers) {
+    public void remove(PlugInContext context, Layerable[] selectedLayers) {
         for (int i = 0; i < selectedLayers.length; i++) {
             // SIGLE start [obedel]
             // dispose layer immediately
             //selectedLayers[i].getLayerManager().remove(selectedLayers[i]);
             // ... becomes ...
-            selectedLayers[i].getLayerManager().dispose(selectedLayers[i]);
+            // Changed again by [Michael Michaud] on 2007-05-21 to solve the memory leak
+            // thanks to the new LayerManager.dispose(PlugInContext, Layerable) method
+            selectedLayers[i].getLayerManager()
+                             .dispose(context.getWorkbenchFrame(), selectedLayers[i]);
             // SIGLE end
         }
-        // SIGLE start [obedel]
-        // forcing memory freeing
-        System.gc();
-        // SIGLE end
-        
         //Don't call LayerManager#setFiringEvents and
         //LayerManager#fireModelChanged, so that each
         //removed node is individually removed from the tree. [Jon Aquino]
