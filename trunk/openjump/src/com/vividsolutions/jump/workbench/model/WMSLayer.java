@@ -51,6 +51,11 @@ import com.vividsolutions.wms.BoundingBox;
 import com.vividsolutions.wms.MapRequest;
 import com.vividsolutions.wms.WMService;
 
+import java.net.URL;
+
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
+
 /**
  * A Layerable that retrieves images from a Web Map Server.
  */
@@ -66,6 +71,10 @@ public class WMSLayer extends AbstractLayerable implements Cloneable {
 	private WMService service;
 
 	private String wmsVersion = WMService.WMS_1_0_0;
+
+	protected Reference oldImage;
+	protected URL       oldURL;
+
 	/**
 	 * Called by Java2XML
 	 */
@@ -121,14 +130,30 @@ public class WMSLayer extends AbstractLayerable implements Cloneable {
 	}
 
 	public Image createImage(LayerViewPanel panel) throws IOException {
-		Image image = createRequest(panel).getImage();
-		MediaTracker mt = new MediaTracker(new JButton());
-		mt.addImage(image, 0);
 
-		try {
-			mt.waitForID(0);
-		} catch (InterruptedException e) {
-			Assert.shouldNeverReachHere();
+		MapRequest request = createRequest(panel);
+		URL        newURL  = request.getURL();
+
+		Image image;
+
+		// look if last request equals new one.
+		// if it does take the image from the cache.
+		if (oldURL == null
+		|| !newURL.equals(oldURL) 
+		|| oldImage == null
+		|| (image = (Image)oldImage.get()) == null
+		) {
+			image = request.getImage();
+			MediaTracker mt = new MediaTracker(new JButton());
+			mt.addImage(image, 0);
+
+			try {
+				mt.waitForID(0);
+			} catch (InterruptedException e) {
+				Assert.shouldNeverReachHere();
+			}
+			oldImage = new SoftReference(image);
+			oldURL   = newURL;
 		}
 
 		return image;
