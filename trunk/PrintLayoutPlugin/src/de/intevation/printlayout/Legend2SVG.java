@@ -12,6 +12,8 @@
 package de.intevation.printlayout;
 
 import com.vividsolutions.jump.workbench.model.Layer;
+import com.vividsolutions.jump.workbench.model.Layerable;
+import com.vividsolutions.jump.workbench.model.Category;
 
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 
@@ -20,6 +22,7 @@ import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.ArrayList;
 
 import org.apache.batik.dom.AbstractElement;
 
@@ -236,73 +239,87 @@ implements   DocumentManager.DocumentModifier
 		Offset ofs = new Offset();
 		
 		for (int N = layers.size(), i = 0; i < N; ++i) {
-			Layer layer = (Layer)layers.get(i);		
+			Object l = layers.get(i);
+			if (l instanceof Layer) {
+				Layer layer = (Layer)l;		
 
-			ColorThemingStyle themeStyle =
-				(ColorThemingStyle)layer.getStyle(ColorThemingStyle.class);
+				ColorThemingStyle themeStyle =
+					(ColorThemingStyle)layer.getStyle(ColorThemingStyle.class);
 
-			BasicStyle basicStyle = layer.getBasicStyle();
+				BasicStyle basicStyle = layer.getBasicStyle();
 
-			if (themeStyle.isEnabled()) { // layer with extra styles
+				if (themeStyle.isEnabled()) { // layer with extra styles
 
-				ofs.enlarge(drawThemedRect(
-					g2d, 
-					basicStyle, 
-					themeStyle,
-					0d, ofs.y, 
-					SYMBOL_SIZE, SYMBOL_SIZE));
+					ofs.enlarge(drawThemedRect(
+						g2d, 
+						basicStyle, 
+						themeStyle,
+						0d, ofs.y, 
+						SYMBOL_SIZE, SYMBOL_SIZE));
 
-				String name = trim(layer.getName());
+					String name = trim(layer.getName());
 
-				if (name == null)
-					ofs.nextRow();
-				else
+					if (name == null)
+						ofs.nextRow();
+					else
+						ofs.drawText(
+							g2d,
+							new TextLayout(name, FONT_BOLD, frc),
+							SYMBOL_SIZE + X_GAP);
+
+					Map themes = themeStyle.getAttributeValueToBasicStyleMap();
+
+					for (Iterator t = themes.entrySet().iterator(); t.hasNext();) {
+
+						Map.Entry entry = (Map.Entry)t.next();
+
+						ofs.enlarge(drawRect(
+							g2d,
+							(BasicStyle)entry.getValue(), 
+							2*X_GAP, ofs.y,
+							SYMBOL_SIZE, SYMBOL_SIZE));
+
+						name = trim(entry.getKey() != null 
+							? entry.getKey().toString()
+							: null);
+
+						if (name == null)
+							ofs.nextRow();
+						else 
+							ofs.drawText(
+								g2d,
+								new TextLayout(name, FONT_PLAIN, frc),
+								3*X_GAP + SYMBOL_SIZE);
+					} // for all sub styles
+				}
+				else { // Layer with no extra styles
+					ofs.enlarge(drawRect(
+						g2d,
+						basicStyle, 
+						0, ofs.y,
+						SYMBOL_SIZE, SYMBOL_SIZE));
+
+					String name = trim(layer.getName());
+
+					if (name == null)
+						ofs.nextRow();
+					else
+						ofs.drawText(
+							g2d,
+							new TextLayout(name, FONT_BOLD, frc),
+							SYMBOL_SIZE + X_GAP);
+				}
+			}
+			else if (l instanceof Layerable) { // its only a Layerable
+				Layerable layerable = (Layerable)l;
+
+				String name = trim(layerable.getName());
+
+				if (name != null)
 					ofs.drawText(
 						g2d,
 						new TextLayout(name, FONT_BOLD, frc),
 						SYMBOL_SIZE + X_GAP);
-
-				Map themes = themeStyle.getAttributeValueToBasicStyleMap();
-
-				for (Iterator t = themes.entrySet().iterator(); t.hasNext();) {
-
-					Map.Entry entry = (Map.Entry)t.next();
-
-					ofs.enlarge(drawRect(
-						g2d,
-						(BasicStyle)entry.getValue(), 
-						2*X_GAP, ofs.y,
-						SYMBOL_SIZE, SYMBOL_SIZE));
-
-					name = trim(entry.getKey() != null 
-						? entry.getKey().toString()
-						: null);
-
-					if (name == null)
-						ofs.nextRow();
-					else 
-						ofs.drawText(
-							g2d,
-							new TextLayout(name, FONT_PLAIN, frc),
-							3*X_GAP + SYMBOL_SIZE);
-				} // for all sub styles
-			}
-			else { // Layer with no extra styles
-				ofs.enlarge(drawRect(
-					g2d,
-					basicStyle, 
-					0, ofs.y,
-					SYMBOL_SIZE, SYMBOL_SIZE));
-
-				String name = trim(layer.getName());
-
-				if (name == null)
-					ofs.nextRow();
-				else
-					ofs.drawText(
-						g2d,
-						new TextLayout(name, FONT_BOLD, frc),
-            SYMBOL_SIZE + X_GAP);
 			}
 		}
 		ofs.enlarge(3);
@@ -339,7 +356,13 @@ implements   DocumentManager.DocumentModifier
 
 		SVGGraphics2D svgGenerator = new SVGGraphics2D(ctx, false);
 
-		List layers = pluginContext.getLayerManager().getVisibleLayers(false);
+		ArrayList layers = new ArrayList();
+		for (Iterator i = pluginContext.getLayerManager().getCategories().iterator(); i.hasNext();)
+			for (Iterator j = ((Category)i.next()).getLayerables().iterator(); j.hasNext(); ) {
+				Layerable l = (Layerable)j.next();
+				if (l.isVisible())
+					layers.add(l);
+			}
 
 		Rectangle2D bbox = drawLegend(svgGenerator, layers);
 
