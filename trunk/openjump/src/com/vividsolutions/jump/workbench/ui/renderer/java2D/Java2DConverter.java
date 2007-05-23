@@ -36,16 +36,22 @@ package com.vividsolutions.jump.workbench.ui.renderer.java2D;
 import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D.Double;
+import java.awt.geom.PathIterator;
 import java.util.ArrayList;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
@@ -53,6 +59,13 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  * Converts JTS Geometry objects into Java 2D Shape objects
  */
+ // Optimizations from larry becker's SkyJUMP code to OpenJUMP [mmichaud]
+ // 1 - Added point decimation to toViewCoordinates.
+ // Results in much  improved render speeds when displaying full extent of large datasets.
+ // 2 - Optimized the toShape conversion for linestrings. 
+ // Reduced darw times by 60%.
+ // 3 - Made toViewCoordinates(Coordinate[]) public to make use
+ // of its decimation optimization in AbstractSelectionRenderer.
 public class Java2DConverter {
 	private static double POINT_MARKER_SIZE = 3.0;
 	private PointConverter pointConverter;
@@ -74,16 +87,38 @@ public class Java2DConverter {
 			holeVertexCollection);
 	}
 
-	private Coordinate[] toViewCoordinates(Coordinate[] modelCoordinates)
+	public Coordinate[] toViewCoordinates(Coordinate[] modelCoordinates)
 		throws NoninvertibleTransformException {
 		Coordinate[] viewCoordinates = new Coordinate[modelCoordinates.length];
-
-		for (int i = 0; i < modelCoordinates.length; i++) {
-			Point2D point2D = toViewPoint(modelCoordinates[i]);
-			viewCoordinates[i] = new Coordinate(point2D.getX(), point2D.getY());
+        double ps = 1d / (2d*pointConverter.getScale());  // 1/2 pixel size in model units
+		Coordinate p0 = modelCoordinates[0];
+		int npts = 0;
+		int mpts = modelCoordinates.length;
+		for (int i = 0; i < mpts; i++) {
+			Coordinate pi = modelCoordinates[i];
+			//inline Decimator
+			double xd = Math.abs(p0.x-pi.x);
+			double yd = Math.abs(p0.y-pi.y);
+			if ((xd>=ps) || (yd>=ps) || (npts<4) || (i == mpts-1)) { 
+				//LDB: have replaced the following with inline code but
+				//     it was no faster.  AffineTransform must be highly optimized!
+				Point2D point2D = pointConverter.toViewPoint(pi);
+				viewCoordinates[npts++] = new Coordinate(point2D.getX(), point2D.getY());
+				p0 = pi;
+			}
+		} 
+		if (npts != mpts) {
+			Coordinate[] viewCoordinates2 = new Coordinate[npts];
+			for (int i = 0; i < npts; i++) {
+					viewCoordinates2[i] = viewCoordinates[i];
+			}
+			return viewCoordinates2;
+			// LDB: benchmarkes verify that the following line is slower than
+			//      the above loop probably because of copying vs. referencing
+			//return Arrays.copyOfRange(viewCoordinates,0,npts);
 		}
-
-		return viewCoordinates;
+		else
+			return viewCoordinates;
 	}
 
 	private Shape toShape(GeometryCollection gc)
@@ -112,16 +147,62 @@ public class Java2DConverter {
 		return path;
 	}
 
+    class LineStringPath extends LineString implements PathIterator {
+		
+		private int iterate;
+		private int numPoints;
+		private Coordinate[] points;
+		private Java2DConverter j2D;
+		
+		public LineStringPath(LineString linestring, Java2DConverter j2D){
+			super(null, new GeometryFactory());
+			//this.linestring = linestring;
+			this.j2D = j2D;
+			try {
+			  points = j2D.toViewCoordinates(linestring.getCoordinates());
+			}
+			catch (NoninvertibleTransformException ex){	}
+			this.numPoints = points.length; //linestring.getNumPoints();
+			iterate = 0;
+		}
+		private int getSegType(){
+			return (iterate==0) ? PathIterator.SEG_MOVETO : PathIterator.SEG_LINETO;
+		}
+		public int currentSegment(double[] coords) {
+			coords[0] = points[iterate].x;
+			coords[1] = points[iterate].y;
+			return getSegType();
+		}
+		public int currentSegment(float[] coords) {
+			coords[0] = (float) points[iterate].x;
+			coords[1] = (float) points[iterate].y;
+			return getSegType();
+		}
+		public int getWindingRule() {
+			return GeneralPath.WIND_NON_ZERO;
+		}
+		public boolean isDone() {
+			return !(iterate < numPoints);
+		}
+		public void next() {
+			iterate++;
+		}
+		
+	}
+
 	private GeneralPath toShape(LineString lineString)
 		throws NoninvertibleTransformException {
-		GeneralPath shape = new GeneralPath();
-		Point2D viewPoint = toViewPoint(lineString.getCoordinateN(0));
-		shape.moveTo((float) viewPoint.getX(), (float) viewPoint.getY());
-
-		for (int i = 1; i < lineString.getNumPoints(); i++) {
-			viewPoint = toViewPoint(lineString.getCoordinateN(i));
-			shape.lineTo((float) viewPoint.getX(), (float) viewPoint.getY());
-		}
+        int numPoints = lineString.getNumPoints();
+		GeneralPath shape = new GeneralPath(GeneralPath.WIND_NON_ZERO, numPoints);
+        PathIterator pi = new LineStringPath(lineString, this);
+		shape.append(pi,false);
+		//Point2D viewPoint = toViewPoint(lineString.getCoordinateN(0));
+		//shape.moveTo((float) viewPoint.getX(), (float) viewPoint.getY());
+        //
+		//for (int i = 1; i < lineString.getNumPoints(); i++) {
+		//	viewPoint = toViewPoint(lineString.getCoordinateN(i));
+		//	shape.lineTo((float) viewPoint.getX(), (float) viewPoint.getY());
+		//}
 
 		//BasicFeatureRenderer expects LineStrings and MultiLineStrings to be
 		//converted to GeneralPaths. [Jon Aquino]
@@ -147,17 +228,19 @@ public class Java2DConverter {
         //Do the rounding now; don't rely on Java 2D rounding, because it
         //seems to do it differently for drawing and filling, resulting in the draw
         //being a pixel off from the fill sometimes. [Jon Aquino]
+    	//LDB 04/25/2007: this assumption doesn't seem to be true any longer
         Point2D viewPoint = pointConverter.toViewPoint(modelCoordinate);
         //Optimization recommended by Todd Warnes [Jon Aquino 2004-02-06]
-        viewPoint.setLocation(
-                Math.round(viewPoint.getX()),
-                Math.round(viewPoint.getY()));
+        //viewPoint.setLocation(
+        //        Math.round(viewPoint.getX()),
+        //        Math.round(viewPoint.getY()));
         return viewPoint;
     }
 
 	public static interface PointConverter {
 		public Point2D toViewPoint(Coordinate modelCoordinate)
 			throws NoninvertibleTransformException;
+        public double getScale();
 	}
 
 	/**
@@ -170,6 +253,11 @@ public class Java2DConverter {
 	 */
 	public Shape toShape(Geometry geometry)
 		throws NoninvertibleTransformException {
+        
+        // [NOTE] I tested a short-circuit here to return a 1 pixel representation of
+        // geometries having an envelope of less than 1/2 pixel, but I get only an ugly
+        // render for a small performance improvement [mmichaud - 2007-05-23]
+        
 		if (geometry.isEmpty()) {
 			return new GeneralPath();
 		}

@@ -62,6 +62,7 @@ public class WKTFillPattern extends BasicFillPattern {
                         return new Point2D.Double(modelCoordinate.x,
                                 modelCoordinate.y);
                     }
+                    public double getScale() { return 1;}
                 }).toShape(new WKTReader().read(
                         (String) properties.get(PATTERN_WKT_KEY))));
         } catch (NoninvertibleTransformException e) {

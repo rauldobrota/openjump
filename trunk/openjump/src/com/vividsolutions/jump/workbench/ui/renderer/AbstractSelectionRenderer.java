@@ -41,14 +41,11 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 import javax.swing.Icon;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.util.Assert;
 import com.vividsolutions.jump.feature.Feature;
@@ -119,7 +116,7 @@ public abstract class AbstractSelectionRenderer extends FeatureCollectionRendere
     }
     public void paint(Geometry geometry, Graphics2D g, Viewport viewport)
         throws NoninvertibleTransformException {
-        Coordinate[] coordinates = geometry.getCoordinates();
+        Coordinate[] modelCoordinates = geometry.getCoordinates();
         StyleUtil.paint(
             geometry,
             g,
@@ -130,8 +127,30 @@ public abstract class AbstractSelectionRenderer extends FeatureCollectionRendere
             true,
             lineStroke,
             lineColor);
-        if (paintingHandles) {            
-            paintHandles(g, coordinates, handleStroke, handleFillColor, handleLineColor, panel.getViewport());
+        if (paintingHandles) {
+           //paintHandles(g, coordinates, handleStroke, handleFillColor, handleLineColor, panel.getViewport());
+           // LDB: the above method is very slow.  The following code is aproximately equivalent
+           //      although it draws a different style of handle (overlapping vs. hollow)
+        	Rectangle2D viewRectangle = viewport.toViewRectangle( 
+        								viewport.getEnvelopeInModelCoordinates());
+            Coordinate[] viewCoordinates = viewport.getJava2DConverter().toViewCoordinates(modelCoordinates);
+            Rectangle2D.Double handle = new Rectangle2D.Double(0,0, HANDLE_WIDTH, HANDLE_WIDTH);
+            for (int i = 0; i < viewCoordinates.length; i++) {
+            	Coordinate p = viewCoordinates[i];
+            	double x = p.x;
+            	double y = p.y;
+                if (!viewRectangle.contains(x,y)) {  //<<JOKE:handle with care>>
+                    //Otherwise get "sun.dc.pr.PRException: endPath: bad path" exception [Jon Aquino 10/22/2003]
+                    continue;
+                }
+                handle.x = x - (HANDLE_WIDTH / 2);
+                handle.y = y - (HANDLE_WIDTH / 2);
+                g.setStroke(handleStroke);
+                g.setColor(handleFillColor);
+                g.fill(handle);
+                g.setColor(handleLineColor);
+                g.draw(handle);                		 
+            }
         }
     }
 
@@ -165,7 +184,7 @@ public abstract class AbstractSelectionRenderer extends FeatureCollectionRendere
         throws NoninvertibleTransformException {
         g.setStroke(stroke);
         g.setColor(fillColor);
-
+        
         for (int i = 0; i < coordinates.length; i++) {
             if (!viewport.getEnvelopeInModelCoordinates().contains(coordinates[i])) {
                 //Otherwise get "sun.dc.pr.PRException: endPath: bad path" exception [Jon Aquino 10/22/2003]
@@ -191,5 +210,8 @@ public abstract class AbstractSelectionRenderer extends FeatureCollectionRendere
         }
     }
 
+    protected boolean useImageCaching(Map layerToFeaturesMap) {
+		return true;
+	}
 
 }
