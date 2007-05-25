@@ -1,3 +1,10 @@
+2007-05-25  Stephan Holl <stephan.holl@intevation.de>
+
+	* src/de/latlon/deejump/ui/messages_fi.properties: New. added finish
+	translation
+	* src/de/latlon/deejump/ui/messages_de.properties: Added some german
+	translations, fixed a typo
+	
 2007-05-21  Stephan Holl <stephan.holl@intevation.de>
 
 	* src/de/latlon/deejump/ui/messages_de.properties: updated
