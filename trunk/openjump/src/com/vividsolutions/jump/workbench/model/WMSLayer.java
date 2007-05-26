@@ -79,6 +79,7 @@ public class WMSLayer extends AbstractLayerable implements Cloneable {
 	 * Called by Java2XML
 	 */
 	public WMSLayer() {
+		init();
 	}
 
 	public WMSLayer(LayerManager layerManager, String serverURL, String srs,
@@ -106,10 +107,14 @@ public class WMSLayer extends AbstractLayerable implements Cloneable {
 		setSRS(srs);
 		this.layerNames = new ArrayList(layerNames);
 		setFormat(format);
+		init();
+		this.wmsVersion = version;
+	}
+
+	protected void init() {
 		getBlackboard().put(
 				RenderingManager.USE_MULTI_RENDERING_THREAD_QUEUE_KEY, true);
 		getBlackboard().put(LayerNameRenderer.USE_CLOCK_ANIMATION_KEY, true);
-		this.wmsVersion = version;
 	}
 	
 	private void setService(WMService service) {
