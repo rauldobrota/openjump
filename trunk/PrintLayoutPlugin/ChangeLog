@@ -1,3 +1,33 @@
+2007-05-27  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	- Introduce a new interface to separate version specific features.
+	- Use RenderingManager.copyTo() to fetch the map directly.
+
+	* src/de/intevation/printlayout/Map2SVGConverter.java:
+		New. Interface to generate SVG maps out of GIS.
+
+	* src/de/intevation/printlayout/Map2SVG.java:
+		- Implements the new Map2SVGConverter.
+		- Using RenderingManager.copyTo(...) instead
+		  of LayerViewPanel.paintComponent(...) to fetch
+			the graphical representation. This makes
+			fetching of asynchron layers (WMS/DB) more
+			reliable. It also removes the background
+			rectangle which makes the map transparent.
+
+	* src/de/intevation/printlayout/LayoutFrame.java,
+		src/de/intevation/printlayout/PreviewMapReplacer.java:
+		Use the new factory model for SVG map generation.
+
+	* TODO.txt:
+		Added reminder to refactor the version spezific stuff
+		to new factory model.
+		Removed wish to use PDF driver instead of direct PDF import.
+		This is already possible because you simply have to select
+		a respective printer in the printer dialog.
+		Removed refactor wish of long methods in LayoutFrame. This
+		was already done a long time ago.
+		
 2007-05-23  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	Generate text only legend labels for Layerables that are not Layers.

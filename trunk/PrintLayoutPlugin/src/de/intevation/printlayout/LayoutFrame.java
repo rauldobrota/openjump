@@ -639,7 +639,7 @@ implements   PickingInteractor.PickingListener
 	 * document.
 	 */
 	public void addMap() {
-		docManager.modifyDocumentLater(new Map2SVG(pluginContext));
+		docManager.modifyDocumentLater(Map2SVG.createMap2SVGConverter(pluginContext));
 	}
 
 	/**

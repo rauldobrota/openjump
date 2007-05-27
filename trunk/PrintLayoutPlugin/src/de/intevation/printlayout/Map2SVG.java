@@ -73,7 +73,7 @@ import java.lang.reflect.Method;
  * in the UpdateManager of the DocumentManager.
  */
 public class Map2SVG
-implements   DocumentManager.DocumentModifier
+implements   Map2SVGConverter
 {
 	public static final String EXTRA_WAIT =
 		"de.intevation.printlayout.wait.map.svg";
@@ -142,6 +142,17 @@ implements   DocumentManager.DocumentModifier
 	 */
 	public static final String PRESERVE_TOPOLOGY =
 		"de.intevation.printlayout.simplify.preserve.topology";
+
+	/**
+	 * Implements a little factory for Map2SVGConverters.
+	 * @param pluginContext The binding to the GIS.
+	 * @return the Map2SVGConverter to be used.
+	 */
+	public static Map2SVGConverter createMap2SVGConverter(
+		PlugInContext pluginContext
+	) {
+		return new Map2SVG(pluginContext);
+	}
 	
 	/**
 	 * The plugin context is need to access the LayerViewPanel.
@@ -303,11 +314,11 @@ implements   DocumentManager.DocumentModifier
 
 		long renderStartTime = System.currentTimeMillis();
 
-		ThreadQueue queue = rms.getDefaultRendererThreadQueue();
-		rms.renderAll();
 		final boolean [] locked = { true };
 
-		queue.add(new Runnable() {
+		rms.renderAll();
+
+		rms.getDefaultRendererThreadQueue().add(new Runnable() {
 			public void run() {
 				synchronized (locked) {
 					locked[0] = false;
@@ -316,18 +327,12 @@ implements   DocumentManager.DocumentModifier
 			}
 		});
 
-		layerViewPanel.paintComponent(svgGenerator);
-
 		try {
 			synchronized (locked) {
 				int i = 20; // max 2min
 				while (locked[0] && i-- > 0)
 					locked.wait(6000);
 			}
-			do {
-				Thread.sleep(1000);
-			}
-			while (queue.getRunningThreads() > 0);
 		}
 		catch (InterruptedException ie) {
 		}
@@ -340,6 +345,8 @@ implements   DocumentManager.DocumentModifier
 			}
 			catch (InterruptedException ie) {
 			}
+
+		rms.copyTo(svgGenerator);
 
 		// restore old converter
 		if (setJava2DConverter != null && oldConverter != null) {
@@ -459,7 +466,6 @@ implements   DocumentManager.DocumentModifier
 			? options.getDouble(SIMPLIFY_TOLERANCE)
 			: null;
 	}
-
 
 	/**
 	 * implements the run() method of the DocumentModifier 

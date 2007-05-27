@@ -137,7 +137,7 @@ implements   DocumentManager.Processor
 						continue;
 					}
 
-				Map2SVG map2svg = new Map2SVG(pluginContext);
+				Map2SVGConverter map2svg = Map2SVG.createMap2SVGConverter(pluginContext);
 
 				root = map2svg.createSVG(
 					document, 
