@@ -69,9 +69,20 @@ import com.vividsolutions.jts.geom.Polygon;
 public class Java2DConverter {
 	private static double POINT_MARKER_SIZE = 3.0;
 	private PointConverter pointConverter;
+    // Add the resolution of the decimator as an option to be able to choose more easily
+    // between speed and quality (ex. speed is preferred for light-gray display while
+    // dragging the zoombar or while using the mousewheel) [mmichaud 2007-05-27]
+    // Default resolution for the decimator is half a pixel as discussed on the list
+    private double decimatorResolution = 0.5; 
 
 	public Java2DConverter(PointConverter pointConverter) {
 		this.pointConverter = pointConverter;
+	}
+    
+    // Add a constructor to choose another  decimatorResolution
+    public Java2DConverter(PointConverter pointConverter, double resolution) {
+		this.pointConverter = pointConverter;
+        this.decimatorResolution = resolution;
 	}
 
 	private Shape toShape(Polygon p) throws NoninvertibleTransformException {
@@ -90,7 +101,7 @@ public class Java2DConverter {
 	public Coordinate[] toViewCoordinates(Coordinate[] modelCoordinates)
 		throws NoninvertibleTransformException {
 		Coordinate[] viewCoordinates = new Coordinate[modelCoordinates.length];
-        double ps = 1d / (2d*pointConverter.getScale());  // 1/2 pixel size in model units
+        double ps = decimatorResolution / pointConverter.getScale();  // convert in model units
 		Coordinate p0 = modelCoordinates[0];
 		int npts = 0;
 		int mpts = modelCoordinates.length;
@@ -240,7 +251,7 @@ public class Java2DConverter {
 	public static interface PointConverter {
 		public Point2D toViewPoint(Coordinate modelCoordinate)
 			throws NoninvertibleTransformException;
-        public double getScale();
+        public double getScale() throws NoninvertibleTransformException;
 	}
 
 	/**
