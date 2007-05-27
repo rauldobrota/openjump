@@ -50,7 +50,6 @@ import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.operation.linemerge.LineMerger;
 import com.vividsolutions.jump.geom.*;
 import com.vividsolutions.jump.task.*;
-import com.vividsolutions.jump.workbench.ui.*;
 
 public class ExtractSegmentsPlugIn
     extends ThreadedBasePlugIn

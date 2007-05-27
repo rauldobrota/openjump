@@ -41,7 +41,6 @@ import com.vividsolutions.jump.geom.EnvelopeUtil;
 import com.vividsolutions.jump.workbench.ui.Viewport;
 
 import java.awt.*;
-import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
 
