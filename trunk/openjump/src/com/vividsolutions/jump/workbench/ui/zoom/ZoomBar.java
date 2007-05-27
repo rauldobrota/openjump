@@ -37,6 +37,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.List;
 
@@ -58,17 +59,32 @@ import com.vividsolutions.jump.geom.LineSegmentEnvelopeIntersector;
 import com.vividsolutions.jump.util.Blackboard;
 import com.vividsolutions.jump.util.CoordinateArrays;
 import com.vividsolutions.jump.util.MathUtil;
-import com.vividsolutions.jump.workbench.model.*;
-import com.vividsolutions.jump.workbench.ui.*;
+import com.vividsolutions.jump.workbench.model.CategoryEvent;
+import com.vividsolutions.jump.workbench.model.FeatureEvent;
+import com.vividsolutions.jump.workbench.model.FeatureEventType;
+import com.vividsolutions.jump.workbench.model.Layer;
+import com.vividsolutions.jump.workbench.model.LayerEvent;
+import com.vividsolutions.jump.workbench.model.LayerEventType;
+import com.vividsolutions.jump.workbench.model.LayerListener;
+import com.vividsolutions.jump.workbench.model.LayerManager;
+import com.vividsolutions.jump.workbench.ui.GUIUtil;
+import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
+import com.vividsolutions.jump.workbench.ui.LayerViewPanelContext;
+import com.vividsolutions.jump.workbench.ui.LayerViewPanelProxy;
+import com.vividsolutions.jump.workbench.ui.Viewport;
+import com.vividsolutions.jump.workbench.ui.ViewportListener;
+import com.vividsolutions.jump.workbench.ui.WorkbenchFrame;
 import com.vividsolutions.jump.workbench.ui.plugin.scalebar.IncrementChooser;
 import com.vividsolutions.jump.workbench.ui.plugin.scalebar.MetricSystem;
 import com.vividsolutions.jump.workbench.ui.plugin.scalebar.RoundQuantity;
 import com.vividsolutions.jump.workbench.ui.plugin.scalebar.ScaleBarRenderer;
+import com.vividsolutions.jump.workbench.ui.renderer.java2D.Java2DConverter;
 
-public class ZoomBar extends JPanel {
+public class ZoomBar extends JPanel implements Java2DConverter.PointConverter {
     private int totalGeometries() {
         int totalGeometries = 0;
-        for (Iterator i = layerViewPanel().getLayerManager().iterator(); i.hasNext();) {
+        // Restrict count to visible layers [mmichaud 2007-05-27]
+        for (Iterator i = layerViewPanel().getLayerManager().getVisibleLayers(true).iterator(); i.hasNext();) {
             Layer layer = (Layer) i.next();
             totalGeometries += layer.getFeatureCollectionWrapper().size();
         }
@@ -82,6 +98,10 @@ public class ZoomBar extends JPanel {
     private JLabel label = new JLabel();
     private IncrementChooser incrementChooser = new IncrementChooser();
     private Collection metricUnits = new MetricSystem(1).createUnits();
+    
+    // Add java2DConverter and affineTransform for coordinate decimation
+    private Java2DConverter java2DConverter;
+    private AffineTransform affineTransform;
 
 
     public ZoomBar(
@@ -211,6 +231,9 @@ public class ZoomBar extends JPanel {
 	        }
 	    }));
 
+        // added to use the decimator implemented in Java2DConverter [mmichaud 2007-05-27]
+        java2DConverter = new Java2DConverter(this, 2);
+        
 	    installListenersOnCurrentPanel();
 	    updateComponents();
 	}
@@ -281,8 +304,11 @@ public class ZoomBar extends JPanel {
                     clearModelCaches();
                 }
             }
+            // add LayerEventType.VISIBILITY_CHANGED condition [mmichaud 2007-05-27]
             public void layerChanged(LayerEvent e) {
-                if (e.getType() == LayerEventType.ADDED || e.getType() == LayerEventType.REMOVED) {
+                if (e.getType() == LayerEventType.ADDED ||
+                    e.getType() == LayerEventType.REMOVED ||
+                    e.getType() == LayerEventType.VISIBILITY_CHANGED) {
                     clearModelCaches();
                 }
             }
@@ -358,9 +384,15 @@ public class ZoomBar extends JPanel {
         }
         return proposedModelEnvelope;
     }
-    private double getScale() throws NoninvertibleTransformException {
+    
+   /**
+    * Return the scale of the view according to the zoom bar
+    */
+    //getScale() public to implement Java2DConverter.PointConverter [mmichaud 2007-05-26]
+    public double getScale() throws NoninvertibleTransformException {
         return toScale(slider.getValue());
     }
+    
     private Stroke stroke = new BasicStroke(1);
     private void drawWireframe() throws NoninvertibleTransformException {
         Graphics2D g = (Graphics2D) layerViewPanel().getGraphics();
@@ -383,50 +415,52 @@ public class ZoomBar extends JPanel {
     private LineSegmentEnvelopeIntersector lineSegmentEnvelopeIntersector =
         new LineSegmentEnvelopeIntersector();
 
+    // Modified by [mmichaud 2007-05-26] to use decimation algorithm from Java2DConverter
     private Shape getWireFrame() throws NoninvertibleTransformException {
-        AffineTransform transform =
-            Viewport.modelToViewTransform(
+        // affineTransform computed according to the zoombar slider (getScale)
+        affineTransform = Viewport.modelToViewTransform(
                 getScale(),
                 new Point2D.Double(
-                    proposedModelEnvelope().getMinX(),
-                    proposedModelEnvelope().getMinY()),
+                    proposedModelEnvelope().getMinX(), proposedModelEnvelope().getMinY()),
                 layerViewPanel().getSize().getHeight());
-        Envelope proposedModelEnvelope = proposedModelEnvelope();
+        // view2D rectangle
+        Rectangle2D view2D = new Rectangle2D.Double(
+            0.0, 0.0, layerViewPanel().getWidth(), layerViewPanel().getWidth());
         GeneralPath wireFrame = new GeneralPath();
         ArrayList segments = new ArrayList(getSegmentCache());
-        segments.addAll(toSegments(randomOnScreenGeometries()));
+        //segments.addAll(toSegments(randomOnScreenGeometries()));
+        segments.addAll(toSegments(largeOnScreenGeometries()));
         for (Iterator i = segments.iterator(); i.hasNext();) {
-            Coordinate[] coordinates = (Coordinate[]) i.next();
+            Coordinate[] coordinates =
+                java2DConverter.toViewCoordinates((Coordinate[]) i.next());
             boolean drawing = false;
+            
             for (int j = 1; j < coordinates.length; j++) {
-                if (!lineSegmentEnvelopeIntersector
-                    .touches(coordinates[j - 1], coordinates[j], proposedModelEnvelope)) {
+                if (!view2D.intersectsLine(coordinates[j - 1].x, coordinates[j - 1].y,
+                                           coordinates[j].x, coordinates[j].y)) {
                     drawing = false;
                     continue;
                 }
                 if (!drawing) {
-                    Point2D p1 =
-                        transform.transform(
-                            new Point2D.Double(coordinates[j - 1].x, coordinates[j - 1].y),
-                            null);
-                    wireFrame.moveTo((float) p1.getX(), (float) p1.getY());
+                    wireFrame.moveTo((float) coordinates[j - 1].x,
+                                     (float) coordinates[j - 1].y);
                 }
-                Point2D p2 =
-                    transform.transform(
-                        new Point2D.Double(coordinates[j].x, coordinates[j].y),
-                        null);
-                wireFrame.lineTo((float) p2.getX(), (float) p2.getY());
+                wireFrame.lineTo((float) coordinates[j].x,
+                                 (float) coordinates[j].y);
                 drawing = true;
             }
+            
         }
         return wireFrame;
+        
     }
 
     private Collection getSegmentCache() throws NoninvertibleTransformException {
         //Use LayerManager blackboard for segment cache, so that multiple
         //views can share it. [Jon Aquino]
         if (modelBlackboard().get(SEGMENT_CACHE_KEY) == null) {
-            modelBlackboard().put(SEGMENT_CACHE_KEY, toSegments(randomGeometries()));
+            //modelBlackboard().put(SEGMENT_CACHE_KEY, toSegments(randomGeometries()));
+            modelBlackboard().put(SEGMENT_CACHE_KEY, toSegments(largeGeometries()));
             //
             // We only want to do this when a frame closes. If we don't clear the
             // cache in the blackboard then we'll get a memory leak.
@@ -450,9 +484,95 @@ public class ZoomBar extends JPanel {
         return segments;
     }
 
-    private static final int RANDOM_ONSCREEN_GEOMETRIES = 100;
-    private static final int RANDOM_GEOMETRIES = 100;
+    // Replace RANDOM_ONSCREEN_GEOMETRIES by LARGE_ONSCREEN_GEOMETRIES
+    // private static final int RANDOM_ONSCREEN_GEOMETRIES = 100;
+    // private static final int RANDOM_GEOMETRIES = 100;
+    private static final int LARGE_GEOMETRIES = 100;
+    private static final int LARGE_ONSCREEN_GEOMETRIES = 200;
 
+    
+    
+    
+    // start [mmichaud]
+    // additional code to replace randomGeometries by a largestGeometries approach
+    // one bad side effect of random geometries approach was visible for a big set of points
+    // and a small set of polygons : polygons were not visible because of the proportional
+    // selection of geometries, and points are not displayed :-(
+    
+    static final Comparator MAX_SIZE_COMPARATOR = new Comparator() {
+        public int compare(Object f1, Object f2) {
+            Envelope env1 = ((Feature)f1).getGeometry().getEnvelopeInternal();
+            Envelope env2 = ((Feature)f2).getGeometry().getEnvelopeInternal();
+            double size1 = Math.max(env1.getWidth(), env1.getHeight());
+            double size2 = Math.max(env2.getWidth(), env2.getHeight());
+            return size1 < size2 ? 1 : (size1 > size2 ? -1 : 0);
+        }
+    };
+    
+    private Collection largeGeometries(int maxSize, List features) {
+        Collections.sort(features, MAX_SIZE_COMPARATOR);
+        List geometries = new ArrayList();
+        for (int i = 0 , max = Math.min(maxSize, features.size()) ; i < max ; i++) {
+            geometries.add(((Feature)features.get(i)).getGeometry());
+        }
+        //System.out.println("" + geometries.size() + "/" + features.size());
+        return geometries;
+    }
+    
+    private Collection largeOnScreenGeometries() {
+        List onScreenFeatures = new ArrayList();
+        if (totalGeometries() == 0) {
+            return onScreenFeatures;
+        }
+        // Use proposedModelEnvelope (dynamically computed while the mouse is dragged)
+        // instead of layerViewPanel().getViewport().getEnvelopeInModelCoordinates()
+        // [mmichaud 2007-05-27]
+        Envelope modelEnvelope;
+        try {
+            modelEnvelope = proposedModelEnvelope();
+        }
+        catch(NoninvertibleTransformException e) {
+            modelEnvelope = layerViewPanel().getViewport().getEnvelopeInModelCoordinates();
+        }
+        // Restrict to visible layers [mmichaud 2007-05-27]
+        for (Iterator it = layerViewPanel().getLayerManager()
+                                           .getVisibleLayers(true)
+                                           .iterator() ;  it.hasNext() ; ) {
+            Layer layer = (Layer) it.next();
+            // Select features intersecting the window
+            List visibleFeatures = layer.getFeatureCollectionWrapper().query(modelEnvelope);
+            if (visibleFeatures.size() < 1000) {
+                onScreenFeatures.addAll(layer.getFeatureCollectionWrapper().query(modelEnvelope));
+            }
+            // If there are more than 1000 visible features in this layer
+            // select a maximum of 2000 features stepping through the list
+            else {
+                int step = visibleFeatures.size()/1000;
+                for (int i = 0 , max = visibleFeatures.size() ; i < max ; i += step) {
+                    onScreenFeatures.add(visibleFeatures.get(i));
+                }
+            }
+        }
+        return largeGeometries(LARGE_ONSCREEN_GEOMETRIES, onScreenFeatures);
+    }
+    
+    private Collection largeGeometries() {
+        ArrayList largeGeometries = new ArrayList();
+        if (totalGeometries() == 0) {
+            return largeGeometries;
+        }
+        Envelope modelEnvelope = layerViewPanel().getViewport().getEnvelopeInModelCoordinates();
+        for (Iterator i = layerViewPanel().getLayerManager().getVisibleLayers(true).iterator(); i.hasNext();) {
+            Layer layer = (Layer) i.next();
+            List visibleFeatures = layer.getFeatureCollectionWrapper().query(modelEnvelope);
+            largeGeometries.addAll(layer.getFeatureCollectionWrapper().getFeatures());
+        }
+        return largeGeometries(LARGE_GEOMETRIES, largeGeometries);
+    }
+    // end [mmichaud]
+    
+    // Replaced Random geometries by large geometries
+    /*
     private Collection randomGeometries(int maxSize, List features) {
         if (features.size() <= maxSize) {
             return FeatureUtil.toGeometries(features);
@@ -464,13 +584,26 @@ public class ZoomBar extends JPanel {
         }
         return randomGeometries;
     }
-
+    
     private Collection randomOnScreenGeometries() {
         ArrayList randomOnScreenGeometries = new ArrayList();
-        if (totalGeometries() == 0) {
+        // Avoid method computation inside the loop [mmichaud]
+        int totalGeometries = totalGeometries();
+        if (totalGeometries == 0) {
             return randomOnScreenGeometries;
         }
-        for (Iterator i = layerViewPanel().getLayerManager().iterator(); i.hasNext();) {
+        // Use proposedModelEnvelope (dynamically computed while the mouse is dragged)
+        // instead of layerViewPanel().getViewport().getEnvelopeInModelCoordinates()
+        // [mmichaud 2007-05-27]
+        Envelope modelEnvelope;
+        try {
+            modelEnvelope = proposedModelEnvelope();
+        }
+        catch(NoninvertibleTransformException e) {
+            modelEnvelope = layerViewPanel().getViewport().getEnvelopeInModelCoordinates();
+        }
+        // Restrict to visible layers [mmichaud 2007-05-27]
+        for (Iterator i = layerViewPanel().getLayerManager().getVisibleLayers(true).iterator(); i.hasNext();) {
             Layer layer = (Layer) i.next();
             randomOnScreenGeometries.addAll(
                 randomGeometries(
@@ -478,17 +611,19 @@ public class ZoomBar extends JPanel {
                         * layer.getFeatureCollectionWrapper().size()
                         / totalGeometries(),
                     layer.getFeatureCollectionWrapper().query(
-                        layerViewPanel().getViewport().getEnvelopeInModelCoordinates())));
+                        //layerViewPanel().getViewport().getEnvelopeInModelCoordinates())));
+                        modelEnvelope)));
         }
         return randomOnScreenGeometries;
     }
-
+    
     private Collection randomGeometries() {
         ArrayList randomGeometries = new ArrayList();
         if (totalGeometries() == 0) {
             return randomGeometries;
         }
-        for (Iterator i = layerViewPanel().getLayerManager().iterator(); i.hasNext();) {
+        // Restrict to visible layers [mmichaud 2007-05-27]
+        for (Iterator i = layerViewPanel().getLayerManager().getVisibleLayers(true).iterator(); i.hasNext();) {
             Layer layer = (Layer) i.next();
             randomGeometries.addAll(
                 randomGeometries(
@@ -500,6 +635,7 @@ public class ZoomBar extends JPanel {
         }
         return randomGeometries;
     }
+    */
 
     private int toSliderValue(double scale) throws NoninvertibleTransformException {
         return slider.getMaximum()
@@ -677,5 +813,16 @@ public class ZoomBar extends JPanel {
         }
         slider.setLabelTable(labelTable);
     }
-
+    
+   /**
+    * Return a Point2D in the view model from a model coordinate.
+    */
+    // Added to implement Java2DConverter.PointConverter interface (used in getWireFrame)
+    // [mmichaud 2007-05-27]
+    public Point2D toViewPoint(Coordinate modelCoordinate)
+        throws NoninvertibleTransformException {
+        Point2D.Double pt = new Point2D.Double(modelCoordinate.x, modelCoordinate.y);
+        return affineTransform.transform(pt, pt);
+    }
+    
 }
