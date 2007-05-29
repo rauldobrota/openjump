@@ -1,5 +1,11 @@
 2007-05-25  Stephan Holl <stephan.holl@intevation.de>
 
+	* src/de/latlon/deejump/ui/messages_fi.properties: updated some
+	finnish translations
+	* TODO.txt: more general ideas for further development
+
+2007-05-25  Stephan Holl <stephan.holl@intevation.de>
+
 	* src/de/latlon/deejump/ui/messages_fi.properties: New. added finish
 	translation
 	* src/de/latlon/deejump/ui/messages_de.properties: Added some german

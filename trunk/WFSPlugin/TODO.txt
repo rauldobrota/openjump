@@ -14,3 +14,5 @@
  - integrate WFS-T against geoserver/deegree
  - more general SRS-integration (in deegree)
  - create user-documentation
+ - replace the MaxFeature-selector to a more appropriate place (dunno
+   where yet).
