@@ -35,7 +35,8 @@ public class PostgisValueConverterFactory
 
     // MD - this is slow - is there a better way?
     if (dbTypeName.equalsIgnoreCase("geometry"))
-        return WKT_GEOMETRY_MAPPER;
+        // WKB is now the normal way to store geometry in PostGIS [mmichaud 2007-05-13]
+        return WKB_GEOMETRY_MAPPER;
 
     if (dbTypeName.equalsIgnoreCase("bytea"))
         return WKB_GEOMETRY_MAPPER;
@@ -68,8 +69,9 @@ public class PostgisValueConverterFactory
     public Object getValue(ResultSet rs, int columnIndex)
         throws IOException, SQLException, ParseException
     {
-      Object obj = rs.getObject(columnIndex);
-      byte[] bytes = (byte[]) obj;
+      //Object obj = rs.getObject(columnIndex);
+      //byte[] bytes = (byte[]) obj;
+      byte[] bytes = rs.getBytes(columnIndex);
       Geometry geom = wkbReader.read(bytes);
       return geom;
     }
