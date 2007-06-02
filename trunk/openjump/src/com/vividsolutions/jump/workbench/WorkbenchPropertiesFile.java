@@ -62,12 +62,16 @@ public class WorkbenchPropertiesFile implements WorkbenchProperties {
     }
 
     public List getPlugInClasses() {
+        return getPlugInClasses(null); //null invokes default ClassLoader
+    }
+
+    public List getPlugInClasses(ClassLoader classLoader) {
         ArrayList plugInClasses = new ArrayList();
 
         for (Iterator i = root.getChildren("plug-in").iterator(); i.hasNext();) {
             Element plugInElement = (Element) i.next();
             try {
-                plugInClasses.add(Class.forName(plugInElement.getTextTrim()));
+                plugInClasses.add(Class.forName(plugInElement.getTextTrim(),false,classLoader));
             } catch (ClassNotFoundException e) {
                 errorHandler.handleThrowable(e);
             }

@@ -25,6 +25,7 @@
  * (250)385-6040 www.vividsolutions.com
  */
 package com.vividsolutions.jump.workbench.plugin;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -41,6 +42,7 @@ import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.util.LangUtil;
 import com.vividsolutions.jump.util.StringUtil;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
+
 /**
  * Loads plug-ins (or more precisely, Extensions), and any JAR files that they
  * depend on, from the plug-in directory.
@@ -78,7 +80,7 @@ public class PlugInManager {
 
     public void load() throws Exception {
         loadPlugInClasses(context.getWorkbench().getProperties()
-                .getPlugInClasses());
+                .getPlugInClasses(getClassLoader()));
         loadConfigurations();
     }
 
@@ -122,6 +124,7 @@ public class PlugInManager {
         }
         return configurations;
     }
+
     private void loadPlugInClasses(List plugInClasses) throws Exception {
         for (Iterator i = plugInClasses.iterator(); i.hasNext();) {
             Class plugInClass = (Class) i.next();

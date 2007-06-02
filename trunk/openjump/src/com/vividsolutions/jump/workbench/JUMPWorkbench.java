@@ -102,6 +102,10 @@ public class JUMPWorkbench {
 		public List getPlugInClasses() {
 			return new ArrayList();
 		}
+        
+        public List getPlugInClasses(ClassLoader classLoader) {
+			return new ArrayList();
+		}
 
 		public List getInputDriverClasses() {
 			return new ArrayList();
