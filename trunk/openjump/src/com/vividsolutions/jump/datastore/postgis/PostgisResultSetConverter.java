@@ -67,10 +67,22 @@ public class PostgisResultSetConverter
     {
       mapper[i] = odm.getConverter(rsmd, i + 1);
       String colName = rsmd.getColumnName(i + 1);
-      // only handles one geometry col for now
-      if (mapper[i].getType() == AttributeType.GEOMETRY)
-        colName = "GEOMETRY";
-      featureSchema.addAttribute(colName, mapper[i].getType());
+      // only handles one geometry col for now [MD ?]
+      // Convert the first geometry into AttributeType.GEOMETRY and the following ones
+      // into AttributeType.STRINGs [mmichaud 2007-05-13]
+      if (mapper[i].getType() == AttributeType.GEOMETRY) {
+        if (featureSchema.getGeometryIndex() == -1) {
+          colName = "GEOMETRY";
+          featureSchema.addAttribute(colName, mapper[i].getType());
+        }
+        else {
+          mapper[i] = ValueConverterFactory.STRING_MAPPER;
+          featureSchema.addAttribute(colName, AttributeType.STRING);
+        }
+      }
+      else {
+          featureSchema.addAttribute(colName, mapper[i].getType());
+      }
     }
   }
 
