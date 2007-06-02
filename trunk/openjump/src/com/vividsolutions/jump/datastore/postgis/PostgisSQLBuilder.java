@@ -77,12 +77,14 @@ public class PostgisSQLBuilder
   private String getColumnListSpecifier(
       String[] colName, String geomColName)
   {
+    // Added double quotes around each column name in order to read mixed case table names
+    // correctly [mmichaud 2007-05-13]
     StringBuffer buf = new StringBuffer();
-    buf.append("AsBinary(" + geomColName + ") as " + geomColName + "_wkb");
+    buf.append("AsBinary(\"" + geomColName + "\") as " + geomColName + "_wkb");
     for (int i = 0; i < colName.length; i++) {
       if (! geomColName.equalsIgnoreCase(colName[i])) {
-        buf.append(",");
-        buf.append(colName[i]);
+        buf.append(",\"");
+        buf.append(colName[i]).append("\"");
       }
     }
     return buf.toString();
