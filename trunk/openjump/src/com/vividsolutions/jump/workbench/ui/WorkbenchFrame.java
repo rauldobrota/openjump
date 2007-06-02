@@ -570,7 +570,7 @@ public class WorkbenchFrame extends JFrame implements LayerViewPanelContext,
 			}
 		});
 	}
-	private Collection getInternalFramesAssociatedWith(LayerManager layerManager) {
+	public Collection getInternalFramesAssociatedWith(LayerManager layerManager) {
 		ArrayList internalFramesAssociatedWithLayerManager = new ArrayList();
 		JInternalFrame[] internalFrames = getInternalFrames();
 		for (int i = 0; i < internalFrames.length; i++) {
