@@ -80,11 +80,13 @@ public class InfoFrame
         //remember to null it when I close. [Jon Aquino]
         Assert.isTrue(layerManagerProxy.getLayerManager() != null);
         layerManager = layerManagerProxy.getLayerManager();
-        addInternalFrameListener(new InternalFrameAdapter() {
+        // I cannot see any reason to add this listener [mmichaud 2007-06-03]
+        // See also WorkbenchFrame
+        /*addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameClosed(InternalFrameEvent e) {
                 layerManager = new LayerManager();
             }
-        });
+        });*/
         attributeTab = new AttributeTab(model, workbenchContext, taskFrame, this, false);
         addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameOpened(InternalFrameEvent e) {
@@ -142,7 +144,9 @@ public class InfoFrame
     }
     private void jbInit() throws Exception {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        addInternalFrameListener(new InternalFrameAdapter() {
+        // With the DefaultInternalFrameCloser of WorkbenchFrame,
+        // I think this code is no more necessary [mmichaud 2007-06-03]
+        /*addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameClosing(InternalFrameEvent e) {
                 //Regardless of the defaultCloseOperation, this InfoFrame should be
                 //removed from the WorkbenchFrame when the user hits X so it won't
@@ -153,7 +157,7 @@ public class InfoFrame
                     workbenchFrame.handleThrowable(x);
                 }
             }
-        });
+        });*/
         this.setTitle(I18N.get("ui.InfoFrame.feature-info"));
         this.getContentPane().setLayout(borderLayout1);
         tabbedPane.setTabPlacement(JTabbedPane.LEFT);

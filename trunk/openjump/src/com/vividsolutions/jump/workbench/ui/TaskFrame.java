@@ -111,10 +111,12 @@ public class TaskFrame extends JInternalFrame implements TaskFrameProxy,
 
             public void internalFrameClosed(InternalFrameEvent e) {
                 try {
-                    memoryCleanup();
-                    workbenchContext.getWorkbench()
-                                    .getFrame()
-                                    .removeInternalFrame(TaskFrame.this);
+                    // Code to manage TaskFrame INTERNAL_FRAME_CLOSED event
+                    // has been moved to closeTaskFrame method in WorkbenchFrame
+                    // I let this method because of the timer.stop [mmichaud]
+                    // Maybe the WorkbenchFrame.closeTaskFrame should be moved here...
+                    timer.stop();
+                    //memoryCleanup();
                 } catch (Throwable t) {
                     workbenchContext.getWorkbench().getFrame().handleThrowable(
                             t);
@@ -174,15 +176,18 @@ public class TaskFrame extends JInternalFrame implements TaskFrameProxy,
     // with references to it. Clean up the memory as much as we can. We probably
     // should not overwrite the dispose() method of JInternalFrame.
     //
+    // 
+    // Code to manage TaskFrame INTERNAL_FRAME_CLOSED event has been moved to
+    // closeTaskFrame method in WorkbenchFrame [mmichaud]
+    // [NOTE] Several JInternalFrames subclasses add listeners here and there
+    // It probably need some clean up
+    /*
     public void memoryCleanup() {
         timer.stop();
-
-        int framesUsingThisLayerManager = workbenchContext.getWorkbench()
-            .getFrame().getInternalFramesAssociatedWith(task.getLayerManager()).size();
-        if (framesUsingThisLayerManager==0) { 
-            getLayerManager().setFiringEvents(false);
-            getLayerManager().dispose();
-        }
+        
+        getLayerManager().setFiringEvents(false);
+        getLayerManager().dispose();
+        
         layerViewPanel.dispose();
         layerNamePanel.dispose();
 
@@ -198,6 +203,7 @@ public class TaskFrame extends JInternalFrame implements TaskFrameProxy,
         timer = null;
         splitPane = null;
     }
+    */
 
     public LayerManager getLayerManager() {
         return task.getLayerManager();

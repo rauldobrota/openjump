@@ -570,7 +570,7 @@ public class WorkbenchFrame extends JFrame implements LayerViewPanelContext,
 			}
 		});
 	}
-	public Collection getInternalFramesAssociatedWith(LayerManager layerManager) {
+	private Collection getInternalFramesAssociatedWith(LayerManager layerManager) {
 		ArrayList internalFramesAssociatedWithLayerManager = new ArrayList();
 		JInternalFrame[] internalFrames = getInternalFrames();
 		for (int i = 0; i < internalFrames.length; i++) {
@@ -581,6 +581,33 @@ public class WorkbenchFrame extends JFrame implements LayerViewPanelContext,
 			}
 		}
 		return internalFramesAssociatedWithLayerManager;
+	}
+    // added by [mmichaud 2007-06-03]
+    // Return TaskFrame s using the same layerManager
+    private Collection getTaskFramesAssociatedWith(LayerManager layerManager) {
+		ArrayList taskFramesAssociatedWithLayerManager = new ArrayList();
+		JInternalFrame[] internalFrames = getInternalFrames();
+		for (int i = 0; i < internalFrames.length; i++) {
+			if (internalFrames[i] instanceof TaskFrame
+			    && (((TaskFrame) internalFrames[i]).getLayerManager() == layerManager)) {
+				taskFramesAssociatedWithLayerManager.add(internalFrames[i]);
+			}
+		}
+		return taskFramesAssociatedWithLayerManager;
+	}
+    // added by [mmichaud 2007-06-03]
+    // Return every InternalFrame associated with taskFrame (taskFrame is excluded)
+    private Collection getInternalFramesAssociatedWith(TaskFrame taskFrame) {
+		ArrayList internalFramesAssociatedWithTaskFrame = new ArrayList();
+		JInternalFrame[] internalFrames = getInternalFrames();
+		for (int i = 0; i < internalFrames.length; i++) {
+			if (internalFrames[i] instanceof TaskFrameProxy
+                && (((TaskFrameProxy) internalFrames[i]).getTaskFrame() == taskFrame)
+                && internalFrames[i] != taskFrame) {
+				internalFramesAssociatedWithTaskFrame.add(internalFrames[i]);
+			}
+		}
+		return internalFramesAssociatedWithTaskFrame;
 	}
 	public TaskFrame addTaskFrame() {
 		TaskFrame f = addTaskFrame(createTask());
@@ -1064,19 +1091,64 @@ public class WorkbenchFrame extends JFrame implements LayerViewPanelContext,
 			}
 		}
 	}
+    
+    // Method completed by [mmichaud 2007-06-03] to close properly
+    // internal frames depending on a TaskFrame.
+    // Maybe this method should take place in TaskFrame instead...
 	private void closeTaskFrame(TaskFrame taskFrame) {
 		LayerManager layerManager = taskFrame.getLayerManager();
-		if (getInternalFramesAssociatedWith(layerManager).size() == 1) {
-			Collection modifiedItems = layerManager
-					.getLayersWithModifiedFeatureCollections();
-			if (confirmClose(I18N.get("ui.WorkbenchFrame.close-task"), modifiedItems)) {
-				GUIUtil.dispose(taskFrame, desktopPane);
-				layerManager.dispose();
-			}
-		} else {
-			GUIUtil.dispose(taskFrame, desktopPane);
-		}
+        Collection associatedFrames = getInternalFramesAssociatedWith(taskFrame);
+        boolean lastTaskFrame = getTaskFramesAssociatedWith(layerManager).size() == 1;
+        if (lastTaskFrame) {
+            Collection modifiedItems = layerManager.getLayersWithModifiedFeatureCollections();
+            if (confirmClose(I18N.get("ui.WorkbenchFrame.close-task"), modifiedItems)) {
+                // There are other internal frames associated with this task
+                if (associatedFrames.size() != 0) {
+                    // Confirm you want to close them first
+                    if (confirmClose(
+                        StringUtil.split(
+                        I18N.get("ui.WorkbenchFrame.other-internal-frames-depend-on-this-task-frame")
+                        + " " + I18N.get("ui.WorkbenchFrame.do-you-want-to-close-them-also"),
+                        60),
+                        I18N.get("ui.WorkbenchFrame.close-all"))) {
+                        for (java.util.Iterator it = associatedFrames.iterator() ;
+                             it.hasNext() ; ) {
+                            GUIUtil.dispose((JInternalFrame)it.next(), desktopPane);
+                        }
+                        
+                    }
+                    else return; // finally, I don't want to close
+                }
+                layerManager.dispose();
+                taskFrame.getLayerViewPanel().dispose();
+                taskFrame.getLayerNamePanel().dispose();
+                GUIUtil.dispose(taskFrame, desktopPane);
+            }
+            else return; // finally, I don't want to close
+        }
+        else {
+            // There are other internal frames associated with this task
+            if (associatedFrames.size() != 0) {
+                // Confirm you want to close them first
+                if (confirmClose(
+                    StringUtil.split(
+                    I18N.get("ui.WorkbenchFrame.other-internal-frames-depend-on-this-task-frame")
+                    + " " + I18N.get("ui.WorkbenchFrame.do-you-want-to-close-them-also"),
+                    60),
+                    I18N.get("ui.WorkbenchFrame.close-all"))) {
+                    for (java.util.Iterator it = associatedFrames.iterator() ;
+                        it.hasNext() ; ) {
+                        GUIUtil.dispose((JInternalFrame)it.next(), desktopPane);
+                    }
+                }
+                else return; // finally, I don't want to close
+            }
+            taskFrame.getLayerViewPanel().dispose();
+            taskFrame.getLayerNamePanel().dispose();
+            GUIUtil.dispose(taskFrame, desktopPane);
+        }
 	}
+    
 	private boolean confirmClose(String action, Collection modifiedLayers) {
 		if (modifiedLayers.isEmpty()) {
 			return true;
@@ -1096,6 +1168,15 @@ public class WorkbenchFrame extends JFrame implements LayerViewPanelContext,
 						.size()))) + "). "+I18N.get("ui.WorkbenchFrame.continue")+"?", 80),
 				JOptionPane.WARNING_MESSAGE);
 		pane.setOptions(new String[]{action, I18N.get("ui.WorkbenchFrame.cancel")});
+		pane.createDialog(this, "JUMP").setVisible(true);
+		return pane.getValue().equals(action);
+	}
+    
+    private boolean confirmClose(String question, String action) {
+		javax.swing.JOptionPane pane = new javax.swing.JOptionPane(question,
+				javax.swing.JOptionPane.WARNING_MESSAGE);
+		pane.setOptions(new String[]{action,
+            com.vividsolutions.jump.I18N.get("ui.WorkbenchFrame.cancel")});
 		pane.createDialog(this, "JUMP").setVisible(true);
 		return pane.getValue().equals(action);
 	}
