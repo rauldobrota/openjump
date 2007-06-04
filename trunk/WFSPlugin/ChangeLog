@@ -1,5 +1,11 @@
 2007-06-04  Stephan Holl <stephan.holl@intevation.de>
 
+	* Changes.txt: preparation for the next release: 1.0.0
+	* src/de/latlon/deejump/plugin/wfs/WFSPanel.java: adjust
+	version-number 
+
+2007-06-04  Stephan Holl <stephan.holl@intevation.de>
+
 	* src/de/latlon/deejump/util/data/JUMPFeatureFactory.java:
 	implementing a fix which repairs the casting of attributes to
 	strings. includes a simple heuristic to determine the type of the

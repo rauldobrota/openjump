@@ -1,3 +1,23 @@
+Version 1.0.0 (2007-06-03)
+
+  This release includes more fixes.
+
+  Features:
+  - support for EPSG:3067 in deegree2.jar
+  - updated I18N-translations (DE, FI)
+  - added more verbose logging-options
+  - WFSPlugin now uses the given proxy-entries from Java
+ 
+  Fixes:
+  - reenabled the Advanced-tab even if DescribeFeatureType fails -
+    essential feature for debugging.
+  - Some GUI-beautifying, rearranging buttons
+  - disabled GET/POST-selector
+  - Fix for DWithin-spatial filter
+  - Fix for the problems of null prefixes and false namespaces of 
+	misbehaving WFS 
+  - Fix for casting every attribute to strings
+  
 Version 0.3.0 (2007-05-10)
 
   This release includes major bugfixes
