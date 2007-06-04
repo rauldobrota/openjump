@@ -1,6 +1,12 @@
 2007-06-04  Stephan Holl <stephan.holl@intevation.de>
 
-	* de/intevation/printlayout/i18n/messages_de.properties: some typos in
+	* src/de/intevation/printlayout/resources/info.html,
+	  src/de/intevation/printlayout/resources/options_help.html, 
+	  src/de/intevation/printlayout/resources/options_help_de.html: fixed typos
+	
+2007-06-04  Stephan Holl <stephan.holl@intevation.de>
+
+	* src/de/intevation/printlayout/i18n/messages_de.properties: some typos in
 	german i18n-messages
 
 2007-05-27  Sascha L. Teichmann <sascha.teichmann@intevation.de>
