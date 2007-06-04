@@ -8,20 +8,14 @@
  */
 package de.latlon.deejump.util.data;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.URI;
 import java.util.Iterator;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.log4j.Logger;
 import org.deegree.datatypes.QualifiedName;
+import org.deegree.datatypes.Types;
 import org.deegree.datatypes.UnknownTypeException;
 import org.deegree.framework.util.IDGenerator;
 import org.deegree.framework.xml.Marshallable;
@@ -54,7 +48,6 @@ import com.vividsolutions.jump.feature.BasicFeature;
 import com.vividsolutions.jump.feature.FeatureCollection;
 import com.vividsolutions.jump.feature.FeatureDataset;
 import com.vividsolutions.jump.feature.FeatureSchema;
-import com.vividsolutions.jump.workbench.model.LayerManager;
 
 import de.latlon.deejump.ui.DeeJUMPException;
 
@@ -192,7 +185,7 @@ public class JUMPFeatureFactory {
 
         StringReader sr = new StringReader( s );
         
-        GMLFeatureCollectionDocument gfDoc = new GMLFeatureCollectionDocument();
+        GMLFeatureCollectionDocument gfDoc = new GMLFeatureCollectionDocument(true);
         org.deegree.model.feature.FeatureCollection newFeatCollec = null;
         try {
             gfDoc.load( sr, "http://dummySysId" );
@@ -269,7 +262,8 @@ public class JUMPFeatureFactory {
 
             if ( !geoProName.equals( name ) ) {
                 // TODO get schema to define correct type
-                fs.addAttribute( name, AttributeType.STRING );
+                //fs.addAttribute( name, AttributeType.STRING );
+                fs.addAttribute( name, findType( featTypeProps[j].getType() )  );
             } else {
                 fs.addAttribute( "GEOMETRY", AttributeType.GEOMETRY ); //$NON-NLS-1$
 
@@ -321,6 +315,39 @@ public class JUMPFeatureFactory {
 
         return jumpFC;
     }
+
+    /**
+     * @param type an SQL type code as in deegree Types class
+     * @return the JUMP type
+     */
+    private static AttributeType findType( int type ) {
+        // assumes integer for SQL's NUMERIC
+        String xsd = Types.getXSDTypeForSQLType(type, 0);
+
+        if(xsd.equals("dateTime")){
+            return AttributeType.DATE;
+        }
+
+        if(xsd.equals("gml:GeometryPropertyType")){
+            return AttributeType.GEOMETRY;
+        }
+
+        if(xsd.equals("integer")){
+            return AttributeType.INTEGER;
+        }
+        
+        if(xsd.equals("double") || xsd.equals("decimal") || xsd.equals("float")){
+            return AttributeType.DOUBLE;
+        }
+
+        if(xsd.equals("gml:FeaturePropertyType")){
+            return AttributeType.OBJECT; // unknown what happens in this case
+        }
+        
+        // default is string, should work for booleans as well
+        return AttributeType.STRING;
+    }
+
 
     /* TODO re-ignite!!!
     
