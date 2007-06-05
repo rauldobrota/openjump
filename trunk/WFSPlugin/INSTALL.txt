@@ -30,4 +30,6 @@ to the file README.txt.
 
 3. Start your OpenJUMP and you should use the WFSPlugin-icon on the right.
 
+-----------------------------------------------------------------------------------
+Development of the WFSPlugin was sponsored by the Finnish Agency for Rural Affairs.
 

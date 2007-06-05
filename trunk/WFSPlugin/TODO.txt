@@ -16,3 +16,5 @@
  - create user-documentation
  - replace the MaxFeature-selector to a more appropriate place (dunno
    where yet).
+ - Make casting of doubles not as integers (Problem resides in geoserver
+   and deegree)

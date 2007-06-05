@@ -58,3 +58,6 @@ I - Install
           installation (for additional jar-files please refer to the 
           INSTALL.txt).
 
+-----------------------------------------------------------------------------------
+Development of the WFSPlugin was sponsored by the Finnish Agency for Rural Affairs.
+
