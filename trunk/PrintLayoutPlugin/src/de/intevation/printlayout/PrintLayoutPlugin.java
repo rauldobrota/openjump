@@ -58,7 +58,7 @@ implements   ThreadedPlugIn
 	/**
 	 * This is the current version of the plug in.
 	 */
-	public static final String PLUGIN_VERSION = "1.0.0";
+	public static final String PLUGIN_VERSION = "1.0.1";
 
 	/**
 	 * the black board of the plugin

@@ -1,6 +1,21 @@
 General Changes of PrintLayout Plugin
 -------------------------------------
 
+Version 1.0.1 (2007-06-05)
+
+  Bugfix release
+
+  * New: Enable legends for Layerables (WMS)
+  * New: New factory model for SVG map generation
+  * New: Ability to print transparent maps
+  * New: Enable legends for Layerables (WMS)
+  * New: New factory model for SVG map generation
+  * Fixed: removing some unneeded imports
+  * Fixed: updated i18n-messages, typos fixed
+  * Fixed: make fetching asynchron layers (WMS/DB) more reliably
+  * various cleanups
+
+
 Version 1.0.0 (2007-04-27)
 
   The Grand release.

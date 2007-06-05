@@ -1,3 +1,9 @@
+2007-06-05  Stephan Holl <stephan.holl@intevation.de>
+
+	* Changes.txt: preparation for bugfix release 1.0.1
+	* src/de/intevation/printlayout/PrintLayoutPlugin.java: Version to	1.0.1
+	* src/de/intevation/printlayout/resources/about.html: added credits
+	
 2007-06-04  Stephan Holl <stephan.holl@intevation.de>
 
 	* src/de/intevation/printlayout/resources/info.html,
