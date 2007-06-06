@@ -1,3 +1,27 @@
+2007-06-06  s-l-teichmann <teichmann@intevation.de>
+
+	* ChangeLog: Moving around my generated ChangeLog locally eated my last ChangeLog entry. ;-)
+
+2007-06-06  s-l-teichmann <teichmann@intevation.de>
+
+	- Fix for expensive BasicStyle construction (slowed down colour theming a lot)
+	- Reorganisation of ChangeLog, Changes.txt and TODO.txt
+
+	* src/com/vividsolutions/jump/workbench/ui/renderer/style/BasicStyle.java,
+	  src/com/vividsolutions/jump/workbench/ui/style/BasicStylePanel.java:
+		Applied patches to solve the problem of expensive BasicStyle object
+		construction. A WKTFillPattern was created also which slows down
+		construction by factor 100. Now BasicStyle are constructed without
+		a fill pattern.
+
+	* src/ChangeLog, src/Changes.txt, src/TODO.txt: removed
+
+	* ChangeLog: readded here and fill with content from cvs2cl.pl.
+	  From now on maintain it manually, please! Thanks.
+
+	* TODO.txt, Changes.txt: readded here to make them more visible
+	  and emphasize the fact that they are for etc/, lib/ and so on too.
+
 2007-06-05  mentaer <sstein@geo.unizh.ch>
 
 	* lib/ext/BeanTools/dissolve.bsh: added dissolve beanshell script
