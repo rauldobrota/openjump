@@ -56,18 +56,23 @@ public class BasicStyle implements Style {
     private boolean renderingLinePattern = false;
     private boolean renderingFillPattern = false;
 
+		public static final Color       DEFAULT_FILL_COLOR  = new Color(0, 0, 0, 255);
+		public static final Color       DEFAULT_LINE_COLOR  = DEFAULT_FILL_COLOR;
+		public static final BasicStroke DEFAULT_FILL_STROKE = new BasicStroke(1);
+
     //The important thing here is the initial alpha. [Jon Aquino]
-    private Color fillColor = new Color(0, 0, 0, 255);
-    private Color lineColor = new Color(0, 0, 0, 255);
+    private Color fillColor = DEFAULT_FILL_COLOR;
+    private Color lineColor = DEFAULT_LINE_COLOR;
+
     private BasicStroke lineStroke;
-    private Stroke fillStroke = new BasicStroke(1);
+    private Stroke fillStroke = DEFAULT_FILL_STROKE;
     private boolean enabled = true;
     private String linePattern = "3";
 
     //Set fill pattern to something, so that the BasicStylePanel combobox won't
     //start empty. [Jon Aquino]
-    private Paint fillPattern = WKTFillPattern.createDiagonalStripePattern(4,
-            2, false, true);
+		// Fixing the GUI is a better idea! [s-l-teichmann]
+    private Paint fillPattern;
 
     public BasicStyle(Color fillColor) {
         setFillColor(fillColor);

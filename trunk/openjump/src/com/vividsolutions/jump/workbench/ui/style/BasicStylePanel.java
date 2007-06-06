@@ -457,8 +457,12 @@ public class BasicStylePanel extends JPanel {
         //Because fillPatternComboBox is not editable, we must use findEquivalentItem,
         //otherwise the combobox gets confused and a stack overflow occurs
         //if the two items are equal but not == . [Jon Aquino]
-        fillPatternComboBox.setSelectedItem(findEquivalentItem(
-                basicStyle.getFillPattern(), fillPatternComboBox));
+
+				Object fill = findEquivalentItem(basicStyle.getFillPattern(), fillPatternComboBox);
+
+				if (fill != null)
+					fillPatternComboBox.setSelectedItem(fill);
+
         updateControls();
     }
 
@@ -477,6 +481,16 @@ public class BasicStylePanel extends JPanel {
     }
 
     private Object findEquivalentItem(Object item, JComboBox comboBox) {
+
+				if (comboBox == null)
+					return null;
+
+				if (item == null) {
+					return comboBox.getItemCount() > 0
+						? comboBox.getItemAt(0)
+						: null;
+				}
+
         for (int i = 0; i < comboBox.getItemCount(); i++) {
             if (item.equals(comboBox.getItemAt(i))) {
                 return comboBox.getItemAt(i);
