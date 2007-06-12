@@ -125,13 +125,13 @@ import java.util.*;
  *
  * <table border='1' cellspacing='0' cellpadding='4'>
  *   <tr>
- *     <th>First non-NULL geometry in FeatureCollection</th>
+ *     <th>First non-NULL non-Point geometry in FeatureCollection</th>
  *      <th>Coordinate Dimensionality</th>
  *      <th>Shape Type</th>
  *   </tr>
  *   <tr>
  *     <td>
- *        POINT/MULTIPOINT
+ *        MULTIPOINT
  *     </td>
  *     <td>
  *        xy xym xyzm     
@@ -160,6 +160,22 @@ import java.util.*;
  *     </td>
  *     <td>
  *	   POLYGON POLYGONM POLYGONZ
+ *     </td>
+ *   </tr>
+ *   <tr>
+ *     <th>All geometries in FeatureCollection are</th>
+ *      <th>Coordinate Dimensionality</th>
+ *      <th>Shape Type</th>
+ *   </tr>
+ *   <tr>
+ *     <td>
+ *        POINT
+ *     </td>
+ *     <td>
+ *        xy xym xyzm     
+ *     </td>
+ *     <td>
+ *	     POINT POINTM POINTZ
  *     </td>
  *   </tr>
  * </table>
@@ -479,12 +495,17 @@ public class ShapefileWriter implements JUMPWriter {
      **/
     int findBestGeometryType(FeatureCollection fc) {
         Geometry geom;
-
+        // [mmichaud 2007-06-12] : add the type variable to test if
+        // all geometries are single Point
+        // maybe it would be clearer using shapefile types integer for type
+        int type = 0;
+        
         for (Iterator i = fc.iterator(); i.hasNext();) {
             geom = ((Feature) i.next()).getGeometry();
 
             if (geom instanceof Point) {
-                return 1;
+                // [mmichaud 2007-06-12] type is -1 while geometries are Point
+                type = -1;
             }
 
             if (geom instanceof MultiPoint) {
@@ -508,7 +529,8 @@ public class ShapefileWriter implements JUMPWriter {
             }
         }
 
-        return 0;
+        return type; // return  0 if all geometries are null
+                     // return -1 if all geometries are single point
     }
 
     /**
@@ -602,6 +624,18 @@ public class ShapefileWriter implements JUMPWriter {
             geom = ((Feature) features.get(t)).getGeometry();
 
             switch (geomtype) {
+            // 2007/06/12 : add -1 case for collections with only single points
+            // maybe it would be clearer using shapefile types integer for geomtype
+            case -1: //single point
+
+                if ((geom instanceof Point)) {
+                    allGeoms[t] = (Point) geom;
+                } else {
+                    allGeoms[t] = new Point(null, new PrecisionModel(), 0);
+                }
+
+                break;
+                
             case 1: //point
 
                 if ((geom instanceof Point)) {
