@@ -10,8 +10,12 @@ package de.latlon.deejump.util.data;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.deegree.datatypes.QualifiedName;
@@ -20,12 +24,16 @@ import org.deegree.datatypes.UnknownTypeException;
 import org.deegree.framework.util.IDGenerator;
 import org.deegree.framework.xml.Marshallable;
 import org.deegree.framework.xml.XMLParsingException;
+import org.deegree.framework.xml.schema.XMLSchemaException;
 import org.deegree.model.crs.CoordinateSystem;
+import org.deegree.model.crs.UnknownCRSException;
 import org.deegree.model.feature.FeatureFactory;
 import org.deegree.model.feature.FeatureProperty;
 import org.deegree.model.feature.GMLFeatureCollectionDocument;
 import org.deegree.model.feature.schema.AbstractPropertyType;
 import org.deegree.model.feature.schema.FeatureType;
+import org.deegree.model.feature.schema.GMLSchema;
+import org.deegree.model.feature.schema.GMLSchemaDocument;
 import org.deegree.model.feature.schema.PropertyType;
 import org.deegree.model.filterencoding.ComplexFilter;
 import org.deegree.model.filterencoding.Filter;
@@ -49,6 +57,7 @@ import com.vividsolutions.jump.feature.FeatureCollection;
 import com.vividsolutions.jump.feature.FeatureDataset;
 import com.vividsolutions.jump.feature.FeatureSchema;
 
+import de.latlon.deejump.plugin.wfs.AbstractWFSWrapper;
 import de.latlon.deejump.ui.DeeJUMPException;
 
 /**
@@ -147,13 +156,14 @@ public class JUMPFeatureFactory {
      * @param request
      *            the GetFeature request
      * @return a deegree FeatureCollection
+     * @throws Exception throwing ALL exceptions
      */
     public static org.deegree.model.feature.FeatureCollection createDeegreeFCfromWFS(
-                                                                                     String serverUrl,
+                                                                                     AbstractWFSWrapper serverUrl,
                                                                                      GetFeature request )
         throws Exception {
 
-        return createDeegreeFCfromWFS( serverUrl, ( (Marshallable) request ).exportAsXML() );
+        return createDeegreeFCfromWFS( serverUrl, ( (Marshallable) request ).exportAsXML(), null );
     }
 
 
@@ -163,16 +173,17 @@ public class JUMPFeatureFactory {
      * server.
      * 
      * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei </a>
-     * @param serverUrl
+     * @param server
      *            the URL of the WFS server
      * @param request
      *            the GetFeature request
+     * @param featureType if non null, a DescribeFeatureType will be performed to get the correct schema
      * @return a deegree FeatureCollection
      * @throws DeeJUMPException 
      */
-    public static org.deegree.model.feature.FeatureCollection createDeegreeFCfromWFS( String serverUrl, String request ) throws DeeJUMPException {
-
-        String s = WFSClientHelper.createResponsefromWFS( serverUrl, request );
+    public static org.deegree.model.feature.FeatureCollection createDeegreeFCfromWFS( AbstractWFSWrapper server, String request, QualifiedName featureType ) throws DeeJUMPException {
+        
+        String s = WFSClientHelper.createResponsefromWFS( server.getGetFeatureURL(), request );
         
         if ( s.indexOf( "<Exception>" ) >= 0 || s.indexOf( "<ServiceExceptionReport" ) >= 0 ) { //$NON-NLS-1$ //$NON-NLS-2$
             RuntimeException re = new RuntimeException( "Couldn't get data from WFS:\n" //$NON-NLS-1$
@@ -185,7 +196,33 @@ public class JUMPFeatureFactory {
 
         StringReader sr = new StringReader( s );
         
-        GMLFeatureCollectionDocument gfDoc = new GMLFeatureCollectionDocument(true);
+        GMLFeatureCollectionDocument gfDoc = new GMLFeatureCollectionDocument();
+
+        // get schema from server
+        if(featureType != null){
+            Map<URI, GMLSchema> schemaMap = new HashMap<URI, GMLSchema>();
+            String dft = server.getDescribeTypeURL(featureType);
+            GMLSchemaDocument doc = new GMLSchemaDocument();
+            try {
+                doc.load(new URL(dft));
+                GMLSchema schema = doc.parseGMLSchema();
+                schemaMap.put(featureType.getNamespace(), schema);
+                gfDoc.setSchemas(schemaMap);
+            } catch ( XMLSchemaException e ) {
+                LOG.debug("DescribeFeatureType did not work.");
+            } catch ( UnknownCRSException e ) {
+                LOG.debug("DescribeFeatureType did not work.");
+            } catch ( XMLParsingException e ) {
+                LOG.debug("DescribeFeatureType did not work.");
+            } catch ( MalformedURLException e ) {
+                LOG.debug("DescribeFeatureType did not work.");
+            } catch ( IOException e ) {
+                LOG.debug("DescribeFeatureType did not work.");
+            } catch ( SAXException e ) {
+                LOG.debug("DescribeFeatureType did not work.");
+            }
+        }
+        
         org.deegree.model.feature.FeatureCollection newFeatCollec = null;
         try {
             gfDoc.load( sr, "http://dummySysId" );

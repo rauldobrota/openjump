@@ -161,7 +161,8 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
         String crs = rd.getWFSPanel().getGMLGeometrySRS();
         
         org.deegree.model.feature.FeatureCollection dfc = 
-            JUMPFeatureFactory.createDeegreeFCfromWFS( rd.getWFSPanel().getWfService().getGetFeatureURL() , request );
+            JUMPFeatureFactory.createDeegreeFCfromWFS(rd.getWFSPanel().getWfService(), request,
+                                                      rd.getWFSPanel().getFeatureType());
         
         monitor.report( "Parsing feature collection (size = " + dfc.size() +")"  );
         FeatureCollection dataset = JUMPFeatureFactory.createFromDeegreeFC( dfc );

@@ -1,3 +1,11 @@
+2007-06-13  Stephan Holl <stephan.holl@intevation.de>
+
+	* src/de/latlon/deejump/plugin/wfs/WFSPlugIn.java,
+	src/de/latlon/deejump/util/data/JUMPFeatureFactory.java: Fix for wrong
+	schema-parsing. This patch provided by Andreas Schmitz fixes the
+	casting of FeatureTypes in OJ. Now the DataTypes provided in
+	DescribeFeatureType are used.
+	
 2007-06-05  Stephan Holl <stephan.holl@intevation.de>
 
 	* TODO.txt, INSTALL.txt, README.txt: added credits of the Finnish Agency for Rural Affairs
