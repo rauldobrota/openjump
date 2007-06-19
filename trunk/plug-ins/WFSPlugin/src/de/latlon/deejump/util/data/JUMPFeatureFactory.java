@@ -80,6 +80,7 @@ public class JUMPFeatureFactory {
      * @param deegreeFeatCollec
      *            the deegree FeatureCollection
      * @return the new JUMP FeatureCollection
+     * @throws Exception 
      */
     public static FeatureCollection createFromDeegreeFC( org.deegree.model.feature.FeatureCollection deegreeFeatCollec )
         throws Exception {
@@ -96,12 +97,12 @@ public class JUMPFeatureFactory {
      * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei </a>
      * @param version
      *            the WFS version
-     * @param localName
+     * @param qualName
      *            the feature (type) name
      * @param envelope
      *            the box inside of which data has been requested
-     * @param prefix 
      * @return a wfs GetFeature request
+     * @throws Exception 
      */
     public static GetFeature createFeatureRequest( String version, QualifiedName qualName,
                                                             org.deegree.model.spatialschema.Envelope envelope ) throws Exception {
@@ -238,7 +239,23 @@ public class JUMPFeatureFactory {
             throw new DeeJUMPException( mesg, e  );
         } catch ( XMLParsingException e ) {
             String mesg = "Error parsing response."; 
-            LOG.error( mesg, e );
+            LOG.error(mesg, e);
+            try {
+                LOG.error("Schema could not be used to validate FeatureCollection.");
+                LOG.error("Trying once again with crude guessing method.");
+                gfDoc = new GMLFeatureCollectionDocument(true);
+                gfDoc.load(sr, "http://www.systemid.org");
+                newFeatCollec = gfDoc.parse();
+            } catch ( SAXException e1 ) {
+                LOG.error( mesg, e );
+                throw new DeeJUMPException( mesg, e  );
+            } catch ( IOException e1 ) {
+                LOG.error( mesg, e );
+                throw new DeeJUMPException( mesg, e  );
+            } catch ( XMLParsingException e1 ) {
+                LOG.error( mesg, e );
+                throw new DeeJUMPException( mesg, e  );
+            }
             throw new DeeJUMPException( mesg, e  );
         }
         
@@ -258,6 +275,7 @@ public class JUMPFeatureFactory {
      * @param defaultGeometry
      *            the geometry of the returned FeatureCollection
      * @return the new JUMP FeatureCollection
+     * @throws Exception 
      */
     public static FeatureCollection createFromDeegreeFC(org.deegree.model.feature.FeatureCollection deegreeFeatCollec,
                                                         Geometry defaultGeometry )
@@ -291,7 +309,7 @@ public class JUMPFeatureFactory {
         }
         
         PropertyType[] featTypeProps = ft.getProperties();
-        Object[] properties = feats[0].getProperties();
+//        Object[] properties = feats[0].getProperties();
 
         // populate JUMP schema
         for ( int j = 0; j < featTypeProps.length; j++ ) {
@@ -386,6 +404,12 @@ public class JUMPFeatureFactory {
     }
 
 
+    /**
+     * @param jumpFeatureCollection
+     * @return a deegree FeatureCollection
+     * @throws UnknownTypeException
+     * @throws GeometryException
+     */
     /* TODO re-ignite!!!
     
     public static WFSLayer createWFSLayer(
@@ -418,7 +442,7 @@ public class JUMPFeatureFactory {
         final URI GMLNS = CommonNamespaces.GMLNS;
         final URI XSNS = CommonNamespaces.XSNS;
         
-        for (Iterator iter = jumpFeatureCollection.iterator(); iter.hasNext();) {
+        for (Iterator<?> iter = jumpFeatureCollection.iterator(); iter.hasNext();) {
             com.vividsolutions.jump.feature.Feature feature = 
                 (com.vividsolutions.jump.feature.Feature) iter.next();
             
@@ -494,10 +518,17 @@ public class JUMPFeatureFactory {
         }
     }
          
+    /**
+     * @return the maxFeatures setting
+     */
     public static int getMaxFeatures() {
         return maxFeatures;
     }
     
+    /**
+     * @param type
+     * @return converts type to xsd typename
+     */
     public static String toXSDName( AttributeType type ){
         String t = null;
         if( type == AttributeType.DATE ){

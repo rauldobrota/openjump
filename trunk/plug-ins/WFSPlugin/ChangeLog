@@ -1,3 +1,9 @@
+2007-06-19  Andreas Schmitz <schmitz@lat-lon.de>
+
+  * src/de/latlon/deejump/util/data/JUMPFeatureFactory.java: Workaround for
+	  buggy setups where the feature collection documents cannot be validated
+		against their Schema.
+
 2007-06-13  Stephan Holl <stephan.holl@intevation.de>
 
 	* src/de/latlon/deejump/plugin/wfs/WFSPlugIn.java,
