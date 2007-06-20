@@ -1,3 +1,8 @@
+2007-06-20  Stephan Holl <stephan.holl@intevation.de>
+
+	* added trunk, branches and tags and moved everything into trunk
+	* recommited broken jars from lib/-folder
+
 2007-06-19  Andreas Schmitz <schmitz@lat-lon.de>
 
   * src/de/latlon/deejump/util/data/JUMPFeatureFactory.java: Workaround for
