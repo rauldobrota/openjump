@@ -1,5 +1,10 @@
 2007-06-21  Stephan Holl <stephan.holl@intevation.de>
 
+	* src/de/latlon/deejump/ui/messages_fr.properties>: thanks to sascha,
+	I forgot this one...
+
+2007-06-21  Stephan Holl <stephan.holl@intevation.de>
+
 	* src/de/latlon/deejump/ui/messages_de.properties,
 	src/de/latlon/deejump/ui/messages_fi.properties: Unicode-repairs in
 	the translations
