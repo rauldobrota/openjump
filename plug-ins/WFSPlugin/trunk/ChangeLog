@@ -1,5 +1,11 @@
 2007-06-21  Stephan Holl <stephan.holl@intevation.de>
 
+	* src/de/latlon/deejump/ui/messages_de.properties,
+	src/de/latlon/deejump/ui/messages_fi.properties: Unicode-repairs in
+	the translations
+	
+2007-06-21  Stephan Holl <stephan.holl@intevation.de>
+
 	* deleted, readded and recommited broken jars from lib/-folder:
 	Sorry..
 
