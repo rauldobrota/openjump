@@ -1,3 +1,11 @@
+2007-06-22  Sascha L. Teichmann <sascha.teichmann@intevation.de>
+
+	* bin/run.sh:
+	  - added OJ's batik sub folder to list of searched CLASSPATH folders.
+		- extended limit of maximum used memory to 768MB
+		- If $PRINTHOME is not found use $HOME/prog/PrintLayoutPlugin-svn
+		  as default to distinguish between CVS and SVN.
+		
 2007-06-05  Stephan Holl <stephan.holl@intevation.de>
 
 	* created trunk, branches, tags-subfolder and added everything under
