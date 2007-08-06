@@ -21,15 +21,12 @@ Guide for developers for creating a new release
    $ cp WFSPlugin/INSTALL.txt WFSPlugin-N.N.N
    $ cp WFSPlugin/dist/wfsplugin-YYYYMMDD.jar WFSPlugin-N.N.N/wfsplugin.jar
    $ cd WFSPlugin-N.N.N
-   $ cvs -d:pserver:anonymous@jump-pilot.cvs.sourceforge.net:/cvsroot/jump-pilot login
-   (just hit return)
-   $ cvs -z3
-   -d:pserver:anonymous@jump-pilot.cvs.sourceforge.net:/cvsroot/jump-pilot co WFSPlugin
+   $ svn export http://jump-pilot.svn.sourceforge.net/svnroot/jump-pilot/plug-ins/WFSPlugin/trunk WFSPlugin
 
-   (check whether the anonymous CVS is in sync with the master CVS.
+   (check whether the anonymous SVN is in sync with the master SVN.
    The following command should not result anything, ie. files are
    identical. If the diff commands shows differences, you need
-   to wait until the anonymous CVS has catched up or use your
+   to wait until the anonymous SVN has catched up or use your
    write access acount for getting the current contents)
    $ diff WFSPlugin/ChangeLog ../WFSPlugin/ChangeLog
 
@@ -38,7 +35,10 @@ Guide for developers for creating a new release
    $ cd ..
    $ zip -r WFSPlugin-N.N.N.zip WFSPlugin-N.N.N
 
-6. Upload to SourceForge:
+6. Tag release:
+   $ svn copy . ../tags/release_WFSPlugin-N.N.N
+   
+7. Upload to SourceForge:
    $ ftp upload.sourceforge.net
    Login as "anonymous"
    Use your e-mail address as the password for this login
@@ -47,9 +47,9 @@ Guide for developers for creating a new release
    ftp> put WFSPlugin-N.N.N.zip
    ftp> exit
 
-7. Create release "N.N.N" on SourceForge
+8. Create release "N.N.N" on SourceForge
 
-8. Send a announcement mail to jump-users@lists.jump-project.org,
+9. Send a announcement mail to jump-users@lists.jump-project.org,
    jump-devel@lists.jump-project.org, freegis-list@intevation.de, 
    geoserver-users@lists.sourceforge.net
 
