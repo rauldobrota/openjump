@@ -1,9 +1,5 @@
 2007-08-06  Stephan Holl <stephan.holl@intevation.de>
 
-	* ../tags/pre_wfs-t-commits: added tag
-
-2007-08-06  Stephan Holl <stephan.holl@intevation.de>
-
 	* HowTo-Release.txt: added note that sources are switched to svn, added topic to tag after a new
 	release
 	
