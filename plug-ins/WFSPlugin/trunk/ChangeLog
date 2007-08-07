@@ -1,4 +1,8 @@
 2007-08-07  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/plugin/wfs/WFSFrame.java:
+        Fixed the WFSFrame to allow standalone usage again.
+
+2007-08-07  Andreas Schmitz <schmitz@lat-lon.de>
         lib/deegree2.jar,
         src/de/latlon/deejump/ui/messages_fi.properties,
         src/de/latlon/deejump/ui/messages.properties,
