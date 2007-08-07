@@ -162,24 +162,3 @@ public class WFSClientHelper {
         return s;
     }
 }
-
-/* ********************************************************************
-Changes to this class. What the people have been up to:
-
-$Log$
-Revision 1.5  2007/05/16 12:15:17  taddei
-added logging output
-
-Revision 1.4  2007/05/15 08:04:46  taddei
-check if user and prox host are null, before settign them.
-
-Revision 1.3  2007/05/14 12:35:09  taddei
-candidate fix for proxy problem.
-
-Revision 1.2  2007/04/27 13:00:12  taddei
-minor change in returned object
-
-Revision 1.1  2007/04/26 13:14:29  taddei
-Added new classes.
-
-********************************************************************** */

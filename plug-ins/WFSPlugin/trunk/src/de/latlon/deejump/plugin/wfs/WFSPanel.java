@@ -8,8 +8,8 @@
  */
 package de.latlon.deejump.plugin.wfs;
 
-import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
@@ -21,9 +21,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -41,19 +41,24 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.border.Border;
 
+import org.apache.log4j.Logger;
 import org.deegree.datatypes.QualifiedName;
 import org.deegree.framework.xml.XMLFragment;
 import org.deegree.model.crs.CoordinateSystem;
 import org.deegree.model.spatialschema.Geometry;
 import org.deegree.model.spatialschema.GeometryImpl;
 import org.deegree.ogcwebservices.wfs.capabilities.WFSFeatureType;
-import org.deegree.ogcwebservices.wfs.operation.GetFeature;
+import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jump.workbench.WorkbenchContext;
 
+import de.latlon.deejump.plugin.wfs.auth.LoginDialog;
+import de.latlon.deejump.plugin.wfs.auth.MD5Hasher;
+import de.latlon.deejump.plugin.wfs.auth.UserData;
+import de.latlon.deejump.ui.DeeJUMPException;
 import de.latlon.deejump.ui.ExtensibleComboBox;
 import de.latlon.deejump.ui.Messages;
-import de.latlon.deejump.ui.XMLEditorPane;
 
 /**
  * This is a panel which contains other basic GUIs for accessing Features of
@@ -66,6 +71,8 @@ import de.latlon.deejump.ui.XMLEditorPane;
  */
 public class WFSPanel extends JPanel {
 
+    protected static final Logger LOG = Logger.getLogger(WFSPanel.class);
+    
     //TODO put a props
     static final String releaseVersion = "1.0.0";
 
@@ -80,7 +87,7 @@ public class WFSPanel extends JPanel {
     /** Search uses a selected (GML) geometry as spatial criteria */
     public static final String SELECTED_GEOM = "SELECTED_GEOM";
 
-    private static List servers = new ArrayList();
+    private List<String> servers = new ArrayList<String>();
 
     private static File lastDirectory;
 
@@ -140,10 +147,18 @@ public class WFSPanel extends JPanel {
 
     WFSPanelButtons controlButtons;
 
-    private XMLEditorPane xmlPane;
+    private JTextArea xmlPane;
 
-    public WFSPanel( List<String> urlList ) {
-        super();
+    private UserData logins;
+
+    private WorkbenchContext context;
+    
+    /**
+     * @param context 
+     * @param urlList the list of servers
+     */
+    public WFSPanel( WorkbenchContext context, List<String> urlList ) {
+	this.context = context;
         setWFSList( urlList );
         initGUI();
         this.options = new WFSOptions();
@@ -171,7 +186,12 @@ public class WFSPanel extends JPanel {
         connecButton.setAlignmentX( 0.5f );
         connecButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
-                reinitService( (String) serverCombo.getSelectedItem() );
+                try {
+		    reinitService( (String) serverCombo.getSelectedItem() );
+		} catch (DeeJUMPException e1) {
+		    LOG.info("Service could not be initialized.");
+		    LOG.debug("Stack trace: ", e1);
+		}
             }
         } );
 
@@ -183,6 +203,13 @@ public class WFSPanel extends JPanel {
 
             }
         } );
+        
+        JButton loginButton = new JButton(Messages.getString("FeatureResearchDialog.login"));
+        loginButton.addActionListener(new ActionListener(){
+	    public void actionPerformed(ActionEvent e) {
+		performLogin();
+	    }
+        });
 
         JPanel p = new JPanel();
         p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
@@ -193,6 +220,7 @@ public class WFSPanel extends JPanel {
         JPanel innerPanel = new JPanel();
         innerPanel.add( connecButton );
         innerPanel.add( capabilitiesButton );
+        innerPanel.add( loginButton );
         p.add( innerPanel );
 
         featureTypeCombo = createFeatureTypeCombo();
@@ -255,6 +283,37 @@ public class WFSPanel extends JPanel {
         //        setPreferredSize( new Dimension( 400, 600 ) );
     }
 
+    protected void performLogin() {
+        LoginDialog dialog = new LoginDialog( (Dialog)this.getTopLevelAncestor(), Messages.getString("FeatureResearchDialog.login"), serverCombo.getSelectedItem().toString() );
+
+        String pass = dialog.getPassword();
+        String user = dialog.getName();
+
+        if(user == null || user.equals("")){
+            JOptionPane.showMessageDialog(this, Messages.getString("WFSPanel.userEmpty"));
+            return;
+        }
+
+        if(pass == null || pass.equals("")){
+            JOptionPane.showMessageDialog(this, Messages.getString("WFSPanel.passEmpty"));
+            return;
+        }
+
+        logins = new UserData(user, MD5Hasher.getMD5(pass));
+        context.getBlackboard().put( "LOGINS", logins );
+        
+        try{
+            reinitService( (String) serverCombo.getSelectedItem() );
+        }catch(DeeJUMPException ex){
+            String msg = Messages.getString("WFSPanel.loginFailed") + "\n" + ex.getLocalizedMessage() + "\n" + Messages.getString("WFSPanel.loginFailed2");
+            JOptionPane.showMessageDialog(this, msg);
+            ex.printStackTrace();
+            return;
+        }
+
+        JOptionPane.showMessageDialog(this, Messages.getString("WFSPanel.loginSuccessful"));
+    }
+
     // Gh 15.11.05
     private JComboBox createServerCombo() {
         // 
@@ -282,11 +341,19 @@ public class WFSPanel extends JPanel {
     
     void createXMLFrame( final Component parent, String txt ) {
 
-        //FIXME: this is still too slow...
-
-        //final XMLEditorPane xe = new XMLEditorPane( txt );
+	// try to beautify the XML
+	XMLFragment doc = new XMLFragment();
+	try {
+	    doc.load(new StringReader(txt), "http://www.systemid.org");
+	    txt = doc.getAsPrettyString();
+	} catch (SAXException e) {
+	    // ignore and use the old text
+	} catch (IOException e) {
+	    // ignore and use the old text
+	}
+	
         if ( xmlPane == null ){
-            xmlPane = new XMLEditorPane( txt );
+            xmlPane = new JTextArea( txt );
         } else {
             xmlPane.setText( txt );
         }
@@ -306,24 +373,14 @@ public class WFSPanel extends JPanel {
                                       JOptionPane.PLAIN_MESSAGE, null, opts, opts[1] );
        
         if( i == 0 ){ // save our capabilities!
-            WFSPanel.saveTextToFile( parent, xmlPane.getVisibleText() );
+            WFSPanel.saveTextToFile( parent, xmlPane.getText() );
         } 
     }
 
-    private void reinitService( String url ) {
-        try {
-            wfService = "1.1.0".equals( this.wfsVersion ) ? new WFServiceWrapper_1_1_0( url )
-                                                         : new WFServiceWrapper_1_0_0( url );
+    private void reinitService( String url ) throws DeeJUMPException {
+            wfService = "1.1.0".equals( this.wfsVersion ) ? new WFServiceWrapper_1_1_0( logins, url )
+                                                         : new WFServiceWrapper_1_0_0( logins, url );
             refreshGUIs();
-        } catch ( Exception e ) {
-            JOptionPane.showMessageDialog( this, "Could not connect to WFS server at '" + url
-                                                 + "'\n" + e.getMessage(), "Error",
-                                           JOptionPane.ERROR_MESSAGE );
-
-            this.controlButtons.okButton.setEnabled( false );
-            e.printStackTrace();
-        }
-
     }
 
     private Component createVersionButtons( String[] versions ) {
@@ -498,8 +555,11 @@ public class WFSPanel extends JPanel {
 
         final String outputFormat = options.getSelectedOutputFormat();
 
-        sb.append( "<wfs:GetFeature xmlns:ogc=\"http://www.opengis.net/ogc\" " )
-        .append("xmlns:gml=\"http://www.opengis.net/gml\" " )
+        sb.append( "<wfs:GetFeature xmlns:ogc=\"http://www.opengis.net/ogc\" " );
+        if(logins != null && logins.getUsername() != null && logins.getPassword() != null) {
+            sb.append("user=\"" + logins.getUsername() + "\" password=\"" + logins.getPassword() + "\" ");
+        }
+        sb.append("xmlns:gml=\"http://www.opengis.net/gml\" " )
         .append("xmlns:wfs=\"http://www.opengis.net/wfs\" service=\"WFS\" " )
         .append("version=\"" ).append(wfService.getServiceVersion() ).append("\" " )
         .append("maxFeatures=\"" ).append( options.getMaxFeatures() ).append("\" " )
@@ -565,32 +625,15 @@ public class WFSPanel extends JPanel {
         QualifiedName qn = getChosenGeoProperty();
 
         if ( envelope != null ) {
-            sb.append( "<ogc:BBOX>" ).append( "<ogc:PropertyName>" ).append( ft.getPrefix() ).append(
-                                                                                                      ":" ).append(
-                                                                                                                    qn.getLocalName() ).append(
-                                                                                                                                                "</ogc:PropertyName>" ).append(
-                                                                                                                                                                                "<gml:Box><gml:coord>" ).append(
-                                                                                                                                                                                                                 "<gml:X>" ).append(
-                                                                                                                                                                                                                                     envelope.getMinX() ).append(
-                                                                                                                                                                                                                                                                  "</gml:X>" ).append(
-                                                                                                                                                                                                                                                                                       "<gml:Y>" ).append(
-                                                                                                                                                                                                                                                                                                           envelope.getMinY() ).append(
-                                                                                                                                                                                                                                                                                                                                        "</gml:Y>" ).append(
-                                                                                                                                                                                                                                                                                                                                                             "</gml:coord><gml:coord>" ).append(
-                                                                                                                                                                                                                                                                                                                                                                                                 "<gml:X>" ).append(
-                                                                                                                                                                                                                                                                                                                                                                                                                     envelope.getMaxX() ).append(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                  "</gml:X>" ).append(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                       "<gml:Y>" ).append(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           envelope.getMaxY() ).append(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "</gml:Y>" ).append(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             "</gml:coord></gml:Box></ogc:BBOX>" );
+            sb.append( "<ogc:BBOX>" ).append( "<ogc:PropertyName>" ).append( ft.getPrefix() ).append( ":" );
+            sb.append( qn.getLocalName() ).append( "</ogc:PropertyName>" ).append( "<gml:Box><gml:coord>" );
+            sb.append( "<gml:X>" ).append( envelope.getMinX() ).append( "</gml:X>" ).append( "<gml:Y>" );
+            sb.append( envelope.getMinY() ).append( "</gml:Y>" ).append( "</gml:coord><gml:coord>" );
+            sb.append( "<gml:X>" ).append( envelope.getMaxX() ).append( "</gml:X>" ).append( "<gml:Y>" );
+            sb.append( envelope.getMaxY() ).append( "</gml:Y>" ).append( "</gml:coord></gml:Box></ogc:BBOX>" );
         }
 
         return sb;
-    }
-
-    private void setRequestText( String text ) {
-        requestTextArea.setRequestText( text );
     }
 
     public static void saveTextToFile( Component compo, String txt ) {
@@ -617,8 +660,8 @@ public class WFSPanel extends JPanel {
     }
 
     /**
-     * Convenience method to create XML tags mit "ogc" namespace. For example an
-     * input like MyTag will return <code>{"<ogc:MyTag>", "</ogc:MyTag>"}</code>
+     * Convenience method to create XML tags mit "ogc" namespace. For example an input like MyTag
+     * will return <code>{"<ogc:MyTag>", "</ogc:MyTag>"}</code>
      * 
      * @param tagName
      *            the tag name
@@ -631,12 +674,11 @@ public class WFSPanel extends JPanel {
 
     public QualifiedName getChosenGeoProperty() {
         return geoProperty;
-        /*QualifiedName[] qns = wfService.getGeometryProperties(this.getFeatureType().getAsString());
-         QualifiedName qn = null;
-         if ( qns.length > 1 ){
-         qn = qns[0];
-         }
-         return qn;*/
+        /*
+         * QualifiedName[] qns =
+         * wfService.getGeometryProperties(this.getFeatureType().getAsString()); QualifiedName qn =
+         * null; if ( qns.length > 1 ){ qn = qns[0]; } return qn;
+         */
     }
 
     public void setGeoProperty( QualifiedName geoProp ) {
@@ -689,6 +731,23 @@ public class WFSPanel extends JPanel {
         servers = serverURLS;
     }
 
+    /**
+     * @return the current list of servers
+     */
+    public List<String> getWFSList() {
+	LinkedList<String> list = new LinkedList<String>();
+	
+	String sel = serverCombo.getSelectedItem().toString();
+	list.add(sel);
+	
+	for(int i = 0; i < serverCombo.getItemCount(); ++i) {
+	    String s = serverCombo.getItemAt(i).toString();
+	    if(!sel.equals(s))
+		list.add(s);
+	}
+	return list;
+    }
+    
     public void setResposeText( String txt ) {
         responseTextArea.setText( txt );
         responseTextArea.setCaretPosition( 0 );

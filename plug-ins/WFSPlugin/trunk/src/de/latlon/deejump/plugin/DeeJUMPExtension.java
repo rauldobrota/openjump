@@ -11,17 +11,12 @@ package de.latlon.deejump.plugin;
 import com.vividsolutions.jump.workbench.plugin.Extension;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 
+import de.latlon.deejump.plugin.wfs.UpdateWFSLayerPlugIn;
 import de.latlon.deejump.plugin.wfs.WFSPlugIn;
 
 
 /**
- * General extension classes for installing deeJump plug-ins. This extension
- * installs the follwoing plug-ins:
- * <blockquote>
- * - WFSPlugin
- * </blockquote>
- * 
- * 
+ * Installs WFS and WFS Update plugin.
  * 
  * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei</a>
  * 
@@ -34,7 +29,8 @@ public class DeeJUMPExtension extends Extension {
     public void configure( PlugInContext context ) throws Exception {
         System.out.println( "Installing latlon WFSPlugin" );
         new WFSPlugIn(null).install(context); 
-        
+        System.out.println( "Installing latlon WFSUpdatePlugin" );
+        new UpdateWFSLayerPlugIn().install(context);
     }
 
 }

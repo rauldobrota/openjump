@@ -10,7 +10,6 @@
 package de.latlon.deejump.plugin.wfs;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +24,8 @@ import org.deegree.ogcbase.CommonNamespaces;
 import org.deegree.ogcwebservices.wfs.capabilities.WFSFeatureType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import de.latlon.deejump.plugin.wfs.auth.UserData;
 
 /**
  * TODO add documentation here
@@ -41,8 +42,8 @@ public class WFServiceWrapper_1_0_0 extends AbstractWFSWrapper {
     
     private String[] featureTypes;
     
-    public WFServiceWrapper_1_0_0( String baseUrl ){
-        super( baseUrl );
+    public WFServiceWrapper_1_0_0( UserData logins, String baseUrl ){
+        super( logins, baseUrl );
         init();
     }
     
@@ -160,53 +161,4 @@ public class WFServiceWrapper_1_0_0 extends AbstractWFSWrapper {
         return createOnlineResourceForOperation( "GetFeature", "Post" );
     }
     
-    public static void main( String[] args ){
-        
-        if( args.length == 21 ){
-            System.out.println("Usage: todo...");
-        } else {
-            String url = "http://www.refractions.net:8080/geoserver/wfs/GetCapabilities";
-            //url = "file:///home/taddei/Desktop/test_caps.xml";
-//            url = "http://demo.intevation.de/geoserver/wfs";
-            
-            AbstractWFSWrapper wfs = new WFServiceWrapper_1_0_0( url );
-            
-//            System.out.println( wfs.createCapabilitiesOnlineResource() );
-//            System.out.println( wfs.getCapabilitiesURL() );
-            
-            System.out.println( wfs.createDescribeFTOnlineResource() );
-            
-            QualifiedName qn = null;
-            try {
-                qn = new QualifiedName("blah", "Blih", new URI("http://host") );    
-            } catch ( Exception e ) {
-                e.printStackTrace();
-            }
-            
-            System.out.println( wfs.getDescribeTypeURL( qn ) );
-            System.out.println( wfs.getGetFeatureURL() );
-            
-            String[] featTypes = wfs.getFeatureTypes();
-            for ( int i = 0; i < featTypes.length; i++ ) {
-                System.out.println( featTypes[i] );
-            }            
-            
-        }
-    }
-    
 }
-
-/* ********************************************************************
-Changes to this class. What the people have been up to:
-
-$Log$
-Revision 1.3  2007/05/14 08:50:53  taddei
-Fix for the problems of null prefixes and false namespaces of misbehaving WFS
-
-Revision 1.2  2007/05/02 13:27:11  taddei
-Use now WFSFeatureType instead of QualifiedName.
-
-Revision 1.1  2007/04/26 09:19:26  taddei
-Added initial working version of classes and complementary files.
-
-********************************************************************** */

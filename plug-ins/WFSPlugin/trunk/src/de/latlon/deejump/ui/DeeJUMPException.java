@@ -21,35 +21,21 @@ package de.latlon.deejump.ui;
 
 public class DeeJUMPException extends Exception {
 
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
-    public DeeJUMPException( String message ) {
-        super( message );
-    }
-
+    /**
+     * @param message
+     * @param cause
+     */
     public DeeJUMPException( String message, Throwable cause ) {
         super( message, cause );
     }
 
+    /**
+     * @param cause
+     */
     public DeeJUMPException( Throwable cause ) {
         super( cause );
     }
 
 }
-
-
-/* ********************************************************************
-Changes to this class. What the people have been up to:
-$Log$
-Revision 1.1  2007/04/26 09:19:26  taddei
-Added initial working version of classes and complementary files.
-
-Revision 1.1.2.1  2006/05/31 10:04:35  ut
-deejump pre deegree day
-
-
-********************************************************************** */

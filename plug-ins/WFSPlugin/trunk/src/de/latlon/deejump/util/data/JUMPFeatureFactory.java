@@ -126,7 +126,7 @@ public class JUMPFeatureFactory {
         Filter filter = new ComplexFilter( op );
         
         //TODO get maxFeatures...
-        Query query = Query.create( null, null, null, null, version, new QualifiedName[]{qualName}, srs, filter, maxFeatures, 0, RESULT_TYPE.RESULTS );
+        Query query = Query.create( null, null, null, null, version, new QualifiedName[]{qualName}, null, srs, filter, maxFeatures, 0, RESULT_TYPE.RESULTS );
         IDGenerator idg = IDGenerator.getInstance();
         // create WFS GetFeature request
         
@@ -206,6 +206,7 @@ public class JUMPFeatureFactory {
             GMLSchemaDocument doc = new GMLSchemaDocument();
             try {
                 doc.load(new URL(dft));
+                LOG.debug("Feature type schema:\n" + doc.getAsPrettyString());
                 GMLSchema schema = doc.parseGMLSchema();
                 schemaMap.put(featureType.getNamespace(), schema);
                 gfDoc.setSchemas(schemaMap);
@@ -221,6 +222,31 @@ public class JUMPFeatureFactory {
                 LOG.debug("DescribeFeatureType did not work.");
             } catch ( SAXException e ) {
                 LOG.debug("DescribeFeatureType did not work.");
+            } finally {
+        	LOG.debug("Trying to use base url of server for DescribeFeatureType...");
+        	try{
+        	    String baseURL = server.getBaseWfsURL();
+        	    baseURL += baseURL.endsWith("?")?"":"?";
+        	    doc.load(new URL(server.getDescribeTypeURL(baseURL, featureType)));
+        	    
+        	    LOG.debug("Feature type schema:\n" + doc.getAsPrettyString());
+        	    
+        	    GMLSchema schema = doc.parseGMLSchema();
+        	    schemaMap.put(featureType.getNamespace(), schema);
+        	    gfDoc.setSchemas(schemaMap);
+        	} catch ( XMLSchemaException e ) {
+        	    LOG.debug("DescribeFeatureType did not work.");
+        	} catch ( UnknownCRSException e ) {
+        	    LOG.debug("DescribeFeatureType did not work.");
+        	} catch ( XMLParsingException e ) {
+        	    LOG.debug("DescribeFeatureType did not work.");
+        	} catch ( MalformedURLException e ) {
+        	    LOG.debug("DescribeFeatureType did not work.");
+        	} catch ( IOException e ) {
+        	    LOG.debug("DescribeFeatureType did not work.");
+        	} catch ( SAXException e ) {
+        	    LOG.debug("DescribeFeatureType did not work.");
+        	}
             }
         }
         
@@ -303,9 +329,11 @@ public class JUMPFeatureFactory {
             throw new RuntimeException( "FeatureType has more than one GeometryProperty.\n" //$NON-NLS-1$
                                  + "This is currently not supported." ); //$NON-NLS-1$
         } else if ( geoTypeProps == null || geoTypeProps.length == 0 ) {
+            LOG.debug("Guessing geometry property name.");
             geoProName = "GEOMETRY"; //$NON-NLS-1$
         } else {
             geoProName = geoTypeProps[0].getName().getLocalName();
+            LOG.debug("Geometry property name: " + geoProName);
         }
         
         PropertyType[] featTypeProps = ft.getProperties();
@@ -314,15 +342,7 @@ public class JUMPFeatureFactory {
         // populate JUMP schema
         for ( int j = 0; j < featTypeProps.length; j++ ) {
             String name =  featTypeProps[j].getName().getLocalName();
-
-            if ( !geoProName.equals( name ) ) {
-                // TODO get schema to define correct type
-                //fs.addAttribute( name, AttributeType.STRING );
-                fs.addAttribute( name, findType( featTypeProps[j].getType() )  );
-            } else {
-                fs.addAttribute( "GEOMETRY", AttributeType.GEOMETRY ); //$NON-NLS-1$
-
-            }
+            fs.addAttribute( name, findType( featTypeProps[j].getType() )  );
         }
         
         if( defaultGeometry == null && fs.getGeometryIndex() == -1 ){
@@ -330,7 +350,6 @@ public class JUMPFeatureFactory {
         } else if ( defaultGeometry != null && fs.getGeometryIndex() == -1 ){
             fs.addAttribute( "GEOMETRY", AttributeType.GEOMETRY ); //$NON-NLS-1$
         }
-        
         
         // populate FC with data
         for ( int i = 0; i < feats.length; i++ ) {
@@ -406,21 +425,10 @@ public class JUMPFeatureFactory {
 
     /**
      * @param jumpFeatureCollection
-     * @return a deegree FeatureCollection
+     * @return a deegree FC
      * @throws UnknownTypeException
      * @throws GeometryException
      */
-    /* TODO re-ignite!!!
-    
-    public static WFSLayer createWFSLayer(
-                                          com.vividsolutions.jump.feature.FeatureCollection featCollec,
-                                          String displayName, QualifiedName ftName, QualifiedName geoPropName, String crs,
-                                          LayerManager layerManager ) throws Exception {
-
-        return new WFSLayer( displayName, layerManager.generateLayerFillColor(), featCollec,
-            layerManager, ftName, geoPropName, crs );
-    }
-*/
     public static org.deegree.model.feature.FeatureCollection createFromJUMPFeatureCollection(
             com.vividsolutions.jump.feature.FeatureCollection jumpFeatureCollection) throws UnknownTypeException, GeometryException
              {
@@ -489,11 +497,11 @@ public class JUMPFeatureFactory {
             for (int i = 0; i < schema.getAttributeCount(); i++) {
                 if( i != geoIx ){
                     fp[i] = FeatureFactory
-                                .createFeatureProperty(schema.getAttributeName(i), 
+                                .createFeatureProperty(new QualifiedName(schema.getAttributeName(i)), 
                                                        feature.getAttribute(i));
                 } else {
                     fp[i] = FeatureFactory
-                    .createFeatureProperty( schema.getAttributeName( geoIx ), 
+                    .createFeatureProperty( new QualifiedName(schema.getAttributeName( geoIx )), 
                                             JTSAdapter.wrap(feature.getGeometry()));
 
                 }

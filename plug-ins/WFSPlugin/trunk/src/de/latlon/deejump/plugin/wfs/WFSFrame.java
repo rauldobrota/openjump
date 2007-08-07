@@ -8,38 +8,47 @@
  */
 package de.latlon.deejump.plugin.wfs;
 
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+
+import com.vividsolutions.jump.workbench.WorkbenchContext;
 
 import de.latlon.deejump.ui.DeeJUMPException;
 import de.latlon.deejump.ui.Messages;
 import de.latlon.deejump.util.data.WFSClientHelper;
 
+/**
+ * <code>WFSFrame</code> is the dialog window.
+ *
+ * @author <a href="mailto:schmitz@lat-lon.de">Andreas Schmitz</a>
+ * @author last edited by: $Author:$
+ *
+ * @version $Revision:$, $Date:$
+ */
 public class WFSFrame extends JFrame {
 
-    private WFSPanel wfsPanel;
+    private static final long serialVersionUID = -4892892282926150006L;
 
-    private Thread loaderThread;
+    protected WFSPanel wfsPanel;
+
+    protected Thread loaderThread;
+
+    private WorkbenchContext context;
     
-    public WFSFrame( String[] wfsURLs ) {
+    /**
+     * @param context 
+     * @param wfsURLs an array with server addresses
+     */
+    public WFSFrame( WorkbenchContext context, String[] wfsURLs ) {
         super( "WFSFrame v. " + WFSPanel.releaseVersion );
+        this.context = context;
         setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
         initGUI( wfsURLs );
         setDefaultLookAndFeelDecorated( true );
@@ -50,9 +59,7 @@ public class WFSFrame extends JFrame {
     private void initGUI(String[] wfsURLs) {
         getContentPane().setLayout( new FlowLayout() );
         
-//        setJMenuBar( new MiniMenu(  ) );
-        
-        this.wfsPanel = new WFSPanel( Arrays.asList( wfsURLs ) );
+        this.wfsPanel = new WFSPanel( context, Arrays.asList( wfsURLs ) );
         
         add( this.wfsPanel );
         
@@ -80,35 +87,7 @@ public class WFSFrame extends JFrame {
         add( buttons );
     }
 
-    
-    /**
-     * Create the GUI and show it.  For thread safety,
-     * this method should be invoked from the
-     * event-dispatching thread.
-     */
-    private static void createAndShowGUI(String[] wfsURLs) {
-
-        WFSFrame wfsFrame = new WFSFrame( wfsURLs );
-        wfsFrame.setVisible( true );
-    }
-
-    private static List<String> createInitialServerList( String[] serverURLs )
-                            throws MalformedURLException {
-        List<String> servers = new ArrayList<String>();
-
-        for ( int i = 0; i < serverURLs.length; i++ ) {
-            URL tmpUrl = new URL( serverURLs[i] );
-            if ( !"http".equals( tmpUrl.getProtocol() ) ) {
-                throw new IllegalArgumentException( "Protocol must be http: " + servers );
-            }
-            // create URLs to check if input string are valid URLs
-            servers.add( tmpUrl.toString() );
-        }
-
-        return servers;
-    }
-
-    private void load(){
+    protected void load(){
         final String resp;
         String tmp = null;
         try {
@@ -143,6 +122,7 @@ public class WFSFrame extends JFrame {
     }
     
     class GetFeatureAction extends AbstractAction implements Runnable {
+        private static final long serialVersionUID = 8707156676984986438L;
         public void actionPerformed( ActionEvent e ) {
             if( loaderThread != null ){
                 return;
@@ -156,17 +136,4 @@ public class WFSFrame extends JFrame {
         }
     }
     
-    /**
-     * @param args
-     */
-    public static void main( final String[] args ) {
-        //      Schedule a job for the event-dispatching thread:
-        //creating and showing this application's GUI.
-        javax.swing.SwingUtilities.invokeLater( new Runnable() {
-            public void run() {
-                createAndShowGUI( args );
-            }
-        } );
-    }
-
 }

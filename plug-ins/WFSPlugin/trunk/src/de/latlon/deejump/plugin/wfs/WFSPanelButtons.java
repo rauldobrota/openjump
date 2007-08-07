@@ -50,14 +50,10 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import de.latlon.deejump.ui.DeeJUMPException;
 import de.latlon.deejump.ui.Messages;
-import de.latlon.deejump.util.data.WFSClientHelper;
 
 /**
  * TODO add documentation here
@@ -161,21 +157,3 @@ class WFSPanelButtons extends JPanel {
     }
 
 }
-
-/* ********************************************************************
-Changes to this class. What the people have been up to:
-
-$Log$
-Revision 1.4  2007/05/16 14:43:34  taddei
-Externalisation of i18n
-
-Revision 1.3  2007/04/30 08:16:28  taddei
-removed handler of cancel button.
-
-Revision 1.2  2007/04/27 13:09:47  taddei
-changes regarding parent window size.
-
-Revision 1.1  2007/04/27 07:26:38  taddei
-Added class
-
-********************************************************************** */

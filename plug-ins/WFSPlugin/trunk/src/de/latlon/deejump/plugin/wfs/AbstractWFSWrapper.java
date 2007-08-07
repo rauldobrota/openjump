@@ -9,7 +9,6 @@
 
 package de.latlon.deejump.plugin.wfs;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
@@ -29,17 +27,14 @@ import org.apache.log4j.Logger;
 import org.deegree.datatypes.QualifiedName;
 import org.deegree.datatypes.Types;
 import org.deegree.framework.xml.DOMPrinter;
-import org.deegree.framework.xml.XMLException;
-import org.deegree.framework.xml.XMLParsingException;
-import org.deegree.framework.xml.schema.XMLSchemaException;
 import org.deegree.model.feature.schema.FeatureType;
 import org.deegree.model.feature.schema.GMLSchema;
 import org.deegree.model.feature.schema.GMLSchemaDocument;
 import org.deegree.model.feature.schema.PropertyType;
 import org.deegree.ogcwebservices.OWSUtils;
 import org.deegree.ogcwebservices.wfs.capabilities.WFSFeatureType;
-import org.xml.sax.SAXException;
 
+import de.latlon.deejump.plugin.wfs.auth.UserData;
 import de.latlon.deejump.ui.DeeJUMPException;
 
 /**
@@ -76,6 +71,8 @@ public abstract class AbstractWFSWrapper {
     private Map<String, QualifiedName[]> geoPropsNameToQNames;
 
     private HttpClient httpClient;
+
+    protected UserData logins;
     
     public abstract String getServiceVersion();
     
@@ -101,11 +98,12 @@ public abstract class AbstractWFSWrapper {
     //not abs
     public abstract String getCapabilitesAsString();
     
-    protected AbstractWFSWrapper( String baseUrl ){
+    protected AbstractWFSWrapper( UserData logins, String baseUrl ){
         if( baseUrl == null || baseUrl.length() == 0 ){
             throw new IllegalArgumentException("The URL for the WFServer cannot be null or empty.");
         }
         this.baseURL = baseUrl;
+        this.logins = logins;
         this.featureTypeToSchema = new HashMap( 10 );
         this.featureTypeToSchemaXML = new HashMap( 10 );
         this.geoPropsNameToQNames = new HashMap<String, QualifiedName[]> ( 10 );
@@ -118,19 +116,37 @@ public abstract class AbstractWFSWrapper {
         StringBuffer sb = new StringBuffer(OWSUtils.validateHTTPGetBaseURL( this.baseURL ) );
         sb.append( "SERVICE=WFS&REQUEST=GetCapabilities&VERSION=" );
         sb.append( getServiceVersion() );
-                
+        if(logins != null && logins.getUsername() != null && logins.getPassword() != null) {
+            sb.append("&user=" + logins.getUsername() + "&password=" + logins.getPassword());
+        }
         return sb.toString();
     }
     
     
-    public String getDescribeTypeURL( QualifiedName typename){
+    /**
+     * @param baseURL the base URL to use
+     * @param typename
+     * @return the full request String
+     */
+    public String getDescribeTypeURL( String baseURL, QualifiedName typename){
         
-        String url = OWSUtils.validateHTTPGetBaseURL(createDescribeFTOnlineResource()) + "SERVICE=WFS&REQUEST=DescribeFeatureType&version="
+        String url = baseURL + "SERVICE=WFS&REQUEST=DescribeFeatureType&version="
             +  getServiceVersion() + "&TYPENAME=" 
             + typename.getPrefix() + ":" + typename.getLocalName()  
             + "&NAMESPACE=xmlns(" + typename.getPrefix()+"="+typename.getNamespace()+")";
+        if(logins != null && logins.getUsername() != null && logins.getPassword() != null) {
+            url += "&user=" + logins.getUsername() + "&password=" + logins.getPassword();
+        }
         
         return url;
+    }
+
+    /**
+     * @param typename
+     * @return the full request String
+     */
+    public String getDescribeTypeURL( QualifiedName typename){
+	return getDescribeTypeURL(OWSUtils.validateHTTPGetBaseURL(createDescribeFTOnlineResource()), typename);
     }
 
     public GMLSchema getSchemaForFeatureType( String featureType ){
@@ -360,35 +376,6 @@ public abstract class AbstractWFSWrapper {
         }
         
         return httpMethod;
-    }    
+    }
+
 }
-
-/* ********************************************************************
-Changes to this class. What the people have been up to:
-
-$Log$
-Revision 1.8  2007/05/14 10:07:00  taddei
-removed println
-
-Revision 1.7  2007/05/14 09:05:23  taddei
-attempt to fix problem of DescribeFeatureType request not being loaded through the proxy.
-
-Revision 1.6  2007/05/14 08:50:53  taddei
-Fix for the problems of null prefixes and false namespaces of misbehaving WFS
-
-Revision 1.5  2007/05/10 07:36:45  taddei
-Added hack for reading gml:GeometryAssociationProperty from 2.1.2 schemas
-
-Revision 1.4  2007/05/02 13:50:11  taddei
-fixed URL problem when loading schema.
-
-Revision 1.3  2007/05/02 13:27:11  taddei
-Use now WFSFeatureType instead of QualifiedName.
-
-Revision 1.2  2007/04/27 13:07:12  taddei
-added wfs prefix.
-
-Revision 1.1  2007/04/26 09:19:26  taddei
-Added initial working version of classes and complementary files.
-
-********************************************************************** */

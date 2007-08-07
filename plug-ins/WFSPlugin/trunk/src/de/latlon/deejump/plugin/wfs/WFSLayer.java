@@ -56,24 +56,17 @@ public class WFSLayer extends Layer {
     
     private QualifiedName origName;
     
-    /**
-     * The layer listener that keeps track of changes.
-     */
-//    private WFSLayerListener layerListener; 
-    
     // FIXME remove is now in datasource
     private String serverURL; 
     
     private QualifiedName geoPropertyName;
 
     private String crs;
-    
-    /**
-     * This contructor should not be used.*/
-    public WFSLayer(){
-        super();
-    }
 
+    private WFSLayerListener layerListener;
+
+    private AbstractWFSWrapper wfs;
+    
     /**
      * Creates a new WFS layer from its display name, a color, some data, and
      * using a layer manager ad an original (WFS) layer name. This constructor
@@ -87,11 +80,12 @@ public class WFSLayer extends Layer {
      */
     public WFSLayer(String displayName, Color fillColor,
             FeatureCollection featureCollection, LayerManager layerManager,
-            QualifiedName origName, QualifiedName geoPropertyName, String crs){
+            QualifiedName origName, QualifiedName geoPropertyName, String crs, AbstractWFSWrapper wfs){
         super(displayName, fillColor,featureCollection, layerManager);
         this.origName = origName;
         this.geoPropertyName = geoPropertyName;
         this.crs = crs;
+        this.wfs = wfs;
     }
     
     public QualifiedName getQualifiedName(){ return this.origName; }
@@ -100,19 +94,17 @@ public class WFSLayer extends Layer {
      * Gets the layer listener
      * @return the layer listener associated with this WFSLayer
      */
-    /*
     public WFSLayerListener getLayerListener() {
         return layerListener;
-    }*/
+    }
     
     /**
      * Sets the layer listener
      * @param layerListener the layer listener
      */
-    /*
     public void setLayerListener(WFSLayerListener layerListener) {
         this.layerListener = layerListener;
-    }*/
+    }
     
     
     public String getServerURL() {
@@ -144,6 +136,13 @@ public class WFSLayer extends Layer {
 
     public String getCrs(){
         return this.crs;
+    }
+    
+    /**
+     * @return the WFS
+     */
+    public AbstractWFSWrapper getServer() {
+        return wfs;
     }
     
 }

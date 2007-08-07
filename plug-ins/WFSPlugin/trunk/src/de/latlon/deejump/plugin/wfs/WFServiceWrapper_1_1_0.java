@@ -26,6 +26,7 @@ import org.deegree.ogcwebservices.wfs.capabilities.WFSCapabilitiesDocument;
 import org.deegree.ogcwebservices.wfs.capabilities.WFSFeatureType;
 import org.xml.sax.SAXException;
 
+import de.latlon.deejump.plugin.wfs.auth.UserData;
 import de.latlon.deejump.ui.DeeJUMPException;
 
 
@@ -57,8 +58,8 @@ public class WFServiceWrapper_1_1_0 extends AbstractWFSWrapper {
 
 //    private WFSCapabilitiesDocument wfsCapsDoc;
 
-    public WFServiceWrapper_1_1_0(String wfsURL) throws DeeJUMPException{ 
-        super(wfsURL);
+    public WFServiceWrapper_1_1_0(UserData logins, String wfsURL) throws DeeJUMPException{ 
+        super(logins, wfsURL);
         init();
     }
     

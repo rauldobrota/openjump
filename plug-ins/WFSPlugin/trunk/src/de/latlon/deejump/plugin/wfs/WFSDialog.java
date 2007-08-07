@@ -9,60 +9,17 @@
 
 package de.latlon.deejump.plugin.wfs;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
-import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.io.StringReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.DebugGraphics;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.UIManager;
-import javax.swing.border.Border;
 
-import org.deegree.datatypes.QualifiedName;
-import org.deegree.framework.xml.XMLFragment;
-import org.deegree.model.crs.CoordinateSystem;
-import org.deegree.model.spatialschema.Geometry;
-import org.deegree.model.spatialschema.GeometryImpl;
-import org.deegree.ogcwebservices.wfs.operation.GetFeature;
-
-import com.vividsolutions.jts.geom.Envelope;
-
-import de.latlon.deejump.ui.DeeJUMPException;
-import de.latlon.deejump.ui.ExtensibleComboBox;
-import de.latlon.deejump.ui.Messages;
-import de.latlon.deejump.util.data.JUMPFeatureFactory;
-import de.latlon.deejump.util.data.WFSClientHelper;
+import com.vividsolutions.jump.workbench.WorkbenchContext;
 
 /**
  * This dialog presents a graphical user interface to OGC Filter operations. It
@@ -85,6 +42,8 @@ public class WFSDialog extends JDialog {
     private boolean canSearch = false;
 
     private WFSPanel wfsPanel;
+
+    private WorkbenchContext context;
     
     /**
      * Creates a dialog from an owner, with a title and a WFS server address.
@@ -98,9 +57,10 @@ public class WFSDialog extends JDialog {
      *            http://my.domain.com/deegreewfs/wfs
      * @throws java.awt.HeadlessException
      */
-    public WFSDialog( Frame owner, String title, String[] urls ) throws Exception {
+    public WFSDialog( WorkbenchContext context, Frame owner, String title, String[] urls ) throws Exception {
 
         super( owner, title, true );
+        this.context = context;
         setTitle( "WFSPlugin v. " + WFSPanel.releaseVersion );
         setLocation( 0, 50 );
         //        setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
@@ -121,7 +81,7 @@ public class WFSDialog extends JDialog {
         
         getContentPane().setLayout( new FlowLayout() );
         
-        this.wfsPanel = new WFSPanel( Arrays.asList( wfsURLs ) );
+        this.wfsPanel = new WFSPanel( context, Arrays.asList( wfsURLs ) );
         
         // remove response tab from dialog
         this.wfsPanel.getTabs().removeTabAt( 4 );
@@ -167,34 +127,6 @@ public class WFSDialog extends JDialog {
     public void setCanSearch( boolean canSearch ) {
         this.canSearch = canSearch;
     }
-
-    /** Used for GUI layout testing */
-    public static void main( String[] args ) {
-
-        if ( args.length < 1 ) {
-            System.out.println( "Usage TODO" );
-        } else {
-            
-            try {
-                
-            JFrame jf = new JFrame();
-            
-            final WFSDialog rd = new WFSDialog( jf, "WFS Dialog", args );
-            rd.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-            rd.addWindowListener( new WindowAdapter() {
-                public void windowClosing( WindowEvent we ) {
-                    System.exit( 0 );
-                }
-            } );
-
-            rd.setVisible( true );
-            
-            } catch ( Exception e ) {
-                e.printStackTrace();
-            }
-        }
-    }
-
 
     public WFSPanel getWFSPanel() {
         return this.wfsPanel;
