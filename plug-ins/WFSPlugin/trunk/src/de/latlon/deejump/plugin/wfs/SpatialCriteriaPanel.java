@@ -47,7 +47,7 @@ import org.deegree.model.filterencoding.SpatialOperation;
 import org.deegree.model.spatialschema.Geometry;
 import org.deegree.model.spatialschema.GeometryImpl;
 
-import de.latlon.deejump.ui.Messages;
+import de.latlon.deejump.ui.I18N;
 
 /**
  * This panel provides a user interface to spatial filter operations.<p/> 
@@ -141,7 +141,7 @@ class SpatialCriteriaPanel extends JPanel {
 */
         
         JPanel p = new JPanel();
-        p.add( new JLabel(Messages.getString("SpatialResearchPanel.geometryName") ) );
+        p.add( new JLabel(I18N.getString("SpatialResearchPanel.geometryName") ) );
         p.add( geomPropsCombo );
         add( p );
         return p;
@@ -188,7 +188,7 @@ class SpatialCriteriaPanel extends JPanel {
 //        srsCombo.setEditable( true );
         
         JPanel p = new JPanel();
-        p.add( new JLabel( Messages.getString("SpatialResearchPanel.srs")) );
+        p.add( new JLabel( I18N.getString("SpatialResearchPanel.srs")) );
         p.add( srsCombo );
         add( p );
         return p;
@@ -230,10 +230,10 @@ class SpatialCriteriaPanel extends JPanel {
         String simpleName = getClass().getSimpleName();  
         for (int i = 0; i < OPERATION_NAMES.length; i++) {
             String txt = simpleName + "." + OPERATION_NAMES[i];
-            String buttonTxt = Messages.getString( txt );
+            String buttonTxt = I18N.getString( txt );
             opButtons[i] = new JRadioButton( buttonTxt );
             txt += ".descrip";
-            buttonTxt = Messages.getString( txt );
+            buttonTxt = I18N.getString( txt );
             opButtons[i].setToolTipText( buttonTxt );
             opButtons[i].setActionCommand( OPERATION_NAMES[i] );
             opButtons[i].addActionListener( bal );
@@ -258,7 +258,7 @@ class SpatialCriteriaPanel extends JPanel {
         opButtons[0].doClick();
         JPanel combiPanel = new JPanel();
         combiPanel.setBorder(
-                BorderFactory.createTitledBorder( Messages.getString("SpatialResearchPanel.spatialOperation") ));
+                BorderFactory.createTitledBorder( I18N.getString("SpatialResearchPanel.spatialOperation") ));
         combiPanel.setLayout( new GridLayout( 1, 2) );
         combiPanel.add( opsPanel );
         combiPanel.add( opsFieldPanel );

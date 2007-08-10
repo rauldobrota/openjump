@@ -25,7 +25,7 @@ import javax.swing.JTextArea;
 import org.deegree.framework.xml.XMLFragment;
 import org.deegree.ogcwebservices.wfs.operation.GetFeature;
 
-import de.latlon.deejump.ui.Messages;
+import de.latlon.deejump.ui.I18N;
 
 /**
  * TODO add documentation here
@@ -62,7 +62,7 @@ class RequestTextArea extends JPanel {
     }
 
     private JComponent createValidationtButton() {
-        validateReq = new JButton( Messages.getString( "FeatureResearchDialog.validateRequest" ) );
+        validateReq = new JButton( I18N.getString( "FeatureResearchDialog.validateRequest" ) );
 
         validateReq.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
@@ -84,7 +84,7 @@ class RequestTextArea extends JPanel {
                 } catch ( Exception ex ) {
                     ex.printStackTrace();                                       
                     JOptionPane.showMessageDialog( wfsPanel, ex.getMessage(), 
-                                                   Messages.getString( "error"),
+                                                   I18N.getString( "error"),
                                                    JOptionPane.ERROR_MESSAGE );
                 }
             }
@@ -94,7 +94,7 @@ class RequestTextArea extends JPanel {
 
     private JComponent createRequestButton() {
         createReqButton = new JButton(
-                                      Messages.getString( "FeatureResearchDialog.createWFSRequest" ) );
+                                      I18N.getString( "FeatureResearchDialog.createWFSRequest" ) );
         createReqButton.setBounds( 260, 20, 80, 20 );
         createReqButton.setAlignmentX( 0.5f );
         createReqButton.addActionListener( new ActionListener() {

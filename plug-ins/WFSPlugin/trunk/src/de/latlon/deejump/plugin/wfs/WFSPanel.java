@@ -58,7 +58,7 @@ import de.latlon.deejump.plugin.wfs.auth.MD5Hasher;
 import de.latlon.deejump.plugin.wfs.auth.UserData;
 import de.latlon.deejump.ui.DeeJUMPException;
 import de.latlon.deejump.ui.ExtensibleComboBox;
-import de.latlon.deejump.ui.Messages;
+import de.latlon.deejump.ui.I18N;
 
 /**
  * This is a panel which contains other basic GUIs for accessing Features of
@@ -174,15 +174,15 @@ public class WFSPanel extends JPanel {
         Dimension d = new Dimension( 400, 45 );
         serverCombo.setPreferredSize( d );
         serverCombo.setMaximumSize( d );
-        String txt = Messages.getString( "FeatureResearchDialog.wfsService" );
+        String txt = I18N.getString( "FeatureResearchDialog.wfsService" );
         serverCombo.setBorder( BorderFactory.createTitledBorder( txt ) );
-        txt = Messages.getString( "FeatureResearchDialog.wfsServiceToolTip" );
+        txt = I18N.getString( "FeatureResearchDialog.wfsServiceToolTip" );
         serverCombo.setToolTipText( txt );
 
         add( serverCombo );
 
         // connect and capabilities button
-        JButton connecButton = new JButton( Messages.getString( "FeatureResearchDialog.connect" ) );
+        JButton connecButton = new JButton( I18N.getString( "FeatureResearchDialog.connect" ) );
         connecButton.setAlignmentX( 0.5f );
         connecButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
@@ -195,7 +195,7 @@ public class WFSPanel extends JPanel {
             }
         } );
 
-        capabilitiesButton = new JButton( Messages.getString( "FeatureResearchDialog.capabilities" ) );
+        capabilitiesButton = new JButton( I18N.getString( "FeatureResearchDialog.capabilities" ) );
         capabilitiesButton.setEnabled( false );
         capabilitiesButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
@@ -204,7 +204,7 @@ public class WFSPanel extends JPanel {
             }
         } );
         
-        JButton loginButton = new JButton(Messages.getString("FeatureResearchDialog.login"));
+        JButton loginButton = new JButton(I18N.getString("FeatureResearchDialog.login"));
         loginButton.addActionListener(new ActionListener(){
 	    public void actionPerformed(ActionEvent e) {
 		performLogin();
@@ -257,20 +257,20 @@ public class WFSPanel extends JPanel {
 
         attributeResPanel = new PropertyCriteriaPanel( this, featureTypeCombo );
         attributeResPanel.setEnabled( false );
-        tabs.add( Messages.getString( "FeatureResearchDialog.attributeSearch" ), attributeResPanel );
+        tabs.add( I18N.getString( "FeatureResearchDialog.attributeSearch" ), attributeResPanel );
 
         propertiesPanel = new PropertySelectionPanel( this );
-        tabs.add( Messages.getString( "FeatureResearchDialog.properties" ), propertiesPanel );
+        tabs.add( I18N.getString( "FeatureResearchDialog.properties" ), propertiesPanel );
 
         spatialResPanel = new SpatialCriteriaPanel( this );
-        tabs.add( Messages.getString( "FeatureResearchDialog.spatialSearch" ), spatialResPanel );
+        tabs.add( I18N.getString( "FeatureResearchDialog.spatialSearch" ), spatialResPanel );
         
         requestTextArea = new RequestTextArea(this);
         
-        tabs.add( Messages.getString( "FeatureResearchDialog.request" ), requestTextArea );
+        tabs.add( I18N.getString( "FeatureResearchDialog.request" ), requestTextArea );
 
 
-        tabs.add( Messages.getString( "FeatureResearchDialog.response" ), createResponseTextArea() );
+        tabs.add( I18N.getString( "FeatureResearchDialog.response" ), createResponseTextArea() );
         tabs.setEnabled( false );
         
         box = Box.createHorizontalBox();
@@ -284,18 +284,18 @@ public class WFSPanel extends JPanel {
     }
 
     protected void performLogin() {
-        LoginDialog dialog = new LoginDialog( (Dialog)this.getTopLevelAncestor(), Messages.getString("FeatureResearchDialog.login"), serverCombo.getSelectedItem().toString() );
+        LoginDialog dialog = new LoginDialog( (Dialog)this.getTopLevelAncestor(), I18N.getString("FeatureResearchDialog.login"), serverCombo.getSelectedItem().toString() );
 
         String pass = dialog.getPassword();
         String user = dialog.getName();
 
         if(user == null || user.equals("")){
-            JOptionPane.showMessageDialog(this, Messages.getString("WFSPanel.userEmpty"));
+            JOptionPane.showMessageDialog(this, I18N.getString("WFSPanel.userEmpty"));
             return;
         }
 
         if(pass == null || pass.equals("")){
-            JOptionPane.showMessageDialog(this, Messages.getString("WFSPanel.passEmpty"));
+            JOptionPane.showMessageDialog(this, I18N.getString("WFSPanel.passEmpty"));
             return;
         }
 
@@ -305,13 +305,13 @@ public class WFSPanel extends JPanel {
         try{
             reinitService( (String) serverCombo.getSelectedItem() );
         }catch(DeeJUMPException ex){
-            String msg = Messages.getString("WFSPanel.loginFailed") + "\n" + ex.getLocalizedMessage() + "\n" + Messages.getString("WFSPanel.loginFailed2");
+            String msg = I18N.getString("WFSPanel.loginFailed") + "\n" + ex.getLocalizedMessage() + "\n" + I18N.getString("WFSPanel.loginFailed2");
             JOptionPane.showMessageDialog(this, msg);
             ex.printStackTrace();
             return;
         }
 
-        JOptionPane.showMessageDialog(this, Messages.getString("WFSPanel.loginSuccessful"));
+        JOptionPane.showMessageDialog(this, I18N.getString("WFSPanel.loginSuccessful"));
     }
 
     // Gh 15.11.05
@@ -364,11 +364,11 @@ public class WFSPanel extends JPanel {
         sp.setMaximumSize( new Dimension( 600, 400 ) );
         sp.setPreferredSize( new Dimension( 800, 400 ) );
 
-        String[] opts = new String[]{ Messages.getString( "closeAndSave" ),  
-                                      Messages.getString( "OK" ) };
+        String[] opts = new String[]{ I18N.getString( "closeAndSave" ),  
+                                      I18N.getString( "OK" ) };
         
         int i = JOptionPane.showOptionDialog( parent, sp,
-                                              Messages.getString( "FeatureResearchDialog.capabilities" ),
+                                              I18N.getString( "FeatureResearchDialog.capabilities" ),
                                               JOptionPane.YES_NO_OPTION, 
                                       JOptionPane.PLAIN_MESSAGE, null, opts, opts[1] );
        
@@ -386,7 +386,7 @@ public class WFSPanel extends JPanel {
     private Component createVersionButtons( String[] versions ) {
         JPanel p = new JPanel();
 
-        p.add( new JLabel( Messages.getString( "FeatureResearchDialog.version" ) ) );
+        p.add( new JLabel( I18N.getString( "FeatureResearchDialog.version" ) ) );
         ButtonGroup bg = new ButtonGroup();
         for ( int i = 0; i < versions.length; i++ ) {
             final JRadioButton b = new JRadioButton( versions[i] );
@@ -411,7 +411,7 @@ public class WFSPanel extends JPanel {
         tmpFeatureTypeCombo.setPreferredSize( d );
         tmpFeatureTypeCombo.setMaximumSize( d );
 
-        Border border = BorderFactory.createTitledBorder( Messages.getString( "FeatureResearchDialog.featureType" ) );
+        Border border = BorderFactory.createTitledBorder( I18N.getString( "FeatureResearchDialog.featureType" ) );
 
         Border border2 = BorderFactory.createEmptyBorder( 5, 2, 10, 2 );
 

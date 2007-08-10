@@ -53,7 +53,7 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import de.latlon.deejump.ui.Messages;
+import de.latlon.deejump.ui.I18N;
 
 /**
  * TODO add documentation here
@@ -84,12 +84,12 @@ class WFSPanelButtons extends JPanel {
         Box box = Box.createHorizontalBox();
         box.setBorder( BorderFactory.createEmptyBorder( 20, 5, 10, 5 ));
         
-        okButton = new JButton( Messages.getString( "OK" ) );
+        okButton = new JButton( I18N.getString( "OK" ) );
         
         okButton.setEnabled( true );
         okButton.setFocusable( true );
 
-        cancelButton = new JButton( Messages.getString( "CANCEL" ) );
+        cancelButton = new JButton( I18N.getString( "CANCEL" ) );
         cancelButton.setAlignmentX( 0.5f );
         cancelButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
@@ -98,7 +98,7 @@ class WFSPanelButtons extends JPanel {
                 //setCanSearch( true );
             }
         } );
-        final String optionsTxt = Messages.getString( "WFSPanel.options" );
+        final String optionsTxt = I18N.getString( "WFSPanel.options" );
         JButton optionsbutton = new JButton(optionsTxt);
         optionsbutton.addActionListener( new ActionListener(){
             public void actionPerformed( ActionEvent e ) {
@@ -111,8 +111,8 @@ class WFSPanelButtons extends JPanel {
         });
         
         //TODO externalize
-        final String showAdvanced =  Messages.getString( "WFSPanel.showAdvanced" );
-        final String hideAdvanced = Messages.getString( "WFSPanel.hideAdvanced" );
+        final String showAdvanced =  I18N.getString( "WFSPanel.showAdvanced" );
+        final String hideAdvanced = I18N.getString( "WFSPanel.hideAdvanced" );
 
         JButton extrasButton = new JButton( showAdvanced );
         extrasButton.setBounds( 260, 20, 80, 20 );

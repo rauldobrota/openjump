@@ -1,4 +1,21 @@
 2007-08-10  Andreas Schmitz <schmitz@lat-lon.de>
+        de/latlon/deejump/ui/I18N.java,
+        de/latlon/deejump/ui/messages.properties,
+        de/latlon/deejump/ui/messages_en.properties,
+        de/latlon/deejump/ui/Messages.java,
+        de/latlon/deejump/plugin/wfs/SpatialCriteriaPanel.java,
+        de/latlon/deejump/plugin/wfs/WFSFrame.java,
+        de/latlon/deejump/plugin/wfs/PropertySelectionPanel.java,
+        de/latlon/deejump/plugin/wfs/WFSOptionsPanel2.java,
+        de/latlon/deejump/plugin/wfs/WFSPlugIn.java,
+        de/latlon/deejump/plugin/wfs/WFSPanel.java,
+        de/latlon/deejump/plugin/wfs/auth/LoginDialog.java,
+        de/latlon/deejump/plugin/wfs/RequestTextArea.java,
+        de/latlon/deejump/plugin/wfs/PropertyCriteriaPanel.java,
+        de/latlon/deejump/plugin/wfs/WFSPanelButtons.java:
+        * Fixed an issue with non-localized messages under Windows.
+
+2007-08-10  Andreas Schmitz <schmitz@lat-lon.de>
         build.xml:
         * Added simplejar target to create .jar without timestamp in name.
 

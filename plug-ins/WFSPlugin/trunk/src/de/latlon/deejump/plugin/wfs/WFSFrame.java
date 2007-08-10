@@ -21,7 +21,7 @@ import javax.swing.SwingUtilities;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 
 import de.latlon.deejump.ui.DeeJUMPException;
-import de.latlon.deejump.ui.Messages;
+import de.latlon.deejump.ui.I18N;
 import de.latlon.deejump.util.data.WFSClientHelper;
 
 /**
@@ -68,14 +68,14 @@ public class WFSFrame extends JFrame {
 	this.wfsPanel.controlButtons = buttons;
 	buttons.okButton.setAction(new GetFeatureAction());
 
-	buttons.okButton.setText(Messages.getString("WFSPanel.doGetFeature"));
+	buttons.okButton.setText(I18N.getString("WFSPanel.doGetFeature"));
 	buttons.okButton.setEnabled(false);
 
-	buttons.cancelButton.setText(Messages.getString("WFSPanel.exit"));
+	buttons.cancelButton.setText(I18N.getString("WFSPanel.exit"));
 	buttons.cancelButton.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent e) {
-		int i = JOptionPane.showConfirmDialog(WFSFrame.this, Messages
-			.getString("WFSPanel.exitQuestion"), Messages
+		int i = JOptionPane.showConfirmDialog(WFSFrame.this, I18N
+			.getString("WFSPanel.exitQuestion"), I18N
 			.getString("WFSPanel.exitQuestion2"),
 			JOptionPane.OK_CANCEL_OPTION,
 			JOptionPane.QUESTION_MESSAGE);
@@ -112,7 +112,7 @@ public class WFSFrame extends JFrame {
 	    // wfsPanel.getTabs().setSelectedIndex( 4 );
 	    // wfsPanel.setResposeText( resp );
 	} else {
-	    int i = JOptionPane.showConfirmDialog(WFSFrame.this, Messages
+	    int i = JOptionPane.showConfirmDialog(WFSFrame.this, I18N
 		    .getString("WFSPanel.responseTooLarge"), "",
 		    JOptionPane.YES_NO_OPTION);
 	    if (i == JOptionPane.YES_OPTION) {

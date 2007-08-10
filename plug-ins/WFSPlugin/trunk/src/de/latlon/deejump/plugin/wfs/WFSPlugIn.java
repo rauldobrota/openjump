@@ -40,7 +40,7 @@ import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.cursortool.editing.EditingPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
 
-import de.latlon.deejump.ui.Messages;
+import de.latlon.deejump.ui.I18N;
 import de.latlon.deejump.util.data.JUMPFeatureFactory;
 
 /**
@@ -96,7 +96,7 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
 
 	if (rd == null) {
 	    rd = new WFSDialog(context.getWorkbenchContext(), context
-		    .getWorkbenchFrame(), Messages
+		    .getWorkbenchFrame(), I18N
 		    .getString("WFSResearchPlugIn.mainDialogTitle"),
 		    createUrlList(context.getWorkbenchContext()));
 	}
@@ -139,7 +139,7 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
     public void run(TaskMonitor monitor, PlugInContext context)
 	    throws Exception {
 
-	monitor.report(Messages.getString("WFSSearch.searching"));
+	monitor.report(I18N.getString("WFSSearch.searching"));
 
 	String request = rd.getWFSPanel().getRequest();
 
@@ -237,13 +237,13 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
 
 	    if (dataset.size() == JUMPFeatureFactory.getMaxFeatures()) {
 		context.getWorkbenchFrame().warnUser(
-			Messages.getString("WFSPlugin.maxnumber") + " "
+			I18N.getString("WFSPlugin.maxnumber") + " "
 				+ JUMPFeatureFactory.getMaxFeatures());
 	    }
 
 	} else {
 
-	    JOptionPane.showMessageDialog(context.getWorkbenchFrame(), Messages
+	    JOptionPane.showMessageDialog(context.getWorkbenchFrame(), I18N
 		    .getString("WFSPlugin.nodata"), "Info",
 		    JOptionPane.WARNING_MESSAGE);
 
@@ -276,7 +276,7 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
 	GeometryFactory gf = new GeometryFactory();
 	Geometry geo = gf.buildGeometry((List) geoCollec);
 	if (geo instanceof GeometryCollection) {
-	    throw new WorkbenchException(Messages
+	    throw new WorkbenchException(I18N
 		    .getString("WFSResearchPlugIn.invalideGeomType"));
 	}
 	org.deegree.model.spatialschema.Geometry geoObj = org.deegree.model.spatialschema.JTSAdapter
