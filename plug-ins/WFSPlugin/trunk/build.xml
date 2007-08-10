@@ -47,6 +47,10 @@
 		<jar jarfile="${dist}/${appname}-${DSTAMP}.jar" basedir="${build}" />
 	</target>
 
+	<target name="simplejar" depends="compile" description="build a jar without timestamp">
+		<jar jarfile="${dist}/${appname}.jar" basedir="${build}" />
+	</target>
+	
 	<target name="run" depends="compile" description="run the application like 'ant run -Dargs=http://your.wfs.host./wfsserver/wfs'">
 		<java classname="de.latlon.deejump.plugin.wfs.WFSFrame" 
 		fork="true"
