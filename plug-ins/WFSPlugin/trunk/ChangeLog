@@ -1,3 +1,7 @@
+2007-08-15  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/plugin/wfs/TransactionFactory.java:
+        * Fixed version string in namespace.
+
 2007-08-10  Andreas Schmitz <schmitz@lat-lon.de>
         de/latlon/deejump/ui/I18N.java,
         de/latlon/deejump/ui/messages.properties,
