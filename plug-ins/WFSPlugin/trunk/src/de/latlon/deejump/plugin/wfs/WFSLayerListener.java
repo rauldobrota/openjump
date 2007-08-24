@@ -22,7 +22,7 @@ Contact:
 
 Andreas Poth
 lat/lon GmbH
-Aennchenstraße 19
+AennchenstraÃŸe 19
 53177 Bonn
 Germany
 

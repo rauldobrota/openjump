@@ -1,3 +1,7 @@
+2007-08-24  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/plugin/wfs/WFSLayerListener.java:
+        Fixed non-unicode comment character.
+
 2007-08-15  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/plugin/wfs/TransactionFactory.java:
         * Fixed version string in namespace.
