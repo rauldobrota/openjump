@@ -146,7 +146,9 @@ public abstract class AbstractWFSWrapper {
      * @return the full request String
      */
     public String getDescribeTypeURL( QualifiedName typename){
-	return getDescribeTypeURL(OWSUtils.validateHTTPGetBaseURL(createDescribeFTOnlineResource()), typename);
+        String url = getDescribeTypeURL(OWSUtils.validateHTTPGetBaseURL(createDescribeFTOnlineResource()), typename);
+        LOG.debug("Describe Feature Type request:\n" + url);
+        return url;
     }
 
     public GMLSchema getSchemaForFeatureType( String featureType ){

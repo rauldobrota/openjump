@@ -36,8 +36,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -78,7 +78,7 @@ public class LoginDialog extends JDialog {
         super(owner, title);
         initGUI(serverName);
         setModal(true);
-        setLocation(50, 50);
+        setLocationRelativeTo(owner);
         setVisible( true );
     }
     
@@ -140,19 +140,8 @@ public class LoginDialog extends JDialog {
         pack();
         setResizable(false);
         
-        addComponentListener(new ComponentListener(){
-            public void componentHidden( ComponentEvent e ) {
-                // ignore
-            }
-
-            public void componentMoved( ComponentEvent e ) {
-                // ignore
-            }
-
-            public void componentResized( ComponentEvent e ) {
-                // ignore
-            }
-
+        addComponentListener(new ComponentAdapter(){
+            @Override
             public void componentShown( ComponentEvent e ) {
                 nameField.grabFocus();
             }

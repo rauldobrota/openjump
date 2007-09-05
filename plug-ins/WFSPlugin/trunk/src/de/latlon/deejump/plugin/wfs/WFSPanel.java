@@ -300,6 +300,7 @@ public class WFSPanel extends JPanel {
         }
 
         logins = new UserData(user, MD5Hasher.getMD5(pass));
+//        logins = new UserData(user, pass);
         context.getBlackboard().put( "LOGINS", logins );
         
         try{
@@ -339,18 +340,19 @@ public class WFSPanel extends JPanel {
         return this.tabs;
     }
     
-    void createXMLFrame( final Component parent, String txt ) {
-
-	// try to beautify the XML
-	XMLFragment doc = new XMLFragment();
-	try {
-	    doc.load(new StringReader(txt), "http://www.systemid.org");
-	    txt = doc.getAsPrettyString();
-	} catch (SAXException e) {
-	    // ignore and use the old text
-	} catch (IOException e) {
-	    // ignore and use the old text
-	}
+    protected void createXMLFrame( final Component parent, String txt ) {
+        if(txt == null) txt = "";
+        
+        // try to beautify the XML
+        XMLFragment doc = new XMLFragment();
+        try {
+            doc.load(new StringReader(txt), "http://www.systemid.org");
+            txt = doc.getAsPrettyString();
+        } catch (SAXException e) {
+            // ignore and use the old text
+        } catch (IOException e) {
+            // ignore and use the old text
+        }
 	
         if ( xmlPane == null ){
             xmlPane = new JTextArea( txt );

@@ -1,3 +1,9 @@
+2007-09-05  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/plugin/wfs/WFSPanel.java,
+        src/de/latlon/deejump/plugin/wfs/auth/LoginDialog.java,
+        src/de/latlon/deejump/plugin/wfs/AbstractWFSWrapper.java:
+        Cosmetic changes.
+
 2007-08-24  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/plugin/wfs/WFSLayerListener.java:
         Fixed non-unicode comment character.
