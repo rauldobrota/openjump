@@ -1,3 +1,7 @@
+2007-09-06  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/util/data/JUMPFeatureFactory.java:
+        Added method to convert an AttributeType to an SQL type code.
+
 2007-09-05  Andreas Schmitz <schmitz@lat-lon.de>
         build.properties:
         Made library path relative for ease of use.

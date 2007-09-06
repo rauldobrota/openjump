@@ -394,7 +394,7 @@ public class JUMPFeatureFactory {
      * @param type an SQL type code as in deegree Types class
      * @return the JUMP type
      */
-    private static AttributeType findType( int type ) {
+    public static AttributeType findType( int type ) {
         // assumes integer for SQL's NUMERIC
         String xsd = Types.getXSDTypeForSQLType(type, 0);
 
@@ -554,6 +554,26 @@ public class JUMPFeatureFactory {
         }
         
         return t;
+    }
+    
+    /**
+     * @param type
+     * @return an SQL type code approximation of the type
+     */
+    public static int toSQLTypeCode( AttributeType type ) {
+        if( type == AttributeType.DATE ){
+            return Types.DATE;
+        } else if ( type == AttributeType.INTEGER ){
+            return Types.INTEGER;
+        } else if ( type == AttributeType.STRING ){
+            return Types.VARCHAR;
+        } else if ( type == AttributeType.DOUBLE ){
+            return Types.DOUBLE;
+        } else if ( type == AttributeType.OBJECT ){
+            return Types.GEOMETRY;
+        } else {
+            return Types.VARBINARY;
+        }
     }
     
 }
