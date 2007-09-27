@@ -47,8 +47,6 @@ import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.OptionsDialog;
 
-import de.latlon.deejump.ui.I18N;
-
 /**
  * ...
  * 
@@ -70,7 +68,7 @@ public class InstallLayerViewOptionsPanelPlugIn extends AbstractPlugIn {
 
         JUMPWorkbench workbench = context.getWorkbenchContext().getWorkbench();
         OptionsDialog.instance(context.getWorkbenchContext().getWorkbench()).addTab(
-                I18N.getString("Options.LayerViewOptions"),
+                Messages.getString("Options.LayerViewOptions"),
             new LayerViewOptionsPanel(context.getWorkbenchContext().getWorkbench().getBlackboard()));        
     }
 }
