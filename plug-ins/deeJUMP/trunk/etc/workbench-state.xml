@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workbench-state>
+	<properties>
+		<mapping>
+			<key class="java.lang.String">LAST FILENAME</key>
+			<value class="java.lang.String">C:\Dokumente und Einstellungen\hamammi\Eigene Dateien\blah.png</value>
+		</mapping>
+		<mapping>
+			<key class="java.lang.String">com.vividsolutions.jump.workbench.datasource.LoadFileDataSourceQueryChooser - FILE CHOOSER DIRECTORY</key>
+			<value class="java.lang.String">C:\Dokumente und Einstellungen\hamammi\Eigene Dateien</value>
+		</mapping>
+		<mapping>
+			<key class="java.lang.String">WFS_URL_LIST</key>
+			<value class="java.util.ArrayList">
+				<item class="java.lang.String">http://127.0.0.1:8080/deegreewfs/wfs</item>
+				<item class="java.lang.String">http://10.19.1.210:8082/deegreewfs/wfs</item>
+				<item class="java.lang.String">http://localhost:8081/deegreewfs/wfs</item>
+				<item class="java.lang.String">http://10.19.1.251:8080/deegreewfs/wfs</item>
+				<item class="java.lang.String">http://www.refractions.net:8080/geoserver/wfs/GetCapabilities</item>
+				<item class="java.lang.String">http://www.bsc-eoc.org/cgi-bin/bsc_ows.asp?version=1.0.0&amp;service= WFS&amp;request=GetCapabilities</item>
+			</value>
+		</mapping>
+		<mapping>
+			<key class="java.lang.String">WMS_URL_LIST</key>
+			<value class="java.util.ArrayList">
+				<item class="java.lang.String">http://demo.deegree.org:8080/deegree/wms</item>
+				<item class="java.lang.String">http://localhost:8080/deegreewms/wms</item>
+				<item class="java.lang.String">http://www.geoserver.nrw.de/GeoOgcWms1.3/servlet/TK25</item>
+				<item class="java.lang.String">http://www.geoserver.nrw.de/GeoOgcWms1.3/servlet/NRW500?</item>
+				<item class="java.lang.String">http://www.geoserver.nrw.de/GeoOgcWms1.3/servlet/TK100?</item>
+				<item class="java.lang.String">http://wms.jpl.nasa.gov/wms.cgi?</item>
+			</value>
+		</mapping>
+		<mapping>
+			<key class="java.lang.String">com.vividsolutions.jump.workbench.datasource.LoadFileDataSourceQueryChooser - FILE CHOOSER DIRECTORY</key>
+			<value class="java.lang.String">E:\geodata\bonnshapes</value>
+		</mapping>
+		<mapping>
+			<key class="java.lang.String">com.vividsolutions.jump.workbench.datasource.LoadFileDataSourceQueryChooser - FILE CHOOSER COORDINATE SYSTEM</key>
+			<value class="java.lang.String">Unspecified</value>
+		</mapping>
+		<mapping>
+			<key class="java.lang.String">com.vividsolutions.jump.workbench.datasource.LoadDatasetPlugIn - LAST FORMAT</key>
+			<value class="java.lang.String">ESRI Shapefile</value>
+		</mapping>
+	</properties>
+</workbench-state>

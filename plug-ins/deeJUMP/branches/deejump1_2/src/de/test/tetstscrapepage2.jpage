@@ -1,0 +1,41 @@
+{
+    import com.vividsolutions.jump.workbench.model.Layer;
+    import com.vividsolutions.jump.feature.FeatureSchema;
+    import com.vividsolutions.jts.geom.Geometry;
+    import com.vividsolutions.jump.feature.BasicFeature; 
+	
+    // get selected items
+	Collection items = wc.getLayerViewPanel().getSelectionManager().getSelectedItems();
+	
+    // get the target layer, to which buffered geometries will be added
+	bufferLayer = wc.getLayerManager().getLayer( "buffer_layer" );
+	
+    // check if there
+	if( bufferLayer == null ){
+	    System.out.println( "Forgot to add target layer!" );
+	    return;
+	}
+	
+	// create buffer distance
+	double bufferValue = 50;
+	System.out.println( "Using buffer: " + bufferValue );
+	
+	// create the data schema of target laye
+	FeatureSchema schema = bufferLayer.getFeatureCollectionWrapper().getFeatureSchema();
+	
+	for (Iterator iter = items.iterator(); iter.hasNext();) {
+	    // for each chosen geometrx
+	    Geometry chosenGeometry = (Geometry) iter.next();
+	    
+	    // create a buffer
+	    chosenGeometry = chosenGeometry.buffer( bufferValue );
+	    
+	    // create a new feature and set its geomtry
+	    BasicFeature newFeature = new BasicFeature( schema );
+	    newFeature.setGeometry( chosenGeometry );
+	    
+	    // finally add it to target layer
+	    bufferLayer.getFeatureCollectionWrapper().add( newFeature );
+	}
+
+}

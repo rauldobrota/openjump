@@ -1,0 +1,3 @@
+- fix build.xml
+- check out bug tracker
+- check in LaF changes

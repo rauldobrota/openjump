@@ -1,0 +1,80 @@
+deeJUMP ToDos
+
+HIGH Priority
+-------------
+
+- WMS request: strip anything after the ?
+
+Maybe there is something missing in my configuration. For example, are 
+these issues related to this and similar errors in jump.log:
+"11:14:36,640 ERROR (AbstractPlugIn.java:createName:91) - Can't find 
+resource for bundle java.util.PropertyResourceBundle, 
+key de.latlon.deejump.plugin.style.DeeChangeStylesPlugIn 
+de.latlon.deejump.plugin.style.DeeChangeStylesPlugIn"? 
+
+
+2 - Change style menu / "Point Display Typ" (e missing) :
+
+- If you import a point layer and try to change "Point Display Typ" into bitmap before choosing a bitmap, it ends into a NPE. If you choose the bitmap first, you don't have to select bitmap to get it displayed.
+
+- There are both a vertices size choozer and a point size chooser, but vertices and points menus seem to be synchronized in some ways. May be a clear distinction between point (a Geometry) and vertices (a coordinate) have to be done (let points have a representation for its coordinate and another for the feature geometry).
+
+- When you choose a bitmap and select, for example, circle, then close the Change Style dialog box and open it again, you alternatively have the vertices checkbox set to true, then false, then true...
+
+- Is the point size supposed to apply to bitmaps ? 
+
+
+- Use Request elements defined in Capabilities request
+- WFS cancel request (on monitor dialog)
+
+
+
+
+
+LOW Priority
+-------------
+
+- WFS adapter -> what if no schema?, then only get feature w/o props
+- WFS adapter geo pro not recognized properly 8guessGeoPro, with PG db THE_GEOM
+use new mthod public FeatureTypeProperty[] getGeometryProperties() {
+- WFS adapter plug-in, when no window -> null pointer...
+- WFS adapter: (Re-)connect must reset GUI! (especially remove cached schemas and other stuff)
+- java.lang.IllegalArgumentException: host parameter is null
+- WFS adapter native deegree FC
+
+
+NICE-TO-HAVE
+------------
+
+- WMS STYLES fehlen
+
+
+OpenJUMP TO DOs
+---------------
+
+- Skin stuff!
+
+ - commons-loggin.jar x log4j.jar ?
+ - explain them! (style guide, development guide?)
+ - WMS 1.1
+ - repeated get wms capabilties request
+ - change language on-the-fly?
+ - JPP-specific stuff -> package org.jpp. For example, org.jpp.i18n
+ - Fix bug in com.vividsolutions.jump.workbench.ui.plugin.wms.EditWMSQueryPlugIn.java (already reported to Jon Aquino)
+ - jump.properties is 2x there!
+ - remove references to JDOM
+
+DONE
+----
+These changes mainly regarding adding of WMS ver 1.1 and 1.1.0 (NRW-GDI)
+com.vividsolutions.wms.MapImageFormatChooser.java
+com.vividsolutions.wms.MapRequest.java
+com.vividsolutions.wms.Parser.java
+com.vividsolutions.wms.WMService.java
+com.vividsolutions.jump.workbench.ui.plugin.wms.URLWizardPanel.java (and others)
+com.vividsolutions.jump.workbench.ui.plugin.wms.AddWMSQueryPlugIn.java
+
+
+// bug fix regarding Threaded PlugIn
+com.vividsolutions.jump.workbench.plugin.AbstractPlugIn.java
+com.vividsolutions.jump.workbench.ui.WorkbenchFrame.java

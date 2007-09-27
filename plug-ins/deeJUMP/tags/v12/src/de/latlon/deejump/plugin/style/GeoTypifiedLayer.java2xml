@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<root>
+  <attribute xml-name="name" java-name="name"/>
+  <attribute xml-name="visible" java-name="visible"/>
+  <element xml-name="scaleDependentRendering">  
+    <attribute xml-name="enabled" java-name="scaleDependentRenderingEnabled"/>      
+    <element xml-name="minScale" java-name="minScale"/>  
+    <element xml-name="maxScale" java-name="maxScale"/>        
+  </element>
+  <element xml-name="description" java-name="description"/>
+  <element xml-name="data-source-query" java-name="dataSourceQuery"/>
+  <attribute xml-name="drawnLast" java-name="drawingLast"/>
+  <attribute xml-name="synchronizedLineColor" java-name="synchronizingLineColor"/>
+  <element xml-name="styles">
+    <element xml-name="style" java-name="style"/>
+  </element>
+  <attribute xml-name="wmsLayerName" java-name="wmsLayerName"/>
+  <attribute xml-name="styleName" java-name="styleName"/>
+  <attribute xml-name="styleTitle" java-name="styleTitle"/>
+  <attribute xml-name="featureTypeStyle" java-name="featureTypeStyle"/>
+  <attribute xml-name="geoType" java-name="geoType"/>
+</root>

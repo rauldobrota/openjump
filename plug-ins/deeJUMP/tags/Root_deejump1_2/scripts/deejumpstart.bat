@@ -1,0 +1,1 @@
+start javaw.exe  -Duser.language=en -Dlog4j.configuration=file:log4j.xml -jar deejump.jar -properties workbench-properties.xml -plug-in-directory "lib\ext"
