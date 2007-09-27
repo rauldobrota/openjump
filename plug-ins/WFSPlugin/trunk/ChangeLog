@@ -1,4 +1,11 @@
 2007-09-06  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/util/data/JUMPFeatureFactory.java,
+        src/de/latlon/deejump/plugin/wfs/WFSFrame.java,
+        src/de/latlon/deejump/plugin/wfs/WFSPlugIn.java:
+        Cosmetic changes, some small fixes.
+
+
+2007-09-06  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/util/data/JUMPFeatureFactory.java:
         Added method to convert an AttributeType to an SQL type code.
 

@@ -22,7 +22,6 @@ import org.deegree.datatypes.QualifiedName;
 import org.deegree.datatypes.Types;
 import org.deegree.datatypes.UnknownTypeException;
 import org.deegree.framework.util.IDGenerator;
-import org.deegree.framework.xml.Marshallable;
 import org.deegree.framework.xml.XMLParsingException;
 import org.deegree.framework.xml.schema.XMLSchemaException;
 import org.deegree.model.crs.CoordinateSystem;
@@ -45,6 +44,7 @@ import org.deegree.model.spatialschema.GeometryException;
 import org.deegree.model.spatialschema.GeometryFactory;
 import org.deegree.model.spatialschema.JTSAdapter;
 import org.deegree.ogcbase.CommonNamespaces;
+import org.deegree.ogcwebservices.wfs.XMLFactory;
 import org.deegree.ogcwebservices.wfs.operation.GetFeature;
 import org.deegree.ogcwebservices.wfs.operation.Query;
 import org.deegree.ogcwebservices.wfs.operation.GetFeature.RESULT_TYPE;
@@ -67,12 +67,13 @@ import de.latlon.deejump.ui.DeeJUMPException;
  * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei </a>
  */
 public class JUMPFeatureFactory {
-    
-    private static Logger LOG = Logger.getLogger( JUMPFeatureFactory.class );    
-    
+
+    private static Logger LOG = Logger.getLogger( JUMPFeatureFactory.class );
+
     private static int maxFeatures = 100;
-        //Integer.parseInt( DeeJUMPProperties.getString("maxFeatures") );
-    
+
+    // Integer.parseInt( DeeJUMPProperties.getString("maxFeatures") );
+
     /**
      * Creates a JUMP FeatureCollection from a deegree FeatureCollection [UT]
      * 
@@ -80,14 +81,13 @@ public class JUMPFeatureFactory {
      * @param deegreeFeatCollec
      *            the deegree FeatureCollection
      * @return the new JUMP FeatureCollection
-     * @throws Exception 
+     * @throws Exception
      */
     public static FeatureCollection createFromDeegreeFC( org.deegree.model.feature.FeatureCollection deegreeFeatCollec )
-        throws Exception {
+                            throws Exception {
 
         return createFromDeegreeFC( deegreeFeatCollec, null );
     }
-
 
     /**
      * Creates a deegree <code>WFSGetFeatureRequest</code> based on the WFS version, the feature
@@ -102,47 +102,39 @@ public class JUMPFeatureFactory {
      * @param envelope
      *            the box inside of which data has been requested
      * @return a wfs GetFeature request
-     * @throws Exception 
      */
     public static GetFeature createFeatureRequest( String version, QualifiedName qualName,
-                                                            org.deegree.model.spatialschema.Envelope envelope ) throws Exception {
+                                                   org.deegree.model.spatialschema.Envelope envelope ) {
 
         // FIXME srs is null!!!!
         String srs = null;
-        //TODO
+        // TODO
         CoordinateSystem cs = null;
-        
-        org.deegree.model.spatialschema.Geometry boxGeom = null;
-        try {
-            boxGeom = GeometryFactory.createSurface( envelope, cs );
-        } catch ( GeometryException e ) {
-            e.printStackTrace();
-            throw new RuntimeException( "Cannot create surface from bbox." + e.getMessage() );
-        } 
-        
-        
-        Operation op = new SpatialOperation( OperationDefines.BBOX, new PropertyName( new QualifiedName( "GEOM" ) ), boxGeom ); //$NON-NLS-1$
 
-        Filter filter = new ComplexFilter( op );
-        
-        //TODO get maxFeatures...
-        Query query = Query.create( null, null, null, null, version, new QualifiedName[]{qualName}, null, srs, filter, maxFeatures, 0, RESULT_TYPE.RESULTS );
+        Filter filter = null;
+        if ( envelope != null ) {
+            org.deegree.model.spatialschema.Geometry boxGeom = null;
+            try {
+                boxGeom = GeometryFactory.createSurface( envelope, cs );
+            } catch ( GeometryException e ) {
+                e.printStackTrace();
+                throw new RuntimeException( "Cannot create surface from bbox." + e.getMessage() );
+            }
+
+            Operation op = new SpatialOperation( OperationDefines.BBOX,
+                                                 new PropertyName( new QualifiedName( "GEOM" ) ), boxGeom ); //$NON-NLS-1$
+
+            filter = new ComplexFilter( op );
+        }
+
+        Query query = Query.create( null, null, null, null, version, new QualifiedName[] { qualName }, null, srs,
+                                    filter, maxFeatures, 0, RESULT_TYPE.RESULTS );
         IDGenerator idg = IDGenerator.getInstance();
-        // create WFS GetFeature request
-        
-        //FIXME TODO what the heck???
+
         int maxDepth = 100;
         int traverseExpiry = -999;
-        GetFeature gfr = GetFeature.create( version, 
-                                            "" + idg.generateUniqueID(), 
-                                            RESULT_TYPE.RESULTS, 
-                                            "GML3",
-                                            null,
-                                            maxFeatures, 
-                                            0,
-                                            maxDepth,
-                                            traverseExpiry, 
-                                            new Query[] { query });
+        GetFeature gfr = GetFeature.create( version, "" + idg.generateUniqueID(), RESULT_TYPE.RESULTS, "text/xml; subtype=gml/3.1.1", null,
+                                            maxFeatures, 0, maxDepth, traverseExpiry, new Query[] { query } );
 
         return gfr;
     }
@@ -157,18 +149,16 @@ public class JUMPFeatureFactory {
      * @param request
      *            the GetFeature request
      * @return a deegree FeatureCollection
-     * @throws Exception throwing ALL exceptions
+     * @throws Exception
+     *             throwing ALL exceptions
      */
-    public static org.deegree.model.feature.FeatureCollection createDeegreeFCfromWFS(
-                                                                                     AbstractWFSWrapper serverUrl,
-                                                                                     GetFeature request )
-        throws Exception {
+    public static org.deegree.model.feature.FeatureCollection createDeegreeFCfromWFS( AbstractWFSWrapper serverUrl,
+                                                                                      GetFeature request )
+                            throws Exception {
 
-        return createDeegreeFCfromWFS( serverUrl, ( (Marshallable) request ).exportAsXML(), null );
+        return createDeegreeFCfromWFS( serverUrl, XMLFactory.export(request ).getAsString(), null );
     }
 
-
-    
     /**
      * Creates a deegree <code>FeatureCollection</code> from a given GetFeature request to a
      * server.
@@ -178,114 +168,116 @@ public class JUMPFeatureFactory {
      *            the URL of the WFS server
      * @param request
      *            the GetFeature request
-     * @param featureType if non null, a DescribeFeatureType will be performed to get the correct schema
+     * @param featureType
+     *            if non null, a DescribeFeatureType will be performed to get the correct schema
      * @return a deegree FeatureCollection
-     * @throws DeeJUMPException 
+     * @throws DeeJUMPException
      */
-    public static org.deegree.model.feature.FeatureCollection createDeegreeFCfromWFS( AbstractWFSWrapper server, String request, QualifiedName featureType ) throws DeeJUMPException {
-        
+    public static org.deegree.model.feature.FeatureCollection createDeegreeFCfromWFS( AbstractWFSWrapper server,
+                                                                                      String request,
+                                                                                      QualifiedName featureType )
+                            throws DeeJUMPException {
+
         String s = WFSClientHelper.createResponsefromWFS( server.getGetFeatureURL(), request );
-        
+
         if ( s.indexOf( "<Exception>" ) >= 0 || s.indexOf( "<ServiceExceptionReport" ) >= 0 ) { //$NON-NLS-1$ //$NON-NLS-2$
             RuntimeException re = new RuntimeException( "Couldn't get data from WFS:\n" //$NON-NLS-1$
-                                                        + s ); 
-            LOG.debug( "Couldn't get data from WFS.", re ); 
+                                                        + s );
+            LOG.debug( "Couldn't get data from WFS.", re );
             throw re;
         }
-      
+
         LOG.debug( "WFS FC: " + s ); //$NON-NLS-1$ //$NON-NLS-2$
 
         StringReader sr = new StringReader( s );
-        
+
         GMLFeatureCollectionDocument gfDoc = new GMLFeatureCollectionDocument();
 
         // get schema from server
-        if(featureType != null){
+        if ( featureType != null ) {
             Map<URI, GMLSchema> schemaMap = new HashMap<URI, GMLSchema>();
-            String dft = server.getDescribeTypeURL(featureType);
+            String dft = server.getDescribeTypeURL( featureType );
             GMLSchemaDocument doc = new GMLSchemaDocument();
             try {
-                doc.load(new URL(dft));
-                LOG.debug("Feature type schema:\n" + doc.getAsPrettyString());
+                doc.load( new URL( dft ) );
+                LOG.debug( "Feature type schema:\n" + doc.getAsPrettyString() );
                 GMLSchema schema = doc.parseGMLSchema();
-                schemaMap.put(featureType.getNamespace(), schema);
-                gfDoc.setSchemas(schemaMap);
+                schemaMap.put( featureType.getNamespace(), schema );
+                gfDoc.setSchemas( schemaMap );
             } catch ( XMLSchemaException e ) {
-                LOG.debug("DescribeFeatureType did not work.");
+                LOG.debug( "DescribeFeatureType did not work." );
             } catch ( UnknownCRSException e ) {
-                LOG.debug("DescribeFeatureType did not work.");
+                LOG.debug( "DescribeFeatureType did not work." );
             } catch ( XMLParsingException e ) {
-                LOG.debug("DescribeFeatureType did not work.");
+                LOG.debug( "DescribeFeatureType did not work." );
             } catch ( MalformedURLException e ) {
-                LOG.debug("DescribeFeatureType did not work.");
+                LOG.debug( "DescribeFeatureType did not work." );
             } catch ( IOException e ) {
-                LOG.debug("DescribeFeatureType did not work.");
+                LOG.debug( "DescribeFeatureType did not work." );
             } catch ( SAXException e ) {
-                LOG.debug("DescribeFeatureType did not work.");
+                LOG.debug( "DescribeFeatureType did not work." );
             } finally {
-        	LOG.debug("Trying to use base url of server for DescribeFeatureType...");
-        	try{
-        	    String baseURL = server.getBaseWfsURL();
-        	    baseURL += baseURL.endsWith("?")?"":"?";
-        	    doc.load(new URL(server.getDescribeTypeURL(baseURL, featureType)));
-        	    
-        	    LOG.debug("Feature type schema:\n" + doc.getAsPrettyString());
-        	    
-        	    GMLSchema schema = doc.parseGMLSchema();
-        	    schemaMap.put(featureType.getNamespace(), schema);
-        	    gfDoc.setSchemas(schemaMap);
-        	} catch ( XMLSchemaException e ) {
-        	    LOG.debug("DescribeFeatureType did not work.");
-        	} catch ( UnknownCRSException e ) {
-        	    LOG.debug("DescribeFeatureType did not work.");
-        	} catch ( XMLParsingException e ) {
-        	    LOG.debug("DescribeFeatureType did not work.");
-        	} catch ( MalformedURLException e ) {
-        	    LOG.debug("DescribeFeatureType did not work.");
-        	} catch ( IOException e ) {
-        	    LOG.debug("DescribeFeatureType did not work.");
-        	} catch ( SAXException e ) {
-        	    LOG.debug("DescribeFeatureType did not work.");
-        	}
+                LOG.debug( "Trying to use base url of server for DescribeFeatureType..." );
+                try {
+                    String baseURL = server.getBaseWfsURL();
+                    baseURL += baseURL.endsWith( "?" ) ? "" : "?";
+                    doc.load( new URL( server.getDescribeTypeURL( baseURL, featureType ) ) );
+
+                    LOG.debug( "Feature type schema:\n" + doc.getAsPrettyString() );
+
+                    GMLSchema schema = doc.parseGMLSchema();
+                    schemaMap.put( featureType.getNamespace(), schema );
+                    gfDoc.setSchemas( schemaMap );
+                } catch ( XMLSchemaException e ) {
+                    LOG.debug( "DescribeFeatureType did not work." );
+                } catch ( UnknownCRSException e ) {
+                    LOG.debug( "DescribeFeatureType did not work." );
+                } catch ( XMLParsingException e ) {
+                    LOG.debug( "DescribeFeatureType did not work." );
+                } catch ( MalformedURLException e ) {
+                    LOG.debug( "DescribeFeatureType did not work." );
+                } catch ( IOException e ) {
+                    LOG.debug( "DescribeFeatureType did not work." );
+                } catch ( SAXException e ) {
+                    LOG.debug( "DescribeFeatureType did not work." );
+                }
             }
         }
-        
+
         org.deegree.model.feature.FeatureCollection newFeatCollec = null;
         try {
             gfDoc.load( sr, "http://dummySysId" );
-            
+
             newFeatCollec = gfDoc.parse();
         } catch ( SAXException e ) {
-            String mesg = "Error parsing response."; 
+            String mesg = "Error parsing response.";
             LOG.error( mesg, e );
-            throw new DeeJUMPException( mesg, e  );
+            throw new DeeJUMPException( mesg, e );
         } catch ( IOException e ) {
-            String mesg = "Error parsing response."; 
+            String mesg = "Error parsing response.";
             LOG.error( mesg, e );
-            throw new DeeJUMPException( mesg, e  );
+            throw new DeeJUMPException( mesg, e );
         } catch ( XMLParsingException e ) {
-            String mesg = "Error parsing response."; 
-            LOG.error(mesg, e);
+            String mesg = "Error parsing response.";
+            LOG.error( mesg, e );
             try {
-                LOG.error("Schema could not be used to validate FeatureCollection.");
-                LOG.error("Trying once again with crude guessing method.");
-                gfDoc = new GMLFeatureCollectionDocument(true);
-                gfDoc.load(sr, "http://www.systemid.org");
+                LOG.error( "Schema could not be used to validate FeatureCollection." );
+                LOG.error( "Trying once again with crude guessing method." );
+                gfDoc = new GMLFeatureCollectionDocument( true );
+                gfDoc.load( sr, "http://www.systemid.org" );
                 newFeatCollec = gfDoc.parse();
             } catch ( SAXException e1 ) {
                 LOG.error( mesg, e );
-                throw new DeeJUMPException( mesg, e  );
+                throw new DeeJUMPException( mesg, e );
             } catch ( IOException e1 ) {
                 LOG.error( mesg, e );
-                throw new DeeJUMPException( mesg, e  );
+                throw new DeeJUMPException( mesg, e );
             } catch ( XMLParsingException e1 ) {
                 LOG.error( mesg, e );
-                throw new DeeJUMPException( mesg, e  );
+                throw new DeeJUMPException( mesg, e );
             }
-            throw new DeeJUMPException( mesg, e  );
+            throw new DeeJUMPException( mesg, e );
         }
-        
-       
 
         return newFeatCollec;
     }
@@ -301,12 +293,12 @@ public class JUMPFeatureFactory {
      * @param defaultGeometry
      *            the geometry of the returned FeatureCollection
      * @return the new JUMP FeatureCollection
-     * @throws Exception 
+     * @throws Exception
      */
-    public static FeatureCollection createFromDeegreeFC(org.deegree.model.feature.FeatureCollection deegreeFeatCollec,
-                                                        Geometry defaultGeometry )
+    public static FeatureCollection createFromDeegreeFC( org.deegree.model.feature.FeatureCollection deegreeFeatCollec,
+                                                         Geometry defaultGeometry )
 
-        throws Exception {
+                            throws Exception {
 
         FeatureSchema fs = new FeatureSchema();
 
@@ -316,41 +308,41 @@ public class JUMPFeatureFactory {
 
         if ( feats == null || feats.length < 1 ) {
             throw new Exception( "No data found" ); //$NON-NLS-1$
-        } 
-        
-        //assuming one at least
+        }
+
+        // assuming one at least
         FeatureType ft = feats[0].getFeatureType();
-        
+
         AbstractPropertyType[] geoTypeProps = ft.getGeometryProperties();
 
         String geoProName = null;
 
         if ( geoTypeProps.length > 1 ) {
             throw new RuntimeException( "FeatureType has more than one GeometryProperty.\n" //$NON-NLS-1$
-                                 + "This is currently not supported." ); //$NON-NLS-1$
+                                        + "This is currently not supported." ); //$NON-NLS-1$
         } else if ( geoTypeProps == null || geoTypeProps.length == 0 ) {
-            LOG.debug("Guessing geometry property name.");
+            LOG.debug( "Guessing geometry property name." );
             geoProName = "GEOMETRY"; //$NON-NLS-1$
         } else {
             geoProName = geoTypeProps[0].getName().getLocalName();
-            LOG.debug("Geometry property name: " + geoProName);
+            LOG.debug( "Geometry property name: " + geoProName );
         }
-        
+
         PropertyType[] featTypeProps = ft.getProperties();
-//        Object[] properties = feats[0].getProperties();
+        // Object[] properties = feats[0].getProperties();
 
         // populate JUMP schema
         for ( int j = 0; j < featTypeProps.length; j++ ) {
-            String name =  featTypeProps[j].getName().getLocalName();
-            fs.addAttribute( name, findType( featTypeProps[j].getType() )  );
+            String name = featTypeProps[j].getName().getLocalName();
+            fs.addAttribute( name, findType( featTypeProps[j].getType() ) );
         }
-        
-        if( defaultGeometry == null && fs.getGeometryIndex() == -1 ){
+
+        if ( defaultGeometry == null && fs.getGeometryIndex() == -1 ) {
             throw new RuntimeException( "No geometry property found!" );
-        } else if ( defaultGeometry != null && fs.getGeometryIndex() == -1 ){
+        } else if ( defaultGeometry != null && fs.getGeometryIndex() == -1 ) {
             fs.addAttribute( "GEOMETRY", AttributeType.GEOMETRY ); //$NON-NLS-1$
         }
-        
+
         // populate FC with data
         for ( int i = 0; i < feats.length; i++ ) {
 
@@ -375,10 +367,10 @@ public class JUMPFeatureFactory {
                 if ( j != geoIndex ) {
                     QualifiedName qn = new QualifiedName( fs.getAttributeName( j ),
                                                           featTypeProps[j].getName().getNamespace() );
-                    
-                    FeatureProperty fp = feats[i].getDefaultProperty( qn );  
+
+                    FeatureProperty fp = feats[i].getDefaultProperty( qn );
                     Object value = null;
-                    if ( fp != null ){
+                    if ( fp != null ) {
                         value = fp.getValue();
                     }
                     jf.setAttribute( j, value );
@@ -391,37 +383,37 @@ public class JUMPFeatureFactory {
     }
 
     /**
-     * @param type an SQL type code as in deegree Types class
+     * @param type
+     *            an SQL type code as in deegree Types class
      * @return the JUMP type
      */
     public static AttributeType findType( int type ) {
         // assumes integer for SQL's NUMERIC
-        String xsd = Types.getXSDTypeForSQLType(type, 0);
+        String xsd = Types.getXSDTypeForSQLType( type, 0 );
 
-        if(xsd.equals("dateTime")){
+        if ( xsd.equals( "dateTime" ) ) {
             return AttributeType.DATE;
         }
 
-        if(xsd.equals("gml:GeometryPropertyType")){
+        if ( xsd.equals( "gml:GeometryPropertyType" ) ) {
             return AttributeType.GEOMETRY;
         }
 
-        if(xsd.equals("integer")){
+        if ( xsd.equals( "integer" ) ) {
             return AttributeType.INTEGER;
         }
-        
-        if(xsd.equals("double") || xsd.equals("decimal") || xsd.equals("float")){
+
+        if ( xsd.equals( "double" ) || xsd.equals( "decimal" ) || xsd.equals( "float" ) ) {
             return AttributeType.DOUBLE;
         }
 
-        if(xsd.equals("gml:FeaturePropertyType")){
+        if ( xsd.equals( "gml:FeaturePropertyType" ) ) {
             return AttributeType.OBJECT; // unknown what happens in this case
         }
-        
+
         // default is string, should work for booleans as well
         return AttributeType.STRING;
     }
-
 
     /**
      * @param jumpFeatureCollection
@@ -430,150 +422,146 @@ public class JUMPFeatureFactory {
      * @throws GeometryException
      */
     public static org.deegree.model.feature.FeatureCollection createFromJUMPFeatureCollection(
-            com.vividsolutions.jump.feature.FeatureCollection jumpFeatureCollection) throws UnknownTypeException, GeometryException
-             {
+                                                                                               com.vividsolutions.jump.feature.FeatureCollection jumpFeatureCollection )
+                            throws UnknownTypeException, GeometryException {
 
-        if (jumpFeatureCollection.size() == 0 || jumpFeatureCollection == null) {
-            throw new IllegalArgumentException(
-                    "FeatureCollection cannot be null and must have at least one feature");
+        if ( jumpFeatureCollection.size() == 0 || jumpFeatureCollection == null ) {
+            throw new IllegalArgumentException( "FeatureCollection cannot be null and must have at least one feature" );
         }
-        org.deegree.model.feature.FeatureCollection fc = FeatureFactory
-                .createFeatureCollection("id", jumpFeatureCollection.size());
+        org.deegree.model.feature.FeatureCollection fc = FeatureFactory.createFeatureCollection(
+                                                                                                 "id",
+                                                                                                 jumpFeatureCollection.size() );
 
         FeatureSchema schema = jumpFeatureCollection.getFeatureSchema();
-        //      for (int i = 0; i < schema.getAttributeCount(); i++) {
-        //          System.out.println(schema.getAttributeName(i) + " "
-        //                  + schema.getAttributeType(i));
-        //      }
+        // for (int i = 0; i < schema.getAttributeCount(); i++) {
+        // System.out.println(schema.getAttributeName(i) + " "
+        // + schema.getAttributeType(i));
+        // }
         int count = 0;
-        
+
         final URI GMLNS = CommonNamespaces.GMLNS;
         final URI XSNS = CommonNamespaces.XSNS;
-        
-        for (Iterator<?> iter = jumpFeatureCollection.iterator(); iter.hasNext();) {
-            com.vividsolutions.jump.feature.Feature feature = 
-                (com.vividsolutions.jump.feature.Feature) iter.next();
-            
-//            FeatureProperty[] ftp = new FeatureProperty[ schema.getAttributeCount() ];
-            PropertyType[] propType = new PropertyType[ schema.getAttributeCount() ];
-            
+
+        for ( Iterator<?> iter = jumpFeatureCollection.iterator(); iter.hasNext(); ) {
+            com.vividsolutions.jump.feature.Feature feature = (com.vividsolutions.jump.feature.Feature) iter.next();
+
+            // FeatureProperty[] ftp = new FeatureProperty[ schema.getAttributeCount() ];
+            PropertyType[] propType = new PropertyType[schema.getAttributeCount()];
+
             int geoIx = schema.getGeometryIndex();
-            
-            for (int i = 0; i < schema.getAttributeCount(); i++) {
-            	          
-                if( i != geoIx ){
-                    String type = toXSDName( schema.getAttributeType(i) );
 
-                    propType[i] = FeatureFactory
-                        .createPropertyType( new QualifiedName( schema.getAttributeName(i) ),
-                                         new QualifiedName( type, XSNS ), true );                        
+            for ( int i = 0; i < schema.getAttributeCount(); i++ ) {
 
-                    /*ftp[i] = FeatureFactory
-                        .createFeatureProperty( propType[i].getName(),
-                                            feature.getAttribute( schema.getAttributeName(i) ) );
-                    */
+                if ( i != geoIx ) {
+                    String type = toXSDName( schema.getAttributeType( i ) );
+
+                    propType[i] = FeatureFactory.createPropertyType( new QualifiedName( schema.getAttributeName( i ) ),
+                                                                     new QualifiedName( type, XSNS ), true );
+
+                    /*
+                     * ftp[i] = FeatureFactory .createFeatureProperty( propType[i].getName(),
+                     * feature.getAttribute( schema.getAttributeName(i) ) );
+                     */
 
                 } else {
-                    
+
                     String type = "org.deegree.model.geometry.Geometry";
-                    propType[i] = FeatureFactory
-                    .createPropertyType( new QualifiedName( schema.getAttributeName(geoIx) ),
-                                         new QualifiedName( type, GMLNS ), true );
-                
-                /*    ftp[i] = FeatureFactory
-                        .createFeatureProperty( propType[0].getName() , feature.getAttribute( schema.getAttributeName(i) ));
-                  */  
+                    propType[i] = FeatureFactory.createPropertyType(
+                                                                     new QualifiedName( schema.getAttributeName( geoIx ) ),
+                                                                     new QualifiedName( type, GMLNS ), true );
+
+                    /*
+                     * ftp[i] = FeatureFactory .createFeatureProperty( propType[0].getName() ,
+                     * feature.getAttribute( schema.getAttributeName(i) ));
+                     */
                 }
             }
 
-            //2.
-            FeatureType ft = FeatureFactory
-                .createFeatureType( new QualifiedName("featuretypename"), false, propType);
-            //3.
-            FeatureProperty[] fp = new FeatureProperty[schema
-                    .getAttributeCount()];
-            
-            
-            for (int i = 0; i < schema.getAttributeCount(); i++) {
-                if( i != geoIx ){
-                    fp[i] = FeatureFactory
-                                .createFeatureProperty(new QualifiedName(schema.getAttributeName(i)), 
-                                                       feature.getAttribute(i));
+            // 2.
+            FeatureType ft = FeatureFactory.createFeatureType( new QualifiedName( "featuretypename" ), false, propType );
+            // 3.
+            FeatureProperty[] fp = new FeatureProperty[schema.getAttributeCount()];
+
+            for ( int i = 0; i < schema.getAttributeCount(); i++ ) {
+                if ( i != geoIx ) {
+                    fp[i] = FeatureFactory.createFeatureProperty( new QualifiedName( schema.getAttributeName( i ) ),
+                                                                  feature.getAttribute( i ) );
                 } else {
-                    fp[i] = FeatureFactory
-                    .createFeatureProperty( new QualifiedName(schema.getAttributeName( geoIx )), 
-                                            JTSAdapter.wrap(feature.getGeometry()));
+                    fp[i] = FeatureFactory.createFeatureProperty(
+                                                                  new QualifiedName( schema.getAttributeName( geoIx ) ),
+                                                                  JTSAdapter.wrap( feature.getGeometry() ) );
 
                 }
             }
-            //4.
-            org.deegree.model.feature.Feature fe = 
-                FeatureFactory.createFeature("fid_" + count++, ft, fp);
-            
-            fc.add(fe);
+            // 4.
+            org.deegree.model.feature.Feature fe = FeatureFactory.createFeature( "fid_" + count++, ft, fp );
+
+            fc.add( fe );
         }
-        
-        
+
         return fc;
-    }    
-    
+    }
+
     /**
-     * @param i max number of features. Values below 1 are ignored
+     * @param i
+     *            max number of features. Values below 1 are ignored
      */
     public static void setMaxFeatures( int i ) {
-        if( i > 0 ){
+        if ( i > 0 ) {
             maxFeatures = i;
         }
     }
-         
+
     /**
      * @return the maxFeatures setting
      */
     public static int getMaxFeatures() {
         return maxFeatures;
     }
-    
+
     /**
      * @param type
      * @return converts type to xsd typename
      */
-    public static String toXSDName( AttributeType type ){
+    public static String toXSDName( AttributeType type ) {
         String t = null;
-        if( type == AttributeType.DATE ){
+        if ( type == AttributeType.DATE ) {
             t = "date";
-        } else if ( type == AttributeType.INTEGER ){
+        } else if ( type == AttributeType.INTEGER ) {
             t = "integer";
-        } else if ( type == AttributeType.STRING ){
+        } else if ( type == AttributeType.STRING ) {
             t = "string";
-        } else if ( type == AttributeType.DOUBLE ){
+        } else if ( type == AttributeType.DOUBLE ) {
             t = "double";
-        } else if ( type == AttributeType.OBJECT ){
+        } else if ( type == AttributeType.OBJECT ) {
             t = "object";
         } else {
-            throw new RuntimeException( "no xsd type found for: " + type);
+            throw new RuntimeException( "no xsd type found for: " + type );
         }
-        
+
         return t;
     }
-    
+
     /**
      * @param type
      * @return an SQL type code approximation of the type
      */
     public static int toSQLTypeCode( AttributeType type ) {
-        if( type == AttributeType.DATE ){
+        if ( type == AttributeType.DATE ) {
             return Types.DATE;
-        } else if ( type == AttributeType.INTEGER ){
+        } else if ( type == AttributeType.INTEGER ) {
             return Types.INTEGER;
-        } else if ( type == AttributeType.STRING ){
+        } else if ( type == AttributeType.STRING ) {
             return Types.VARCHAR;
-        } else if ( type == AttributeType.DOUBLE ){
+        } else if ( type == AttributeType.DOUBLE ) {
             return Types.DOUBLE;
-        } else if ( type == AttributeType.OBJECT ){
+        } else if ( type == AttributeType.OBJECT ) {
+            return Types.VARBINARY;
+        } else if ( type == AttributeType.GEOMETRY ) {
             return Types.GEOMETRY;
         } else {
             return Types.VARBINARY;
         }
     }
-    
+
 }
