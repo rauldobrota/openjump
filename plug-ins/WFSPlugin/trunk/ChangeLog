@@ -1,9 +1,13 @@
 2007-09-06  Andreas Schmitz <schmitz@lat-lon.de>
+        lib/deegree2.jar:
+        Added a version of the library which includes support for
+        EPSG:2391,2392,2393,2394 and EPSG:3067.
+
+2007-09-06  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/util/data/JUMPFeatureFactory.java,
         src/de/latlon/deejump/plugin/wfs/WFSFrame.java,
         src/de/latlon/deejump/plugin/wfs/WFSPlugIn.java:
         Cosmetic changes, some small fixes.
-
 
 2007-09-06  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/util/data/JUMPFeatureFactory.java:
