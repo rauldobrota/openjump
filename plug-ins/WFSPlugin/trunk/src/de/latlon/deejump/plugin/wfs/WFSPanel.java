@@ -21,6 +21,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -61,19 +62,18 @@ import de.latlon.deejump.ui.ExtensibleComboBox;
 import de.latlon.deejump.ui.I18N;
 
 /**
- * This is a panel which contains other basic GUIs for accessing Features of
- * a WFS.
- *
+ * This is a panel which contains other basic GUIs for accessing Features of a WFS.
+ * 
  * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei</a>
  * @author last edited by: $Author$
- *
+ * 
  * @version $Revision$, $Date$
  */
 public class WFSPanel extends JPanel {
 
-    protected static final Logger LOG = Logger.getLogger(WFSPanel.class);
-    
-    //TODO put a props
+    protected static final Logger LOG = Logger.getLogger( WFSPanel.class );
+
+    // TODO put a props
     static final String releaseVersion = "1.0.0";
 
     // Constants for spatial search criteria type
@@ -92,8 +92,8 @@ public class WFSPanel extends JPanel {
     private static File lastDirectory;
 
     /**
-     * The standard geometry type name (used when getting schemata and creating
-     * filters with spatial clauses
+     * The standard geometry type name (used when getting schemata and creating filters with spatial
+     * clauses
      */
     public static final String GEOMETRY_PROPERTY_NAME = "GEOM";
 
@@ -111,20 +111,20 @@ public class WFSPanel extends JPanel {
 
     AbstractWFSWrapper wfService;
 
-    //private JTextArea requestTextArea;
+    // private JTextArea requestTextArea;
     private RequestTextArea requestTextArea;
 
     private JTextArea responseTextArea;
 
     private JComboBox serverCombo;
 
-    //    private JButton okButton;
+    // private JButton okButton;
 
     private JTabbedPane tabs;
 
     private JComboBox featureTypeCombo;
 
-    //    private JPanel mainPanel;
+    // private JPanel mainPanel;
 
     private Box box;
 
@@ -132,7 +132,7 @@ public class WFSPanel extends JPanel {
     /** The envelope of the current bounding box */
     private Envelope envelope = new Envelope( -1d, -1d, 1d, 1d );
 
-    //private GMLGeometry gmlBbox;
+    // private GMLGeometry gmlBbox;
     private Geometry selectedGeom;
 
     private String srs = "EPSG:4326";
@@ -152,13 +152,14 @@ public class WFSPanel extends JPanel {
     private UserData logins;
 
     private WorkbenchContext context;
-    
+
     /**
-     * @param context 
-     * @param urlList the list of servers
+     * @param context
+     * @param urlList
+     *            the list of servers
      */
     public WFSPanel( WorkbenchContext context, List<String> urlList ) {
-	this.context = context;
+        this.context = context;
         setWFSList( urlList );
         initGUI();
         this.options = new WFSOptions();
@@ -169,7 +170,7 @@ public class WFSPanel extends JPanel {
         LayoutManager lm = new BoxLayout( this, BoxLayout.Y_AXIS );
         setLayout( lm );
 
-        //combo box for WFS URLs
+        // combo box for WFS URLs
         serverCombo = createServerCombo();
         Dimension d = new Dimension( 400, 45 );
         serverCombo.setPreferredSize( d );
@@ -187,11 +188,11 @@ public class WFSPanel extends JPanel {
         connecButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 try {
-		    reinitService( (String) serverCombo.getSelectedItem() );
-		} catch (DeeJUMPException e1) {
-		    LOG.info("Service could not be initialized.");
-		    LOG.debug("Stack trace: ", e1);
-		}
+                    reinitService( (String) serverCombo.getSelectedItem() );
+                } catch ( DeeJUMPException e1 ) {
+                    LOG.info( "Service could not be initialized." );
+                    LOG.debug( "Stack trace: ", e1 );
+                }
             }
         } );
 
@@ -203,13 +204,13 @@ public class WFSPanel extends JPanel {
 
             }
         } );
-        
-        JButton loginButton = new JButton(I18N.getString("FeatureResearchDialog.login"));
-        loginButton.addActionListener(new ActionListener(){
-	    public void actionPerformed(ActionEvent e) {
-		performLogin();
-	    }
-        });
+
+        JButton loginButton = new JButton( I18N.getString( "FeatureResearchDialog.login" ) );
+        loginButton.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                performLogin();
+            }
+        } );
 
         JPanel p = new JPanel();
         p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
@@ -224,11 +225,11 @@ public class WFSPanel extends JPanel {
         p.add( innerPanel );
 
         featureTypeCombo = createFeatureTypeCombo();
-        //featureTypeCombo.setVisible( false );
+        // featureTypeCombo.setVisible( false );
         featureTypeCombo.setEnabled( false );
         p.add( featureTypeCombo );
 
-        //FIXME what's this???
+        // FIXME what's this???
         setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
         add( p );
 
@@ -243,8 +244,8 @@ public class WFSPanel extends JPanel {
             public Dimension getMinimumSize() {
                 return minDim;
             }
-            
-            public void setEnabled( boolean e ){
+
+            public void setEnabled( boolean e ) {
                 super.setEnabled( e );
                 attributeResPanel.setEnabled( e );
                 propertiesPanel.setEnabled( e );
@@ -264,55 +265,57 @@ public class WFSPanel extends JPanel {
 
         spatialResPanel = new SpatialCriteriaPanel( this );
         tabs.add( I18N.getString( "FeatureResearchDialog.spatialSearch" ), spatialResPanel );
-        
-        requestTextArea = new RequestTextArea(this);
-        
-        tabs.add( I18N.getString( "FeatureResearchDialog.request" ), requestTextArea );
 
+        requestTextArea = new RequestTextArea( this );
+
+        tabs.add( I18N.getString( "FeatureResearchDialog.request" ), requestTextArea );
 
         tabs.add( I18N.getString( "FeatureResearchDialog.response" ), createResponseTextArea() );
         tabs.setEnabled( false );
-        
+
         box = Box.createHorizontalBox();
         box.setBorder( BorderFactory.createEmptyBorder( 20, 5, 10, 5 ) );
 
         add( tabs );
         tabs.setVisible( false );
 
-        //        setMinimumSize( new Dimension( 400, 300 ) );
-        //        setPreferredSize( new Dimension( 400, 600 ) );
+        // setMinimumSize( new Dimension( 400, 300 ) );
+        // setPreferredSize( new Dimension( 400, 600 ) );
     }
 
     protected void performLogin() {
-        LoginDialog dialog = new LoginDialog( (Dialog)this.getTopLevelAncestor(), I18N.getString("FeatureResearchDialog.login"), serverCombo.getSelectedItem().toString() );
+        LoginDialog dialog = new LoginDialog( (Dialog) this.getTopLevelAncestor(),
+                                              I18N.getString( "FeatureResearchDialog.login" ),
+                                              serverCombo.getSelectedItem().toString() );
 
         String pass = dialog.getPassword();
         String user = dialog.getName();
 
-        if(user == null || user.equals("")){
-            JOptionPane.showMessageDialog(this, I18N.getString("WFSPanel.userEmpty"));
+        if ( user == null || user.equals( "" ) ) {
+            JOptionPane.showMessageDialog( this, I18N.getString( "WFSPanel.userEmpty" ) );
             return;
         }
 
-        if(pass == null || pass.equals("")){
-            JOptionPane.showMessageDialog(this, I18N.getString("WFSPanel.passEmpty"));
+        if ( pass == null || pass.equals( "" ) ) {
+            JOptionPane.showMessageDialog( this, I18N.getString( "WFSPanel.passEmpty" ) );
             return;
         }
 
-        logins = new UserData(user, MD5Hasher.getMD5(pass));
-//        logins = new UserData(user, pass);
+        logins = new UserData( user, MD5Hasher.getMD5( pass ) );
+        // logins = new UserData(user, pass);
         context.getBlackboard().put( "LOGINS", logins );
-        
-        try{
+
+        try {
             reinitService( (String) serverCombo.getSelectedItem() );
-        }catch(DeeJUMPException ex){
-            String msg = I18N.getString("WFSPanel.loginFailed") + "\n" + ex.getLocalizedMessage() + "\n" + I18N.getString("WFSPanel.loginFailed2");
-            JOptionPane.showMessageDialog(this, msg);
+        } catch ( DeeJUMPException ex ) {
+            String msg = I18N.getString( "WFSPanel.loginFailed" ) + "\n" + ex.getLocalizedMessage() + "\n"
+                         + I18N.getString( "WFSPanel.loginFailed2" );
+            JOptionPane.showMessageDialog( this, msg );
             ex.printStackTrace();
             return;
         }
 
-        JOptionPane.showMessageDialog(this, I18N.getString("WFSPanel.loginSuccessful"));
+        JOptionPane.showMessageDialog( this, I18N.getString( "WFSPanel.loginSuccessful" ) );
     }
 
     // Gh 15.11.05
@@ -327,62 +330,62 @@ public class WFSPanel extends JPanel {
         extensibleComboBox.addItemListener( new ItemListener() {
             public void itemStateChanged( ItemEvent e ) {
                 if ( e.getStateChange() == ItemEvent.SELECTED ) {
-                    /*String selected = extensibleComboBox.getSelectedItem().toString();
-                     reinitService( selected );
+                    /*
+                     * String selected = extensibleComboBox.getSelectedItem().toString();
+                     * reinitService( selected );
                      */
                 }
             }
         } );
         return extensibleComboBox;
     }
-    
-    JTabbedPane getTabs(){
+
+    JTabbedPane getTabs() {
         return this.tabs;
     }
-    
+
     protected void createXMLFrame( final Component parent, String txt ) {
-        if(txt == null) txt = "";
-        
+        if ( txt == null )
+            txt = "";
+
         // try to beautify the XML
         XMLFragment doc = new XMLFragment();
         try {
-            doc.load(new StringReader(txt), "http://www.systemid.org");
+            doc.load( new StringReader( txt ), "http://www.systemid.org" );
             txt = doc.getAsPrettyString();
-        } catch (SAXException e) {
+        } catch ( SAXException e ) {
             // ignore and use the old text
-        } catch (IOException e) {
+        } catch ( IOException e ) {
             // ignore and use the old text
         }
-	
-        if ( xmlPane == null ){
+
+        if ( xmlPane == null ) {
             xmlPane = new JTextArea( txt );
         } else {
             xmlPane.setText( txt );
         }
-        
-        //        ta.setLineWrap( true );
+
+        // ta.setLineWrap( true );
         JScrollPane sp = new JScrollPane( xmlPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                           JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
         sp.setMaximumSize( new Dimension( 600, 400 ) );
         sp.setPreferredSize( new Dimension( 800, 400 ) );
 
-        String[] opts = new String[]{ I18N.getString( "closeAndSave" ),  
-                                      I18N.getString( "OK" ) };
-        
-        int i = JOptionPane.showOptionDialog( parent, sp,
-                                              I18N.getString( "FeatureResearchDialog.capabilities" ),
-                                              JOptionPane.YES_NO_OPTION, 
-                                      JOptionPane.PLAIN_MESSAGE, null, opts, opts[1] );
-       
-        if( i == 0 ){ // save our capabilities!
+        String[] opts = new String[] { I18N.getString( "closeAndSave" ), I18N.getString( "OK" ) };
+
+        int i = JOptionPane.showOptionDialog( parent, sp, I18N.getString( "FeatureResearchDialog.capabilities" ),
+                                              JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, opts, opts[1] );
+
+        if ( i == 0 ) { // save our capabilities!
             WFSPanel.saveTextToFile( parent, xmlPane.getText() );
-        } 
+        }
     }
 
-    private void reinitService( String url ) throws DeeJUMPException {
-            wfService = "1.1.0".equals( this.wfsVersion ) ? new WFServiceWrapper_1_1_0( logins, url )
-                                                         : new WFServiceWrapper_1_0_0( logins, url );
-            refreshGUIs();
+    private void reinitService( String url )
+                            throws DeeJUMPException {
+        wfService = "1.1.0".equals( this.wfsVersion ) ? new WFServiceWrapper_1_1_0( logins, url )
+                                                     : new WFServiceWrapper_1_0_0( logins, url );
+        refreshGUIs();
     }
 
     private Component createVersionButtons( String[] versions ) {
@@ -398,7 +401,7 @@ public class WFSPanel extends JPanel {
                 }
             } );
             bg.add( b );
-            if ( i == 0 ) {//first is clicked 
+            if ( i == 0 ) {// first is clicked
                 b.doClick();
             }
             p.add( b );
@@ -431,18 +434,17 @@ public class WFSPanel extends JPanel {
                     geoProperties = getGeoProperties();
                     propertiesPanel.setProperties( attributeNames, geoProperties );
                     spatialResPanel.resetGeoCombo( geoProperties );
-                    ///hmmm repeated code...
+                    // /hmmm repeated code...
                     WFSFeatureType ft = wfService.getFeatureTypeByName( selectFt );
-                    if( ft != null ){
-                    //UT could support other srrs, but not doing it now
-                        String[] crs = new String[]{ ft.getDefaultSRS().toString() };
+                    if ( ft != null ) {
+                        // UT could support other srrs, but not doing it now
+                        String[] crs = new String[] { ft.getDefaultSRS().toString() };
                         spatialResPanel.setCrs( crs );
                     }
                     requestTextArea.setRequestText( "" );
                 } catch ( Exception e ) {
                     e.printStackTrace();
-                    JOptionPane.showMessageDialog( WFSPanel.this, "Error loading schema: "
-                                                                  + e.getMessage() );
+                    JOptionPane.showMessageDialog( WFSPanel.this, "Error loading schema: " + e.getMessage() );
                 }
             }
         } );
@@ -475,6 +477,7 @@ public class WFSPanel extends JPanel {
         responseTextArea.setText( "" );
         try {
             featTypes = wfService.getFeatureTypes();
+            Arrays.sort( featTypes );
             featureTypeCombo.setModel( new javax.swing.DefaultComboBoxModel( featTypes ) );
 
             controlButtons.okButton.setEnabled( true );
@@ -482,28 +485,26 @@ public class WFSPanel extends JPanel {
             tabs.setEnabledAt( 1, true );
 
             featureTypeCombo.setEnabled( true );
-            //            featureTypeCombo.setVisible( true );
+            // featureTypeCombo.setVisible( true );
             attributeResPanel.setFeatureTypeComboEnabled( true );
 
         } catch ( Exception e ) {
-            JOptionPane.showMessageDialog( this, "Could not connect to WFS server at \n'"
-                                                 + wfService.getBaseWfsURL() + "'\n"
-                                                 + e.getMessage(), "Error",
-                                           JOptionPane.ERROR_MESSAGE );
+            JOptionPane.showMessageDialog( this, "Could not connect to WFS server at \n'" + wfService.getBaseWfsURL()
+                                                 + "'\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE );
 
             featureTypeCombo.setModel( new javax.swing.DefaultComboBoxModel( new String[0] ) );
             attributeResPanel.setFeatureTypeComboEnabled( false );
             tabs.setEnabledAt( 1, false );
             capabilitiesButton.setEnabled( false );
             controlButtons.okButton.setEnabled( false );
-            
+
             tabs.setEnabled( false );
-            
+
         }
 
         if ( featTypes != null && featTypes.length > 0 ) {
             try {
-                
+
                 attributeNames = wfService.getProperties( featTypes[0] );
                 attributeResPanel.setEnabled( true );
                 geoProperties = wfService.getGeometryProperties( featTypes[0] );
@@ -511,36 +512,35 @@ public class WFSPanel extends JPanel {
                 propertiesPanel.setProperties( attributeNames, geoProperties );
                 propertiesPanel.setEnabled( true );
                 spatialResPanel.resetGeoCombo( geoProperties );
-                
-                ///hmmm repeated code...
+
+                // /hmmm repeated code...
                 WFSFeatureType ft = wfService.getFeatureTypeByName( featTypes[0] );
-                //UT could support other srs, but not doing it now
-                if( ft != null ){
-                    String[] crs = new String[]{ ft.getDefaultSRS().toString() };
+                // UT could support other srs, but not doing it now
+                if ( ft != null ) {
+                    String[] crs = new String[] { ft.getDefaultSRS().toString() };
                     spatialResPanel.setCrs( crs );
                 }
                 tabs.setEnabled( true );
             } catch ( Exception e ) {
                 e.printStackTrace();
-                //this is necessary to turn tabs click area on
+                // this is necessary to turn tabs click area on
                 tabs.setEnabled( true );
-                //if something went wrong, disable all but req/response tabs
-                //featureTypeCombo.setModel( new javax.swing.DefaultComboBoxModel( new String[0] ) );
+                // if something went wrong, disable all but req/response tabs
+                // featureTypeCombo.setModel( new javax.swing.DefaultComboBoxModel( new String[0] )
+                // );
 
                 attributeResPanel.setEnabled( false );
                 propertiesPanel.setEnabled( false );
                 spatialResPanel.setEnabled( false );
-                
+
                 requestTextArea.setEnabled( true );
                 responseTextArea.setEnabled( true );
-                
+
                 controlButtons.okButton.setEnabled( true );
-                
-                JOptionPane.showMessageDialog( this, "Could not get DescribeFeatureType for '"
-                                                     + featTypes[0] + "' from WFS server at \n'"
-                                                     + wfService.getBaseWfsURL() + "'\n"
-                                                     + e.getMessage(), "Error",
-                                               JOptionPane.ERROR_MESSAGE );
+
+                JOptionPane.showMessageDialog( this, "Could not get DescribeFeatureType for '" + featTypes[0]
+                                                     + "' from WFS server at \n'" + wfService.getBaseWfsURL() + "'\n"
+                                                     + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE );
             }
         }
 
@@ -550,7 +550,7 @@ public class WFSPanel extends JPanel {
     private StringBuffer concatenateRequest() {
 
         StringBuffer sb = new StringBuffer();
-        if ( wfService == null ) {//not inited yet
+        if ( wfService == null ) {// not inited yet
             return sb;
         }
         sb.append( "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" );
@@ -558,27 +558,33 @@ public class WFSPanel extends JPanel {
         final String outputFormat = options.getSelectedOutputFormat();
 
         sb.append( "<wfs:GetFeature xmlns:ogc=\"http://www.opengis.net/ogc\" " );
-        if(logins != null && logins.getUsername() != null && logins.getPassword() != null) {
-            sb.append("user=\"" + logins.getUsername() + "\" password=\"" + logins.getPassword() + "\" ");
+        if ( logins != null && logins.getUsername() != null && logins.getPassword() != null ) {
+            sb.append( "user=\"" + logins.getUsername() + "\" password=\"" + logins.getPassword() + "\" " );
         }
-        sb.append("xmlns:gml=\"http://www.opengis.net/gml\" " )
-        .append("xmlns:wfs=\"http://www.opengis.net/wfs\" service=\"WFS\" " )
-        .append("version=\"" ).append(wfService.getServiceVersion() ).append("\" " )
-        .append("maxFeatures=\"" ).append( options.getMaxFeatures() ).append("\" " )
-        .append("outputFormat=\"" ).append(outputFormat ).append("\">" )
-        .append("<wfs:Query " );
+        sb.append( "xmlns:gml=\"http://www.opengis.net/gml\" " ).append(
+                                                                         "xmlns:wfs=\"http://www.opengis.net/wfs\" service=\"WFS\" " ).append(
+                                                                                                                                               "version=\"" ).append(
+                                                                                                                                                                      wfService.getServiceVersion() ).append(
+                                                                                                                                                                                                              "\" " ).append(
+                                                                                                                                                                                                                              "maxFeatures=\"" ).append(
+                                                                                                                                                                                                                                                         options.getMaxFeatures() ).append(
+                                                                                                                                                                                                                                                                                            "\" " ).append(
+                                                                                                                                                                                                                                                                                                            "outputFormat=\"" ).append(
+                                                                                                                                                                                                                                                                                                                                        outputFormat ).append(
+                                                                                                                                                                                                                                                                                                                                                               "\">" ).append(
+                                                                                                                                                                                                                                                                                                                                                                               "<wfs:Query " );
 
         String ftName = (String) featureTypeCombo.getSelectedItem();
         QualifiedName ft = wfService.getFeatureTypeByName( ftName ).getName();
 
-        sb.append( "xmlns:" ).append( ft.getPrefix() ).append( "=\"" )
-        .append( ft.getNamespace() ).append("\" " ).append( "typeName=\"" );
-        
-        String prefix = ft.getPrefix(); 
-        if( prefix != null && prefix.length() > 0 ){
+        sb.append( "xmlns:" ).append( ft.getPrefix() ).append( "=\"" ).append( ft.getNamespace() ).append( "\" " ).append(
+                                                                                                                           "typeName=\"" );
+
+        String prefix = ft.getPrefix();
+        if ( prefix != null && prefix.length() > 0 ) {
             sb.append( prefix ).append( ":" );
         }
-        sb.append( ft.getLocalName() ).append("\">" );
+        sb.append( ft.getLocalName() ).append( "\">" );
 
         sb.append( propertiesPanel.getXmlElement() );
 
@@ -653,7 +659,7 @@ public class WFSPanel extends JPanel {
                 fw.close();
                 lastDirectory = jfc.getSelectedFile().getParentFile();
             } catch ( Exception e ) {
-                JOptionPane.showMessageDialog( compo, e.getMessage(), "Error!",JOptionPane.ERROR_MESSAGE );
+                JOptionPane.showMessageDialog( compo, e.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE );
                 e.printStackTrace();
             }
 
@@ -700,7 +706,7 @@ public class WFSPanel extends JPanel {
         String s = (String) featureTypeCombo.getSelectedItem();
         QualifiedName qn = null;
         WFSFeatureType ft = wfService.getFeatureTypeByName( s );
-        if( ft != null ){
+        if ( ft != null ) {
             qn = ft.getName();
         }
         return qn;
@@ -711,8 +717,7 @@ public class WFSPanel extends JPanel {
     }
 
     /**
-     * Returns the currently selected geometry that serves as basis for spatial
-     * operation operations
+     * Returns the currently selected geometry that serves as basis for spatial operation operations
      * 
      * @return the currently selected geometry
      */
@@ -721,14 +726,14 @@ public class WFSPanel extends JPanel {
     }
 
     public void setGMLGeometrySRS( CoordinateSystem cs ) {
-        //FIXME is this needed?
-        //      this.srs = cs;
+        // FIXME is this needed?
+        // this.srs = cs;
         if ( this.selectedGeom != null ) {
             ( (GeometryImpl) this.selectedGeom ).setCoordinateSystem( cs );
         }
     }
 
-    //GH 29.11.05
+    // GH 29.11.05
     public void setWFSList( List serverURLS ) {
         servers = serverURLS;
     }
@@ -737,19 +742,19 @@ public class WFSPanel extends JPanel {
      * @return the current list of servers
      */
     public List<String> getWFSList() {
-	LinkedList<String> list = new LinkedList<String>();
-	
-	String sel = serverCombo.getSelectedItem().toString();
-	list.add(sel);
-	
-	for(int i = 0; i < serverCombo.getItemCount(); ++i) {
-	    String s = serverCombo.getItemAt(i).toString();
-	    if(!sel.equals(s))
-		list.add(s);
-	}
-	return list;
+        LinkedList<String> list = new LinkedList<String>();
+
+        String sel = serverCombo.getSelectedItem().toString();
+        list.add( sel );
+
+        for ( int i = 0; i < serverCombo.getItemCount(); ++i ) {
+            String s = serverCombo.getItemAt( i ).toString();
+            if ( !sel.equals( s ) )
+                list.add( s );
+        }
+        return list;
     }
-    
+
     public void setResposeText( String txt ) {
         responseTextArea.setText( txt );
         responseTextArea.setCaretPosition( 0 );
@@ -768,8 +773,6 @@ public class WFSPanel extends JPanel {
         return t.replaceAll( "\n", "" );
     }
 
-
-    
     public void setTabsVisible( boolean visible ) {
         tabs.setVisible( visible );
     }

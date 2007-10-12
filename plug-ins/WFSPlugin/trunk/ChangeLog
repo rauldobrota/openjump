@@ -1,3 +1,7 @@
+2007-10-12  Andreas Schmitz <schmitz@lat-lon.de>
+		src/de/latlon/deejump/plugin/wfs/WFSPanel.java:
+		Feature type list is now sorted.
+
 2007-09-06  Andreas Schmitz <schmitz@lat-lon.de>
         lib/deegree2.jar:
         Added a version of the library which includes support for
