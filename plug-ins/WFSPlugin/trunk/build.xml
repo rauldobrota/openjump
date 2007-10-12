@@ -33,7 +33,7 @@
 		<!-- Compile the java code from ${src} into ${build} 
 		excludesfile="src/de/latlon/deejump/util/data/JUMPFeatureFactory.java"
 		-->
-		<javac srcdir="${src}" destdir="${build}" debug="on" >
+		<javac srcdir="${src}" destdir="${build}" debug="on" source="1.5" target="1.5">
 			<classpath refid="classpath" />
 		</javac>
 		<!-- copy property files too -->

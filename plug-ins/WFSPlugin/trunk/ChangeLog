@@ -1,4 +1,8 @@
 2007-10-12  Andreas Schmitz <schmitz@lat-lon.de>
+		build.xml:
+		Set source and target options to 1.5.
+
+2007-10-12  Andreas Schmitz <schmitz@lat-lon.de>
 		src/de/latlon/deejump/plugin/wfs/WFSPanel.java:
 		Feature type list is now sorted.
 
