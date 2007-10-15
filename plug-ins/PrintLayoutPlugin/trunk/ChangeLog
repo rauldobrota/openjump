@@ -1,3 +1,8 @@
+2007-10-15  Ludwig Reiter  <ludwig.reiter@intevation.de>
+
+	* src/de/intevation/printlayout/tools/TextConsumer.java:
+	  - scaling the inserted text to the right size.
+
 2007-06-22  Sascha L. Teichmann <sascha.teichmann@intevation.de>
 
 	* bin/run.sh:

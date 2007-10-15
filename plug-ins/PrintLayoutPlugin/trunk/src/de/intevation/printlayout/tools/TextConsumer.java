@@ -41,6 +41,7 @@ import de.intevation.printlayout.DocumentManager;
 
 import de.intevation.printlayout.util.MatrixTools;
 import de.intevation.printlayout.util.ElementUtils;
+import de.intevation.printlayout.util.TypoUnits;
 
 public class TextConsumer 
 implements TextInteractor.Consumer {
@@ -85,6 +86,8 @@ implements TextInteractor.Consumer {
 					(AbstractElement)document.getElementById(
 					documentManager.DOCUMENT_SHEET);
 
+				double scale = TypoUnits.pt2mm(1);
+				trans.concatenate(AffineTransform.getScaleInstance(scale, scale));
 				xform.setAttributeNS(
 					null, "transform", MatrixTools.toSVGString(trans));
 
