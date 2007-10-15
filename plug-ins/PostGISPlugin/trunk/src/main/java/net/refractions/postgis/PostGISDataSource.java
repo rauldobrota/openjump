@@ -31,6 +31,7 @@ public class PostGISDataSource extends DataSource {
   public final static String PORT_KEY = "PORT";
   public final static String DATABASE_KEY = "DATABASE";
   public final static String TABLE_KEY = "TABLE";
+  public final static String WHERE_KEY = "WHERE";
   public final static String USERNAME_KEY = "USERNAME";
   public final static String PASSWORD_KEY = "PASSWORD";
   public final static String SAVE_METHOD_KEY = "SAVE_METHOD";

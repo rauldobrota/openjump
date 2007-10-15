@@ -283,6 +283,10 @@ public class PostGISSaveDriverPanel extends AbstractDriverPanel implements Actio
 		return commonPanel.getPassword();
 	}
 
+	public String getWhere() {
+		return commonPanel.getWhere();
+	}
+
 	public void actionPerformed( ActionEvent ae ) {
 		String action = ae.getActionCommand();
 		if( action.equals( "insert" ) ) {

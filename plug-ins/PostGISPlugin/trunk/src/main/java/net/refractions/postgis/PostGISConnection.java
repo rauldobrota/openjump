@@ -44,6 +44,7 @@ public class PostGISConnection implements Connection {
   String port;
   String database;
   String table;
+  String where;
   String username;
   String password;
   String uniqueCol;
@@ -165,6 +166,9 @@ public class PostGISConnection implements Connection {
       
       sql.deleteCharAt( sql.lastIndexOf( "," ) );
       sql.append( " FROM " + table);
+      if (where != null && where != "") {
+    	  sql.append(" WHERE "+ where);
+      }
       
       st.execute( "BEGIN" );
       String s = "DECLARE my_cursor CURSOR FOR " + sql.toString();
@@ -249,8 +253,11 @@ public class PostGISConnection implements Connection {
           			
           			BigDecimal dObj = ( BigDecimal ) ob;
 //System.out.println ( "PGC 240 Long: " + dObj.doubleValue( ) );
-          			f.setAttribute
-          				( attr_idx, new BigDecimal ( dObj.doubleValue( ) ) );
+          			// if dObj value is outside of Double.MAX_VALUE and Double.MIN_VALUE
+          			// the value is +/- infinity [lemesre]
+          			f.setAttribute( attr_idx, new Double ( dObj.doubleValue( ) ) );
+          			// BigDecimal is not Handeling by OpenJUMP
+          			//f.setAttribute( attr_idx, new BigDecimal ( dObj.doubleValue( ) ) );
           		}
           	} 
 //            f.setAttribute( attr_idx, new Double( rs.getDouble( schema.getAttributeName( attr_idx ) ) ) );
@@ -419,6 +426,10 @@ System.out.println
 					if ( opt == JOptionPane.NO_OPTION ) return;
 					
 					String sqlDrop = "DELETE FROM " + table ;
+				    if (where != null && where != "") {
+				    	sqlDrop = sqlDrop + " WHERE "+ where;
+				    }
+
 //System.out.println( "PostGISConnection: sqlDrop: " + sqlDrop );
 					try 
 					{
@@ -876,6 +887,11 @@ System.out.println( " Error: Please insert FeatureColumn!" );
       }
       sqlBuf.deleteCharAt(sqlBuf.lastIndexOf(","));
       sqlBuf.append(" WHERE " + uniqueCol + " = " + uniqueVal);
+
+//System.out.println ("Where clause = " + where);
+//      if (where != null && where != "") {
+//    	  sqlBuf.append(" AND " + where);
+//      }
       String sql = sqlBuf.toString();
 
       try {
@@ -1130,6 +1146,7 @@ System.out.println( " Error: Please insert FeatureColumn!" );
     port = (String)properties.get( PostGISDataSource.PORT_KEY );
     database = (String)properties.get( PostGISDataSource.DATABASE_KEY );
     table = (String)properties.get( PostGISDataSource.TABLE_KEY );
+    where = (String)properties.get( PostGISDataSource.WHERE_KEY);
     username = (String)properties.get( PostGISDataSource.USERNAME_KEY );
     password = (String)properties.get( PostGISDataSource.PASSWORD_KEY );
     uniqueCol = (String)properties.get( PostGISDataSource.UNIQUE_COLUMN_KEY );

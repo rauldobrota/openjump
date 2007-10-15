@@ -45,8 +45,15 @@ public class PostGISLoadDataSourceQueryChooser extends PostGISDataSourceQueryCho
     
     sql.append(
       "SELECT * " + 
-        "FROM " + (String)properties.get(PostGISDataSource.TABLE_KEY)
+        "FROM " + (String)properties.get(PostGISDataSource.TABLE_KEY)  
     );
+
+    if (!properties.get(PostGISDataSource.WHERE_KEY).equals("")){
+    	sql.append(
+    		" WHERE " + (String)properties.get(PostGISDataSource.WHERE_KEY)
+    	);
+    }
+    
     PostGISDataSourceQuery query = new PostGISDataSourceQuery(
       getDataSource(), sql.toString(), (String)properties.get(PostGISDataSource.TABLE_KEY)
     );    

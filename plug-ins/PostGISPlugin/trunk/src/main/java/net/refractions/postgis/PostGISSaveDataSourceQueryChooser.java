@@ -121,6 +121,7 @@ public class PostGISSaveDataSourceQueryChooser extends PostGISDataSourceQueryCho
     properties.put(PostGISDataSource.PORT_KEY, panel.getPort());
     properties.put(PostGISDataSource.DATABASE_KEY, panel.getDatabase());
     properties.put(PostGISDataSource.TABLE_KEY, panel.getTable());
+    properties.put(PostGISDataSource.WHERE_KEY, panel.getWhere());
     properties.put(PostGISDataSource.USERNAME_KEY, panel.getUsername());
     properties.put(PostGISDataSource.PASSWORD_KEY, panel.getPassword());
     properties.put(PostGISDataSource.SAVE_METHOD_KEY, panel.getSaveMethod());

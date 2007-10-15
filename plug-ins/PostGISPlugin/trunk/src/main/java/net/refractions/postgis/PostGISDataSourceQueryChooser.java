@@ -24,6 +24,7 @@ import java.util.HashMap;
 
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.JTextArea;
 
 import com.vividsolutions.jump.workbench.datasource.DataSourceQueryChooser;
 
@@ -39,6 +40,7 @@ public abstract class PostGISDataSourceQueryChooser implements DataSourceQueryCh
   JTextField portField;
   JTextField databaseField;
   JTextField tableField;
+  JTextArea whereField;
   JTextField usernameField;
   JPasswordField passwordField;
   
@@ -83,6 +85,11 @@ public abstract class PostGISDataSourceQueryChooser implements DataSourceQueryCh
     properties.put(PostGISDataSource.PORT_KEY, panel.getPort());
     properties.put(PostGISDataSource.DATABASE_KEY, panel.getDatabase());
     properties.put(PostGISDataSource.TABLE_KEY, panel.getTable());
+    if (!panel.getWhere().trim().equals("")) {
+    	properties.put(PostGISDataSource.WHERE_KEY, panel.getWhere());
+    } else {
+    	properties.put(PostGISDataSource.WHERE_KEY, "true");
+    }
     properties.put(PostGISDataSource.USERNAME_KEY, panel.getUsername());
     properties.put(PostGISDataSource.PASSWORD_KEY, panel.getPassword());
     return(properties);
