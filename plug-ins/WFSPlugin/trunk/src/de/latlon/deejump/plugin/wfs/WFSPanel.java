@@ -71,6 +71,8 @@ import de.latlon.deejump.ui.I18N;
  */
 public class WFSPanel extends JPanel {
 
+    private static final long serialVersionUID = 8204179552311582569L;
+
     protected static final Logger LOG = Logger.getLogger( WFSPanel.class );
 
     // TODO put a props
@@ -439,6 +441,7 @@ public class WFSPanel extends JPanel {
                     if ( ft != null ) {
                         // UT could support other srrs, but not doing it now
                         String[] crs = new String[] { ft.getDefaultSRS().toString() };
+                        srs = crs[0];
                         spatialResPanel.setCrs( crs );
                     }
                     requestTextArea.setRequestText( "" );
