@@ -1,4 +1,8 @@
 2007-10-17  Andreas Schmitz <schmitz@lat-lon.de>
+		src/de/latlon/deejump/plugin/wfs/WFSOptionsPanel2.java:
+		Fixed behaviour of the output format drop down box.
+
+2007-10-17  Andreas Schmitz <schmitz@lat-lon.de>
 		src/de/latlon/deejump/plugin/wfs/WFSPanel.java:
 		Sending srsName attribute with Queries.
 

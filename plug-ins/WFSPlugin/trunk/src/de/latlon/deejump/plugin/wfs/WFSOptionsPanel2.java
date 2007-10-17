@@ -24,9 +24,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.border.Border;
@@ -35,82 +33,82 @@ import de.latlon.deejump.ui.I18N;
 
 public class WFSOptionsPanel2 extends JPanel {
 
+    private static final long serialVersionUID = -5976611628887849767L;
+
     private WFSOptions options;
 
     private JFormattedTextField maxFeaturesField;
-    
+
     private JComponent protocolPanel;
 
     private JComboBox outputFormatChooser;
-    
-    
-    public WFSOptionsPanel2(WFSOptions options) {
-        super();
-        if( options == null ) {
-            throw new IllegalArgumentException("WFSOptions cannot be null.");
+
+    public WFSOptionsPanel2( WFSOptions options ) {
+        if ( options == null ) {
+            throw new IllegalArgumentException( "WFSOptions cannot be null." );
         }
         this.options = options;
         initGUI();
     }
 
     private void initGUI() {
-        LayoutManager layoutManager = new BoxLayout(this, BoxLayout.Y_AXIS );
+        LayoutManager layoutManager = new BoxLayout( this, BoxLayout.Y_AXIS );
         setLayout( layoutManager );
-        
+
         maxFeaturesField = new JFormattedTextField();
-        maxFeaturesField.setColumns(4);
-        maxFeaturesField.addPropertyChangeListener( "value", new PropertyChangeListener(){
+        maxFeaturesField.setColumns( 4 );
+        maxFeaturesField.addPropertyChangeListener( "value", new PropertyChangeListener() {
             public void propertyChange( PropertyChangeEvent evt ) {
-                options.setMaxFeatures( ((Integer)evt.getNewValue()).intValue() );
+                options.setMaxFeatures( ( (Integer) evt.getNewValue() ).intValue() );
             }
-        });
+        } );
         JPanel dummy = new JPanel();
-        dummy.add( new JLabel(I18N.getString( "WFSOptions.maxNumberOfFeatures" )));
+        dummy.add( new JLabel( I18N.getString( "WFSOptions.maxNumberOfFeatures" ) ) );
         dummy.add( maxFeaturesField );
-        
+
         add( dummy );
         add( createProtocolPanel() );
         add( Box.createVerticalStrut( 5 ) );
         add( createOutputFormatChooser() );
-        
+
         refreshGUI();
-        
+
     }
 
     private void refreshGUI() {
-        
-        maxFeaturesField.setValue( new Integer( options.getMaxFeatures() ));
+
+        maxFeaturesField.setValue( new Integer( options.getMaxFeatures() ) );
 
         protocolPanel.removeAll();
-        createProtocolButtons();        
-        
-        outputFormatChooser
-            .setModel( new DefaultComboBoxModel(options.getOutputFormats()) );
-        
+        createProtocolButtons();
+
+        outputFormatChooser.setModel( new DefaultComboBoxModel( options.getOutputFormats() ) );
+        outputFormatChooser.setSelectedItem( options.getSelectedOutputFormat() );
+
     }
 
     private void createProtocolButtons() {
-        
+
         ButtonGroup bg = new ButtonGroup();
         final String[] protocs = options.getProtocols();
         final String selProtoc = options.getSelectedProtocol();
-        
-        for (int i = 0; i < protocs.length; i++) {
-            
+
+        for ( int i = 0; i < protocs.length; i++ ) {
+
             JRadioButton rb = new JRadioButton( protocs[i] );
-            
-            //disabling protocol buttons! this feature isn't implemented
+
+            // disabling protocol buttons! this feature isn't implemented
             rb.setEnabled( false );
 
-            if( selProtoc.equals( protocs[i] ) ) {
-                rb.setSelected(true);
+            if ( selProtoc.equals( protocs[i] ) ) {
+                rb.setSelected( true );
             }
-            final int ix = i; 
-            rb.addActionListener( new ActionListener(){
-                public void actionPerformed(ActionEvent e) {
-                    WFSOptionsPanel2.this.options.setSelectedProtocol( protocs[ix] );
+            final int ix = i;
+            rb.addActionListener( new ActionListener() {
+                public void actionPerformed( ActionEvent e ) {
+                    options.setSelectedProtocol( protocs[ix] );
                 }
-            }); 
+            } );
             bg.add( rb );
             protocolPanel.add( rb );
         }
@@ -118,43 +116,28 @@ public class WFSOptionsPanel2 extends JPanel {
 
     private Component createProtocolPanel() {
         protocolPanel = new JPanel();
-        protocolPanel.setBorder( BorderFactory.createTitledBorder(I18N.getString( "WFSOptions.protocols" )));
-        protocolPanel.setLayout( new BoxLayout(protocolPanel, BoxLayout.Y_AXIS ) );
-        protocolPanel.setMaximumSize( new Dimension(150,100));
-        protocolPanel.setAlignmentX(1f);
+        protocolPanel.setBorder( BorderFactory.createTitledBorder( I18N.getString( "WFSOptions.protocols" ) ) );
+        protocolPanel.setLayout( new BoxLayout( protocolPanel, BoxLayout.Y_AXIS ) );
+        protocolPanel.setMaximumSize( new Dimension( 150, 100 ) );
+        protocolPanel.setAlignmentX( 1f );
         return protocolPanel;
     }
 
     private JComponent createOutputFormatChooser() {
-        
+
         outputFormatChooser = new JComboBox();
-        Border b1 = BorderFactory.createTitledBorder(I18N.getString( "WFSOptions.outputFormats" ));
-        Border b2 = BorderFactory.createEmptyBorder(2,4,4,4);
-        
-        outputFormatChooser.setBorder( BorderFactory.createCompoundBorder(b1,b2));
-        outputFormatChooser.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JComboBox jcb = (JComboBox)e.getSource();
-                WFSOptionsPanel2.this.options.setSelectedOutputFormat((String)jcb.getSelectedItem());
+        Border b1 = BorderFactory.createTitledBorder( I18N.getString( "WFSOptions.outputFormats" ) );
+        Border b2 = BorderFactory.createEmptyBorder( 2, 4, 4, 4 );
+
+        outputFormatChooser.setBorder( BorderFactory.createCompoundBorder( b1, b2 ) );
+        outputFormatChooser.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                JComboBox jcb = (JComboBox) e.getSource();
+                options.setSelectedOutputFormat( (String) jcb.getSelectedItem() );
             }
-        });
-      
+        } );
+
         return outputFormatChooser;
-    }
-
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        new WFSOptionsPanel2(new WFSOptions()), "Options",
-                        -1);
-                System.exit(0);
-            }
-        });
-
     }
 
 }
