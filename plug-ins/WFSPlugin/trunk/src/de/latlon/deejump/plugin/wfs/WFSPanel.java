@@ -399,7 +399,15 @@ public class WFSPanel extends JPanel {
             final JRadioButton b = new JRadioButton( versions[i] );
             b.addActionListener( new ActionListener() {
                 public void actionPerformed( ActionEvent e ) {
-                    WFSPanel.this.wfsVersion = b.getText();
+                    wfsVersion = b.getText();
+                    // automatically switch to the default format for the version
+                    if ( options != null ) {
+                        if ( wfsVersion.equals( "1.0.0" ) ) {
+                            options.setSelectedOutputFormat( options.getOutputFormats()[0] );
+                        } else {
+                            options.setSelectedOutputFormat( options.getOutputFormats()[1] );
+                        }
+                    }
                 }
             } );
             bg.add( b );
