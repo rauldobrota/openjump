@@ -564,24 +564,19 @@ public class WFSPanel extends JPanel {
         if ( logins != null && logins.getUsername() != null && logins.getPassword() != null ) {
             sb.append( "user=\"" + logins.getUsername() + "\" password=\"" + logins.getPassword() + "\" " );
         }
-        sb.append( "xmlns:gml=\"http://www.opengis.net/gml\" " ).append(
-                                                                         "xmlns:wfs=\"http://www.opengis.net/wfs\" service=\"WFS\" " ).append(
-                                                                                                                                               "version=\"" ).append(
-                                                                                                                                                                      wfService.getServiceVersion() ).append(
-                                                                                                                                                                                                              "\" " ).append(
-                                                                                                                                                                                                                              "maxFeatures=\"" ).append(
-                                                                                                                                                                                                                                                         options.getMaxFeatures() ).append(
-                                                                                                                                                                                                                                                                                            "\" " ).append(
-                                                                                                                                                                                                                                                                                                            "outputFormat=\"" ).append(
-                                                                                                                                                                                                                                                                                                                                        outputFormat ).append(
-                                                                                                                                                                                                                                                                                                                                                               "\">" ).append(
-                                                                                                                                                                                                                                                                                                                                                                               "<wfs:Query " );
+        sb.append( "xmlns:gml=\"http://www.opengis.net/gml\" " );
+        sb.append( "xmlns:wfs=\"http://www.opengis.net/wfs\" service=\"WFS\" " );
+        sb.append( "version=\"" ).append( wfService.getServiceVersion() ).append( "\" " );
+        sb.append( "maxFeatures=\"" ).append( options.getMaxFeatures() ).append( "\" " );
+        sb.append( "outputFormat=\"" ).append( outputFormat ).append( "\">" ).append( "<wfs:Query " );
 
         String ftName = (String) featureTypeCombo.getSelectedItem();
         QualifiedName ft = wfService.getFeatureTypeByName( ftName ).getName();
 
-        sb.append( "xmlns:" ).append( ft.getPrefix() ).append( "=\"" ).append( ft.getNamespace() ).append( "\" " ).append(
-                                                                                                                           "typeName=\"" );
+        sb.append( "xmlns:" ).append( ft.getPrefix() ).append( "=\"" ).append( ft.getNamespace() );
+        sb.append( "\" " );
+        sb.append( "srsName=\"" ).append( srs ).append( "\" " );
+        sb.append( "typeName=\"" );
 
         String prefix = ft.getPrefix();
         if ( prefix != null && prefix.length() > 0 ) {
