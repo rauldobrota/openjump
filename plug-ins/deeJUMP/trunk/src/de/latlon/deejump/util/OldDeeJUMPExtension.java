@@ -45,11 +45,13 @@ package de.latlon.deejump.util;
 import org.apache.log4j.Logger;
 import org.openjump.OpenJumpConfiguration;
 
+import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.plugin.Extension;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.WorkbenchToolBar;
 
 import de.latlon.deejump.plugin.InstallDeegreeFileAdaptersPlugIn;
+import de.latlon.deejump.plugin.style.DeeChangeStylesPlugIn;
 import de.latlon.deejump.plugin.wms.LayerAndWMSFeatureInfoTool;
 
 /**
@@ -62,9 +64,6 @@ public class OldDeeJUMPExtension extends Extension {
 
     private static final Logger LOG = Logger.getLogger( OldDeeJUMPExtension.class );
 
-    /**
-     * @see com.vividsolutions.jump.workbench.plugin.Configuration#configure(com.vividsolutions.jump.workbench.plugin.PlugInContext)
-     */
     public void configure( PlugInContext context )
                             throws Exception {
 
@@ -72,7 +71,10 @@ public class OldDeeJUMPExtension extends Extension {
         LOG.debug( "Adding deegree file adapters..." );
         new InstallDeegreeFileAdaptersPlugIn().initialize( context );
         LOG.debug( "Adding FeatureInfo tool for WMS GetFeatureInfo requests..." );
-        WorkbenchToolBar toolbar = context.getWorkbenchContext().getWorkbench().getFrame().getToolBar();
+        new DeeChangeStylesPlugIn().initialize( context );
+        WorkbenchContext wbcontext = context.getWorkbenchContext();
+        WorkbenchToolBar toolbar = wbcontext.getWorkbench().getFrame().getToolBar();
+
         toolbar.addCursorTool( new LayerAndWMSFeatureInfoTool() );
         OpenJumpConfiguration.postExtensionInitialization( context.getWorkbenchContext() );
     }
