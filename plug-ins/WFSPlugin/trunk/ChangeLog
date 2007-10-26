@@ -1,5 +1,10 @@
 2007-10-26  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/util/data/JUMPFeatureFactory.java,
+        src/de/latlon/deejump/plugin/wfs/TransactionFactory.java:
+        Fixed handling of date fields.
+
+2007-10-26  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/util/data/JUMPFeatureFactory.java,
         src/de/latlon/deejump/plugin/wfs/WFSPlugIn.java,
         src/de/latlon/deejump/plugin/wfs/AbstractWFSWrapper.java:
         Added handling of empty feature types. This may be useful for transactions.

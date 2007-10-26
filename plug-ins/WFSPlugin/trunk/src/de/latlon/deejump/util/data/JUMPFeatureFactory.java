@@ -30,7 +30,6 @@ import org.deegree.model.feature.FeatureFactory;
 import org.deegree.model.feature.FeatureProperty;
 import org.deegree.model.feature.GMLFeatureCollectionDocument;
 import org.deegree.model.feature.schema.AbstractPropertyType;
-import org.deegree.model.feature.schema.FeaturePropertyType;
 import org.deegree.model.feature.schema.FeatureType;
 import org.deegree.model.feature.schema.GMLSchema;
 import org.deegree.model.feature.schema.GMLSchemaDocument;

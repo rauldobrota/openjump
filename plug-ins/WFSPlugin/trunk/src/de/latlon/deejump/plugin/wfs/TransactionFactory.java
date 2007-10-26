@@ -31,7 +31,9 @@
 
 package de.latlon.deejump.plugin.wfs;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -77,6 +79,11 @@ public class TransactionFactory {
                                                  + "xmlns:ogc='http://www.opengis.net/ogc' xmlns:wfs='http://www.opengis.net/wfs' "
                                                  + "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
                                                  + "xsi:schemaLocation='http://www.opengis.net/wfs/1.1.0/WFS-transaction.xsd' ";
+
+    // private static final DateFormat formatter = DateFormat.getDateInstance( DateFormat.SHORT,
+    // Locale.US );
+
+    private static final SimpleDateFormat formatter = new SimpleDateFormat( "yyyy-MM-dd'T'hh:mm:ss" );
 
     /**
      * Combines geometry update xml with attribute update xml into a common transaction update xml
@@ -353,14 +360,23 @@ public class TransactionFactory {
 
             if ( ( ( !( fs.getAttributeType( j ) == AttributeType.GEOMETRY ) ) && fet == FeatureEventType.ATTRIBUTES_MODIFIED ) ) {
                 LOG.debug( "Inserting modified attribute." );
-                Object attValue = bf.getAttribute( j );
-                if ( attValue != null ) {
-                    sb.append( "<wfs:Property><wfs:Name>" ).append( featureType.getPrefix() ).append( ":" ).append(
-                                                                                                                    attName ).append(
-                                                                                                                                      "</wfs:Name>" ).append(
-                                                                                                                                                              "<wfs:Value>" ).append(
-                                                                                                                                                                                      attValue ).append(
-                                                                                                                                                                                                         "</wfs:Value></wfs:Property>" );
+
+                if ( fs.getAttributeType( j ) == AttributeType.DATE ) {
+                    Date attValue = (Date) bf.getAttribute( j );
+                    String val = formatter.format( attValue );
+                    if ( attValue != null ) {
+                        LOG.debug( "Inserting date value of " + val );
+                        sb.append( "<wfs:Property><wfs:Name>" ).append( featureType.getPrefix() ).append( ":" );
+                        sb.append( attName ).append( "</wfs:Name>" ).append( "<wfs:Value>" ).append( val );
+                        sb.append( "</wfs:Value></wfs:Property>" );
+                    }
+                } else {
+                    Object attValue = bf.getAttribute( j );
+                    if ( attValue != null ) {
+                        sb.append( "<wfs:Property><wfs:Name>" ).append( featureType.getPrefix() ).append( ":" );
+                        sb.append( attName ).append( "</wfs:Name>" ).append( "<wfs:Value>" ).append( attValue );
+                        sb.append( "</wfs:Value></wfs:Property>" );
+                    }
                 }
             } else if ( ( fs.getAttributeType( j ) == AttributeType.GEOMETRY )
                         && fet == FeatureEventType.GEOMETRY_MODIFIED ) {
@@ -402,12 +418,22 @@ public class TransactionFactory {
 
             if ( !( featSchema.getAttributeType( j ) == AttributeType.GEOMETRY ) ) {
                 LOG.debug( "Not a geometry." );
-                Object attValue = bf.getAttribute( j );
-                // FIXME ist this right?
-                if ( attValue != null ) {
-                    sb.append( "<" ).append( featureType.getPrefix() ).append( ":" ).append( attName ).append( ">" );
-                    sb.append( attValue );
-                    sb.append( "</" ).append( featureType.getPrefix() ).append( ":" ).append( attName ).append( ">" );
+
+                if ( featSchema.getAttributeType( j ) == AttributeType.DATE ) {
+                    Date attValue = (Date) bf.getAttribute( j );
+                    String val = formatter.format( attValue );
+                    if ( attValue != null ) {
+                        sb.append( "<" ).append( featureType.getPrefix() ).append( ":" ).append( attName ).append( ">" );
+                        sb.append( val );
+                        sb.append( "</" ).append( featureType.getPrefix() ).append( ":" ).append( attName ).append( ">" );
+                    }
+                } else {
+                    Object attValue = bf.getAttribute( j );
+                    if ( attValue != null ) {
+                        sb.append( "<" ).append( featureType.getPrefix() ).append( ":" ).append( attName ).append( ">" );
+                        sb.append( attValue );
+                        sb.append( "</" ).append( featureType.getPrefix() ).append( ":" ).append( attName ).append( ">" );
+                    }
                 }
             } else {
                 LOG.debug( "It's a geometry." );
