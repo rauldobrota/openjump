@@ -349,7 +349,6 @@ public class JUMPFeatureFactory {
         }
 
         PropertyType[] featTypeProps = ft.getProperties();
-        // Object[] properties = feats[0].getProperties();
 
         boolean addedGeometry = false;
 
@@ -370,7 +369,7 @@ public class JUMPFeatureFactory {
         if ( defaultGeometry == null && fs.getGeometryIndex() == -1 ) {
             throw new RuntimeException( "No geometry property found!" );
         } else if ( defaultGeometry != null && fs.getGeometryIndex() == -1 ) {
-            fs.addAttribute( "GEOMETRY", AttributeType.GEOMETRY ); //$NON-NLS-1$
+            fs.addAttribute( "FAKE_GEOMETRY", AttributeType.GEOMETRY ); //$NON-NLS-1$
         }
 
         // populate FC with data

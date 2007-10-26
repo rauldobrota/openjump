@@ -21,10 +21,12 @@ import org.deegree.framework.util.StringTools;
 import org.deegree.model.crs.CoordinateSystem;
 import org.deegree.model.spatialschema.GeometryImpl;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jump.feature.FeatureCollection;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
@@ -151,7 +153,15 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
         monitor.report( "Parsing feature collection (size = " + dfc.size() + ")" );
         QualifiedName ftName = rd.getWFSPanel().getFeatureType();
         AbstractWFSWrapper wfs = rd.getWFSPanel().getWfService();
-        FeatureCollection dataset = JUMPFeatureFactory.createFromDeegreeFC( dfc, null, wfs,ftName );
+
+        FeatureCollection dataset;
+
+        if ( wfs.getGeometryProperties( ftName.getLocalName() ).length == 0 ) {
+            Point point = new GeometryFactory().createPoint( new Coordinate( 0, 0 ) );
+            dataset = JUMPFeatureFactory.createFromDeegreeFC( dfc, point, wfs, ftName );
+        } else {
+            dataset = JUMPFeatureFactory.createFromDeegreeFC( dfc, null, wfs, ftName );
+        }
 
         monitor.report( "Adding Layer" );
 

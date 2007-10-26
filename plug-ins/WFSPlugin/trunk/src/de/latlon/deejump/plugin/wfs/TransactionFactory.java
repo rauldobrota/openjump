@@ -381,7 +381,10 @@ public class TransactionFactory {
             } else if ( ( fs.getAttributeType( j ) == AttributeType.GEOMETRY )
                         && fet == FeatureEventType.GEOMETRY_MODIFIED ) {
                 LOG.debug( "Inserting modified geometry." );
-
+                if ( fs.getAttributeName( j ).equals( "FAKE_GEOMETRY" ) ) {
+                    LOG.debug( "Skipping fake geometry." );
+                    continue;
+                }
                 sb.append( "<wfs:Property><wfs:Name>" );
                 sb.append( featureType.getPrefix() );
                 sb.append( ":" ).append( geoPropName.getLocalName() );
@@ -439,6 +442,10 @@ public class TransactionFactory {
                 LOG.debug( "It's a geometry." );
                 LOG.debug( attName.equals( "GEOMETRY" ) ? "Schema not loaded? Using strange mechanisms here!"
                                                        : "Ok, using schema." );
+                if ( featSchema.getAttributeName( j ).equals( "FAKE_GEOMETRY" ) ) {
+                    LOG.debug( "Skipping fake geometry." );
+                    continue;
+                }
                 sb.append( "<" ).append( featureType.getPrefix() ).append( ":" );
                 sb.append( attName.equals( "GEOMETRY" ) ? geoAttName.getLocalName() : attName ).append( ">" );
                 sb.append( createGeometryGML( bf.getGeometry() ) );

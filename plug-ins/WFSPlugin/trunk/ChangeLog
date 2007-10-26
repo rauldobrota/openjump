@@ -1,5 +1,13 @@
 2007-10-26  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/util/data/JUMPFeatureFactory.java,
+        src/de/latlon/deejump/plugin/wfs/TransactionFactory.java,
+        src/de/latlon/deejump/plugin/wfs/WFSPlugIn.java:
+        Added usage of fake geometries when requesting feature types without geometries.
+        This enables editing of such feature types by adding a fake geometry
+        which will be discarded when updating the feature type.
+
+2007-10-26  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/util/data/JUMPFeatureFactory.java,
         src/de/latlon/deejump/plugin/wfs/AbstractWFSWrapper.java:
 		Showing only the correct geometry properties.
 
