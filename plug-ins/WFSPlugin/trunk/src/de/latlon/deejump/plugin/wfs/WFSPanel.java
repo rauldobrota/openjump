@@ -529,6 +529,7 @@ public class WFSPanel extends JPanel {
                 // UT could support other srs, but not doing it now
                 if ( ft != null ) {
                     String[] crs = new String[] { ft.getDefaultSRS().toString() };
+                    srs = crs[0];
                     spatialResPanel.setCrs( crs );
                 }
                 tabs.setEnabled( true );
