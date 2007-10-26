@@ -262,7 +262,7 @@ public abstract class AbstractWFSWrapper {
             this.featureTypeToSchema.put( featureTypeName, xsd );
             this.featureTypeToSchemaXML.put( featureTypeName, rawXML );
 
-            QualifiedName[] geoProp = guessGeomProperty( xsd );
+            QualifiedName[] geoProp = guessGeomProperty( xsd, featureTypeName );
 
             this.geoPropsNameToQNames.put( featureTypeName, geoProp );
 
@@ -329,13 +329,16 @@ public abstract class AbstractWFSWrapper {
         return geoPropNames;
     }
 
-    protected static QualifiedName[] guessGeomProperty( GMLSchema schema ) {
-
+    protected static QualifiedName[] guessGeomProperty( GMLSchema schema, String featureTypeName ) {
         QualifiedName[] geoPropNames = null;
         List tmpList = new ArrayList( 20 );
 
         FeatureType[] fts = schema.getFeatureTypes();
         for ( int i = 0; i < fts.length; i++ ) {
+            if ( !fts[i].getName().getLocalName().equals( featureTypeName ) ) {
+                continue;
+            }
+
             PropertyType[] props = fts[i].getProperties();
             for ( int j = 0; j < props.length; j++ ) {
                 if ( props[j].getType() == Types.GEOMETRY || props[j].getType() == 10014 ) {

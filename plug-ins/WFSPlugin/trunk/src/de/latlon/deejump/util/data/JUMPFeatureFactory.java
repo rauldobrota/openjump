@@ -338,7 +338,9 @@ public class JUMPFeatureFactory {
             // throw new RuntimeException( "FeatureType has more than one GeometryProperty.\n"
             // //$NON-NLS-1$
             // + "This is currently not supported." ); //$NON-NLS-1$
-        } else if ( geoTypeProps == null || geoTypeProps.length == 0 ) {
+        }
+        
+        if ( geoTypeProps == null || geoTypeProps.length == 0 ) {
             LOG.debug( "Guessing geometry property name." );
             geoProName = "GEOMETRY"; //$NON-NLS-1$
         } else {

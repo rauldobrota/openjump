@@ -1,4 +1,9 @@
 2007-10-26  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/util/data/JUMPFeatureFactory.java,
+        src/de/latlon/deejump/plugin/wfs/AbstractWFSWrapper.java:
+		Showing only the correct geometry properties.
+
+2007-10-26  Andreas Schmitz <schmitz@lat-lon.de>
 		src/de/latlon/deejump/plugin/wfs/WFSPanel.java:
 		Sending srsName attribute with Queries - bug fix for the first selected feature type.
 
