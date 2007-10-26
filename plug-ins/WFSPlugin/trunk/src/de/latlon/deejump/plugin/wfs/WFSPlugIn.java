@@ -149,7 +149,9 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
                                                                                                      rd.getWFSPanel().getFeatureType() );
 
         monitor.report( "Parsing feature collection (size = " + dfc.size() + ")" );
-        FeatureCollection dataset = JUMPFeatureFactory.createFromDeegreeFC( dfc );
+        QualifiedName ftName = rd.getWFSPanel().getFeatureType();
+        AbstractWFSWrapper wfs = rd.getWFSPanel().getWfService();
+        FeatureCollection dataset = JUMPFeatureFactory.createFromDeegreeFC( dfc, null, wfs,ftName );
 
         monitor.report( "Adding Layer" );
 
@@ -157,7 +159,6 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
 
             LayerManager layerManager = context.getLayerManager();
 
-            QualifiedName ftName = rd.getWFSPanel().getFeatureType();
             QualifiedName geoQN = rd.getWFSPanel().getChosenGeoProperty();
 
             if ( geoQN == null ) {
@@ -168,7 +169,7 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
 
             String displayName = AbstractWFSWrapper.WFS_PREFIX + ":" + ftName.getLocalName();
             WFSLayer layer = new WFSLayer( displayName, layerManager.generateLayerFillColor(), dataset, layerManager,
-                                           ftName, geoQN, crs, rd.getWFSPanel().getWfService() );
+                                           ftName, geoQN, crs, wfs );
 
             WFSLayerListener listener = new WFSLayerListener( displayName );
             layer.setLayerListener( listener );

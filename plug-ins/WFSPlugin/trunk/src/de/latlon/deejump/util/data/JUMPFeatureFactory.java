@@ -30,6 +30,7 @@ import org.deegree.model.feature.FeatureFactory;
 import org.deegree.model.feature.FeatureProperty;
 import org.deegree.model.feature.GMLFeatureCollectionDocument;
 import org.deegree.model.feature.schema.AbstractPropertyType;
+import org.deegree.model.feature.schema.FeaturePropertyType;
 import org.deegree.model.feature.schema.FeatureType;
 import org.deegree.model.feature.schema.GMLSchema;
 import org.deegree.model.feature.schema.GMLSchemaDocument;
@@ -133,8 +134,9 @@ public class JUMPFeatureFactory {
 
         int maxDepth = 100;
         int traverseExpiry = -999;
-        GetFeature gfr = GetFeature.create( version, "" + idg.generateUniqueID(), RESULT_TYPE.RESULTS, "text/xml; subtype=gml/3.1.1", null,
-                                            maxFeatures, 0, maxDepth, traverseExpiry, new Query[] { query } );
+        GetFeature gfr = GetFeature.create( version, "" + idg.generateUniqueID(), RESULT_TYPE.RESULTS,
+                                            "text/xml; subtype=gml/3.1.1", null, maxFeatures, 0, maxDepth,
+                                            traverseExpiry, new Query[] { query } );
 
         return gfr;
     }
@@ -156,7 +158,7 @@ public class JUMPFeatureFactory {
                                                                                       GetFeature request )
                             throws Exception {
 
-        return createDeegreeFCfromWFS( serverUrl, XMLFactory.export(request ).getAsString(), null );
+        return createDeegreeFCfromWFS( serverUrl, XMLFactory.export( request ).getAsString(), null );
     }
 
     /**
@@ -282,6 +284,11 @@ public class JUMPFeatureFactory {
         return newFeatCollec;
     }
 
+    public static FeatureCollection createFromDeegreeFC( org.deegree.model.feature.FeatureCollection fc, Geometry geom )
+                            throws Exception {
+        return createFromDeegreeFC( fc, geom, null, null );
+    }
+
     /**
      * Creates a JUMP FeatureCollection from a deegree FeatureCollection [UT] and a specified
      * JUMP/JTS Geometry object. The new JUMP FeatureCollection returned will have the
@@ -292,11 +299,17 @@ public class JUMPFeatureFactory {
      *            the deegree FeatureCollection
      * @param defaultGeometry
      *            the geometry of the returned FeatureCollection
+     * @param wfs
+     *            if the data came from a wfs, this can be used to determine the feature type even
+     *            without any features
+     * @param ftName
+     *            the requested feature type from the above wfs
      * @return the new JUMP FeatureCollection
      * @throws Exception
      */
     public static FeatureCollection createFromDeegreeFC( org.deegree.model.feature.FeatureCollection deegreeFeatCollec,
-                                                         Geometry defaultGeometry )
+                                                         Geometry defaultGeometry, AbstractWFSWrapper wfs,
+                                                         QualifiedName ftName )
 
                             throws Exception {
 
@@ -306,20 +319,26 @@ public class JUMPFeatureFactory {
 
         org.deegree.model.feature.Feature[] feats = deegreeFeatCollec.toArray();
 
-        if ( feats == null || feats.length < 1 ) {
+        if ( wfs == null && ( feats == null || feats.length < 1 ) ) {
             throw new Exception( "No data found" ); //$NON-NLS-1$
         }
 
-        // assuming one at least
-        FeatureType ft = feats[0].getFeatureType();
+        FeatureType ft;
+        if ( feats.length > 0 ) {
+            ft = feats[0].getFeatureType();
+        } else {
+            ft = wfs.getSchemaForFeatureType( ftName.getLocalName() ).getFeatureType( ftName );
+        }
 
         AbstractPropertyType[] geoTypeProps = ft.getGeometryProperties();
 
         String geoProName = null;
 
         if ( geoTypeProps.length > 1 ) {
-            throw new RuntimeException( "FeatureType has more than one GeometryProperty.\n" //$NON-NLS-1$
-                                        + "This is currently not supported." ); //$NON-NLS-1$
+            LOG.warn( "This feature type has more than one geometry property. Only the first one will be used." );
+            // throw new RuntimeException( "FeatureType has more than one GeometryProperty.\n"
+            // //$NON-NLS-1$
+            // + "This is currently not supported." ); //$NON-NLS-1$
         } else if ( geoTypeProps == null || geoTypeProps.length == 0 ) {
             LOG.debug( "Guessing geometry property name." );
             geoProName = "GEOMETRY"; //$NON-NLS-1$
@@ -331,10 +350,20 @@ public class JUMPFeatureFactory {
         PropertyType[] featTypeProps = ft.getProperties();
         // Object[] properties = feats[0].getProperties();
 
+        boolean addedGeometry = false;
+
         // populate JUMP schema
         for ( int j = 0; j < featTypeProps.length; j++ ) {
             String name = featTypeProps[j].getName().getLocalName();
-            fs.addAttribute( name, findType( featTypeProps[j].getType() ) );
+            AttributeType type = findType( featTypeProps[j].getType() );
+            if ( type == AttributeType.GEOMETRY ) {
+                if ( !addedGeometry ) {
+                    addedGeometry = true;
+                } else {
+                    continue;
+                }
+            }
+            fs.addAttribute( name, type );
         }
 
         if ( defaultGeometry == null && fs.getGeometryIndex() == -1 ) {

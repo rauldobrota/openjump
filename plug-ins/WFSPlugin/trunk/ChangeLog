@@ -1,3 +1,9 @@
+2007-10-26  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/util/data/JUMPFeatureFactory.java,
+        src/de/latlon/deejump/plugin/wfs/WFSPlugIn.java,
+        src/de/latlon/deejump/plugin/wfs/AbstractWFSWrapper.java:
+        Added handling of empty feature types. This may be useful for transactions.
+
 2007-10-17  Andreas Schmitz <schmitz@lat-lon.de>
 		src/de/latlon/deejump/plugin/wfs/WFSPanel.java:
 		Changing the version will automatically select the correct default format.
