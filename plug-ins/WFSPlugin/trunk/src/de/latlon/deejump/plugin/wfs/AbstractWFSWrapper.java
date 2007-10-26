@@ -57,10 +57,10 @@ public abstract class AbstractWFSWrapper {
     /**
      * Maps a feature type to its schem. Geometry property is not held here!
      */
-    private Map featureTypeToSchema;
+    private Map<String, GMLSchema> featureTypeToSchema;
 
     // hmmm, this is repating the above, really...
-    private Map featureTypeToSchemaXML;
+    private Map<String, String> featureTypeToSchemaXML;
 
     /**
      * Maps a feature type to its geometry!
@@ -101,9 +101,9 @@ public abstract class AbstractWFSWrapper {
         }
         this.baseURL = baseUrl;
         this.logins = logins;
-        this.featureTypeToSchema = new HashMap( 10 );
-        this.featureTypeToSchemaXML = new HashMap( 10 );
-        this.geoPropsNameToQNames = new HashMap<String, QualifiedName[]>( 10 );
+        this.featureTypeToSchema = new HashMap<String, GMLSchema>();
+        this.featureTypeToSchemaXML = new HashMap<String, String>();
+        this.geoPropsNameToQNames = new HashMap<String, QualifiedName[]>();
         createHttpClient();
 
     }
@@ -148,11 +148,17 @@ public abstract class AbstractWFSWrapper {
     }
 
     public GMLSchema getSchemaForFeatureType( String featureType ) {
-        return (GMLSchema) this.featureTypeToSchema.get( featureType );
+        GMLSchema res = this.featureTypeToSchema.get( featureType );
+        if ( res != null ) {
+            return res;
+        }
+
+        createSchemaForFeatureType( featureType );
+        return this.featureTypeToSchema.get( featureType );
     }
 
     public String getRawSchemaForFeatureType( String featureType ) {
-        return (String) this.featureTypeToSchemaXML.get( featureType );
+        return this.featureTypeToSchemaXML.get( featureType );
     }
 
     protected String loadSchemaForFeatureType( String featureType )
@@ -273,11 +279,11 @@ public abstract class AbstractWFSWrapper {
 
     public String[] getProperties( String featureType ) {
 
-        List propsList = new ArrayList<String>();
+        List<String> propsList = new ArrayList<String>();
         try {
             createSchemaForFeatureType( featureType );
 
-            GMLSchema schema = (GMLSchema) this.featureTypeToSchema.get( featureType );
+            GMLSchema schema = this.featureTypeToSchema.get( featureType );
             if ( schema != null ) {
                 FeatureType[] fts = schema.getFeatureTypes();
                 for ( int i = 0; i < fts.length; i++ ) {
@@ -294,10 +300,13 @@ public abstract class AbstractWFSWrapper {
             propsList = new ArrayList<String>();
         }
 
-        return (String[]) propsList.toArray( new String[propsList.size()] );
+        return propsList.toArray( new String[propsList.size()] );
     }
 
     public WFSFeatureType getFeatureTypeByName( String ftName ) {
+        if ( ftNameToWfsFT == null ) {
+            getFeatureTypes(); // side effects in functions that return lists are wonderful
+        }
         return ftNameToWfsFT.get( ftName );
     }
 
@@ -305,12 +314,12 @@ public abstract class AbstractWFSWrapper {
      * guess which property might be "the" geometry property
      * 
      * @param propNames
-     * @return
+     * @return a list of qualified names
      */
     protected QualifiedName[] guessGeomProperty2( GMLSchema schema ) {
 
         QualifiedName[] geoPropNames = null;
-        List tmpList = new ArrayList( 20 );
+        List<QualifiedName> tmpList = new ArrayList<QualifiedName>( 20 );
 
         FeatureType[] fts = schema.getFeatureTypes();
         for ( int i = 0; i < fts.length; i++ ) {
@@ -324,14 +333,14 @@ public abstract class AbstractWFSWrapper {
             }
         }
 
-        geoPropNames = (QualifiedName[]) tmpList.toArray( new QualifiedName[tmpList.size()] );
+        geoPropNames = tmpList.toArray( new QualifiedName[tmpList.size()] );
 
         return geoPropNames;
     }
 
     protected static QualifiedName[] guessGeomProperty( GMLSchema schema, String featureTypeName ) {
         QualifiedName[] geoPropNames = null;
-        List tmpList = new ArrayList( 20 );
+        List<QualifiedName> tmpList = new ArrayList<QualifiedName>( 20 );
 
         FeatureType[] fts = schema.getFeatureTypes();
         for ( int i = 0; i < fts.length; i++ ) {
@@ -348,13 +357,13 @@ public abstract class AbstractWFSWrapper {
             }
         }
 
-        geoPropNames = (QualifiedName[]) tmpList.toArray( new QualifiedName[tmpList.size()] );
+        geoPropNames = tmpList.toArray( new QualifiedName[tmpList.size()] );
 
         return geoPropNames;
     }
 
     public QualifiedName[] getGeometryProperties( String featureType ) {
-        return (QualifiedName[]) this.geoPropsNameToQNames.get( featureType );
+        return this.geoPropsNameToQNames.get( featureType );
     }
 
     protected void createHttpClient() {

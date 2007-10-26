@@ -184,7 +184,6 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
             WFSLayerListener listener = new WFSLayerListener( displayName );
             layer.setLayerListener( listener );
             layerManager.addLayerListener( listener );
-            // TODO this should be mandatory
             layer.setServerURL( this.wfsUrl );
             /*
              * WFSLayerListener layerListener = new WFSLayerListener( displayName );
