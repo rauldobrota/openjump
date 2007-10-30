@@ -1,4 +1,8 @@
-2007-10-26  Andreas Schmitz <schmitz@lat-lon.de>
+2007-10-30  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/util/data/JUMPFeatureFactory.java:
+        Fixed bug when setting default geometry.
+
+2007-10-30  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/ui/DeeJUMPException.java,
         src/de/latlon/deejump/util/data/JUMPFeatureFactory.java:
         Improved Exception handling.

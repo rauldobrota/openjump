@@ -380,7 +380,7 @@ public class JUMPFeatureFactory {
             com.vividsolutions.jump.feature.Feature jf = new BasicFeature( fs );
             org.deegree.model.spatialschema.Geometry geoObject = feats[i].getDefaultGeometryPropertyValue();
 
-            if ( defaultGeometry == null && geoObject != null ) {
+            if ( addedGeometry ) {
                 try {
                     Geometry geom = JTSAdapter.export( geoObject );
                     jf.setGeometry( geom );
