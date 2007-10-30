@@ -9,7 +9,7 @@
 package de.latlon.deejump.ui;
 
 /**
- * ... 
+ * ...
  * 
  * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei</a>
  * @author last edited by: $Author$
@@ -36,6 +36,13 @@ public class DeeJUMPException extends Exception {
      */
     public DeeJUMPException( Throwable cause ) {
         super( cause );
+    }
+
+    /**
+     * @param msg
+     */
+    public DeeJUMPException( String msg ) {
+        super( msg );
     }
 
 }

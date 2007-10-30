@@ -81,10 +81,10 @@ public class JUMPFeatureFactory {
      * @param deegreeFeatCollec
      *            the deegree FeatureCollection
      * @return the new JUMP FeatureCollection
-     * @throws Exception
+     * @throws DeeJUMPException
      */
     public static FeatureCollection createFromDeegreeFC( org.deegree.model.feature.FeatureCollection deegreeFeatCollec )
-                            throws Exception {
+                            throws DeeJUMPException {
 
         return createFromDeegreeFC( deegreeFeatCollec, null );
     }
@@ -150,12 +150,13 @@ public class JUMPFeatureFactory {
      * @param request
      *            the GetFeature request
      * @return a deegree FeatureCollection
-     * @throws Exception
-     *             throwing ALL exceptions
+     * @throws XMLParsingException
+     * @throws IOException
+     * @throws DeeJUMPException
      */
     public static org.deegree.model.feature.FeatureCollection createDeegreeFCfromWFS( AbstractWFSWrapper serverUrl,
                                                                                       GetFeature request )
-                            throws Exception {
+                            throws DeeJUMPException, IOException, XMLParsingException {
 
         return createDeegreeFCfromWFS( serverUrl, XMLFactory.export( request ).getAsString(), null );
     }
@@ -284,7 +285,7 @@ public class JUMPFeatureFactory {
     }
 
     public static FeatureCollection createFromDeegreeFC( org.deegree.model.feature.FeatureCollection fc, Geometry geom )
-                            throws Exception {
+                            throws DeeJUMPException {
         return createFromDeegreeFC( fc, geom, null, null );
     }
 
@@ -304,13 +305,14 @@ public class JUMPFeatureFactory {
      * @param ftName
      *            the requested feature type from the above wfs
      * @return the new JUMP FeatureCollection
-     * @throws Exception
+     * @throws DeeJUMPException
      */
     public static FeatureCollection createFromDeegreeFC( org.deegree.model.feature.FeatureCollection deegreeFeatCollec,
                                                          Geometry defaultGeometry, AbstractWFSWrapper wfs,
                                                          QualifiedName ftName )
+                            throws DeeJUMPException
 
-                            throws Exception {
+    {
 
         FeatureSchema fs = new FeatureSchema();
 
@@ -319,7 +321,7 @@ public class JUMPFeatureFactory {
         org.deegree.model.feature.Feature[] feats = deegreeFeatCollec.toArray();
 
         if ( wfs == null && ( feats == null || feats.length < 1 ) ) {
-            throw new Exception( "No data found" ); //$NON-NLS-1$
+            throw new DeeJUMPException( "No data found" ); //$NON-NLS-1$
         }
 
         FeatureType ft;
@@ -339,7 +341,7 @@ public class JUMPFeatureFactory {
             // //$NON-NLS-1$
             // + "This is currently not supported." ); //$NON-NLS-1$
         }
-        
+
         if ( geoTypeProps == null || geoTypeProps.length == 0 ) {
             LOG.debug( "Guessing geometry property name." );
             geoProName = "GEOMETRY"; //$NON-NLS-1$

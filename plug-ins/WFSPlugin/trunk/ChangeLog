@@ -1,4 +1,9 @@
 2007-10-26  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/ui/DeeJUMPException.java,
+        src/de/latlon/deejump/util/data/JUMPFeatureFactory.java:
+        Improved Exception handling.
+
+2007-10-26  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/plugin/wfs/WFSPlugIn.java,
         src/de/latlon/deejump/plugin/wfs/AbstractWFSWrapper.java:
         Fixed feature type extraction.
