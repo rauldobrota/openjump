@@ -1,3 +1,10 @@
+2007-11-08  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/util/data/JUMPFeatureFactory.java,
+        src/de/latlon/deejump/plugin/wfs/TransactionFactory.java,
+        src/de/latlon/deejump/plugin/wfs/WFSPlugIn.java,
+        src/de/latlon/deejump/plugin/wfs/UpdateWFSLayerPlugIn.java:
+        Improved the API to be more usable outside of the plugin.
+
 2007-10-30  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/util/data/JUMPFeatureFactory.java:
         Fixed bug when setting default geometry.

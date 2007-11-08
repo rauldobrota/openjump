@@ -164,7 +164,7 @@ public class TransactionFactory {
 
     public static final StringBuffer createTransaction( WorkbenchContext context, FeatureEventType transacType,
                                                         QualifiedName featureType, QualifiedName geoPropName,
-                                                        ArrayList<Feature> newFeatures ) {
+                                                        ArrayList<Feature> newFeatures, boolean useExisting ) {
 
         StringBuffer sb = new StringBuffer();
         if ( featureType == null ) {
@@ -186,7 +186,7 @@ public class TransactionFactory {
                                                                                                                             "'  >" );
 
         if ( transacType.equals( FeatureEventType.ADDED ) ) {
-            appendInsert( sb, featureType, geoPropName, newFeatures );
+            appendInsert( sb, featureType, geoPropName, newFeatures, useExisting );
 
         } else if ( transacType.equals( FeatureEventType.DELETED ) ) {
             appendDelete( sb, featureType, newFeatures );
@@ -245,16 +245,24 @@ public class TransactionFactory {
      *            the list of new features
      */
     private static final void appendInsert( StringBuffer sb, QualifiedName featureType, QualifiedName geoPropName,
-                                            ArrayList<Feature> features ) {
+                                            ArrayList<Feature> features, boolean useExisting ) {
 
-        sb.append( "<wfs:Insert handle='insert1' idgen='GenerateNew' >" );
+        sb.append( "<wfs:Insert handle='insert1' idgen='" + ( useExisting ? "UseExisting" : "GenerateNew" ) + "' >" );
 
         for ( Iterator<Feature> iter = features.iterator(); iter.hasNext(); ) {
             Feature feat = iter.next();
-            String s = new StringBuilder().append( featureType.getPrefix() ).append( ":" ).append(
-                                                                                                   featureType.getLocalName() ).toString();
+            String s = featureType.getPrefix() + ":" + featureType.getLocalName();
 
-            sb.append( "<" ).append( s ).append( ">" );
+            sb.append( "<" ).append( s );
+            if ( useExisting ) {
+                String id = (String) feat.getAttribute( "Internal ID" );
+                if ( !id.startsWith( featureType.getLocalName().toUpperCase() ) ) {
+                    id = featureType.getLocalName().toUpperCase() + "_" + id;
+                    feat.setAttribute( "Internal ID", id );
+                }
+                sb.append( " gml:id=\"" ).append( id );
+            }
+            sb.append( "\">" );
             sb.append( createInsertPropertiesFragment( geoPropName, featureType, feat ) );
             sb.append( "</" ).append( s ).append( ">" );
         }
@@ -359,6 +367,11 @@ public class TransactionFactory {
             LOG.debug( "Shall we insert attribute " + attName + "?" );
 
             if ( ( ( !( fs.getAttributeType( j ) == AttributeType.GEOMETRY ) ) && fet == FeatureEventType.ATTRIBUTES_MODIFIED ) ) {
+                if ( fs.getAttributeName( j ).equals( "Internal ID" ) ) {
+                    LOG.debug( "Skipping fake id attribute." );
+                    continue;
+                }
+
                 LOG.debug( "Inserting modified attribute." );
 
                 if ( fs.getAttributeType( j ) == AttributeType.DATE ) {
@@ -431,6 +444,11 @@ public class TransactionFactory {
                         sb.append( "</" ).append( featureType.getPrefix() ).append( ":" ).append( attName ).append( ">" );
                     }
                 } else {
+                    if ( featSchema.getAttributeName( j ).equals( "Internal ID" ) ) {
+                        LOG.debug( "Skipping fake id attribute." );
+                        continue;
+                    }
+
                     Object attValue = bf.getAttribute( j );
                     if ( attValue != null ) {
                         sb.append( "<" ).append( featureType.getPrefix() ).append( ":" ).append( attName ).append( ">" );
@@ -471,6 +489,17 @@ public class TransactionFactory {
         for ( int j = 0; j < os.length; j++ ) {
 
             String attName = fs.getAttributeName( j );
+
+            if ( attName.equals( "Internal ID" ) ) {
+                LOG.debug( "Skipping fake id attribute." );
+                continue;
+            }
+
+            if ( attName.equals( "FAKE_GEOMETRY" ) ) {
+                LOG.debug( "Skipping fake geometry." );
+                continue;
+            }
+
             if ( !( fs.getAttributeType( j ) == AttributeType.GEOMETRY ) ) {
                 Object attValue = bf.getAttribute( j );
 

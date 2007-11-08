@@ -286,7 +286,7 @@ public class JUMPFeatureFactory {
 
     public static FeatureCollection createFromDeegreeFC( org.deegree.model.feature.FeatureCollection fc, Geometry geom )
                             throws DeeJUMPException {
-        return createFromDeegreeFC( fc, geom, null, null );
+        return createFromDeegreeFC( fc, geom, null, null, false );
     }
 
     /**
@@ -304,12 +304,14 @@ public class JUMPFeatureFactory {
      *            without any features
      * @param ftName
      *            the requested feature type from the above wfs
+     * @param addids
+     *            whether to add the GML ids as field
      * @return the new JUMP FeatureCollection
      * @throws DeeJUMPException
      */
     public static FeatureCollection createFromDeegreeFC( org.deegree.model.feature.FeatureCollection deegreeFeatCollec,
                                                          Geometry defaultGeometry, AbstractWFSWrapper wfs,
-                                                         QualifiedName ftName )
+                                                         QualifiedName ftName, boolean addids )
                             throws DeeJUMPException
 
     {
@@ -354,6 +356,10 @@ public class JUMPFeatureFactory {
 
         boolean addedGeometry = false;
 
+        if ( addids ) {
+            fs.addAttribute( "Internal ID", AttributeType.STRING );
+        }
+
         // populate JUMP schema
         for ( int j = 0; j < featTypeProps.length; j++ ) {
             String name = featTypeProps[j].getName().getLocalName();
@@ -392,12 +398,16 @@ public class JUMPFeatureFactory {
                 jf.setGeometry( defaultGeometry );
             }
 
-            int geoIndex = jf.getSchema().getGeometryIndex();
+            int geoIndex = fs.getGeometryIndex();
 
-            for ( int j = 0; j < jf.getSchema().getAttributeCount(); j++ ) {
+            if ( addids ) {
+                jf.setAttribute( 0, feats[i].getId() );
+            }
+
+            for ( int j = addids ? 1 : 0; j < fs.getAttributeCount(); j++ ) {
                 if ( j != geoIndex ) {
                     QualifiedName qn = new QualifiedName( fs.getAttributeName( j ),
-                                                          featTypeProps[j].getName().getNamespace() );
+                                                          featTypeProps[addids ? j - 1 : j].getName().getNamespace() );
 
                     FeatureProperty fp = feats[i].getDefaultProperty( qn );
                     Object value = null;
