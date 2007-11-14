@@ -1,3 +1,7 @@
+2007-11-14  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/plugin/wfs/TransactionFactory.java:
+        Fixed null pointer when inserting null Dates.
+
 2007-11-08  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/util/data/JUMPFeatureFactory.java,
         src/de/latlon/deejump/plugin/wfs/TransactionFactory.java,

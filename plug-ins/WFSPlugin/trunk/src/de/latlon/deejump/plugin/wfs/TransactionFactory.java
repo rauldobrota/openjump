@@ -80,9 +80,6 @@ public class TransactionFactory {
                                                  + "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
                                                  + "xsi:schemaLocation='http://www.opengis.net/wfs/1.1.0/WFS-transaction.xsd' ";
 
-    // private static final DateFormat formatter = DateFormat.getDateInstance( DateFormat.SHORT,
-    // Locale.US );
-
     private static final SimpleDateFormat formatter = new SimpleDateFormat( "yyyy-MM-dd'T'hh:mm:ss" );
 
     /**
@@ -376,8 +373,8 @@ public class TransactionFactory {
 
                 if ( fs.getAttributeType( j ) == AttributeType.DATE ) {
                     Date attValue = (Date) bf.getAttribute( j );
-                    String val = formatter.format( attValue );
                     if ( attValue != null ) {
+                        String val = formatter.format( attValue );
                         LOG.debug( "Inserting date value of " + val );
                         sb.append( "<wfs:Property><wfs:Name>" ).append( featureType.getPrefix() ).append( ":" );
                         sb.append( attName ).append( "</wfs:Name>" ).append( "<wfs:Value>" ).append( val );
@@ -437,8 +434,8 @@ public class TransactionFactory {
 
                 if ( featSchema.getAttributeType( j ) == AttributeType.DATE ) {
                     Date attValue = (Date) bf.getAttribute( j );
-                    String val = formatter.format( attValue );
                     if ( attValue != null ) {
+                        String val = formatter.format( attValue );
                         sb.append( "<" ).append( featureType.getPrefix() ).append( ":" ).append( attName ).append( ">" );
                         sb.append( val );
                         sb.append( "</" ).append( featureType.getPrefix() ).append( ":" ).append( attName ).append( ">" );
