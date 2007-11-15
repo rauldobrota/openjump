@@ -29,7 +29,7 @@
 
  ---------------------------------------------------------------------------*/
 
-package de.latlon.deejump.plugin.wfs;
+package de.latlon.deejump.plugin.wfs.transaction;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

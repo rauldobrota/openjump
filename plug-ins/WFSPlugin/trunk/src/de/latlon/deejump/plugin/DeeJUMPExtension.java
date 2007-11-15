@@ -11,8 +11,8 @@ package de.latlon.deejump.plugin;
 import com.vividsolutions.jump.workbench.plugin.Extension;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 
-import de.latlon.deejump.plugin.wfs.UpdateWFSLayerPlugIn;
 import de.latlon.deejump.plugin.wfs.WFSPlugIn;
+import de.latlon.deejump.plugin.wfs.transaction.UpdateWFSLayerPlugIn;
 
 
 /**

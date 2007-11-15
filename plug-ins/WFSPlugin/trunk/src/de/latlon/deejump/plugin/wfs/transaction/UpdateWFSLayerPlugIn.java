@@ -29,7 +29,7 @@
 
  ---------------------------------------------------------------------------*/
 
-package de.latlon.deejump.plugin.wfs;
+package de.latlon.deejump.plugin.wfs.transaction;
 
 import static com.vividsolutions.jump.workbench.model.FeatureEventType.ADDED;
 import static com.vividsolutions.jump.workbench.model.FeatureEventType.ATTRIBUTES_MODIFIED;
@@ -44,8 +44,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -65,30 +63,24 @@ import org.deegree.framework.util.CharsetUtils;
 import org.deegree.framework.xml.DOMPrinter;
 import org.deegree.framework.xml.XMLFragment;
 import org.deegree.framework.xml.XMLTools;
-import org.deegree.model.spatialschema.GeometryFactory;
-import org.deegree.ogcwebservices.wfs.operation.GetFeature;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jump.feature.Feature;
-import com.vividsolutions.jump.feature.FeatureCollection;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.util.StringUtil;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.model.Layer;
 import com.vividsolutions.jump.workbench.model.LayerEventType;
 import com.vividsolutions.jump.workbench.plugin.EnableCheck;
-import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.ThreadedBasePlugIn;
 import com.vividsolutions.jump.workbench.ui.HTMLFrame;
+import com.vividsolutions.jump.workbench.ui.WorkbenchToolBar;
 import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 
-import de.latlon.deejump.util.data.JUMPFeatureFactory;
+import de.latlon.deejump.plugin.wfs.WFSLayer;
 
 /**
  * Plug-in to update a wfs layer
@@ -98,23 +90,7 @@ import de.latlon.deejump.util.data.JUMPFeatureFactory;
  */
 public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
 
-    public static final String RELOAD_LAYER_KEY = "RELOAD_LAYER";
-
-    // used to check when there are mixed geometries.
-    // not used here yet
-    // private static final Map GEOMETRIES;
-
     private static Logger LOG = Logger.getLogger( UpdateWFSLayerPlugIn.class );
-
-    // static{
-    // HashMap tmpGEOMETRIES = new HashMap(3);
-    // //TODO internationalize this
-    // tmpGEOMETRIES.put( LineString.class, "Lines" );
-    // tmpGEOMETRIES.put( Polygon.class, "Polygons" );
-    // tmpGEOMETRIES.put( Point.class, "Points" );
-    //        
-    // GEOMETRIES = Collections.unmodifiableMap( tmpGEOMETRIES );
-    // }
 
     private StringBuffer updateRequest = null;
 
@@ -133,8 +109,6 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
     // if user added new geoms, need to reload from DB
     private boolean hasInserted = false;
 
-    private AbstractWFSWrapper wfs;
-
     /**
      * @param context
      * @throws Exception
@@ -142,11 +116,10 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
     public void install( PlugInContext context )
                             throws Exception {
 
-        context.getWorkbenchContext().getWorkbench().getFrame().getToolBar().addPlugIn(
-                                                                                        getIcon(),
-                                                                                        this,
-                                                                                        createEnableCheck( context.getWorkbenchContext() ),
-                                                                                        context.getWorkbenchContext() );
+        WorkbenchContext wbcontext = context.getWorkbenchContext();
+
+        WorkbenchToolBar toolbar = wbcontext.getWorkbench().getFrame().getToolBar();
+        toolbar.addPlugIn( getIcon(), this, createEnableCheck( wbcontext ), wbcontext );
     }
 
     @Override
@@ -210,7 +183,8 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
         // INSERT
         if ( newFeatures.size() > 0 ) {
             insertRequest = TransactionFactory.createTransaction( context.getWorkbenchContext(), ADDED,
-                                                                  layer.getQualifiedName(), geoPropName, newFeatures, false );
+                                                                  layer.getQualifiedName(), geoPropName, newFeatures,
+                                                                  false );
             hasInserted = true;
         }
 
@@ -307,7 +281,7 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
 
         Document doc = XMLTools.parse( new StringReader( mesg.toString() ) );
 
-        URL url = UpdateWFSLayerPlugIn.class.getResource( "transationresp2html.xsl" );
+        URL url = UpdateWFSLayerPlugIn.class.getResource( "response2html.xsl" );
 
         String s = DOMPrinter.nodeToString( doc, CharsetUtils.getSystemCharset() );
 
@@ -315,56 +289,13 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
         out.append( s );
     }
 
+    @Override
     public String getName() {
         return "Update WFSLayer";
     }
 
-    public ImageIcon getIcon() {
+    public static ImageIcon getIcon() {
         return IconLoader.icon( "Data.gif" );
-    }
-
-    private boolean checkGeometries( Class comparisonGeo, FeatureCollection featCollec ) {
-
-        List featList = featCollec.getFeatures();
-        for ( Iterator iter = featList.iterator(); iter.hasNext(); ) {
-            Feature f = (Feature) iter.next();
-            Geometry g = f.getGeometry();
-            if ( g instanceof GeometryCollection ) {
-
-                GeometryCollection geoCollec = (GeometryCollection) g;
-                int nGeos = geoCollec.getNumGeometries();
-                for ( int i = 0; i < nGeos; i++ ) {
-                    if ( !( comparisonGeo == geoCollec.getGeometryN( i ).getClass() ) ) {
-                        return false;
-                    }
-                }
-
-            } else if ( !( comparisonGeo == g.getClass() ) ) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void reloadLayer( TaskMonitor monitor, PlugInContext context, String layerName )
-                            throws Exception {
-        monitor.report( "AddWFSQueryPlugIn.generating" );
-
-        Envelope jEnv = context.getLayerViewPanel().getViewport().getEnvelopeInModelCoordinates();
-
-        org.deegree.model.spatialschema.Envelope env = GeometryFactory.createEnvelope(
-                                                                                       GeometryFactory.createPosition(
-                                                                                                                       jEnv.getMinX(),
-                                                                                                                       jEnv.getMinY() ),
-                                                                                       GeometryFactory.createPosition(
-                                                                                                                       jEnv.getMaxX(),
-                                                                                                                       jEnv.getMaxY() ),
-                                                                                       null );
-
-        GetFeature gfr = null;
-
-        org.deegree.model.feature.FeatureCollection dfc = JUMPFeatureFactory.createDeegreeFCfromWFS( wfs, gfr );
-
     }
 
     private static String doXSLTransform( URL xsltUrl, String content ) {
@@ -397,14 +328,10 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
         return sw.toString();
     }
 
-    public EnableCheck createEnableCheck( final WorkbenchContext workbenchContext ) {
-        EnableCheckFactory ecf = new EnableCheckFactory( workbenchContext );
-
-        MultiEnableCheck mec = new MultiEnableCheck().add(
-                                                           createExactlyNWfsLayersMustBeSelectedCheck(
-                                                                                                       workbenchContext,
-                                                                                                       1 ) ).add(
-                                                                                                                  createFeatureMustHaveChangedCheck( workbenchContext ) );
+    public static EnableCheck createEnableCheck( final WorkbenchContext workbenchContext ) {
+        MultiEnableCheck mec = new MultiEnableCheck();
+        mec.add( createExactlyNWfsLayersMustBeSelectedCheck( workbenchContext, 1 ) );
+        mec.add( createFeatureMustHaveChangedCheck( workbenchContext ) );
 
         return mec;
     }
@@ -426,7 +353,7 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
         };
     }
 
-    public EnableCheck createFeatureMustHaveChangedCheck( final WorkbenchContext workbenchContext ) {
+    public static EnableCheck createFeatureMustHaveChangedCheck( final WorkbenchContext workbenchContext ) {
         return new EnableCheck() {
             public String check( JComponent component ) {
 
