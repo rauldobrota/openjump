@@ -257,9 +257,9 @@ public class TransactionFactory {
                     id = featureType.getLocalName().toUpperCase() + "_" + id;
                     feat.setAttribute( "Internal ID", id );
                 }
-                sb.append( " gml:id=\"" ).append( id );
+                sb.append( " gml:id=\"" ).append( id ).append( "\"" );
             }
-            sb.append( "\">" );
+            sb.append( ">" );
             sb.append( createInsertPropertiesFragment( geoPropName, featureType, feat ) );
             sb.append( "</" ).append( s ).append( ">" );
         }
