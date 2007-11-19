@@ -1,5 +1,9 @@
 somme usefull maven goal
 
+for build :
+mvn clean package
+ * all result is in target directory
+
 somme common build life cicle:
 
     * validate  - validate the project is correct and all necessary information is available

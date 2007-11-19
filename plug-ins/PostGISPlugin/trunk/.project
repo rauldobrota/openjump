@@ -1,6 +1,11 @@
 <projectDescription>
   <name>PostGISPlugin</name>
-  <comment/>
+  <comment>The JumpPostGIS PlugIn is an extension of the original PostGIS
+		driver created by Refractions Research (www.refractions.net) for
+		Jump.
+
+		With this driver you can read and write PostgreSQL/PostGIS
+		tables with OpenJUMP.</comment>
   <projects/>
   <buildSpec>
     <buildCommand>

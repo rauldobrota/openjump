@@ -26,6 +26,8 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
 import javax.swing.text.PlainDocument;
+
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.workbench.ui.*;
 
 //u.d.
@@ -40,9 +42,22 @@ import com.vividsolutions.jump.workbench.model.Layer;
 //displaying it -- see jcstest.AbstractDriverPanelProxy and
 //http://www.visi.com/~gyles19/fom-serve/cache/97.html. [Jon Aquino]
 public class PostGISCommonDriverPanel extends JPanel {
+  public static final String KEY = PostGISCommonDriverPanel.class.getName();
+  
   public static String PG_DEFAULT_PORT = "5432";
   
-	//These allow differnt objects to retain the same field values
+  private static final String PKG_KEY = "net.refractions.postgis";
+  
+  private static final String SERVER = I18N.getText(PKG_KEY,KEY + ".server");
+  private static final String PORT = I18N.getText(PKG_KEY,KEY + ".port");
+  private static final String DATABASE = I18N.getText(PKG_KEY,KEY + ".database");
+  private static final String TABLE = I18N.getText(PKG_KEY,KEY + ".table");
+  private static final String USERNAME = I18N.getText(PKG_KEY,KEY + ".username");
+  private static final String PASSWORD = I18N.getText(PKG_KEY,KEY + ".password");
+  private static final String WHERE = I18N.getText(PKG_KEY,KEY + ".where");
+  
+  
+  //These allow differnt objects to retain the same field values
   private static PlainDocument serverDoc = null;
   private static PlainDocument portDoc = null;
   private static PlainDocument databaseDoc = null;
@@ -86,7 +101,7 @@ public class PostGISCommonDriverPanel extends JPanel {
 		c.gridx = 0;
 		c.insets = labelInsets;
 		c.anchor = GridBagConstraints.EAST;
-		theLabel = new JLabel( "Server:" );
+		theLabel = new JLabel( SERVER+":" );
 		gbLayout.setConstraints( theLabel, c );
 		this.add( theLabel );
 		c.gridx = 1;
@@ -99,7 +114,7 @@ public class PostGISCommonDriverPanel extends JPanel {
 		c.gridx = 2;
 		c.insets = labelInsets;
 		c.anchor = GridBagConstraints.EAST;
-		theLabel = new JLabel( "Port:" );
+		theLabel = new JLabel( PORT+":" );
 		gbLayout.setConstraints( theLabel, c );
 		this.add( theLabel );
 		c.gridx = 3;
@@ -115,7 +130,7 @@ public class PostGISCommonDriverPanel extends JPanel {
 		c.gridx = 0;
 		c.insets = labelInsets;
 		c.anchor = GridBagConstraints.EAST;
-		theLabel = new JLabel( "Database:" );
+		theLabel = new JLabel( DATABASE+":" );
 		gbLayout.setConstraints( theLabel, c );
 		this.add( theLabel );
 		c.gridx = 1;
@@ -128,7 +143,7 @@ public class PostGISCommonDriverPanel extends JPanel {
 		c.gridx = 2;
 		c.insets = labelInsets;
 		c.anchor = GridBagConstraints.EAST;
-		theLabel = new JLabel( "Table:" );
+		theLabel = new JLabel( TABLE+":" );
 		gbLayout.setConstraints( theLabel, c );
 		this.add( theLabel );
 		c.gridx = 3;
@@ -145,7 +160,7 @@ public class PostGISCommonDriverPanel extends JPanel {
 		c.gridx = 0;
 		c.insets = labelInsets;
 		c.anchor = GridBagConstraints.EAST;
-		theLabel = new JLabel( "Username:" );
+		theLabel = new JLabel( USERNAME+":" );
 		gbLayout.setConstraints( theLabel, c );
 		this.add( theLabel );
 		c.gridx = 1;
@@ -158,7 +173,7 @@ public class PostGISCommonDriverPanel extends JPanel {
 		c.gridx = 2;
 		c.insets = labelInsets;
 		c.anchor = GridBagConstraints.EAST;
-		theLabel = new JLabel( "Password:" );
+		theLabel = new JLabel( PASSWORD+":" );
 		gbLayout.setConstraints( theLabel, c );
 		this.add( theLabel );
 		c.gridx = 3;
@@ -174,7 +189,7 @@ public class PostGISCommonDriverPanel extends JPanel {
 		c.gridx = 0;
 		c.insets = labelInsets;
 		c.anchor = GridBagConstraints.EAST;
-		theLabel = new JLabel( "Where:" );
+		theLabel = new JLabel( WHERE+":" );
 		gbLayout.setConstraints( theLabel, c );
 		this.add( theLabel );
 		c.gridx = 1;
@@ -223,7 +238,7 @@ public class PostGISCommonDriverPanel extends JPanel {
 		}
 	}
 	
-	public void putCache( DriverPanelCache cache ) {
+ 	public void putCache( DriverPanelCache cache ) {
 		cache.put( PostGISDataSource.SERVER_KEY, serverField.getText() );
 		cache.put( PostGISDataSource.PORT_KEY, portField.getText() );
 		cache.put( PostGISDataSource.DATABASE_KEY, databaseField.getText() );

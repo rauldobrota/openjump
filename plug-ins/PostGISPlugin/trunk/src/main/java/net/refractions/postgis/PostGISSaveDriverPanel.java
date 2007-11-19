@@ -31,6 +31,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.workbench.ui.*;
 
 /**
@@ -42,13 +43,21 @@ import com.vividsolutions.jump.workbench.ui.*;
 //http://www.visi.com/~gyles19/fom-serve/cache/97.html. [Jon Aquino]
 // Last change UD, uwe dalluege, HCU Hamburg, 2006.03.24
 public class PostGISSaveDriverPanel extends AbstractDriverPanel implements ActionListener {
-	static final String INSERT_HELP_STRING = "Create the table if it doesn't already exist, then insert new geometries into it.";
-	static final String UPDATE_HELP_STRING = "Insert new rows or update the existing rows in the table, based on the specified unique column (primary key). You must specify a unique column name which exists in both the feature schema and the database table.";
+	public static final String KEY = PostGISSaveDriverPanel.class.getName();
+
+	private static final String PKG_KEY = "net.refractions.postgis";
+	
+	static final String INSERT_HELP_STRING = I18N.getText(PKG_KEY,KEY + ".INSERT_HELP_STRING");
+	static final String UPDATE_HELP_STRING = I18N.getText(PKG_KEY,KEY + ".UPDATE_HELP_STRING");
 // UD, 2006.07.28
-	static final String DELETE_HELP_STRING = 
-		"Creates a new PostGIS-Table without CONSTRAINTSs and saves the layer."; 
-		static final String OVERWRITE_HELP_STRING = 
-		"\n\nOverwrites an existing PostGIS-Table and keeps the table CONSTRAINTs."; 
+	static final String DELETE_HELP_STRING = I18N.getText(PKG_KEY,KEY + ".DELETE_HELP_STRING"); 
+	static final String OVERWRITE_HELP_STRING = I18N.getText(PKG_KEY,KEY + ".OVERWRITE_HELP_STRING"); 
+	
+	static final String SELECT_SAVE_METHOD = I18N.getText(PKG_KEY,KEY + ".select-save-method");
+	static final String NEW_TABLE = I18N.getText(PKG_KEY,KEY + ".new-table");
+	static final String OVERWRITE = I18N.getText(PKG_KEY,KEY + ".overwrite");
+	static final String INSERT = I18N.getText(PKG_KEY,KEY + ".insert");
+	static final String UNIQUE_COLUMN = I18N.getText(PKG_KEY,KEY + ".unique-Column");
 	
 	ButtonGroup methodButtons;
 	//JRadioButton insertButton;
@@ -86,7 +95,7 @@ public class PostGISSaveDriverPanel extends AbstractDriverPanel implements Actio
 		Insets insets = new Insets( 2, 2, 2, 2 );
 		c.insets = insets;
 		
-		TitledBorder border = BorderFactory.createTitledBorder( BorderFactory.createEtchedBorder(), "Select Save Method:" );
+		TitledBorder border = BorderFactory.createTitledBorder( BorderFactory.createEtchedBorder(), SELECT_SAVE_METHOD );
 		border.setTitleJustification( TitledBorder.LEFT );
 		topPanel.setBorder( border );
 		
@@ -107,7 +116,7 @@ public class PostGISSaveDriverPanel extends AbstractDriverPanel implements Actio
 // U.D. 2006.03.24
 		c.gridx = 0;
 		c.gridy = 0;
-		deleteButton = new JRadioButton ( "New Table" );
+		deleteButton = new JRadioButton ( NEW_TABLE );
 		deleteButton.setActionCommand( "delete" );
 //		deleteButton.setSelected(true);
 		deleteButton.addActionListener( this );
@@ -118,7 +127,7 @@ public class PostGISSaveDriverPanel extends AbstractDriverPanel implements Actio
 // UD, 2006.07.28
 		c.gridx = 0;
 		c.gridy = 1;
-		overwriteButton = new JRadioButton ( "Overwrite" );
+		overwriteButton = new JRadioButton ( OVERWRITE );
 		overwriteButton.setActionCommand( "overwrite" );
 		overwriteButton.setSelected(true);
 		overwriteButton.addActionListener( this );
@@ -128,7 +137,7 @@ public class PostGISSaveDriverPanel extends AbstractDriverPanel implements Actio
 		
 		c.gridx = 0;
 		c.gridy = 2;
-		updateButton = new JRadioButton( "Insert" );
+		updateButton = new JRadioButton( INSERT );
 		updateButton.setActionCommand( "update" );
 		updateButton.addActionListener( this );
 		updateButton.setSelected(false);
@@ -149,7 +158,7 @@ public class PostGISSaveDriverPanel extends AbstractDriverPanel implements Actio
 		c.gridx = 0;
 		c.gridy = 3;
 		c.anchor = GridBagConstraints.EAST;
-		theLabel = new JLabel( "Unique Column:" );
+		theLabel = new JLabel( UNIQUE_COLUMN );
 		gbLayout.setConstraints( theLabel, c );
 		theLabel.setEnabled( false );
 		topPanel.add( theLabel );

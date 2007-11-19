@@ -18,6 +18,9 @@
  */ 
 package net.refractions.postgis;
 
+import org.openjump.core.ui.plugin.datastore.AddDataStoreLayerWizard;
+import org.openjump.core.ui.plugin.file.OpenWizardPlugIn;
+
 import com.vividsolutions.jump.workbench.datasource.DataSourceQueryChooserManager;
 import com.vividsolutions.jump.workbench.plugin.PlugIn;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
@@ -45,6 +48,10 @@ public class PostGISPlugIn implements PlugIn {
       context.getWorkbenchContext().getWorkbench().getBlackboard()
     ).addLoadDataSourceQueryChooser(loadChooser)
     .addSaveDataSourceQueryChooser(saveChooser);
+
+    PostGISOpenWizard postGISOpenWizard = new PostGISOpenWizard(context.getWorkbenchContext());
+    OpenWizardPlugIn.addWizard(context.getWorkbenchContext(), postGISOpenWizard);
+
   }
 
   /**

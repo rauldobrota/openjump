@@ -23,6 +23,7 @@ package net.refractions.postgis;
 
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.io.WKTReader;
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.*;
 import com.vividsolutions.jump.io.datasource.Connection;
 import com.vividsolutions.jump.task.TaskMonitor;
@@ -39,6 +40,10 @@ import java.math.*;
  * This class represents the actual connection of a PostGIS data source. 
  */
 public class PostGISConnection implements Connection {
+  public static final String KEY = PostGISConnection.class.getName();
+  
+  private static final String PKG_KEY = "net.refractions.postgis";
+
   Map properties;
   String server;
   String port;
@@ -302,6 +307,7 @@ public class PostGISConnection implements Connection {
   public void executeUpdate(String query, FeatureCollection collection) {
   
 // U.D. for exist unique column
+	String[] param; 
     boolean unColExists = false;
     
   	if (collection.isEmpty()) 
@@ -378,10 +384,12 @@ public class PostGISConnection implements Connection {
 				{
 //System.out.println 
 //( "PostGIS Connection tabelle: " + table + " löschen!"); 
+					param = new String[1];
+					param[0] = table;
 					int opt = JOptionPane.showConfirmDialog 
 						( PostGISCommonDriverPanel.driverPanel, 
-								"OverWrite existing table  " + table + " ?", 
-								"OverWrite " + table + " ?", 
+								I18N.getMessage(PKG_KEY,KEY+".overwrite.existing", param), 
+								I18N.getMessage(PKG_KEY,KEY+".overwrite", param), 
 								JOptionPane.YES_NO_OPTION );
 					
 //System.out.println ( "PGC opt = " + opt + " " + JOptionPane.NO_OPTION ); 					
@@ -416,10 +424,12 @@ System.out.println
 				{
 //System.out.println 
 //( "PostGIS Connection tabelle: " + table + " löschen!"); 
+					param = new String[1];
+					param[0] = table;
 					int opt = JOptionPane.showConfirmDialog 
 						( PostGISCommonDriverPanel.driverPanel, 
-								"OverWrite existing table  " + table + " ?", 
-								"OverWrite " + table + " ?", 
+								I18N.getMessage(PKG_KEY,KEY+".overwrite.existing", param), 
+								I18N.getMessage(PKG_KEY,KEY+".overwrite", param), 
 								JOptionPane.YES_NO_OPTION );
 					
 //System.out.println ( "PGC opt = " + opt + " " + JOptionPane.NO_OPTION ); 					
