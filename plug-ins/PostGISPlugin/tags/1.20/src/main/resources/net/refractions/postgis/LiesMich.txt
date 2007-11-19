@@ -1,0 +1,62 @@
+--- Informationen zum OpenJUMP PostGIS PlugIn (29.07.2006)
+
+Das JumpPostGIS PlugIn ist eine Erweiterung des PostGIS Treibers
+der Fa. Refractions Research (www.refractions.net) für Jump.
+
+Mit diesem Treiber können PostgreSQL/PostGIS Tabellen von
+OpenJUMP gelesen und geschrieben werden.
+
+Liegt dieses PlugIn in dem OpenJUMP PlugIn-Verzeichnis lib/ext ,
+können über File>Load Dataset(s) Tabellen gelesen
+und über File>Save dataset as... Tabellen geschrieben werden,
+wenn "PostGIS Table" bei "Format:" ausgewählt wird (ComboBox links oben).
+
+Achtung! Benutzen Sie bitte nur kleingeschriebene Spaltennamen!
+
+Im "Save Modus" kann "New Table", "Overwrite" und "Insert"
+gewählt werden:
+
+- New Table
+
+  Existiert die Tabelle nicht, wird sie neu angelegt.
+  Existiert die Tabelle, wird sie gelöscht und neu angelegt.
+  
+- Overwrite
+
+  Existiert die Tabelle nicht, wird sie neu angelegt.
+  Existiert die Tabelle, werden nur die Daten gelöscht (nicht die ganze Tabelle)
+  und die neuen Daten eingefügt. Die Tabellen-CONSTRAINTs bleiben erhalten.  
+ 
+- Insert
+
+  Existiert die Tabelle, werden nur die Datensätze verändert, die über
+  den Schlüssel der "Unique Column" identifiziert werden können (Update). 
+  Alle anderen Datensätze werden eingefügt (Insert).
+  Damit das Update/Insert richtig funktionieren kann, sollten in der
+  "Unique Column" nur eindeutige Schlüssel (Primärschlüssel) stehen!
+
+Weitere Informationen zu OpenJUMP und PostGIS
+finden Sie in meinem PostGIS Tutorial, das Sie unter
+
+http://openjump.org/wiki/show/Documentation
+
+finden können.
+
+
+Bei Fragen stehe ich Ihnen gerne zur Verfügung!
+
+Viel Spaß!
+
+Uwe Dalluege
+
+uwe.dalluege@rzcn.haw-hamburg.de
+
+HCU Hamburg, Department Geomatik
+
+http://www.hcu-hamburg.de/geomatik/ 
+
+
+
+
+
+

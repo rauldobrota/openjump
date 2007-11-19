@@ -1,0 +1,32 @@
+somme usefull maven goal
+
+somme common build life cicle:
+
+    * validate  - validate the project is correct and all necessary information is available
+    * compile - compile the source code of the project
+    * test - test the compiled source code using a suitable unit testing framework. 
+    	These tests should not require the code be packaged or deployed
+    * package - take the compiled code and package it in its distributable format, such as a JAR.
+    * integration-test - process and deploy the package if necessary into an environment where integration tests can be run
+    * verify - run any checks to verify the package is valid and meets quality criteria
+    * install - install the package into the local repository, for use as a dependency in other projects locally
+    * deploy - done in an integration or release environment, copies the final package to the remote repository for sharing with other developers and projects.
+
+The Ant Plugin has two goals:
+
+    * ant:ant Generate Ant build files.
+    * ant:clean Clean all Ant build files.
+    
+Another package :
+
+	* javadoc:jar - creates an archive file of the generated javadocs. 
+		It is used during the release process to create the javadoc artifact for the project's release. 
+		This artifact is uploaded to the remote repository along with the project's compiled binary and source archive.
+	* source:jar - build sources and ressources in jar format
+	* eclipse:eclipse - build .clathpass and .project (add variable M2_REPO link onto your local repository) 
+	* site - build site
+	
+good work 
+Eric Lemesre
+
+	 	
