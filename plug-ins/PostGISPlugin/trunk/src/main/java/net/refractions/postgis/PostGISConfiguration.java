@@ -29,11 +29,11 @@ public class PostGISConfiguration extends Extension {
   }
   
   public String getName() {
-    return("PostGIS Driver (Refractions Research/HCU Hamburg, RZCN, V1.30.01)");
+    return("PostGIS Driver (Refractions Research/HCU Hamburg, RZCN, V1.30.02)");
   }
   
   public String getVersion() {
 // UD, uwe.dalluege@rzcn.haw-hamburg.de
-    return("V1.30.01");
+    return("V1.30.02");
   }
 }
