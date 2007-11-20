@@ -1,3 +1,7 @@
+2007-11-20  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/plugin/wfs/transaction/TransactionFactory.java:
+        Fixed Date valued filters.
+
 2007-11-16  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/plugin/wfs/transaction/TransactionFactory.java:
 		Fixed typo when building XML by hand.

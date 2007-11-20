@@ -498,28 +498,42 @@ public class TransactionFactory {
             }
 
             if ( !( fs.getAttributeType( j ) == AttributeType.GEOMETRY ) ) {
-                Object attValue = bf.getAttribute( j );
-
-                if ( attValue != null ) {
-
-                    double value = 0.1;
-
-                    try {
-                        value = Double.parseDouble( attValue.toString() );
-
-                    } catch ( NumberFormatException e ) {
-                        value = 0d;
-                    }
-
-                    value = value - (int) value;
-                    if ( value == 0d ) {
+                if ( fs.getAttributeType( j ) == AttributeType.DATE ) {
+                    Date attValue = (Date) bf.getAttribute( j );
+                    if ( attValue != null ) {
                         String attNameWoPrefix = attName.substring( attName.indexOf( ":" ) + 1, attName.length() );
                         QualifiedName qn = new QualifiedName( featureType.getPrefix(), attNameWoPrefix,
                                                               featureType.getNamespace() );
-                        AbstractOperation oper = new PropertyIsCOMPOperation( 100, new PropertyName( qn ),
-                                                                              new Literal( attValue.toString() ) );
+                        PropertyIsCOMPOperation oper;
+                        oper = new PropertyIsCOMPOperation( 100, new PropertyName( qn ),
+                                                            new Literal( formatter.format( attValue ) ) );
                         sb.append( oper.toXML() );
                         featCount++;
+                    }
+                } else {
+                    Object attValue = bf.getAttribute( j );
+
+                    if ( attValue != null ) {
+
+                        double value = 0.1;
+
+                        try {
+                            value = Double.parseDouble( attValue.toString() );
+
+                        } catch ( NumberFormatException e ) {
+                            value = 0d;
+                        }
+
+                        value = value - (int) value;
+                        if ( value == 0d ) {
+                            String attNameWoPrefix = attName.substring( attName.indexOf( ":" ) + 1, attName.length() );
+                            QualifiedName qn = new QualifiedName( featureType.getPrefix(), attNameWoPrefix,
+                                                                  featureType.getNamespace() );
+                            AbstractOperation oper = new PropertyIsCOMPOperation( 100, new PropertyName( qn ),
+                                                                                  new Literal( attValue.toString() ) );
+                            sb.append( oper.toXML() );
+                            featCount++;
+                        }
                     }
                 }
             }
