@@ -40,7 +40,7 @@ public class ExtensibleComboBox extends JComboBox {
                 	JComboBox box = (JComboBox)e.getSource();
                     String newServer = (String)e.getItem();	                        
                     int size = box.getModel().getSize();
-                    List candidateGeoProps = new ArrayList( size );
+                    List<Object> candidateGeoProps = new ArrayList<Object>( size );
                     for (int i = 0; i < size; i++) {
                         candidateGeoProps.add( box.getModel().getElementAt( i ) );
                     }

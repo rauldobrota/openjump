@@ -22,7 +22,7 @@
 
  Andreas Poth
  lat/lon GmbH
- Aennchenstra�e 19
+ Aennchenstraße 19
  53177 Bonn
  Germany
 
@@ -69,7 +69,6 @@ public class TransactionFactory {
     private static Logger LOG = Logger.getLogger( TransactionFactory.class );
 
     /** the srs to be used in requests containing gml */
-    // FIXME
     private static String crs = "-1";
 
     /** common transaction header */

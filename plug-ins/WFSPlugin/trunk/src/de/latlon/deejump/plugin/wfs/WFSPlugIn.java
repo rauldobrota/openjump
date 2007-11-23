@@ -8,8 +8,10 @@
  */
 package de.latlon.deejump.plugin.wfs;
 
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
+import static javax.swing.JOptionPane.showMessageDialog;
+
 import java.util.Collection;
-import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -18,8 +20,7 @@ import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 import org.deegree.datatypes.QualifiedName;
 import org.deegree.framework.util.StringTools;
-import org.deegree.model.crs.CoordinateSystem;
-import org.deegree.model.spatialschema.GeometryImpl;
+import org.deegree.model.spatialschema.JTSAdapter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -39,7 +40,7 @@ import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.ThreadedBasePlugIn;
 import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
-import com.vividsolutions.jump.workbench.ui.cursortool.editing.EditingPlugIn;
+import com.vividsolutions.jump.workbench.ui.WorkbenchFrame;
 import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
 
 import de.latlon.deejump.ui.I18N;
@@ -62,28 +63,15 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
 
     private String wfsUrl;
 
-    private EditingPlugIn editingPlugIn;
-
-    /**
-     * @param editingPlugIn
-     */
-    public WFSPlugIn( EditingPlugIn editingPlugIn ) {
-        this.editingPlugIn = editingPlugIn;
-    }
-
-    /**
-     * @param context
-     * @throws Exception
-     */
-    public void install( PlugInContext context )
+    @Override
+    public void initialize( PlugInContext context )
                             throws Exception {
+        WorkbenchContext wbcontext = context.getWorkbenchContext();
 
         // only active if there's a map panel
-        MultiEnableCheck mec = createEnableCheck( context.getWorkbenchContext() );
+        MultiEnableCheck mec = createEnableCheck( wbcontext );
 
-        // crete toolbar button
-        context.getWorkbenchContext().getWorkbench().getFrame().getToolBar().addPlugIn( getIcon(), this, mec,
-                                                                                        context.getWorkbenchContext() );
+        wbcontext.getWorkbench().getFrame().getToolBar().addPlugIn( getIcon(), this, mec, wbcontext );
 
         // also create menu item
         /*
@@ -94,7 +82,7 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
     }
 
     @Override
-    public boolean execute( PlugInContext context )
+    public synchronized boolean execute( PlugInContext context )
                             throws Exception {
 
         if ( rd == null ) {
@@ -103,16 +91,15 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
                                 createUrlList( context.getWorkbenchContext() ) );
         }
 
-        // get the srs of the current view
-        String srs = rd.getWFSPanel().getGMLGeometrySRS();
         LayerViewPanel lvPanel = context.getLayerViewPanel();
+        WFSPanel pnl = rd.getWFSPanel();
         // get selected geometry(ies)
-        Collection geoCollec = lvPanel.getSelectionManager().getFeatureSelection().getSelectedItems();
+        Collection<?> geoCollec = lvPanel.getSelectionManager().getFeatureSelection().getSelectedItems();
         // then make GML out of it
         org.deegree.model.spatialschema.Geometry selectedGeom;
 
         try {
-            selectedGeom = getSelectedGeoAsGML( geoCollec, srs );
+            selectedGeom = getSelectedGeoAsGML( geoCollec );
         } catch ( WorkbenchException e ) {
             e.printStackTrace();
             JOptionPane.showMessageDialog( context.getWorkbenchFrame(), e.getMessage(), "Error",
@@ -121,42 +108,43 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
         }
 
         // get the view envelope to perform BBOX operations
-        Envelope env = context.getLayerViewPanel().getViewport().getEnvelopeInModelCoordinates();
-        rd.getWFSPanel().setEnvelope( env );
+        Envelope env = lvPanel.getViewport().getEnvelopeInModelCoordinates();
+        pnl.setEnvelope( env );
 
         // sets set selected geometry
         // this geometry is used for spatial filter operations
-        rd.getWFSPanel().setComparisonGeometry( selectedGeom );
+        pnl.setComparisonGeometry( selectedGeom );
         rd.setVisible( true );
         if ( !rd.canSearch() ) {
             return false;
         }
-        wfsUrl = rd.getWFSPanel().getWfService().getGetFeatureURL();
+        wfsUrl = pnl.getWfService().getGetFeatureURL();
 
         return true;
     }
 
     public void run( TaskMonitor monitor, PlugInContext context )
                             throws Exception {
+        WorkbenchFrame wbframe = context.getWorkbenchFrame();
+        WorkbenchContext wbcontext = context.getWorkbenchContext();
 
         monitor.report( I18N.getString( "WFSSearch.searching" ) );
 
-        String request = rd.getWFSPanel().getRequest();
+        WFSPanel panel = rd.getWFSPanel();
+        String request = panel.getRequest();
+        String crs = panel.getGMLGeometrySRS();
 
-        String crs = rd.getWFSPanel().getGMLGeometrySRS();
-
-        org.deegree.model.feature.FeatureCollection dfc = JUMPFeatureFactory.createDeegreeFCfromWFS(
-                                                                                                     rd.getWFSPanel().getWfService(),
-                                                                                                     request,
-                                                                                                     rd.getWFSPanel().getFeatureType() );
+        org.deegree.model.feature.FeatureCollection dfc;
+        dfc = JUMPFeatureFactory.createDeegreeFCfromWFS( panel.getWfService(), request, panel.getFeatureType() );
 
         monitor.report( "Parsing feature collection (size = " + dfc.size() + ")" );
-        QualifiedName ftName = rd.getWFSPanel().getFeatureType();
-        AbstractWFSWrapper wfs = rd.getWFSPanel().getWfService();
+        QualifiedName ftName = panel.getFeatureType();
+        AbstractWFSWrapper wfs = panel.getWfService();
 
         FeatureCollection dataset;
 
         if ( wfs.getGeometryProperties( ftName.getLocalName() ).length == 0 ) {
+            LOG.info( "No geometry was found, using default point at (0, 0)." );
             Point point = new GeometryFactory().createPoint( new Coordinate( 0, 0 ) );
             dataset = JUMPFeatureFactory.createFromDeegreeFC( dfc, point, wfs, ftName, false );
         } else {
@@ -169,7 +157,7 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
 
             LayerManager layerManager = context.getLayerManager();
 
-            QualifiedName geoQN = rd.getWFSPanel().getChosenGeoProperty();
+            QualifiedName geoQN = panel.getChosenGeoProperty();
 
             if ( geoQN == null ) {
                 geoQN = new QualifiedName( "GEOMETRY" );
@@ -181,72 +169,27 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
             WFSLayer layer = new WFSLayer( displayName, layerManager.generateLayerFillColor(), dataset, layerManager,
                                            ftName, geoQN, crs, wfs );
 
-            WFSLayerListener listener = new WFSLayerListener( displayName );
-            layer.setLayerListener( listener );
-            layerManager.addLayerListener( listener );
-            layer.setServerURL( this.wfsUrl );
-            /*
-             * WFSLayerListener layerListener = new WFSLayerListener( displayName );
-             * layerManager.addLayerListener( layerListener ); layer.setLayerListener( layerListener );
-             */
-            /*
-             * DataSource ds = new WFSDataSource();
-             * 
-             * Map map = new HashMap(2); map.put( "SERVER_URL", this.wfsUrl ); map.put( "REQUEST", "<![CDATA["+
-             * request +"]]>" ); ds.setProperties( map );
-             * 
-             * //TODO fix this "query to come...", "dataSourceQuery" DataSourceQuery wfsDSQuery =
-             * new DataSourceQuery( ds, "query to come...", "dataSourceQuery");
-             */
-            // fix for threading problem:
-            // don't allow event fireing
-            /*
-             * Disabled due to some rather strange behaviour in OJ1.2b when adding a WFS-Layer with
-             * opened system-tab inside the layerlist.
-             * 
-             * layerManager.setFiringEvents( false );
-             */
-            // silently add layer
-            layerManager.addLayer( StandardCategoryNames.SYSTEM, layer );
-            // .setDataSourceQuery(wfsDSQuery)
-            // .setFeatureCollectionModified(false);
-
-            /*
-             * Disabled due to some rather strange behaviour in OJ1.2b when adding a WFS-Layer with
-             * opened system-tab inside the layerlist.
-             * 
-             * //fire at will layerManager.setFiringEvents( true );
-             * 
-             * //fire! layerManager.fireLayerChanged(layer, LayerEventType.METADATA_CHANGED);
-             */
-
-            // TODO set editable
-            boolean editable = true;// rd.isEditable();
-            // FIXME editing Plugin should always be available
-            if ( editingPlugIn != null ) {
-
-                if ( !editingPlugIn.getToolbox( context.getWorkbenchContext() ).isVisible() ) {
-                    editingPlugIn.execute( context );
-                }
+            synchronized ( layerManager ) {
+                WFSLayerListener listener = new WFSLayerListener( displayName );
+                layer.setLayerListener( listener );
+                layerManager.addLayerListener( listener );
+                layer.setServerURL( this.wfsUrl );
+                layerManager.addLayer( StandardCategoryNames.SYSTEM, layer );
+                layer.setEditable( true );
             }
-            layer.setEditable( editable );
 
             if ( dataset.size() == JUMPFeatureFactory.getMaxFeatures() ) {
-                context.getWorkbenchFrame().warnUser(
-                                                      I18N.getString( "WFSPlugin.maxnumber" ) + " "
-                                                                              + JUMPFeatureFactory.getMaxFeatures() );
+                wbframe.warnUser( I18N.getString( "WFSPlugin.maxnumber" ) + " " + JUMPFeatureFactory.getMaxFeatures() );
             }
 
         } else {
 
-            JOptionPane.showMessageDialog( context.getWorkbenchFrame(), I18N.getString( "WFSPlugin.nodata" ), "Info",
-                                           JOptionPane.WARNING_MESSAGE );
+            showMessageDialog( wbframe, I18N.getString( "WFSPlugin.nodata" ), "Info", WARNING_MESSAGE );
 
         }
 
-        String[] urls = rd.getWFSPanel().getWFSList().toArray( new String[] {} );
-        PersistentBlackboardPlugIn.get( context.getWorkbenchContext() ).put( WFSDialog.WFS_URL_LIST,
-                                                                             StringTools.arrayToString( urls, ',' ) );
+        String[] urls = panel.getWFSList().toArray( new String[] {} );
+        PersistentBlackboardPlugIn.get( wbcontext ).put( WFSDialog.WFS_URL_LIST, StringTools.arrayToString( urls, ',' ) );
     }
 
     /**
@@ -254,13 +197,11 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
      * 
      * @param geoCollec
      *            the Collection containing geometries
-     * @param srs
-     *            the spatial reference system of the GML
      * @return the geometries encoded as GML
      * @throws Exception
      *             if something went wrong when building or wrapping the geometries
      */
-    private org.deegree.model.spatialschema.Geometry getSelectedGeoAsGML( Collection geoCollec, String srs )
+    private org.deegree.model.spatialschema.Geometry getSelectedGeoAsGML( Collection<?> geoCollec )
                             throws Exception {
 
         if ( geoCollec.size() == 0 ) {
@@ -268,33 +209,16 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
         }
 
         GeometryFactory gf = new GeometryFactory();
-        Geometry geo = gf.buildGeometry( (List) geoCollec );
+        Geometry geo = gf.buildGeometry( geoCollec );
         if ( geo instanceof GeometryCollection ) {
             throw new WorkbenchException( I18N.getString( "WFSResearchPlugIn.invalideGeomType" ) );
         }
-        org.deegree.model.spatialschema.Geometry geoObj = org.deegree.model.spatialschema.JTSAdapter.wrap( geo );
-        // GMLGeometry gg = GMLFactory.createGMLGeometry( geoObj );
-        // TODO coord sys
-        CoordinateSystem cs = null;
+        org.deegree.model.spatialschema.Geometry geoObj = JTSAdapter.wrap( geo );
 
-        ( (GeometryImpl) geoObj ).setCoordinateSystem( cs );
         return geoObj;
     }
 
-    /*
-     * not used anymore public static final org.deegree.model.spatialschema.Geometry
-     * createGMLfromEnvelope(Envelope env, String srs) throws Exception {
-     * 
-     * Coordinate[] coords = new Coordinate[5]; coords[0] = new Coordinate(env.getMinX(),
-     * env.getMinY()); coords[1] = new Coordinate(env.getMinX(), env.getMaxY()); coords[2] = new
-     * Coordinate(env.getMaxX(), env.getMaxY()); coords[3] = new Coordinate(env.getMaxX(),
-     * env.getMinY()); coords[4] = coords[0];
-     * 
-     * GeometryFactory gf = new GeometryFactory(); LinearRing shell = gf.createLinearRing( coords );
-     * Polygon poly = gf.createPolygon( shell, null ); GM_Object geoObj = JTSAdapter.wrap( poly );
-     * 
-     * GMLGeometry gg = GMLFactory.createGMLGeometry( geoObj ); gg.setSrs(srs); return gg; }
-     */
+    @Override
     public String getName() {
         return "WFS Dialog";
     }
@@ -306,16 +230,14 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
     public MultiEnableCheck createEnableCheck( final WorkbenchContext workbenchContext ) {
         EnableCheckFactory checkFactory = new EnableCheckFactory( workbenchContext );
 
-        MultiEnableCheck mec = new MultiEnableCheck().add(
-                                                           checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck() ).add(
-                                                                                                                                 new EnableCheck() {
-                                                                                                                                     public String check(
-                                                                                                                                                          JComponent component ) {
-                                                                                                                                         component.setToolTipText( getName() );
-
-                                                                                                                                         return null;
-                                                                                                                                     }
-                                                                                                                                 } );
+        MultiEnableCheck mec = new MultiEnableCheck();
+        mec.add( checkFactory.createWindowWithLayerViewPanelMustBeActiveCheck() );
+        mec.add( new EnableCheck() {
+            public String check( JComponent component ) {
+                component.setToolTipText( getName() );
+                return null;
+            }
+        } );
 
         return mec;
     }
@@ -328,10 +250,8 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
         if ( urlList == null ) {
             urlList = new String[4];
 
+            urlList[0] = "http://demo.deegree.org/deegree-wfs/services";
             urlList[1] = "http://demo.intevation.de/geoserver/wfs";
-            urlList[0] = "http://localhost:8080/deegree/services";
-            urlList[2] = "http://www.refractions.net:8080/geoserver/wfs/GetCapabilities";
-            urlList[3] = "http://localhost:1502?";
 
         }
 

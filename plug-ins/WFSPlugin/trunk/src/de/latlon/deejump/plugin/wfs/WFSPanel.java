@@ -45,9 +45,7 @@ import javax.swing.border.Border;
 import org.apache.log4j.Logger;
 import org.deegree.datatypes.QualifiedName;
 import org.deegree.framework.xml.XMLFragment;
-import org.deegree.model.crs.CoordinateSystem;
 import org.deegree.model.spatialschema.Geometry;
-import org.deegree.model.spatialschema.GeometryImpl;
 import org.deegree.ogcwebservices.wfs.capabilities.WFSFeatureType;
 import org.xml.sax.SAXException;
 
@@ -75,8 +73,7 @@ public class WFSPanel extends JPanel {
 
     protected static final Logger LOG = Logger.getLogger( WFSPanel.class );
 
-    // TODO put a props
-    static final String releaseVersion = "1.0.0";
+    protected static final String releaseVersion = "1.0.0";
 
     // Constants for spatial search criteria type
     // also used by child panels
@@ -100,25 +97,24 @@ public class WFSPanel extends JPanel {
     public static final String GEOMETRY_PROPERTY_NAME = "GEOM";
 
     /** The panel containing the interface for attribute-based search */
-    private PropertyCriteriaPanel attributeResPanel;
+    protected PropertyCriteriaPanel attributeResPanel;
 
     /** The panel containing the interface for geometry-based search */
-    private SpatialCriteriaPanel spatialResPanel;
+    protected SpatialCriteriaPanel spatialResPanel;
 
     String[] attributeNames = new String[] {};
 
-    private QualifiedName[] geoProperties;
+    protected QualifiedName[] geoProperties;
 
     private QualifiedName geoProperty;
 
     AbstractWFSWrapper wfService;
 
-    // private JTextArea requestTextArea;
-    private RequestTextArea requestTextArea;
+    protected RequestTextArea requestTextArea;
 
-    private JTextArea responseTextArea;
+    protected JTextArea responseTextArea;
 
-    private JComboBox serverCombo;
+    protected JComboBox serverCombo;
 
     // private JButton okButton;
 
@@ -137,15 +133,15 @@ public class WFSPanel extends JPanel {
     // private GMLGeometry gmlBbox;
     private Geometry selectedGeom;
 
-    private String srs = "EPSG:4326";
+    protected String srs = "EPSG:4326";
 
-    private PropertySelectionPanel propertiesPanel;
+    protected PropertySelectionPanel propertiesPanel;
 
     private JButton capabilitiesButton;
 
     protected String wfsVersion;
 
-    private WFSOptions options;
+    protected WFSOptions options;
 
     WFSPanelButtons controlButtons;
 
@@ -214,6 +210,8 @@ public class WFSPanel extends JPanel {
             }
         } );
 
+        loginButton.setEnabled( context != null );
+
         JPanel p = new JPanel();
         p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
 
@@ -239,14 +237,19 @@ public class WFSPanel extends JPanel {
         final Dimension minDim = new Dimension( 400, 500 );
 
         tabs = new JTabbedPane() {
+            private static final long serialVersionUID = 6328063093445991041L;
+
+            @Override
             public Dimension getPreferredSize() {
                 return dim;
             }
 
+            @Override
             public Dimension getMinimumSize() {
                 return minDim;
             }
 
+            @Override
             public void setEnabled( boolean e ) {
                 super.setEnabled( e );
                 attributeResPanel.setEnabled( e );
@@ -326,7 +329,7 @@ public class WFSPanel extends JPanel {
         if ( wfService != null ) {
             servers.add( 0, wfService.getCapabilitiesURL() );
         }
-        String[] server = (String[]) servers.toArray( new String[servers.size()] );
+        String[] server = servers.toArray( new String[servers.size()] );
         final ExtensibleComboBox extensibleComboBox = new ExtensibleComboBox( server );
         extensibleComboBox.setSelectedIndex( 0 );
         extensibleComboBox.addItemListener( new ItemListener() {
@@ -383,7 +386,7 @@ public class WFSPanel extends JPanel {
         }
     }
 
-    private void reinitService( String url )
+    protected void reinitService( String url )
                             throws DeeJUMPException {
         wfService = "1.1.0".equals( this.wfsVersion ) ? new WFServiceWrapper_1_1_0( logins, url )
                                                      : new WFServiceWrapper_1_0_0( logins, url );
@@ -682,18 +685,13 @@ public class WFSPanel extends JPanel {
      *            the tag name
      * @return a String[] with start and stop tags
      */
-    public static final String[] createStartStopTags( String tagName ) {
+    protected static final String[] createStartStopTags( String tagName ) {
         String[] tags = new String[] { "<ogc:" + tagName + ">", "</ogc:" + tagName + ">" };
         return tags;
     }
 
     public QualifiedName getChosenGeoProperty() {
         return geoProperty;
-        /*
-         * QualifiedName[] qns =
-         * wfService.getGeometryProperties(this.getFeatureType().getAsString()); QualifiedName qn =
-         * null; if ( qns.length > 1 ){ qn = qns[0]; } return qn;
-         */
     }
 
     public void setGeoProperty( QualifiedName geoProp ) {
@@ -719,7 +717,7 @@ public class WFSPanel extends JPanel {
         return qn;
     }
 
-    public AbstractWFSWrapper getWfService() {
+    protected AbstractWFSWrapper getWfService() {
         return this.wfService;
     }
 
@@ -728,27 +726,19 @@ public class WFSPanel extends JPanel {
      * 
      * @return the currently selected geometry
      */
-    public Geometry getSelectedGeometry() {
+    protected Geometry getSelectedGeometry() {
         return this.selectedGeom;
     }
 
-    public void setGMLGeometrySRS( CoordinateSystem cs ) {
-        // FIXME is this needed?
-        // this.srs = cs;
-        if ( this.selectedGeom != null ) {
-            ( (GeometryImpl) this.selectedGeom ).setCoordinateSystem( cs );
-        }
-    }
-
     // GH 29.11.05
-    public void setWFSList( List serverURLS ) {
+    private void setWFSList( List<String> serverURLS ) {
         servers = serverURLS;
     }
 
     /**
      * @return the current list of servers
      */
-    public List<String> getWFSList() {
+    protected List<String> getWFSList() {
         LinkedList<String> list = new LinkedList<String>();
 
         String sel = serverCombo.getSelectedItem().toString();
@@ -762,12 +752,12 @@ public class WFSPanel extends JPanel {
         return list;
     }
 
-    public void setResposeText( String txt ) {
+    protected void setResposeText( String txt ) {
         responseTextArea.setText( txt );
         responseTextArea.setCaretPosition( 0 );
     }
 
-    public String getRequest() {
+    protected String getRequest() {
         String t = requestTextArea.getText();
         if ( t == null || t.length() == 0 ) {
             t = concatenateRequest().toString();
@@ -775,32 +765,32 @@ public class WFSPanel extends JPanel {
         return t.replaceAll( "\n", "" );
     }
 
-    public String createRequest() {
+    protected String createRequest() {
         String t = concatenateRequest().toString();
         return t.replaceAll( "\n", "" );
     }
 
-    public void setTabsVisible( boolean visible ) {
+    protected void setTabsVisible( boolean visible ) {
         tabs.setVisible( visible );
     }
 
-    public WFSOptions getOptions() {
+    protected WFSOptions getOptions() {
         return this.options;
     }
 
-    public String getResponse() {
+    protected String getResponse() {
         return this.responseTextArea.getText();
     }
 
-    public String getGMLGeometrySRS() {
+    protected String getGMLGeometrySRS() {
         return this.srs;
     }
 
-    public void setEnvelope( Envelope env ) {
+    protected void setEnvelope( Envelope env ) {
         this.envelope = env;
     }
 
-    public void setComparisonGeometry( Geometry geom ) {
+    protected void setComparisonGeometry( Geometry geom ) {
         this.selectedGeom = geom;
     }
 

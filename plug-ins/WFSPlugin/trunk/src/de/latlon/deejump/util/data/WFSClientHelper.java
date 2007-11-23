@@ -60,29 +60,29 @@ import de.latlon.deejump.ui.DeeJUMPException;
 
 /**
  * Does the posting and getting of requests/reponses for the WFSPanel.
- *
+ * 
  * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei</a>
  * @author last edited by: $Author$
- *
+ * 
  * @version $Revision$, $Date$
  */
 public class WFSClientHelper {
 
-    private static ILogger LOG = LoggerFactory.getLogger( WFSClientHelper.class );    
-    
-    
-    public static String createResponsefromWFS( String serverUrl, String request ) throws DeeJUMPException {
-        LOG.logInfo( "WFS GetFeature: " + serverUrl +  " -> " + request ); //$NON-NLS-1$ //$NON-NLS-2$
-        
+    private static ILogger LOG = LoggerFactory.getLogger( WFSClientHelper.class );
+
+    public static String createResponsefromWFS( String serverUrl, String request )
+                            throws DeeJUMPException {
+        LOG.logDebug( "WFS GetFeature: " + serverUrl + " -> " + request );
+
         HttpClient httpclient = new HttpClient();
 
         String proxyUser = System.getProperty( "proxyUser" );
         String proxyPasswd = System.getProperty( "proxyPassword" );
         String proxyHost = System.getProperty( "proxyHost" );
         String port = System.getProperty( "proxyPort" );
-        
+
         int proxyPort = 80;
-        if( port != null ){
+        if ( port != null ) {
             try {
                 proxyPort = Integer.valueOf( port ).intValue();
             } catch ( Exception e ) {
@@ -90,70 +90,62 @@ public class WFSClientHelper {
                 LOG.logDebug( "Cannot convert port into an integer: " + port );
             }
         }
-        
-        LOG.logDebug( "Proxy settings: host='"+ proxyHost + "' port='"+ proxyPort+"' " 
-                   +" user='"+ proxyUser + "' pw='"+ proxyPasswd+"'");
-        
-        if( proxyHost != null ){
-            httpclient.getHostConfiguration().setProxy(proxyHost,  proxyPort );
-            
-            if( proxyUser != null ){
-                httpclient.getState()
-                    .setCredentials( new AuthScope( proxyHost, proxyPort ), 
-                                     new UsernamePasswordCredentials( proxyUser, proxyPasswd) );
+
+        LOG.logDebug( "Proxy settings: host='" + proxyHost + "' port='" + proxyPort + "' " + " user='" + proxyUser
+                      + "' pw='" + proxyPasswd + "'" );
+
+        if ( proxyHost != null ) {
+            httpclient.getHostConfiguration().setProxy( proxyHost, proxyPort );
+
+            if ( proxyUser != null ) {
+                httpclient.getState().setCredentials( new AuthScope( proxyHost, proxyPort ),
+                                                      new UsernamePasswordCredentials( proxyUser, proxyPasswd ) );
             }
         }
-  
+
         PostMethod httppost = new PostMethod( serverUrl );
         httppost.setRequestEntity( new StringRequestEntity( request ) );
-        
+
         InputStream is = null;
         try {
             httpclient.executeMethod( httppost );
             is = httppost.getResponseBodyAsStream();
 
         } catch ( HttpException e ) {
-            String mesg = "Error opening connection with " + serverUrl; 
+            String mesg = "Error opening connection with " + serverUrl;
             LOG.logError( mesg, e );
-            throw new DeeJUMPException( mesg, e  );
+            throw new DeeJUMPException( mesg, e );
         } catch ( IOException e ) {
-            String mesg = "Error opening connection with " + serverUrl; 
+            String mesg = "Error opening connection with " + serverUrl;
             LOG.logError( mesg, e );
-            throw new DeeJUMPException( mesg, e  );
+            throw new DeeJUMPException( mesg, e );
         }
 
-        
-        InputStreamReader ireader = new InputStreamReader( is );
-//        BufferedReader br = new BufferedReader( ireader );
-//        StringBuffer sb = new StringBuffer( 50000 );
         String s = null;
-        
+
         try {
-            
+
             s = inputStreamToString( is );
             /*
-            while (( s = br.readLine() ) != null) {
-                sb.append( s );
-            }
-            s = sb.toString();
-            br.close();
-*/
+             * while (( s = br.readLine() ) != null) { sb.append( s ); } s = sb.toString();
+             * br.close();
+             */
         } catch ( IOException e ) {
-            String mesg = "Error opening connection with " + serverUrl; 
+            String mesg = "Error opening connection with " + serverUrl;
             LOG.logError( mesg, e );
-            throw new DeeJUMPException( mesg, e  );
+            throw new DeeJUMPException( mesg, e );
         }
         return s;
     }
-    
-    private static String inputStreamToString( InputStream inputStream ) throws IOException{
+
+    private static String inputStreamToString( InputStream inputStream )
+                            throws IOException {
         InputStreamReader ireader = new InputStreamReader( inputStream );
         BufferedReader br = new BufferedReader( ireader );
         StringBuffer sb = new StringBuffer( 50000 );
         String s = null;
-        
-            
-        while (( s = br.readLine() ) != null) {
+
+        while ( ( s = br.readLine() ) != null ) {
             sb.append( s );
         }
         s = sb.toString();

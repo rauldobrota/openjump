@@ -22,72 +22,74 @@ import javax.swing.JDialog;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 
 /**
- * This dialog presents a graphical user interface to OGC Filter operations. It
- * encapsulates two panels, one for attribute-based feature search and the other
- * for geometry-based search. Both search methods can be combined. The dialog
- * generates a GetFeature request as an XML string. This can be used to query a
- * WFS.
+ * This dialog presents a graphical user interface to OGC Filter operations. It encapsulates two
+ * panels, one for attribute-based feature search and the other for geometry-based search. Both
+ * search methods can be combined. The dialog generates a GetFeature request as an XML string. This
+ * can be used to query a WFS.
  * 
  * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei </a>
- *  
+ * 
  */
 public class WFSDialog extends JDialog {
-    
+
+    private static final long serialVersionUID = 5540535312268661105L;
+
     public static final String WFS_URL_LIST = "WFS_URL_LIST";
-    
+
     /**
-     * Whether the dialog has enough info to produce a search or it makes sense
-     * to carry on. For example, when the user closed (cancelled) the dialog.
+     * Whether the dialog has enough info to produce a search or it makes sense to carry on. For
+     * example, when the user closed (cancelled) the dialog.
      */
-    private boolean canSearch = false;
+    boolean canSearch = false;
 
     private WFSPanel wfsPanel;
 
     private WorkbenchContext context;
-    
+
     /**
      * Creates a dialog from an owner, with a title and a WFS server address.
+     * 
+     * @param context
      * 
      * @param owner
      *            the parent window
      * @param title
      *            the name to appear on the window bar
-     * @param wfsServer
+     * @param urls
      *            the address of the server. This is something like
      *            http://my.domain.com/deegreewfs/wfs
      * @throws java.awt.HeadlessException
      */
-    public WFSDialog( WorkbenchContext context, Frame owner, String title, String[] urls ) throws Exception {
+    public WFSDialog( WorkbenchContext context, Frame owner, String title, String[] urls ) {
 
         super( owner, title, true );
         this.context = context;
         setTitle( "WFSPlugin v. " + WFSPanel.releaseVersion );
         setLocation( 0, 50 );
-        //        setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         addWindowListener( new WindowAdapter() {
+            @Override
             public void windowClosing( WindowEvent we ) {
                 canSearch = false;
                 dispose();
             }
         } );
 
-        initGUI(urls);
+        initGUI( urls );
 
     }
 
-
     /** Initialize main GUI and its children */
-    private void initGUI(String[] wfsURLs) {
-        
+    private void initGUI( String[] wfsURLs ) {
+
         getContentPane().setLayout( new FlowLayout() );
-        
+
         this.wfsPanel = new WFSPanel( context, Arrays.asList( wfsURLs ) );
-        
+
         // remove response tab from dialog
         this.wfsPanel.getTabs().removeTabAt( 4 );
-        
+
         add( this.wfsPanel );
-  
+
         WFSPanelButtons buttons = new WFSPanelButtons( this, this.wfsPanel );
         this.wfsPanel.controlButtons = buttons;
         buttons.okButton.addActionListener( new ActionListener() {
@@ -98,7 +100,7 @@ public class WFSDialog extends JDialog {
             }
         } );
         buttons.okButton.setEnabled( false );
-        
+
         buttons.cancelButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 setVisible( false );
@@ -113,10 +115,9 @@ public class WFSDialog extends JDialog {
     }
 
     /**
-     * Whether it makes sense to ask for a GetFeature request. This is generally
-     * true, but clicking on the Cancel or clisong the dialog will return
-     * <code>false</code>, meaning that the user changed his mind and no
-     * requst should be sent.
+     * Whether it makes sense to ask for a GetFeature request. This is generally true, but clicking
+     * on the Cancel or clisong the dialog will return <code>false</code>, meaning that the user
+     * changed his mind and no requst should be sent.
      * 
      * @return a boolean value hinting whether to carry on or not
      */

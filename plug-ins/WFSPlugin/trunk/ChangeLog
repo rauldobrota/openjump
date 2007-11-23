@@ -1,4 +1,8 @@
 2007-11-23  Andreas Schmitz <schmitz@lat-lon.de>
+        (almost all files):
+        Cleaned up the code, made it type safe etc., renamed classes etc.
+
+2007-11-23  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/plugin/wfs/transaction/UpdateWFSLayerPlugIn.java:
         Better error handling for transactions.
 

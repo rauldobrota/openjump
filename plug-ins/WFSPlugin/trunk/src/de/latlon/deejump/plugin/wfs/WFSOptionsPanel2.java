@@ -35,7 +35,7 @@ public class WFSOptionsPanel2 extends JPanel {
 
     private static final long serialVersionUID = -5976611628887849767L;
 
-    private WFSOptions options;
+    protected WFSOptions options;
 
     private JFormattedTextField maxFeaturesField;
 

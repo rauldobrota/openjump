@@ -79,6 +79,7 @@ import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.util.StringUtil;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
+import com.vividsolutions.jump.workbench.model.FeatureEventType;
 import com.vividsolutions.jump.workbench.model.Layer;
 import com.vividsolutions.jump.workbench.model.LayerEventType;
 import com.vividsolutions.jump.workbench.plugin.EnableCheck;
@@ -90,6 +91,7 @@ import com.vividsolutions.jump.workbench.ui.WorkbenchToolBar;
 import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 
 import de.latlon.deejump.plugin.wfs.WFSLayer;
+import de.latlon.deejump.ui.I18N;
 
 /**
  * Plug-in to update a wfs layer
@@ -107,11 +109,8 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
 
     private WFSLayer layer;
 
-    /**
-     * @param context
-     * @throws Exception
-     */
-    public void install( PlugInContext context )
+    @Override
+    public void initialize( PlugInContext context )
                             throws Exception {
 
         WorkbenchContext wbcontext = context.getWorkbenchContext();
@@ -142,14 +141,14 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
         TransactionFactory.setCrs( layer.getCrs() );
 
         // get lists and maps with changed, deleted and/or inserted features
-        HashMap<Feature, Feature> changedFeaturesMap = layer.getLayerListener().getChangedFeaturesMap();
+        HashMap<FeatureEventType, ArrayList<Feature>> changedFeaturesMap = layer.getLayerListener().getChangedFeaturesMap();
 
-        ArrayList<Feature> updateGeomFeatures = (ArrayList) changedFeaturesMap.get( GEOMETRY_MODIFIED );
-        ArrayList<Feature> updateAttrFeatures = (ArrayList) changedFeaturesMap.get( ATTRIBUTES_MODIFIED );
+        ArrayList<Feature> updateGeomFeatures = changedFeaturesMap.get( GEOMETRY_MODIFIED );
+        ArrayList<Feature> updateAttrFeatures = changedFeaturesMap.get( ATTRIBUTES_MODIFIED );
         HashMap<Feature, Feature> oldGeomFeatures = layer.getLayerListener().getOldGeomFeaturesMap();
         HashMap<Feature, Feature> oldAttrFeatures = layer.getLayerListener().getOldAttrFeaturesMap();
-        ArrayList<Feature> delFeatures = (ArrayList) changedFeaturesMap.get( DELETED );
-        ArrayList<Feature> newFeatures = (ArrayList) changedFeaturesMap.get( ADDED );
+        ArrayList<Feature> delFeatures = changedFeaturesMap.get( DELETED );
+        ArrayList<Feature> newFeatures = changedFeaturesMap.get( ADDED );
 
         QualifiedName geoPropName = layer.getGeoPropertyName();
 
@@ -217,6 +216,11 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
 
                 XMLFragment doc = doTransaction( request, wfsUrl );
 
+                if ( doc == null ) {
+                    error = true;
+                    continue;
+                }
+
                 String root = doc.getRootElement().getLocalName();
                 String msg;
 
@@ -278,28 +282,21 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
         PostMethod post = new PostMethod( wfsUrl );
         post.setRequestEntity( new StringRequestEntity( xmlRequest ) );
 
-        client.executeMethod( post );
-        result.load( post.getResponseBodyAsStream(), "http://www.systemid.org" );
+        int code = client.executeMethod( post );
+        if ( code == 200 ) {
+            result.load( post.getResponseBodyAsStream(), "http://www.systemid.org" );
+        } else {
+            showMessageDialog( null, I18N.getString( "UpdateWFSLayerPlugIn.answernotxml",
+                                                     post.getResponseBodyAsString() ), I18N.getString( "error" ),
+                               ERROR_MESSAGE );
+            return null;
+        }
 
         if ( LOG.isDebugEnabled() ) {
             LOG.debug( "WFS-T result:\n" + result.getAsPrettyString() );
         }
 
         return result;
-    }
-
-    /**
-     * @param label
-     * @param xmlRequest
-     * @param wfsUrl
-     * @return the result as StringBuilder
-     * @throws Exception
-     * @deprecated
-     */
-    @Deprecated
-    public static StringBuilder doTransaction( String label, String xmlRequest, String wfsUrl )
-                            throws Exception {
-        return new StringBuilder( doTransaction( xmlRequest, wfsUrl ).getAsPrettyString() );
     }
 
     public static void showOutput( PlugInContext context, StringBuffer mesg )

@@ -10,8 +10,7 @@
 package de.latlon.deejump.plugin.wfs;
 
 import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -24,7 +23,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.deegree.datatypes.QualifiedName;
-import org.deegree.model.feature.FeatureProperty;
 import org.deegree.model.feature.schema.FeatureType;
 import org.deegree.model.feature.schema.GMLSchema;
 import org.deegree.model.feature.schema.PropertyType;
@@ -32,7 +30,7 @@ import org.deegree.model.feature.schema.PropertyType;
 import de.latlon.deejump.ui.I18N;
 
 /**
- * ... 
+ * ...
  * 
  * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei</a>
  * @author last edited by: $Author$
@@ -44,66 +42,65 @@ import de.latlon.deejump.ui.I18N;
 
 public class PropertySelectionPanel extends JPanel {
 
-    
+    private static final long serialVersionUID = 2886180413810632383L;
+
     private WFSPanel parentDialog;
 
     protected JList propertiesList;
 
-    protected JComboBox geoPropsCombo; 
-    
-    public PropertySelectionPanel( WFSPanel parentDialog ){
+    protected JComboBox geoPropsCombo;
+
+    public PropertySelectionPanel( WFSPanel parentDialog ) {
         super();
         this.parentDialog = parentDialog;
         initGUI();
         setEnabled( false );
     }
-    
+
     private void initGUI() {
-        
+
         JPanel p = new JPanel();
-        p.setLayout( new BoxLayout(p, BoxLayout.Y_AXIS ));
-        p.setBorder( BorderFactory.createTitledBorder( I18N.getString( "PropertySelectionPanel.downloadProps") ) );
+        p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
+        p.setBorder( BorderFactory.createTitledBorder( I18N.getString( "PropertySelectionPanel.downloadProps" ) ) );
 
         propertiesList = new JList();
         JScrollPane scrollPane = new JScrollPane( propertiesList );
-        
+
         Dimension dim = new Dimension( 400, 200 );
-        
+
         scrollPane.setMaximumSize( dim );
         scrollPane.setPreferredSize( dim );
         scrollPane.setMinimumSize( dim );
-        
-        
+
         p.add( scrollPane );
-        
+
         add( p );
-        
+
         geoPropsCombo = new JComboBox();
-        
+
         dim = new Dimension( 200, 40 );
         geoPropsCombo.setMaximumSize( dim );
         geoPropsCombo.setPreferredSize( dim );
         geoPropsCombo.setMinimumSize( dim );
-        
-        
-        geoPropsCombo.setBorder( BorderFactory.createTitledBorder( I18N.getString( "SpatialResearchPanel.geometryName") ) );
-        
+
+        geoPropsCombo.setBorder( BorderFactory.createTitledBorder( I18N.getString( "SpatialResearchPanel.geometryName" ) ) );
+
         add( geoPropsCombo );
-        
+
     }
 
-    public void setProperties( String[] simpleProps, QualifiedName[] geoProps ){
+    public void setProperties( String[] simpleProps, QualifiedName[] geoProps ) {
 
         resetPropsList( simpleProps );
         resetGeoCombo( geoProps );
     }
-    
+
     private void resetGeoCombo( QualifiedName[] geoProps ) {
         geoPropsCombo.removeAllItems();
-        if( geoProps != null ){
+        if ( geoProps != null ) {
             for ( int i = 0; i < geoProps.length; i++ ) {
-                
-                if( i == 0 ){
+
+                if ( i == 0 ) {
                     this.parentDialog.setGeoProperty( geoProps[i] );
                 }
                 geoPropsCombo.addItem( geoProps[i] );
@@ -111,83 +108,71 @@ public class PropertySelectionPanel extends JPanel {
         }
     }
 
-       
-    private void resetPropsList( String[] props ){
+    private void resetPropsList( String[] props ) {
         propertiesList.removeAll();
         DefaultListModel listModel = new DefaultListModel();
-        int[] selIndices = new int[ props.length ];
+        int[] selIndices = new int[props.length];
         for ( int i = 0; i < props.length; i++ ) {
             listModel.addElement( props[i] );
             selIndices[i] = i;
         }
         propertiesList.setModel( listModel );
         propertiesList.setSelectedIndices( selIndices );
-    
+
     }
-    
-    
-    public StringBuffer getXmlElement(){
-        
+
+    public StringBuffer getXmlElement() {
+
         StringBuffer sb = new StringBuffer( 5000 );
-        
+
         QualifiedName ftQualiName = parentDialog.getFeatureType();
 
-        GMLSchema schema = 
-            this.parentDialog.getWfService().getSchemaForFeatureType( ftQualiName.getPrefix() + ":" + ftQualiName.getLocalName() );
-        
-        if( schema == null ){
+        GMLSchema schema = parentDialog.getWfService().getSchemaForFeatureType( ftQualiName.getPrefixedName() );
+
+        if ( schema == null ) {
             return sb;
         }
         FeatureType[] featTypes = schema.getFeatureTypes();
-        
-        if( featTypes.length < 1 ){
-            throw new RuntimeException( "Schema doesn't define any FeatureType. Must have at least one.");
+
+        if ( featTypes.length < 1 ) {
+            throw new RuntimeException( "Schema doesn't define any FeatureType. Must have at least one." );
         }
-        
+
         // put what's been chosen in a list
         Object[] objs = propertiesList.getSelectedValues();
-        List chosenProps = new ArrayList( objs.length );
-        for ( int i = 0; i < objs.length; i++ ) {
-            chosenProps.add( objs[i] );
-        }
-        
+        List<Object> chosenProps = Arrays.asList( objs );
+
         // and loop over the correct order, seing what's in the list
         PropertyType[] featProperties = featTypes[0].getProperties();
         for ( int i = 0; i < featProperties.length; i++ ) {
-
-            if ( chosenProps.contains( featProperties[i].getName().getLocalName() ) ){
-                sb.append( "<wfs:PropertyName>" )
-                    .append( ftQualiName.getPrefix() )
-                    .append( ":" )
-                    .append( featProperties[i].getName().getLocalName() )
-                    .append( "</wfs:PropertyName>" );
+            if ( chosenProps.contains( featProperties[i].getName().getLocalName() ) ) {
+                sb.append( "<wfs:PropertyName>" ).append( ftQualiName.getPrefix() ).append( ":" );
+                sb.append( featProperties[i].getName().getLocalName() ).append( "</wfs:PropertyName>" );
             }
-            
-            //geom prop
+
+            // geom prop
             QualifiedName qn = (QualifiedName) geoPropsCombo.getSelectedItem();
             if ( qn.equals( featProperties[i].getName() ) ) {
-                sb.append( "<wfs:PropertyName>" )
-                    .append( ftQualiName.getPrefix() )
-                    .append( ":" )
-                    .append( qn.getLocalName() )
-                    .append( "</wfs:PropertyName>" );    
+                sb.append( "<wfs:PropertyName>" ).append( ftQualiName.getPrefix() ).append( ":" );
+                sb.append( qn.getLocalName() ).append( "</wfs:PropertyName>" );
             }
-            
+
         }
-              
-        return sb;          
+
+        return sb;
     }
-    
-    public void setEnabled( boolean enabled ){
+
+    @Override
+    public void setEnabled( boolean enabled ) {
         super.setEnabled( enabled );
         geoPropsCombo.setEnabled( enabled );
         propertiesList.setEnabled( enabled );
-        
-        if( !enabled ){
+
+        if ( !enabled ) {
             propertiesList.removeAll();
-            geoPropsCombo.setModel( new DefaultComboBoxModel(new String[0]) );            
+            geoPropsCombo.setModel( new DefaultComboBoxModel( new String[0] ) );
         }
-        
+
     }
-    
+
 }

@@ -56,7 +56,7 @@ import javax.swing.JPanel;
 import de.latlon.deejump.ui.I18N;
 
 /**
- * TODO add documentation here
+ * Includes the OK, cancel, Options etc. buttons.
  *
  * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei</a>
  * @author last edited by: $Author$
@@ -65,13 +65,15 @@ import de.latlon.deejump.ui.I18N;
  */
 class WFSPanelButtons extends JPanel {
         
+    private static final long serialVersionUID = 5027400556779030070L;
+
     JButton okButton;
     
     JButton cancelButton;
     
-    private Window parentWindow;
+    Window parentWindow;
     
-    private WFSPanel wfsPanel;
+    WFSPanel wfsPanel;
     
     WFSPanelButtons( Window parent, WFSPanel wfsPanel ){
         super();
@@ -91,13 +93,6 @@ class WFSPanelButtons extends JPanel {
 
         cancelButton = new JButton( I18N.getString( "CANCEL" ) );
         cancelButton.setAlignmentX( 0.5f );
-        cancelButton.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e ) {
-                //FIXME: remove, if this is now done somewhere else
-                //setVisible( false );
-                //setCanSearch( true );
-            }
-        } );
         final String optionsTxt = I18N.getString( "WFSPanel.options" );
         JButton optionsbutton = new JButton(optionsTxt);
         optionsbutton.addActionListener( new ActionListener(){
@@ -110,7 +105,6 @@ class WFSPanelButtons extends JPanel {
             }
         });
         
-        //TODO externalize
         final String showAdvanced =  I18N.getString( "WFSPanel.showAdvanced" );
         final String hideAdvanced = I18N.getString( "WFSPanel.hideAdvanced" );
 
@@ -123,21 +117,12 @@ class WFSPanelButtons extends JPanel {
                 JButton b = (JButton) e.getSource();
                 if ( showAdvanced.equals( actComm ) ) {
                     wfsPanel.setTabsVisible( true );
-//                    remove( box );
-                    //hmm, size is hard coded :-(
                     parentWindow.setSize( 500, 900 );
-                    //pack(); //is not looking very nice
-//                    add( tabs );
-//                    add( box );
                     b.setText( hideAdvanced );
                     b.setActionCommand( hideAdvanced );
                 } else {
-//                    remove( box );
-//                    remove( tabs );
                     wfsPanel.setTabsVisible( false );
                     parentWindow.setSize( 500, 300 );
-                    //pack();
-//                    add( box );
                     b.setText( showAdvanced );
                     b.setActionCommand( showAdvanced );
 

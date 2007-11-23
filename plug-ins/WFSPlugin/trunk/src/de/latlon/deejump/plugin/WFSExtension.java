@@ -14,23 +14,18 @@ import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import de.latlon.deejump.plugin.wfs.WFSPlugIn;
 import de.latlon.deejump.plugin.wfs.transaction.UpdateWFSLayerPlugIn;
 
-
 /**
  * Installs WFS and WFS Update plugin.
  * 
  * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei</a>
  * 
  */
-public class DeeJUMPExtension extends Extension {
+public class WFSExtension extends Extension {
 
-    /**
-     * @see com.vividsolutions.jump.workbench.plugin.Configuration#configure(com.vividsolutions.jump.workbench.plugin.PlugInContext)
-     */
-    public void configure( PlugInContext context ) throws Exception {
-        System.out.println( "Installing latlon WFSPlugin" );
-        new WFSPlugIn(null).install(context); 
-        System.out.println( "Installing latlon WFSUpdatePlugin" );
-        new UpdateWFSLayerPlugIn().install(context);
+    public void configure( PlugInContext context )
+                            throws Exception {
+        new WFSPlugIn().initialize( context );
+        new UpdateWFSLayerPlugIn().initialize( context );
     }
 
 }
