@@ -22,7 +22,7 @@
 
  Andreas Poth
  lat/lon GmbH
- Aennchenstra�e 19
+ Aennchenstraße 19
  53177 Bonn
  Germany
 
@@ -35,18 +35,25 @@ import static com.vividsolutions.jump.workbench.model.FeatureEventType.ADDED;
 import static com.vividsolutions.jump.workbench.model.FeatureEventType.ATTRIBUTES_MODIFIED;
 import static com.vividsolutions.jump.workbench.model.FeatureEventType.DELETED;
 import static com.vividsolutions.jump.workbench.model.FeatureEventType.GEOMETRY_MODIFIED;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import static javax.swing.JOptionPane.showMessageDialog;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -55,12 +62,14 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.log4j.Logger;
 import org.deegree.datatypes.QualifiedName;
 import org.deegree.framework.util.CharsetUtils;
 import org.deegree.framework.xml.DOMPrinter;
+import org.deegree.framework.xml.XMLException;
 import org.deegree.framework.xml.XMLFragment;
 import org.deegree.framework.xml.XMLTools;
 import org.w3c.dom.Document;
@@ -92,22 +101,11 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
 
     private static Logger LOG = Logger.getLogger( UpdateWFSLayerPlugIn.class );
 
-    private StringBuffer updateRequest = null;
-
-    private StringBuffer updateGeomRequest = null;
-
-    private StringBuffer updateAttrRequest = null;
-
-    private StringBuffer deleteRequest = null;
-
-    private StringBuffer insertRequest = null;
+    private List<String> requests = new LinkedList<String>();
 
     private String wfsUrl;
 
     private WFSLayer layer;
-
-    // if user added new geoms, need to reload from DB
-    private boolean hasInserted = false;
 
     /**
      * @param context
@@ -155,122 +153,153 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
 
         QualifiedName geoPropName = layer.getGeoPropertyName();
 
+        StringBuffer updateGeom = null, updateAttr = null;
+
         // UPDATE Geom
         if ( updateGeomFeatures.size() > 0 ) {
-            updateGeomRequest = TransactionFactory.createUpdateTransaction( GEOMETRY_MODIFIED,
-                                                                            layer.getQualifiedName(), geoPropName,
-                                                                            updateGeomFeatures, oldGeomFeatures );
+            updateGeom = TransactionFactory.createUpdateTransaction( GEOMETRY_MODIFIED, layer.getQualifiedName(),
+                                                                     geoPropName, updateGeomFeatures, oldGeomFeatures );
         }
 
         // UPDATE Attr
         if ( updateAttrFeatures.size() > 0 ) {
-            updateAttrRequest = TransactionFactory.createUpdateTransaction( ATTRIBUTES_MODIFIED,
-                                                                            layer.getQualifiedName(), geoPropName,
-                                                                            updateAttrFeatures, oldAttrFeatures );
+            updateAttr = TransactionFactory.createUpdateTransaction( ATTRIBUTES_MODIFIED, layer.getQualifiedName(),
+                                                                     geoPropName, updateAttrFeatures, oldAttrFeatures );
         }
 
-        // now CONCAT updates into one request
-        updateRequest = TransactionFactory.createCommonUpdateTransaction( context.getWorkbenchContext(),
-                                                                          layer.getQualifiedName(), updateGeomRequest,
-                                                                          updateAttrRequest );
+        if ( updateAttrFeatures.size() > 0 || updateGeomFeatures.size() > 0 ) {
+            // now CONCAT updates into one request
+            requests.add( TransactionFactory.createCommonUpdateTransaction( context.getWorkbenchContext(),
+                                                                            layer.getQualifiedName(), updateGeom,
+                                                                            updateAttr ).toString() );
+        }
 
         // DELETE
         if ( delFeatures.size() > 0 ) {
-            deleteRequest = TransactionFactory.createTransaction( context.getWorkbenchContext(), DELETED,
-                                                                  layer.getQualifiedName(), null, delFeatures, false );
+            requests.add( TransactionFactory.createTransaction( context.getWorkbenchContext(), DELETED,
+                                                                layer.getQualifiedName(), null, delFeatures, false ).toString() );
         }
 
         // INSERT
         if ( newFeatures.size() > 0 ) {
-            insertRequest = TransactionFactory.createTransaction( context.getWorkbenchContext(), ADDED,
-                                                                  layer.getQualifiedName(), geoPropName, newFeatures,
-                                                                  false );
-            hasInserted = true;
+            requests.add( TransactionFactory.createTransaction( context.getWorkbenchContext(), ADDED,
+                                                                layer.getQualifiedName(), geoPropName, newFeatures,
+                                                                false ).toString() );
         }
 
         return true;
 
     }
 
-    /**
-     * @see com.vividsolutions.jump.workbench.plugin.ThreadedPlugIn#run(com.vividsolutions.jump.task.TaskMonitor,
-     *      com.vividsolutions.jump.workbench.plugin.PlugInContext)
-     */
+    private static void showLongMsg( Component parent, String msg, String title, int type ) {
+        JTextArea area = new JTextArea( msg );
+        area.setLineWrap( true );
+        area.setEditable( false );
+        area.setWrapStyleWord( true );
+        area.setColumns( 40 );
+        area.setRows( 5 );
+        area.setBackground( Color.LIGHT_GRAY );
+        showMessageDialog( parent, new JScrollPane( area ), title, type );
+    }
+
     public void run( TaskMonitor monitor, PlugInContext context )
                             throws Exception {
 
         monitor.report( "UpdateWFSLayerPlugIn.message" );
-        StringBuffer mesg = new StringBuffer();
 
-        try {
+        boolean error = false;
 
-            // TODO provide a better way to output a feedback mesg
-            if ( updateRequest != null && !"".equals( updateRequest.toString() ) ) {
-                mesg.append( doTransaction( "UPDATE", updateRequest.toString(), wfsUrl ) );
+        for ( String request : requests ) {
+            if ( error ) {
+                break;
             }
+            try {
 
-            if ( insertRequest != null && !"".equals( insertRequest.toString() ) ) {
-                mesg.append( doTransaction( "INSERT", insertRequest.toString(), wfsUrl ) );
-            }
+                XMLFragment doc = doTransaction( request, wfsUrl );
 
-            if ( deleteRequest != null && !"".equals( deleteRequest.toString() ) ) {
-                mesg.append( doTransaction( "DELETE", deleteRequest.toString(), wfsUrl ) );
-            }
+                String root = doc.getRootElement().getLocalName();
+                String msg;
 
-            showOutput( context, mesg );
-            /*
-             * if ( hasInserted ){ context.getLayerManager().remove( layer );
-             * 
-             * reloadLayer(monitor, context, layerName ); }
-             */
+                if ( root.equals( "ServiceExceptionReport" ) || root.equals( "ExceptionReport" ) ) {
+                    msg = XMLTools.getNodeAsString( doc.getRootElement(), "ServiceException", null, null );
+                    if ( msg == null ) {
+                        msg = XMLTools.getNodeAsString( doc.getRootElement(), "Exception", null, null );
+                    }
 
-            // clean up listener and mark layer as saved
-            layer.getLayerListener().reset();
-            layer.setFeatureCollectionModified( false );
+                    showLongMsg( context.getWorkbenchFrame(), "The Server responded with an error: " + msg, "Error",
+                                 ERROR_MESSAGE );
 
-        } catch ( IOException e ) {
-            LOG.debug( "Some IO exception occurred: ", e );
-        } finally {
-            insertRequest = null;
-            updateRequest = null;
-            deleteRequest = null;
-            updateGeomRequest = null;
-            updateAttrRequest = null;
+                    LOG.debug( "Complete answer from server: " + doc.getAsPrettyString() );
+                    return;
+                }
 
-            if ( hasInserted ) {
+                showOutput( context, new StringBuffer( doc.getAsPrettyString() ) );
+
+                // clean up listener and mark layer as saved
+                layer.getLayerListener().reset();
+                layer.setFeatureCollectionModified( false );
+
                 LOG.debug( "Removing and re-adding layer." );
                 layer.fireLayerChanged( LayerEventType.REMOVED );
                 layer.fireLayerChanged( LayerEventType.ADDED );
-            }
 
-            hasInserted = false;
+            } catch ( HttpException e ) {
+                showMessageDialog( null, "An HTTP error occurred:\n" + e.getLocalizedMessage(), "Error", ERROR_MESSAGE );
+                error = true;
+            } catch ( XMLException e ) {
+                showMessageDialog( null, "The server did not answer with XML. An XML error occurred:\n"
+                                         + e.getLocalizedMessage(), "Error", ERROR_MESSAGE );
+                error = true;
+            } catch ( SAXException e ) {
+                showMessageDialog( null, "The server did not answer with XML. An XML error occurred:\n"
+                                         + e.getLocalizedMessage(), "Error", ERROR_MESSAGE );
+                error = true;
+            } catch ( IOException e ) {
+                showMessageDialog( null, "An IO error occurred:\n" + e.getLocalizedMessage(), "Error", ERROR_MESSAGE );
+                error = true;
+            }
         }
     }
 
-    public static StringBuilder doTransaction( String label, String xmlRequest, String wfsUrl )
-                            throws Exception {
-        Document doc = null;
+    public static XMLFragment doTransaction( String xmlRequest, String wfsUrl )
+                            throws HttpException, IOException, XMLException, SAXException {
+        XMLFragment result = new XMLFragment();
+
         if ( LOG.isDebugEnabled() ) {
-            XMLFragment d = new XMLFragment( new StringReader( xmlRequest ), "http://www.debug.org" );
-            LOG.debug( "\nWFS-T " + label + " REQUEST: " + wfsUrl + "\n" + d.getAsPrettyString() + "\n" );
+            try {
+                XMLFragment d = new XMLFragment( new StringReader( xmlRequest ), "http://www.debug.org" );
+                LOG.debug( "WFS-T request to " + wfsUrl + ":\n" + d.getAsPrettyString() + "\n" );
+            } catch ( Exception e ) {
+                LOG.debug( "Oh oh, generated String request was not XML:\n" + xmlRequest );
+            }
         }
 
-        HttpClient httpclient = new HttpClient();
-        PostMethod httpMethod = new PostMethod( wfsUrl );
-        httpMethod.setRequestEntity( new StringRequestEntity( xmlRequest ) );
+        HttpClient client = new HttpClient();
+        PostMethod post = new PostMethod( wfsUrl );
+        post.setRequestEntity( new StringRequestEntity( xmlRequest ) );
 
-        httpclient.executeMethod( httpMethod );
-        doc = XMLTools.parse( new InputStreamReader( httpMethod.getResponseBodyAsStream() ) );
+        client.executeMethod( post );
+        result.load( post.getResponseBodyAsStream(), "http://www.systemid.org" );
 
-        String partialResult = DOMPrinter.nodeToString( doc.getDocumentElement(), "UTF-8" );
-
-        LOG.debug( "WFS-T result: " + partialResult );
-
-        StringBuilder result = new StringBuilder( 1000 );
-
-        result.append( partialResult );
+        if ( LOG.isDebugEnabled() ) {
+            LOG.debug( "WFS-T result:\n" + result.getAsPrettyString() );
+        }
 
         return result;
+    }
+
+    /**
+     * @param label
+     * @param xmlRequest
+     * @param wfsUrl
+     * @return the result as StringBuilder
+     * @throws Exception
+     * @deprecated
+     */
+    @Deprecated
+    public static StringBuilder doTransaction( String label, String xmlRequest, String wfsUrl )
+                            throws Exception {
+        return new StringBuilder( doTransaction( xmlRequest, wfsUrl ).getAsPrettyString() );
     }
 
     public static void showOutput( PlugInContext context, StringBuffer mesg )
