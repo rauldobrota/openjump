@@ -1,4 +1,9 @@
 2007-11-27  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/plugin/wfs/transaction/TransactionFactory.java,
+        src/de/latlon/deejump/plugin/wfs/transaction/UpdateWFSLayerPlugIn.java:
+        Using GML ids when possible for update/delete.
+
+2007-11-27  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/util/data/JUMPFeatureFactory.java,
         src/de/latlon/deejump/plugin/wfs/AbstractWFSWrapper.java,
         src/de/latlon/deejump/plugin/wfs/PropertyCriteriaPanel.java:

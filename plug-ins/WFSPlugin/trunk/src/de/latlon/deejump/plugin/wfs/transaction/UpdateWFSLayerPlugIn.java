@@ -157,13 +157,13 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
         // UPDATE Geom
         if ( updateGeomFeatures.size() > 0 ) {
             updateGeom = TransactionFactory.createUpdateTransaction( GEOMETRY_MODIFIED, layer.getQualifiedName(),
-                                                                     geoPropName, updateGeomFeatures, oldGeomFeatures );
+                                                                     updateGeomFeatures, oldGeomFeatures );
         }
 
         // UPDATE Attr
         if ( updateAttrFeatures.size() > 0 ) {
             updateAttr = TransactionFactory.createUpdateTransaction( ATTRIBUTES_MODIFIED, layer.getQualifiedName(),
-                                                                     geoPropName, updateAttrFeatures, oldAttrFeatures );
+                                                                     updateAttrFeatures, oldAttrFeatures );
         }
 
         if ( updateAttrFeatures.size() > 0 || updateGeomFeatures.size() > 0 ) {

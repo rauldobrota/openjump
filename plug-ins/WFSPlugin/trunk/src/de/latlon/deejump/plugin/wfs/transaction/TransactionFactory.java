@@ -134,7 +134,6 @@ public class TransactionFactory {
      *            FeatureEventType.ATTRIBUTE_MODIFIED)
      * @param featureType
      *            the name of the WFS feature type
-     * @param geoPropName
      * @param newFeatures
      *            list containing features to be updated
      * @param oldFeatures
@@ -142,7 +141,6 @@ public class TransactionFactory {
      * @return an XML fragment containing an update transaction
      */
     public static final StringBuffer createUpdateTransaction( FeatureEventType fet, QualifiedName featureType,
-                                                              QualifiedName geoPropName,
                                                               ArrayList<Feature> newFeatures,
                                                               HashMap<Feature, Feature> oldFeatures ) {
         StringBuffer sb = new StringBuffer();
@@ -153,7 +151,7 @@ public class TransactionFactory {
             return sb;
         }
 
-        appendUpdate( fet, sb, featureType, geoPropName, newFeatures, oldFeatures );
+        appendUpdate( fet, sb, featureType, newFeatures, oldFeatures );
 
         return sb;
     }
@@ -207,8 +205,7 @@ public class TransactionFactory {
      *            a ap containing the old features
      */
     private static final void appendUpdate( FeatureEventType fet, StringBuffer sb, QualifiedName featureType,
-                                            QualifiedName geoPropName, ArrayList<Feature> features,
-                                            HashMap<Feature, Feature> oldFeatures ) {
+                                            ArrayList<Feature> features, HashMap<Feature, Feature> oldFeatures ) {
 
         for ( Iterator<Feature> iter = features.iterator(); iter.hasNext(); ) {
 
@@ -216,7 +213,7 @@ public class TransactionFactory {
             sb.append( "<wfs:Update typeName='" ).append( featureType.getPrefix() ).append( ":" ).append(
                                                                                                           featureType.getLocalName() ).append(
                                                                                                                                                "'>" );
-            sb.append( createPropertiesFragment( geoPropName, featureType, fet, feat ) );
+            sb.append( createPropertiesFragment( featureType, fet, feat ) );
 
             Feature oldFeat = oldFeatures.get( feat );
             StringBuffer s = createOperationFragment( oldFeat, featureType );
@@ -337,20 +334,8 @@ public class TransactionFactory {
         TransactionFactory.crs = crs;
     }
 
-    /**
-     * Creates an xml fragment defining properties
-     * 
-     * @param featureType
-     * @param featureType
-     *            the name of the feature type
-     * @param fet
-     *            the feature type event
-     * @param bf
-     *            the feature
-     * @return an xml fragment defining properties
-     */
-    private static final StringBuffer createPropertiesFragment( QualifiedName geoPropName, QualifiedName featureType,
-                                                                FeatureEventType fet, Feature bf ) {
+    private static final StringBuffer createPropertiesFragment( QualifiedName featureType, FeatureEventType fet,
+                                                                Feature bf ) {
 
         StringBuffer sb = new StringBuffer();
         Object[] os = bf.getAttributes();
@@ -396,7 +381,7 @@ public class TransactionFactory {
                 }
                 sb.append( "<wfs:Property><wfs:Name>" );
                 sb.append( featureType.getPrefix() );
-                sb.append( ":" ).append( geoPropName.getLocalName() );
+                sb.append( ":" ).append( attName );
                 sb.append( "</wfs:Name><wfs:Value>" );
                 sb.append( createGeometryGML( bf.getGeometry() ) );
                 sb.append( "</wfs:Value></wfs:Property>" );
@@ -470,13 +455,13 @@ public class TransactionFactory {
         return sb;
     }
 
-    /**
-     * Creates a fragment with a PropertyIsEqualTo filter operation from a feature bf.
-     * 
-     * @param bf
-     * @return the fragment
-     */
     private static final StringBuffer createOperationFragment( Feature bf, QualifiedName featureType ) {
+        if ( bf.getAttribute( "Internal ID" ) != null ) {
+            StringBuffer sb = new StringBuffer( 512 );
+            sb.append( "<ogc:GmlObjectId gml:id='" + bf.getAttribute( "Internal ID" ) + "' />" );
+            LOG.debug( "Using GML id as filter." );
+            return sb;
+        }
 
         StringBuffer sb = new StringBuffer();
         Object[] os = bf.getAttributes();
