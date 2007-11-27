@@ -210,14 +210,16 @@ public abstract class AbstractWFSWrapper {
         try {
             createSchemaForFeatureType( featureType );
 
-            GMLSchema schema = this.featureTypeToSchema.get( featureType );
+            GMLSchema schema = featureTypeToSchema.get( featureType );
             if ( schema != null ) {
                 FeatureType[] fts = schema.getFeatureTypes();
                 for ( int i = 0; i < fts.length; i++ ) {
-                    PropertyType[] props = fts[i].getProperties();
-                    for ( int j = 0; j < props.length; j++ ) {
-                        if ( !( props[j].getType() == Types.GEOMETRY || props[j].getType() == 10014 ) ) {
-                            propsList.add( props[j].getName().getPrefixedName() );
+                    if ( fts[i].getName().getLocalName().equals( featureType ) ) {
+                        PropertyType[] props = fts[i].getProperties();
+                        for ( int j = 0; j < props.length; j++ ) {
+                            if ( !( props[j].getType() == Types.GEOMETRY || props[j].getType() == 10014 ) ) {
+                                propsList.add( props[j].getName().getPrefixedName() );
+                            }
                         }
                     }
                 }

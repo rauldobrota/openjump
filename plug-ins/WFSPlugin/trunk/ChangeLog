@@ -1,3 +1,9 @@
+2007-11-27  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/util/data/JUMPFeatureFactory.java,
+        src/de/latlon/deejump/plugin/wfs/AbstractWFSWrapper.java,
+        src/de/latlon/deejump/plugin/wfs/PropertyCriteriaPanel.java:
+        Cleaned up a little, fixed property lists to include only relevant properties.
+
 2007-11-23  Andreas Schmitz <schmitz@lat-lon.de>
         (almost all files):
         Cleaned up the code, made it type safe etc., renamed classes etc.

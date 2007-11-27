@@ -134,8 +134,7 @@ class PropertyCriteriaPanel extends JPanel {
         describeFTButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 QualifiedName ft = PropertyCriteriaPanel.this.wfsPanel.getFeatureType();
-                String schema = PropertyCriteriaPanel.this.wfsPanel.getWfService().getRawSchemaForFeatureType(
-                                                                                                               ft.getLocalName() );
+                String schema = wfsPanel.getWfService().getRawSchemaForFeatureType( ft.getLocalName() );
                 wfsPanel.createXMLFrame( PropertyCriteriaPanel.this, schema );
             }
         } );
@@ -183,7 +182,7 @@ class PropertyCriteriaPanel extends JPanel {
         operLabel.setBounds( LEFT_MARGIN + SECOND_COL + 5, 18, THIRD_COL - SECOND_COL, STD_HEIGHT );
         criteriaPanel.add( operLabel );
 
-        valLabel = new JLabel( I18N.getString( "AttributeResearchPanel.comparisonValue" ) ); //$NON-NLS-1$
+        valLabel = new JLabel( I18N.getString( "AttributeResearchPanel.comparisonValue" ) );
 
         valLabel.setBounds( LEFT_MARGIN + THIRD_COL + 5, 18, SECOND_COL - LEFT_MARGIN, STD_HEIGHT );
         criteriaPanel.add( valLabel );

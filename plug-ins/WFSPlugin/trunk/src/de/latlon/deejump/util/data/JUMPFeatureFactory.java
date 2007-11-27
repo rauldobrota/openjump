@@ -106,9 +106,6 @@ public class JUMPFeatureFactory {
     public static GetFeature createFeatureRequest( String version, QualifiedName qualName,
                                                    org.deegree.model.spatialschema.Envelope envelope ) {
 
-        // FIXME srs is null!!!!
-        String srs = null;
-        // TODO
         CoordinateSystem cs = null;
 
         Filter filter = null;
@@ -127,7 +124,7 @@ public class JUMPFeatureFactory {
             filter = new ComplexFilter( op );
         }
 
-        Query query = Query.create( null, null, null, null, version, new QualifiedName[] { qualName }, null, srs,
+        Query query = Query.create( null, null, null, null, version, new QualifiedName[] { qualName }, null, null,
                                     filter, maxFeatures, 0, RESULT_TYPE.RESULTS );
         IDGenerator idg = IDGenerator.getInstance();
 
@@ -326,12 +323,7 @@ public class JUMPFeatureFactory {
             throw new DeeJUMPException( "No data found" ); //$NON-NLS-1$
         }
 
-        FeatureType ft;
-        if ( feats.length > 0 ) {
-            ft = feats[0].getFeatureType();
-        } else {
-            ft = wfs.getSchemaForFeatureType( ftName.getLocalName() ).getFeatureType( ftName );
-        }
+        FeatureType ft = wfs.getSchemaForFeatureType( ftName.getLocalName() ).getFeatureType( ftName );
 
         AbstractPropertyType[] geoTypeProps = ft.getGeometryProperties();
 
@@ -339,9 +331,6 @@ public class JUMPFeatureFactory {
 
         if ( geoTypeProps.length > 1 ) {
             LOG.warn( "This feature type has more than one geometry property. Only the first one will be used." );
-            // throw new RuntimeException( "FeatureType has more than one GeometryProperty.\n"
-            // //$NON-NLS-1$
-            // + "This is currently not supported." ); //$NON-NLS-1$
         }
 
         if ( geoTypeProps == null || geoTypeProps.length == 0 ) {
