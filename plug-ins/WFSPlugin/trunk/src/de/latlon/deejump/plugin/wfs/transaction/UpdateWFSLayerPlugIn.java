@@ -105,8 +105,6 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
 
     private List<String> requests = new LinkedList<String>();
 
-    private String wfsUrl;
-
     private WFSLayer layer;
 
     @Override
@@ -135,8 +133,6 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
         // LayerEventType.METADATA_CHANGED is not taken into account by
         // listener...
         context.getLayerManager().fireLayerChanged( layer, LayerEventType.METADATA_CHANGED );
-
-        this.wfsUrl = layer.getServerURL();
 
         TransactionFactory.setCrs( layer.getCrs() );
 
@@ -208,13 +204,16 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
 
         boolean error = false;
 
-        for ( String request : requests ) {
+        while ( !requests.isEmpty() ) {
             if ( error ) {
                 break;
             }
+
+            String request = requests.remove( 0 );
+
             try {
 
-                XMLFragment doc = doTransaction( request, wfsUrl );
+                XMLFragment doc = doTransaction( request, layer.getServerURL() );
 
                 if ( doc == null ) {
                     error = true;

@@ -1,3 +1,7 @@
+2007-12-03  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/plugin/wfs/transaction/UpdateWFSLayerPlugIn.java:
+        Fixed "caching" of transaction requests.
+
 2007-11-27  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/plugin/wfs/transaction/TransactionFactory.java,
         src/de/latlon/deejump/plugin/wfs/transaction/UpdateWFSLayerPlugIn.java:
