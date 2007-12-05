@@ -456,7 +456,7 @@ public class TransactionFactory {
     }
 
     private static final StringBuffer createOperationFragment( Feature bf, QualifiedName featureType ) {
-        if ( bf.getAttribute( "Internal ID" ) != null ) {
+        if ( bf.getSchema().hasAttribute( "Internal ID" ) ) {
             StringBuffer sb = new StringBuffer( 512 );
             sb.append( "<ogc:GmlObjectId gml:id='" + bf.getAttribute( "Internal ID" ) + "' />" );
             LOG.debug( "Using GML id as filter." );
