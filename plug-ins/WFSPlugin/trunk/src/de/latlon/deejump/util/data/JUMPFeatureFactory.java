@@ -320,10 +320,17 @@ public class JUMPFeatureFactory {
         org.deegree.model.feature.Feature[] feats = deegreeFeatCollec.toArray();
 
         if ( wfs == null && ( feats == null || feats.length < 1 ) ) {
-            throw new DeeJUMPException( "No data found" ); //$NON-NLS-1$
+            throw new DeeJUMPException( "No data found" );
         }
 
-        FeatureType ft = wfs.getSchemaForFeatureType( ftName.getLocalName() ).getFeatureType( ftName );
+        FeatureType ft = null;
+        if ( wfs != null && ftName != null ) {
+            ft = wfs.getSchemaForFeatureType( ftName.getLocalName() ).getFeatureType( ftName );
+        } else {
+            if ( feats.length > 0 ) {
+                ft = feats[0].getFeatureType();
+            }
+        }
 
         AbstractPropertyType[] geoTypeProps = ft.getGeometryProperties();
 
