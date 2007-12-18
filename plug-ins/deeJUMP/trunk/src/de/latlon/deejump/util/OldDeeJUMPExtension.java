@@ -72,6 +72,7 @@ public class OldDeeJUMPExtension extends Extension {
         new InstallDeegreeFileAdaptersPlugIn().initialize( context );
         LOG.debug( "Adding FeatureInfo tool for WMS GetFeatureInfo requests..." );
         new DeeChangeStylesPlugIn().initialize( context );
+        
         WorkbenchContext wbcontext = context.getWorkbenchContext();
         WorkbenchToolBar toolbar = wbcontext.getWorkbench().getFrame().getToolBar();
 
