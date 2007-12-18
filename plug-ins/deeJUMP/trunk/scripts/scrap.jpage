@@ -1,9 +1,0 @@
-
-
-com.vividsolutions.jump.workbench.ui.Viewport viewport = lvp.getViewport();
-
-com.vividsolutions.jump.workbench.ui.LayerViewPanel lvp = wc.getLayerViewPanel();
-System.out.println( "WIDHT=" + lvp.getWidth() + "&HEIGHT=" + lvp.getHeight() );
-com.vividsolutions.jts.geom.Envelope env = viewport.getEnvelopeInModelCoordinates();
-String box = env.getMinX() + "," + env.getMinY() + "," + env.getMaxX() + "," + env.getMaxY();
-System.out.println( box );
