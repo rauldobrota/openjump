@@ -125,6 +125,9 @@ class SpatialCriteriaPanel extends JPanel {
         return p;
     }
 
+    /**
+     * @param crs
+     */
     public void setCrs( String[] crs ) {
         this.srsCombo.setModel( new DefaultComboBoxModel( crs ) );
         srsCombo.setEnabled( true );
@@ -261,6 +264,9 @@ class SpatialCriteriaPanel extends JPanel {
 
         }
 
+        /**
+         * @return the distance
+         */
         public double getDistance() {
             return distance;
         }
@@ -271,6 +277,9 @@ class SpatialCriteriaPanel extends JPanel {
         }
     }
 
+    /**
+     * @param geometryProperties
+     */
     public void resetGeoCombo( QualifiedName[] geometryProperties ) {
         this.geomPropsCombo.removeAllItems();
         if ( geometryProperties != null ) {

@@ -1,4 +1,8 @@
 2008-01-22  Andreas Schmitz <schmitz@lat-lon.de>
+        many files:
+        Cleaned up comments, other cosmetic changes.
+
+2008-01-22  Andreas Schmitz <schmitz@lat-lon.de>
         build.xml:
         Modified more jar targets to use Version as main-class.
 

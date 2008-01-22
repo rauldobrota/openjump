@@ -264,6 +264,15 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
         }
     }
 
+    /**
+     * @param xmlRequest
+     * @param wfsUrl
+     * @return an XML fragment containing the response
+     * @throws HttpException
+     * @throws IOException
+     * @throws XMLException
+     * @throws SAXException
+     */
     public static XMLFragment doTransaction( String xmlRequest, String wfsUrl )
                             throws HttpException, IOException, XMLException, SAXException {
         XMLFragment result = new XMLFragment();
@@ -298,6 +307,12 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
         return result;
     }
 
+    /**
+     * @param context
+     * @param mesg
+     * @throws IOException
+     * @throws SAXException
+     */
     public static void showOutput( PlugInContext context, StringBuffer mesg )
                             throws IOException, SAXException {
         HTMLFrame out = context.getOutputFrame();
@@ -319,6 +334,9 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
         return "Update WFSLayer";
     }
 
+    /**
+     * @return an Icon object
+     */
     public static ImageIcon getIcon() {
         return IconLoader.icon( "Data.gif" );
     }
@@ -353,7 +371,7 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
         return sw.toString();
     }
 
-    public static EnableCheck createEnableCheck( final WorkbenchContext workbenchContext ) {
+    private static EnableCheck createEnableCheck( final WorkbenchContext workbenchContext ) {
         MultiEnableCheck mec = new MultiEnableCheck();
         mec.add( createExactlyNWfsLayersMustBeSelectedCheck( workbenchContext, 1 ) );
         mec.add( createFeatureMustHaveChangedCheck( workbenchContext ) );
@@ -361,8 +379,8 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
         return mec;
     }
 
-    public static EnableCheck createExactlyNWfsLayersMustBeSelectedCheck( final WorkbenchContext workbenchContext,
-                                                                          final int n ) {
+    private static EnableCheck createExactlyNWfsLayersMustBeSelectedCheck( final WorkbenchContext workbenchContext,
+                                                                           final int n ) {
         return new EnableCheck() {
             public String check( JComponent component ) {
                 return (
@@ -378,7 +396,7 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
         };
     }
 
-    public static EnableCheck createFeatureMustHaveChangedCheck( final WorkbenchContext workbenchContext ) {
+    private static EnableCheck createFeatureMustHaveChangedCheck( final WorkbenchContext workbenchContext ) {
         return new EnableCheck() {
             public String check( JComponent component ) {
 

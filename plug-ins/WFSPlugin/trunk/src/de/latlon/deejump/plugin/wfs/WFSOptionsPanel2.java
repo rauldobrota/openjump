@@ -31,6 +31,14 @@ import javax.swing.border.Border;
 
 import de.latlon.deejump.ui.I18N;
 
+/**
+ * <code>WFSOptionsPanel2</code>
+ * 
+ * @author <a href="mailto:schmitz@lat-lon.de">Andreas Schmitz</a>
+ * @author last edited by: $Author:$
+ * 
+ * @version $Revision:$, $Date:$
+ */
 public class WFSOptionsPanel2 extends JPanel {
 
     private static final long serialVersionUID = -5976611628887849767L;
@@ -43,6 +51,9 @@ public class WFSOptionsPanel2 extends JPanel {
 
     private JComboBox outputFormatChooser;
 
+    /**
+     * @param options
+     */
     public WFSOptionsPanel2( WFSOptions options ) {
         if ( options == null ) {
             throw new IllegalArgumentException( "WFSOptions cannot be null." );

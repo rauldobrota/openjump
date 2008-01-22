@@ -50,6 +50,9 @@ public class PropertySelectionPanel extends JPanel {
 
     protected JComboBox geoPropsCombo;
 
+    /**
+     * @param parentDialog
+     */
     public PropertySelectionPanel( WFSPanel parentDialog ) {
         super();
         this.parentDialog = parentDialog;
@@ -89,6 +92,10 @@ public class PropertySelectionPanel extends JPanel {
 
     }
 
+    /**
+     * @param simpleProps
+     * @param geoProps
+     */
     public void setProperties( String[] simpleProps, QualifiedName[] geoProps ) {
 
         resetPropsList( simpleProps );
@@ -121,6 +128,9 @@ public class PropertySelectionPanel extends JPanel {
 
     }
 
+    /**
+     * @return not sure, part of the internal 'XML' processing
+     */
     public StringBuffer getXmlElement() {
 
         StringBuffer sb = new StringBuffer( 5000 );

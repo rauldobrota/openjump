@@ -158,6 +158,9 @@ class PropertyCriteriaPanel extends JPanel {
         add( innerPanel );
     }
 
+    /**
+     * 
+     */
     public void refreshPanel() {
         criteriaListPanel.removeAll();
         criteriaList.clear();
@@ -444,6 +447,9 @@ class PropertyCriteriaPanel extends JPanel {
         refreshPanel();
     }
 
+    /**
+     * @param enabled
+     */
     public void setFeatureTypeComboEnabled( boolean enabled ) {
         featureTypeCombo.setEnabled( enabled );
     }

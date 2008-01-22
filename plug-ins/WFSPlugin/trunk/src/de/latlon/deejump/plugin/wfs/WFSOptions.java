@@ -8,90 +8,133 @@
  */
 package de.latlon.deejump.plugin.wfs;
 
+/**
+ * <code>WFSOptions</code>
+ * 
+ * @author <a href="mailto:schmitz@lat-lon.de">Andreas Schmitz</a>
+ * @author last edited by: $Author:$
+ * 
+ * @version $Revision:$, $Date:$
+ */
 public class WFSOptions {
 
     private int maxFeatures;
-    
-    private String[] outputFormats; 
 
-    private String selectedOutputFormat; 
+    private String[] outputFormats;
 
-    private String[] protocols; 
+    private String selectedOutputFormat;
 
-    private String selectedProtocol; 
-    
+    private String[] protocols;
+
+    private String selectedProtocol;
+
+    /**
+     * @param maxFeatures
+     * @param outputFormats
+     * @param protocols
+     */
     public WFSOptions( int maxFeatures, String[] outputFormats, String[] protocols ) {
-        setMaxFeatures(maxFeatures);
-        setOutputFormats(outputFormats);
-        setProtocols(protocols);
+        setMaxFeatures( maxFeatures );
+        setOutputFormats( outputFormats );
+        setProtocols( protocols );
     }
 
-    public WFSOptions(){
-        this( 1000,
-              new String[] {"GML2", "text/xml; subtype=gml/3.1.1"},
-              new String[] {"GET", "POST"});
+    /**
+     * 
+     */
+    public WFSOptions() {
+        this( 1000, new String[] { "GML2", "text/xml; subtype=gml/3.1.1" }, new String[] { "GET", "POST" } );
     }
-    
+
+    /**
+     * @return the max features setting to be used in the request
+     */
     public int getMaxFeatures() {
         return maxFeatures;
     }
 
-    
-    public void setMaxFeatures(int maxFeatures) {
-        if( maxFeatures < 1 ) {
-            throw new IllegalArgumentException("maxFeatures must be a number greater than 1.");
+    /**
+     * @param maxFeatures
+     */
+    public void setMaxFeatures( int maxFeatures ) {
+        if ( maxFeatures < 1 ) {
+            throw new IllegalArgumentException( "maxFeatures must be a number greater than 1." );
         }
         this.maxFeatures = maxFeatures;
     }
 
+    /**
+     * @return the list of output formats
+     */
     public String[] getOutputFormats() {
-        
+
         return outputFormats;
     }
 
-    public void setOutputFormats(String[] outputFormats) {
-        if( outputFormats == null || outputFormats.length == 0 ) {
-            throw new IllegalArgumentException("outputFormats cannot be null or have zero length");
+    /**
+     * @param outputFormats
+     */
+    public void setOutputFormats( String[] outputFormats ) {
+        if ( outputFormats == null || outputFormats.length == 0 ) {
+            throw new IllegalArgumentException( "outputFormats cannot be null or have zero length" );
         }
         this.outputFormats = outputFormats;
-        //the selected is the first one in the list
+        // the selected is the first one in the list
         setSelectedOutputFormat( this.outputFormats[0] );
     }
 
+    /**
+     * @return the list of protocols (unused?)
+     */
     public String[] getProtocols() {
         return protocols;
     }
 
-    public void setProtocols(String[] protocols) {
-        if( protocols == null || protocols.length == 0 ) {
-            throw new IllegalArgumentException("outputFormats cannot be null or have zero length");
+    /**
+     * @param protocols
+     */
+    public void setProtocols( String[] protocols ) {
+        if ( protocols == null || protocols.length == 0 ) {
+            throw new IllegalArgumentException( "outputFormats cannot be null or have zero length" );
         }
         this.protocols = protocols;
-        //the selected is the first one in the list
+        // the selected is the first one in the list
         setSelectedProtocol( this.protocols[0] );
 
     }
 
+    /**
+     * @return the selected output format
+     */
     public String getSelectedOutputFormat() {
         return selectedOutputFormat;
     }
 
-    public void setSelectedOutputFormat(String selectedOutputFormat) {
-        if( selectedOutputFormat == null ) {
-            throw new IllegalArgumentException("selectedOutputFormat cannot be null or have zero length");
+    /**
+     * @param selectedOutputFormat
+     */
+    public void setSelectedOutputFormat( String selectedOutputFormat ) {
+        if ( selectedOutputFormat == null ) {
+            throw new IllegalArgumentException( "selectedOutputFormat cannot be null or have zero length" );
         }
         this.selectedOutputFormat = selectedOutputFormat;
     }
 
+    /**
+     * @return the selected protocol (unused?)
+     */
     public String getSelectedProtocol() {
         return selectedProtocol;
     }
 
-    public void setSelectedProtocol(String selectedProtocol) {
-        if( selectedProtocol == null ) {
-            throw new IllegalArgumentException("selectedProtocol cannot be null or have zero length");
+    /**
+     * @param selectedProtocol
+     */
+    public void setSelectedProtocol( String selectedProtocol ) {
+        if ( selectedProtocol == null ) {
+            throw new IllegalArgumentException( "selectedProtocol cannot be null or have zero length" );
         }
         this.selectedProtocol = selectedProtocol;
     }
-    
+
 }

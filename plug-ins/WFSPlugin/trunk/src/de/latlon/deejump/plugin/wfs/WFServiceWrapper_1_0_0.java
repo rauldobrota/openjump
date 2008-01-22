@@ -41,6 +41,10 @@ public class WFServiceWrapper_1_0_0 extends AbstractWFSWrapper {
 
     private String[] featureTypes;
 
+    /**
+     * @param logins
+     * @param baseUrl
+     */
     public WFServiceWrapper_1_0_0( UserData logins, String baseUrl ) {
         super( logins, baseUrl );
         init();
@@ -91,8 +95,7 @@ public class WFServiceWrapper_1_0_0 extends AbstractWFSWrapper {
 
                 ftList.add( qualiName.getLocalName() );
 
-                URI uri = XMLTools.getNodeAsURI( n, "wfs:SRS/text()", CommonNamespaces.getNamespaceContext(),
-                                                 null );
+                URI uri = XMLTools.getNodeAsURI( n, "wfs:SRS/text()", CommonNamespaces.getNamespaceContext(), null );
                 WFSFeatureType wfsFt = new WFSFeatureType( qualiName, null, null, null, uri, null, null, null, null,
                                                            null );
 

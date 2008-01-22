@@ -156,6 +156,15 @@ public class TransactionFactory {
         return sb;
     }
 
+    /**
+     * @param context
+     * @param transacType
+     * @param featureType
+     * @param geoPropName
+     * @param newFeatures
+     * @param useExisting
+     * @return a StringBuffer representation of the transaction
+     */
     public static final StringBuffer createTransaction( WorkbenchContext context, FeatureEventType transacType,
                                                         QualifiedName featureType, QualifiedName geoPropName,
                                                         ArrayList<Feature> newFeatures, boolean useExisting ) {

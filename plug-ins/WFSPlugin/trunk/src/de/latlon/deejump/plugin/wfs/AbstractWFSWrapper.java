@@ -43,6 +43,9 @@ import de.latlon.deejump.ui.DeeJUMPException;
  */
 public abstract class AbstractWFSWrapper {
 
+    /**
+     * 
+     */
     public static final String WFS_PREFIX = "wfs";
 
     private static Logger LOG = Logger.getLogger( AbstractWFSWrapper.class );
@@ -62,18 +65,33 @@ public abstract class AbstractWFSWrapper {
 
     protected UserData logins;
 
+    /**
+     * @return the version as String
+     */
     public abstract String getServiceVersion();
 
+    /**
+     * @return the list of feature types
+     */
     public abstract String[] getFeatureTypes();
 
+    /**
+     * @return the GET GetFeature URL
+     */
     public abstract String getGetFeatureURL();
 
     abstract protected String createDescribeFTOnlineResource();
 
+    /**
+     * @return the base WFS URL
+     */
     public String getBaseWfsURL() {
         return this.baseURL;
     }
 
+    /**
+     * @return the capabilities as String
+     */
     public abstract String getCapabilitesAsString();
 
     protected AbstractWFSWrapper( UserData logins, String baseUrl ) {
@@ -128,6 +146,10 @@ public abstract class AbstractWFSWrapper {
         return url;
     }
 
+    /**
+     * @param featureType
+     * @return the GMLSchema object for the feature type
+     */
     public GMLSchema getSchemaForFeatureType( String featureType ) {
         GMLSchema res = this.featureTypeToSchema.get( featureType );
         if ( res != null ) {
@@ -138,6 +160,10 @@ public abstract class AbstractWFSWrapper {
         return this.featureTypeToSchema.get( featureType );
     }
 
+    /**
+     * @param featureType
+     * @return a String encoding of the Schema for the feature type
+     */
     public String getRawSchemaForFeatureType( String featureType ) {
         return this.featureTypeToSchemaXML.get( featureType );
     }
@@ -204,6 +230,10 @@ public abstract class AbstractWFSWrapper {
         }
     }
 
+    /**
+     * @param featureType
+     * @return a list of property names
+     */
     public String[] getProperties( String featureType ) {
 
         List<String> propsList = new ArrayList<String>();
@@ -232,6 +262,10 @@ public abstract class AbstractWFSWrapper {
         return propsList.toArray( new String[propsList.size()] );
     }
 
+    /**
+     * @param ftName
+     * @return the WFSFeatureType object
+     */
     public synchronized WFSFeatureType getFeatureTypeByName( String ftName ) {
         if ( ftNameToWfsFT == null ) {
             getFeatureTypes(); // side effects in functions that return lists are wonderful
@@ -263,6 +297,10 @@ public abstract class AbstractWFSWrapper {
         return geoPropNames;
     }
 
+    /**
+     * @param featureType
+     * @return a list of geometry property names
+     */
     public QualifiedName[] getGeometryProperties( String featureType ) {
         return this.geoPropsNameToQNames.get( featureType );
     }

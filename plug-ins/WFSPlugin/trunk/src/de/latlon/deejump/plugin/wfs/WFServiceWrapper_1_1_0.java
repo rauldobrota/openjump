@@ -48,6 +48,11 @@ public class WFServiceWrapper_1_1_0 extends AbstractWFSWrapper {
 
     private String capsString;
 
+    /**
+     * @param logins
+     * @param wfsURL
+     * @throws DeeJUMPException
+     */
     public WFServiceWrapper_1_1_0( UserData logins, String wfsURL ) throws DeeJUMPException {
         super( logins, wfsURL );
         init();

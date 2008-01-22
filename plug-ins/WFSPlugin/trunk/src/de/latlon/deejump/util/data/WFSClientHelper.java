@@ -70,6 +70,12 @@ public class WFSClientHelper {
 
     private static ILogger LOG = LoggerFactory.getLogger( WFSClientHelper.class );
 
+    /**
+     * @param serverUrl
+     * @param request
+     * @return the response as String
+     * @throws DeeJUMPException
+     */
     public static String createResponsefromWFS( String serverUrl, String request )
                             throws DeeJUMPException {
         LOG.logDebug( "WFS GetFeature: " + serverUrl + " -> " + request );

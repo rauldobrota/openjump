@@ -92,6 +92,9 @@ public class WFSLayer extends Layer {
         this.wfs = wfs;
     }
 
+    /**
+     * @return some qualified name (?)
+     */
     public QualifiedName getQualifiedName() {
         return this.origName;
     }
@@ -115,18 +118,30 @@ public class WFSLayer extends Layer {
         this.layerListener = layerListener;
     }
 
+    /**
+     * @return the originating server's URL
+     */
     public String getServerURL() {
         return serverURL;
     }
 
+    /**
+     * @param serverURL
+     */
     public void setServerURL( String serverURL ) {
         this.serverURL = serverURL;
     }
 
+    /**
+     * @return the geometry property's name
+     */
     public QualifiedName getGeoPropertyName() {
         return geoPropertyName;
     }
 
+    /**
+     * @return the geometry property's name as prefixed string
+     */
     public String getGeoPropertyNameAsString() {
         return this.geoPropertyName.getPrefixedName();
     }
@@ -136,14 +151,16 @@ public class WFSLayer extends Layer {
         return false;
     }
 
+    /**
+     * @param geoPropertyName
+     */
     public void setGeoPropertyName( QualifiedName geoPropertyName ) {
         this.geoPropertyName = geoPropertyName;
     }
 
-    public String getNamespace() {
-        throw new UnsupportedOperationException( "Must implement getNamespace..." );
-    }
-
+    /**
+     * @return the CRS as String
+     */
     public String getCrs() {
         return this.crs;
     }

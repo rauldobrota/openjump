@@ -19,9 +19,9 @@ import org.deegree.framework.util.BootLogger;
 
 /**
  * @author sncho
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * 
+ * TODO To change the template for this generated type comment go to Window - Preferences - Java -
+ * Code Style - Code Templates
  */
 public class I18N {
     private static final Properties props = new Properties();
@@ -31,8 +31,8 @@ public class I18N {
             String fileName = "messages_en.properties";
             InputStream is = I18N.class.getResourceAsStream( fileName );
             if ( is == null ) {
-                BootLogger.log( "Error while initializing " + I18N.class.getName() + " : "
-                                + " default message file: '" + fileName + " not found." );
+                BootLogger.log( "Error while initializing " + I18N.class.getName() + " : " + " default message file: '"
+                                + fileName + " not found." );
             }
             is = I18N.class.getResourceAsStream( fileName );
             props.load( is );
@@ -40,27 +40,27 @@ public class I18N {
 
             // override messages using file "/message_en.properties"
             fileName = "/messages_en.properties";
-            overrideMessages(fileName);
-           
+            overrideMessages( fileName );
+
             String lang = Locale.getDefault().getLanguage();
-            if (!"".equals (lang) && !"en".equals(lang)) {
-                // override messages using file "org/deegree/i18n/message_LANG.properties"                
+            if ( !"".equals( lang ) && !"en".equals( lang ) ) {
+                // override messages using file "org/deegree/i18n/message_LANG.properties"
                 fileName = "messages_" + lang + ".properties";
-                overrideMessages(fileName);
+                overrideMessages( fileName );
                 // override messages using file "/message_LANG.properties"
                 fileName = "/messages_" + lang + ".properties";
-                overrideMessages(fileName);
+                overrideMessages( fileName );
             }
         } catch ( IOException e ) {
-            BootLogger.logError( "Error while initializing " + I18N.class.getName() + " : "
-                                 + e.getMessage(), e );
+            BootLogger.logError( "Error while initializing " + I18N.class.getName() + " : " + e.getMessage(), e );
         }
     }
 
-    private static void overrideMessages( String propertiesFile ) throws IOException {
+    private static void overrideMessages( String propertiesFile )
+                            throws IOException {
         InputStream is = I18N.class.getResourceAsStream( propertiesFile );
         if ( is != null ) {
-            // override default messages 
+            // override default messages
             Properties overrideProps = new Properties();
             overrideProps.load( is );
             is.close();
@@ -72,12 +72,17 @@ public class I18N {
         }
     }
 
+    /**
+     * @param key
+     * @param arguments
+     * @return a translated string
+     */
     public static String getString( String key, Object... arguments ) {
         String s = props.getProperty( key );
-        if ( s != null  ) {
+        if ( s != null ) {
             return MessageFormat.format( s, arguments );
-        } 
-        
+        }
+
         return "$Message with key: " + key + " not found$";
     }
 }

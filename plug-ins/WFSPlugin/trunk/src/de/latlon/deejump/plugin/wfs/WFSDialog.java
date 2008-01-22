@@ -34,6 +34,9 @@ public class WFSDialog extends JDialog {
 
     private static final long serialVersionUID = 5540535312268661105L;
 
+    /**
+     * 
+     */
     public static final String WFS_URL_LIST = "WFS_URL_LIST";
 
     /**
@@ -125,10 +128,16 @@ public class WFSDialog extends JDialog {
         return this.canSearch;
     }
 
+    /**
+     * @param canSearch
+     */
     public void setCanSearch( boolean canSearch ) {
         this.canSearch = canSearch;
     }
 
+    /**
+     * @return the internal panel
+     */
     public WFSPanel getWFSPanel() {
         return this.wfsPanel;
     }

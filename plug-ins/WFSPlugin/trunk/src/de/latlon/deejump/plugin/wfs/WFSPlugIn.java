@@ -223,11 +223,14 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
         return "WFS Dialog";
     }
 
+    /**
+     * @return the icon
+     */
     public ImageIcon getIcon() {
         return new ImageIcon( WFSPlugIn.class.getResource( "wfs.png" ) );
     }
 
-    public MultiEnableCheck createEnableCheck( final WorkbenchContext workbenchContext ) {
+    private MultiEnableCheck createEnableCheck( final WorkbenchContext workbenchContext ) {
         EnableCheckFactory checkFactory = new EnableCheckFactory( workbenchContext );
 
         MultiEnableCheck mec = new MultiEnableCheck();

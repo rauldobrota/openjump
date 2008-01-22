@@ -281,6 +281,12 @@ public class JUMPFeatureFactory {
         return newFeatCollec;
     }
 
+    /**
+     * @param fc
+     * @param geom
+     * @return a JUMP feature collection
+     * @throws DeeJUMPException
+     */
     public static FeatureCollection createFromDeegreeFC( org.deegree.model.feature.FeatureCollection fc, Geometry geom )
                             throws DeeJUMPException {
         return createFromDeegreeFC( fc, geom, null, null, false );

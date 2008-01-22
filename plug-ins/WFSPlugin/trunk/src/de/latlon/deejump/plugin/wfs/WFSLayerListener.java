@@ -110,7 +110,7 @@ public class WFSLayerListener implements LayerListener {
             Collection<?> oldFeatures = null;
 
             for ( Iterator<?> iter = collec.iterator(); iter.hasNext(); ) {
-                Feature modifiedFeature = (Feature)iter.next();
+                Feature modifiedFeature = (Feature) iter.next();
 
                 if ( changedGeomFeatures.contains( modifiedFeature ) ) {
                     changedGeomFeatures.remove( modifiedFeature );
@@ -123,7 +123,7 @@ public class WFSLayerListener implements LayerListener {
                     oldFeatIter = oldFeatures.iterator();
                 }
 
-                Feature f = (Feature)oldFeatIter.next();
+                Feature f = (Feature) oldFeatIter.next();
 
                 if ( !oldGeomFeatures.containsKey( modifiedFeature ) ) {
                     oldGeomFeatures.put( modifiedFeature, f );
@@ -147,7 +147,7 @@ public class WFSLayerListener implements LayerListener {
             Collection<?> oldFeatures = null;
 
             for ( Iterator<?> iter = collec.iterator(); iter.hasNext(); ) {
-                Feature modifiedFeature = (Feature)iter.next();
+                Feature modifiedFeature = (Feature) iter.next();
                 if ( changedAttrFeatures.contains( modifiedFeature ) ) {
                     changedAttrFeatures.remove( modifiedFeature );
                 }
@@ -161,7 +161,7 @@ public class WFSLayerListener implements LayerListener {
                     oldFeatIter = oldFeatures.iterator();
                 }
 
-                Feature f = (Feature)oldFeatIter.next();
+                Feature f = (Feature) oldFeatIter.next();
 
                 if ( !oldAttrFeatures.containsKey( modifiedFeature ) ) {
                     oldAttrFeatures.put( modifiedFeature, f );
@@ -216,10 +216,16 @@ public class WFSLayerListener implements LayerListener {
         return map;
     }
 
+    /**
+     * @return the original map of geometry attributes
+     */
     public HashMap<Feature, Feature> getOldGeomFeaturesMap() {
         return oldGeomFeatures;
     }
 
+    /**
+     * @return the original map of normal attributes
+     */
     public HashMap<Feature, Feature> getOldAttrFeaturesMap() {
         return oldAttrFeatures;
     }
