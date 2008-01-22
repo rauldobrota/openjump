@@ -1,4 +1,9 @@
 2008-01-22  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/plugin/wfs/Version.java,
+        build.xml:
+        Added Version class, modified manifest to use it as main-class.
+
+2008-01-22  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/plugin/wfs/WFSPanel.java:
         Removed possible null pointer.
 
