@@ -1,4 +1,8 @@
 2008-01-22  Andreas Schmitz <schmitz@lat-lon.de>
+        build.xml:
+        Modified more jar targets to use Version as main-class.
+
+2008-01-22  Andreas Schmitz <schmitz@lat-lon.de>
         lib/deegree2.jar:
         Updated deegree2 lib, which supports a lot more coordinate systems and
         includes custom changes for EPSG:2391/2/3/4.
