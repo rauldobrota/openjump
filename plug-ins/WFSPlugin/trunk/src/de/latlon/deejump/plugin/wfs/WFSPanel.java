@@ -654,6 +654,10 @@ public class WFSPanel extends JPanel {
         return sb;
     }
 
+    /**
+     * @param compo
+     * @param txt
+     */
     public static void saveTextToFile( Component compo, String txt ) {
 
         JFileChooser jfc = new JFileChooser();
@@ -690,14 +694,23 @@ public class WFSPanel extends JPanel {
         return tags;
     }
 
+    /**
+     * @return the geometry property name
+     */
     public QualifiedName getChosenGeoProperty() {
         return geoProperty;
     }
 
+    /**
+     * @param geoProp
+     */
     public void setGeoProperty( QualifiedName geoProp ) {
         this.geoProperty = geoProp;
     }
 
+    /**
+     * @return the geometry property names
+     */
     public QualifiedName[] getGeoProperties() {
         return this.wfService.getGeometryProperties( (String) featureTypeCombo.getSelectedItem() );
     }
@@ -745,8 +758,8 @@ public class WFSPanel extends JPanel {
         list.add( sel );
 
         for ( int i = 0; i < serverCombo.getItemCount(); ++i ) {
-            String s = serverCombo.getItemAt( i ).toString();
-            if ( !sel.equals( s ) )
+            String s = (String) serverCombo.getItemAt( i );
+            if ( s != null && !sel.equals( s ) )
                 list.add( s );
         }
         return list;

@@ -1,3 +1,7 @@
+2008-01-22  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/plugin/wfs/WFSPanel.java:
+        Removed possible null pointer.
+
 2007-12-06  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/util/data/JUMPFeatureFactory.java:
         Added workaround for GetFeatureInfo when no WFS is available.
@@ -35,7 +39,7 @@
 
 2007-11-16  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/plugin/wfs/transaction/TransactionFactory.java:
-		Fixed typo when building XML by hand.
+                Fixed typo when building XML by hand.
 
 2007-11-15  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/plugin/wfs/transaction*:
@@ -77,11 +81,11 @@
 2007-10-26  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/util/data/JUMPFeatureFactory.java,
         src/de/latlon/deejump/plugin/wfs/AbstractWFSWrapper.java:
-		Showing only the correct geometry properties.
+                Showing only the correct geometry properties.
 
 2007-10-26  Andreas Schmitz <schmitz@lat-lon.de>
-		src/de/latlon/deejump/plugin/wfs/WFSPanel.java:
-		Sending srsName attribute with Queries - bug fix for the first selected feature type.
+                src/de/latlon/deejump/plugin/wfs/WFSPanel.java:
+                Sending srsName attribute with Queries - bug fix for the first selected feature type.
 
 2007-10-26  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/util/data/JUMPFeatureFactory.java,
@@ -95,29 +99,29 @@
         Added handling of empty feature types. This may be useful for transactions.
 
 2007-10-17  Andreas Schmitz <schmitz@lat-lon.de>
-		src/de/latlon/deejump/plugin/wfs/WFSPanel.java:
-		Changing the version will automatically select the correct default format.
+                src/de/latlon/deejump/plugin/wfs/WFSPanel.java:
+                Changing the version will automatically select the correct default format.
 
 2007-10-17  Andreas Schmitz <schmitz@lat-lon.de>
-		src/de/latlon/deejump/plugin/wfs/WFSOptionsPanel2.java:
-		Fixed behaviour of the output format drop down box.
+                src/de/latlon/deejump/plugin/wfs/WFSOptionsPanel2.java:
+                Fixed behaviour of the output format drop down box.
 
 2007-10-17  Andreas Schmitz <schmitz@lat-lon.de>
-		src/de/latlon/deejump/plugin/wfs/WFSPanel.java:
-		Sending srsName attribute with Queries.
+                src/de/latlon/deejump/plugin/wfs/WFSPanel.java:
+                Sending srsName attribute with Queries.
 
 2007-10-16  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/plugin/wfs/TransactionFactory.java,
         src/de/latlon/deejump/plugin/wfs/WFSPanel.java:
-		Fixed srs parameter of transaction requests.
+                Fixed srs parameter of transaction requests.
 
 2007-10-12  Andreas Schmitz <schmitz@lat-lon.de>
-		build.xml:
-		Set source and target options to 1.5.
+                build.xml:
+                Set source and target options to 1.5.
 
 2007-10-12  Andreas Schmitz <schmitz@lat-lon.de>
-		src/de/latlon/deejump/plugin/wfs/WFSPanel.java:
-		Feature type list is now sorted.
+                src/de/latlon/deejump/plugin/wfs/WFSPanel.java:
+                Feature type list is now sorted.
 
 2007-09-06  Andreas Schmitz <schmitz@lat-lon.de>
         lib/deegree2.jar:
