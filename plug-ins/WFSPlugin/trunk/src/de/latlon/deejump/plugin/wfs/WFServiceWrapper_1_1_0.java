@@ -65,7 +65,9 @@ public class WFServiceWrapper_1_1_0 extends AbstractWFSWrapper {
 
         WFSCapabilitiesDocument wfsCapsDoc = new WFSCapabilitiesDocument();
         try {
-            wfsCapsDoc.load( new URL( getCapabilitiesURL() ) );
+            String caps = getCapabilitiesURL();
+            LOG.debug( "Sending capabilities request: " + caps );
+            wfsCapsDoc.load( new URL( caps ) );
         } catch ( MalformedURLException e ) {
             LOG.error( "Invalid URL", e );
             throw new DeeJUMPException( e );

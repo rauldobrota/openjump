@@ -1,3 +1,7 @@
+2008-01-23  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/plugin/wfs/WFServiceWrapper_1_1_0.java:
+        Added GetCapabilities request debug message.
+
 2008-01-22  Andreas Schmitz <schmitz@lat-lon.de>
         many files:
         Cleaned up comments, other cosmetic changes.
