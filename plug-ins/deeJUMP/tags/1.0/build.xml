@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!--
+    Ant build file for deeJUMP.
+    Requires Apache Ant 1.6 or later.
+
+    This file is part of deegree.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+
+    Copyright (C) 2001-2006 by:
+    EXSE, Department of Geography, University of Bonn
+    http://www.giub.uni-bonn.de/exse/
+    lat/lon GmbH, Bonn, Germany
+    http://www.lat-lon.de
+
+    $HeadURL: https://sushibar/svn/deegree/base/trunk/build.xml $
+    $Revision: 150 $, $Date: 2007-06-25 17:55:38 +0200 (Mo, 25 Jun 2007) $
+    $Author: schmitz $ - Andreas Schmitz <schmitz@lat-lon.de>
+  -->
+<project name="deeJUMP" default="jar" basedir=".">
+
+  <property name="src" value="src" />
+  <property name="build" value="classes" />
+  <property name="deegree.base" value="${user.home}/workspace/base" />
+  <property name="openjump.base" value="${user.home}/workspace/openjump" />
+  <property name="dist" value="dist" />
+
+  <path id="classpath">
+    <fileset dir="${deegree.base}">
+      <include name="**/*.jar" />
+    </fileset>
+    <fileset dir="${openjump.base}">
+      <include name="**/*.jar" />
+    </fileset>
+  </path>
+
+  <target name="init">
+    <mkdir dir="${build}" />
+    <mkdir dir="${dist}" />
+    <ant antfile="build.xml" dir="${deegree.base}" target="build-lib" />
+  </target>
+
+  <target name="compile" depends="init">
+    <javac srcdir="${src}" destdir="${build}" includes="**/*.java" fork="true" debug="true" target="1.5" source="1.5">
+      <classpath>
+        <path refid="classpath" />
+      </classpath>
+    </javac>
+
+    <copy todir="${build}">
+      <fileset dir="${src}" includes="**/*.properties" />
+      <fileset dir="${src}" includes="**/*.xsl" />
+      <fileset dir="${src}" includes="**/*.xml" />
+      <fileset dir="${src}" includes="**/*.sql" />
+      <fileset dir="${src}" includes="**/*.html" />
+      <fileset dir="${src}" includes="**/*.png" />
+      <fileset dir="${src}" includes="**/*.gif" />
+    </copy>
+  </target>
+
+  <target name="jar" depends="compile">
+    <jar destfile="${dist}/deejump.jar" basedir="classes">
+      <manifest>
+        <attribute name="Main-Class" value="de.latlon.deejump.Version" />
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="clean">
+    <delete dir="${build}" />
+    <delete dir="${dist}" />
+  </target>
+
+</project>
