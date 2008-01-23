@@ -19,28 +19,23 @@ import de.latlon.deejump.util.data.JUMPFeatureFactory;
 
 /**
  * @author hamammi
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * 
+ * TODO To change the template for this generated type comment go to Window - Preferences - Java -
+ * Code Style - Code Templates
  */
-public class DeegreeGMLFileWriter implements JUMPWriter{
-	
+public class DeegreeGMLFileWriter implements JUMPWriter {
 
-	public static void main(String[] args) {
-	}
-	
-	public void write(FeatureCollection featureCollection, DriverProperties dp) 
-	        throws IllegalParametersException, Exception {
-		String fileRoot = dp.getProperty("File");
+    public void write( FeatureCollection featureCollection, DriverProperties dp )
+                            throws IllegalParametersException, Exception {
+        String fileRoot = dp.getProperty( "File" );
 
-		if (fileRoot == null) {
-			throw new Exception("fileRoot should not be null");
-		}
-		org.deegree.model.feature.FeatureCollection deegreeFC = JUMPFeatureFactory.
-		       createFromJUMPFeatureCollection(featureCollection);
-		FileOutputStream fos = new FileOutputStream(fileRoot);
-		new GMLFeatureAdapter().export(deegreeFC, fos);
-		fos.close();
-		
-	}
+        if ( fileRoot == null ) {
+            throw new Exception( "fileRoot should not be null" );
+        }
+        org.deegree.model.feature.FeatureCollection deegreeFC = JUMPFeatureFactory.createFromJUMPFeatureCollection( featureCollection );
+        FileOutputStream fos = new FileOutputStream( fileRoot );
+        new GMLFeatureAdapter().export( deegreeFC, fos );
+        fos.close();
+
+    }
 }

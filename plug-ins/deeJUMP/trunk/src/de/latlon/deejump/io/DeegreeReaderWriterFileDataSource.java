@@ -26,7 +26,7 @@
 
  Andreas Poth
  lat/lon GmbH
- Aennchenstraße 19
+ Aennchenstraï¿½e 19
  53177 Bonn
  Germany
  E-Mail: poth@lat-lon.de
@@ -43,12 +43,10 @@
 
 package de.latlon.deejump.io;
 
-import com.vividsolutions.jump.io.ShapefileWriter;
 import com.vividsolutions.jump.io.datasource.StandardReaderWriterFileDataSource;
 
-
 /**
- * ... 
+ * ...
  * 
  * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei</a>
  * @author last edited by: $Author: taddei $
@@ -60,32 +58,38 @@ import com.vividsolutions.jump.io.datasource.StandardReaderWriterFileDataSource;
 
 public class DeegreeReaderWriterFileDataSource {
 
-	
-	public static class DeeShapefile extends StandardReaderWriterFileDataSource {
-		public DeeShapefile() {
-			super(new DeegreeShapeFileReader(), new DeegreeShapeFileWriter(),
-					new String[] { "shp" });
-		}
-	}
-	
-	public static class DeeGMLFile extends StandardReaderWriterFileDataSource {
-		public DeeGMLFile() {
-			super(new DeegreeGMLReader(), new DeegreeGMLFileWriter(),
-					new String[] { "gml", "xml" });
-		}
-	}
-	
+    /**
+     * <code>DeeShapefile</code>
+     * 
+     * @author <a href="mailto:schmitz@lat-lon.de">Andreas Schmitz</a>
+     * @author last edited by: $Author:$
+     * 
+     * @version $Revision:$, $Date:$
+     */
+    public static class DeeShapefile extends StandardReaderWriterFileDataSource {
+        /**
+         * 
+         */
+        public DeeShapefile() {
+            super( new DeegreeShapeFileReader(), new DeegreeShapeFileWriter(), new String[] { "shp" } );
+        }
+    }
+
+    /**
+     * <code>DeeGMLFile</code>
+     * 
+     * @author <a href="mailto:schmitz@lat-lon.de">Andreas Schmitz</a>
+     * @author last edited by: $Author:$
+     * 
+     * @version $Revision:$, $Date:$
+     */
+    public static class DeeGMLFile extends StandardReaderWriterFileDataSource {
+        /**
+         * 
+         */
+        public DeeGMLFile() {
+            super( new DeegreeGMLReader(), new DeegreeGMLFileWriter(), new String[] { "gml", "xml" } );
+        }
+    }
+
 }
-
-
-/* ********************************************************************
-Changes to this class. What the people have been up to:
-$Log$
-Revision 1.2  2007/05/08 09:27:50  taddei
-deejump final (UT)
-
-Revision 1.1  2006/03/08 09:36:02  ut
-major refactoring
-
-
-********************************************************************** */
