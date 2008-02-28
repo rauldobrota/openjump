@@ -92,4 +92,23 @@ public class DeegreeReaderWriterFileDataSource {
         }
     }
 
+    /**
+     * <code>DeeMapInfoFile</code>
+     * 
+     * @author <a href="mailto:schmitz@lat-lon.de">Andreas Schmitz</a>
+     * @author last edited by: $Author:$
+     * 
+     * @version $Revision:$, $Date:$
+     */
+    public static class DeeMapInfoFile extends StandardReaderWriterFileDataSource {
+
+        /**
+         * 
+         */
+        public DeeMapInfoFile() {
+            super( new DeegreeMapInfoReader(), null, new String[] { "mid", "mif" } );
+        }
+
+    }
+
 }

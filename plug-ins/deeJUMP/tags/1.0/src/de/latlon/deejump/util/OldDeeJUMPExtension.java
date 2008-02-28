@@ -42,8 +42,10 @@
  ---------------------------------------------------------------------------*/
 package de.latlon.deejump.util;
 
+import static org.apache.log4j.Logger.getLogger;
+import static org.openjump.OpenJumpConfiguration.postExtensionInitialization;
+
 import org.apache.log4j.Logger;
-import org.openjump.OpenJumpConfiguration;
 
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.plugin.Extension;
@@ -51,7 +53,7 @@ import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.WorkbenchToolBar;
 
 import de.latlon.deejump.plugin.InstallDeegreeFileAdaptersPlugIn;
-import de.latlon.deejump.plugin.style.DeeChangeStylesPlugIn;
+import de.latlon.deejump.plugin.MapInfoStylePlugin;
 import de.latlon.deejump.plugin.wms.LayerAndWMSFeatureInfoTool;
 
 /**
@@ -62,7 +64,7 @@ import de.latlon.deejump.plugin.wms.LayerAndWMSFeatureInfoTool;
  */
 public class OldDeeJUMPExtension extends Extension {
 
-    private static final Logger LOG = Logger.getLogger( OldDeeJUMPExtension.class );
+    private static final Logger LOG = getLogger( OldDeeJUMPExtension.class );
 
     public void configure( PlugInContext context )
                             throws Exception {
@@ -70,14 +72,16 @@ public class OldDeeJUMPExtension extends Extension {
         LOG.debug( "Initializing old DeeJUMP plugins" );
         LOG.debug( "Adding deegree file adapters..." );
         new InstallDeegreeFileAdaptersPlugIn().initialize( context );
-        LOG.debug( "Adding FeatureInfo tool for WMS GetFeatureInfo requests..." );
-        new DeeChangeStylesPlugIn().initialize( context );
-        
+        LOG.debug( "Adding MapInfo styles importer..." );
+        new MapInfoStylePlugin().initialize( context );
+
         WorkbenchContext wbcontext = context.getWorkbenchContext();
         WorkbenchToolBar toolbar = wbcontext.getWorkbench().getFrame().getToolBar();
 
+        LOG.debug( "Adding FeatureInfo tool for WMS GetFeatureInfo requests..." );
         toolbar.addCursorTool( new LayerAndWMSFeatureInfoTool() );
-        OpenJumpConfiguration.postExtensionInitialization( context.getWorkbenchContext() );
+
+        postExtensionInitialization( context.getWorkbenchContext() );
     }
 
 }
