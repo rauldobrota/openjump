@@ -1,3 +1,7 @@
+2008-03-10  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/util/data/WFSClientHelper.java:
+        Fixed usage of GetFeature response encoding.
+
 2008-01-23  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/plugin/wfs/WFServiceWrapper_1_1_0.java:
         Added GetCapabilities request debug message.

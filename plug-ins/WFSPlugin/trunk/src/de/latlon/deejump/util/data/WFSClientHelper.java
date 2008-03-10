@@ -42,10 +42,7 @@
 
 package de.latlon.deejump.util.data;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -112,11 +109,9 @@ public class WFSClientHelper {
         PostMethod httppost = new PostMethod( serverUrl );
         httppost.setRequestEntity( new StringRequestEntity( request ) );
 
-        InputStream is = null;
         try {
             httpclient.executeMethod( httppost );
-            is = httppost.getResponseBodyAsStream();
-
+            return httppost.getResponseBodyAsString();
         } catch ( HttpException e ) {
             String mesg = "Error opening connection with " + serverUrl;
             LOG.logError( mesg, e );
@@ -127,36 +122,6 @@ public class WFSClientHelper {
             throw new DeeJUMPException( mesg, e );
         }
 
-        String s = null;
-
-        try {
-
-            s = inputStreamToString( is );
-            /*
-             * while (( s = br.readLine() ) != null) { sb.append( s ); } s = sb.toString();
-             * br.close();
-             */
-        } catch ( IOException e ) {
-            String mesg = "Error opening connection with " + serverUrl;
-            LOG.logError( mesg, e );
-            throw new DeeJUMPException( mesg, e );
-        }
-        return s;
     }
 
-    private static String inputStreamToString( InputStream inputStream )
-                            throws IOException {
-        InputStreamReader ireader = new InputStreamReader( inputStream );
-        BufferedReader br = new BufferedReader( ireader );
-        StringBuffer sb = new StringBuffer( 50000 );
-        String s = null;
-
-        while ( ( s = br.readLine() ) != null ) {
-            sb.append( s );
-        }
-        s = sb.toString();
-        br.close();
-
-        return s;
-    }
 }
