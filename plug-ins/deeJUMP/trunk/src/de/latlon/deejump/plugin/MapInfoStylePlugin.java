@@ -45,7 +45,6 @@ import static java.lang.Integer.parseInt;
 import static java.lang.System.out;
 import static javax.swing.JFileChooser.APPROVE_OPTION;
 import static org.deegree.framework.log.LoggerFactory.getLogger;
-import static org.deegree.io.mapinfoapi.MapInfoReader.parseFeatures;
 
 import java.awt.Color;
 import java.awt.Paint;
@@ -56,7 +55,7 @@ import java.util.HashSet;
 import javax.swing.JFileChooser;
 
 import org.deegree.framework.log.ILogger;
-import org.deegree.framework.util.Pair;
+import org.deegree.io.mapinfoapi.MapInfoReader;
 
 import com.vividsolutions.jump.util.Blackboard;
 import com.vividsolutions.jump.workbench.model.Layer;
@@ -275,10 +274,10 @@ public class MapInfoStylePlugin extends AbstractPlugIn {
         BasicStyle style = layer.getBasicStyle();
         int pattern = parseInt( map.get( "pattern" ) );
         Color fore = decode( map.get( "forecolor" ) );
-        Color back = null;
-        if ( map.get( "backcolor" ) != null ) {
-            back = decode( map.get( "backcolor" ) );
-        }
+//        Color back = null;
+//        if ( map.get( "backcolor" ) != null ) {
+//            back = decode( map.get( "backcolor" ) );
+//        }
 
         style.setRenderingFillPattern( true );
         style.setRenderingFill( true );
@@ -313,47 +312,47 @@ public class MapInfoStylePlugin extends AbstractPlugIn {
             style.setFillPattern( patterns[13] );
             break;
         case 12:
-//            style.setFillPattern( patterns[] );
+            // style.setFillPattern( patterns[] );
             break;
         case 13:
-//            style.setFillPattern( patterns[] );
+            // style.setFillPattern( patterns[] );
             break;
         case 14:
-//            style.setFillPattern( patterns[] );
+            // style.setFillPattern( patterns[] );
             break;
         case 15:
-//            style.setFillPattern( patterns[] );
+            // style.setFillPattern( patterns[] );
             break;
         case 16:
-//            style.setFillPattern( patterns[] );
+            // style.setFillPattern( patterns[] );
             break;
         case 17:
-//            style.setFillPattern( patterns[] );
+            // style.setFillPattern( patterns[] );
             break;
         case 18:
-//            style.setFillPattern( patterns[] );
+            // style.setFillPattern( patterns[] );
             break;
         case 23:
             style.setFillPattern( patterns[18] );
             break;
-//            WKTFillPattern.createVerticalHorizontalStripePattern(2, 4,true, false ).createImage( )
+        // WKTFillPattern.createVerticalHorizontalStripePattern(2, 4,true, false ).createImage( )
         case 24:
-//            style.setFillPattern(  );
+            // style.setFillPattern( );
             break;
         case 25:
-//            style.setFillPattern( patterns[] );
+            // style.setFillPattern( patterns[] );
             break;
         case 26:
-//            style.setFillPattern( patterns[] );
+            // style.setFillPattern( patterns[] );
             break;
         case 27:
-//            style.setFillPattern( patterns[] );
+            // style.setFillPattern( patterns[] );
             break;
         case 28:
-//            style.setFillPattern( patterns[] );
+            // style.setFillPattern( patterns[] );
             break;
         case 29:
-//            style.setFillPattern( patterns[] );
+            // style.setFillPattern( patterns[] );
             break;
         }
     }
@@ -375,27 +374,28 @@ public class MapInfoStylePlugin extends AbstractPlugIn {
             bb.put( "MapInfoStylePlugin.filename", f.getAbsoluteFile().toString() );
             Layer l = context.getSelectedLayer( 0 );
 
-            Pair<org.deegree.model.feature.FeatureCollection, HashMap<String, HashSet<HashMap<String, String>>>> pair;
-            pair = parseFeatures( f.getAbsolutePath() );
-            pair.first = null; // to enable gc when needed, yes it IS bad
+            MapInfoReader reader = new MapInfoReader( f.getAbsolutePath() );
+            reader.parseFeatures();
 
-            for ( String type : pair.second.keySet() ) {
+            HashMap<String, HashSet<HashMap<String, String>>> styles = reader.getStyles();
+
+            for ( String type : styles.keySet() ) {
                 if ( "symbol".equals( type ) ) {
-                    for ( HashMap<String, String> map : pair.second.get( type ) ) {
+                    for ( HashMap<String, String> map : styles.get( type ) ) {
                         out.println( "could use this symbol:" + map );
                         applySymbolStyle( map, l );
                     }
                 }
 
                 if ( "pen".equals( type ) ) {
-                    for ( HashMap<String, String> map : pair.second.get( type ) ) {
+                    for ( HashMap<String, String> map : styles.get( type ) ) {
                         out.println( "could use this pen:" + map );
                         applyPenStyle( map, l );
                     }
                 }
 
                 if ( "brush".equals( type ) ) {
-                    for ( HashMap<String, String> map : pair.second.get( type ) ) {
+                    for ( HashMap<String, String> map : styles.get( type ) ) {
                         out.println( "could use this brush:" + map );
                         applyBrushStyle( map, l );
                     }

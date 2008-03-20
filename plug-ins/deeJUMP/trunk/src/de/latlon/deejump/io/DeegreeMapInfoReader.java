@@ -1,12 +1,8 @@
 package de.latlon.deejump.io;
 
 import static de.latlon.deejump.util.data.JUMPFeatureFactory.createFromDeegreeFC;
-import static org.deegree.io.mapinfoapi.MapInfoReader.parseFeatures;
 
-import java.util.HashMap;
-import java.util.HashSet;
-
-import org.deegree.framework.util.Pair;
+import org.deegree.io.mapinfoapi.MapInfoReader;
 
 import com.vividsolutions.jump.feature.FeatureCollection;
 import com.vividsolutions.jump.io.DriverProperties;
@@ -26,10 +22,10 @@ public class DeegreeMapInfoReader implements JUMPReader {
                             throws Exception {
         String fileRoot = dp.getProperty( "File" );
 
-        Pair<org.deegree.model.feature.FeatureCollection, HashMap<String, HashSet<HashMap<String, String>>>> pair;
-        pair = parseFeatures( fileRoot );
+        MapInfoReader reader = new MapInfoReader( fileRoot );
+        reader.parseFeatures();
 
-        return createFromDeegreeFC( pair.first );
+        return createFromDeegreeFC( reader.getFeatureCollection() );
     }
 
 }
