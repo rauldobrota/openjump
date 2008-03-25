@@ -38,6 +38,7 @@
 
 package de.latlon.deejump.plugin;
 
+import static com.vividsolutions.jump.workbench.ui.MenuNames.LAYER;
 import static com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn.get;
 import static de.latlon.deejump.i18n.I18N.get;
 import static java.awt.Color.decode;
@@ -64,7 +65,6 @@ import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
-import com.vividsolutions.jump.workbench.ui.MenuNames;
 import com.vividsolutions.jump.workbench.ui.renderer.style.BasicStyle;
 import com.vividsolutions.jump.workbench.ui.renderer.style.FillPatternFactory;
 import com.vividsolutions.jump.workbench.ui.renderer.style.VertexStyle;
@@ -91,8 +91,8 @@ public class MapInfoStylePlugin extends AbstractPlugIn {
         enableCheck.add( enableCheckFactory.createWindowWithLayerManagerMustBeActiveCheck() );
         enableCheck.add( enableCheckFactory.createExactlyNLayerablesMustBeSelectedCheck( 1, Layerable.class ) );
 
-        context.getFeatureInstaller().addMainMenuItem( this, new String[] { MenuNames.FILE },
-                                                       get( "MapInfoStylePlugin.name" ) + "{pos:5}", false, null,
+        context.getFeatureInstaller().addMainMenuItem( this, new String[] { LAYER },
+                                                       get( "MapInfoStylePlugin.name" ) + "{pos:10}", false, null,
                                                        enableCheck );
     }
 
