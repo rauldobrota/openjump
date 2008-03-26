@@ -37,9 +37,8 @@ import java.awt.Cursor;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,6 +49,8 @@ import java.util.Set;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.log4j.Logger;
 import org.deegree.framework.util.StringTools;
 import org.deegree.model.feature.GMLFeatureCollectionDocument;
@@ -207,19 +208,22 @@ public class LayerAndWMSFeatureInfoTool extends SpecifyFeaturesTool {
 
                 try {
                     String ir = createFeatureInfoRequest( wmsLayer, getPanel(), sourcePoint );
-                    URL u = new URL( ir );
 
                     LOG.debug( "GetFeatureInfo request: " + ir );
 
-                    InputStreamReader is = new InputStreamReader( u.openStream() );
+                    HttpClient client = new HttpClient();
+                    GetMethod get = new GetMethod( ir );
+                    client.executeMethod( get );
 
-                    // create deegree FeatureCollection
-                    // FIXME this is throwing NullPointer is layer is not queryable
-                    // TODO see if except is thrown, rather than catch and run
-                    // or check if layer is queryable
+                    String response = get.getResponseBodyAsString();
+
                     try {
                         GMLFeatureCollectionDocument gmlDoc = new GMLFeatureCollectionDocument();
-                        gmlDoc.load( is, "http://dummy" );
+                        gmlDoc.load( new StringReader( response ), "http://dummy" );
+
+                        if ( LOG.isDebugEnabled() ) {
+                            LOG.debug( "GetFeatureInfo response: " + gmlDoc.getAsPrettyString() );
+                        }
 
                         org.deegree.model.feature.FeatureCollection deegFc = gmlDoc.parse();
 
@@ -232,8 +236,6 @@ public class LayerAndWMSFeatureInfoTool extends SpecifyFeaturesTool {
                     } catch ( NullPointerException e3 ) {
                         e3.printStackTrace();
                         System.out.println( "NullPointerException when clicking unqueryable layer." );
-                    } finally {
-                        is.close();
                     }
 
                 } catch ( MalformedURLException e2 ) {
