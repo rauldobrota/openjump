@@ -14,7 +14,7 @@ import java.util.Map;
 
 import javax.swing.JPanel;
 
-import com.vividsolutions.jump.I18N;
+//import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.workbench.ui.InputChangedListener;
 import com.vividsolutions.jump.workbench.ui.wizard.WizardPanel;
 
@@ -26,8 +26,8 @@ public class AddPostGISLayerWizardPanel extends JPanel implements WizardPanel {
 	private static final String KEY = AddPostGISLayerWizardPanel.class.getName();
 
 	private static final String PKG_KEY = "net.refractions.postgis";
-	private static final String TITLE = I18N.getText(PKG_KEY,KEY);
-	private static final String INSTRUCTIONS = I18N.getText(PKG_KEY,KEY + ".instructions");
+	private static final String TITLE = I18N.getString(KEY);
+	private static final String INSTRUCTIONS = I18N.getString(KEY + ".instructions");
 
 	private PostGISCommonDriverPanel postGISPanel;
 	private HashMap properties;

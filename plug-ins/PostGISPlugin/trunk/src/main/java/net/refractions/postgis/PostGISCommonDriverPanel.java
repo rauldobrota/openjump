@@ -27,7 +27,7 @@ import javax.swing.JTextField;
 import javax.swing.JTextArea;
 import javax.swing.text.PlainDocument;
 
-import com.vividsolutions.jump.I18N;
+//import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.workbench.ui.*;
 
 //u.d.
@@ -48,13 +48,13 @@ public class PostGISCommonDriverPanel extends JPanel {
   
   private static final String PKG_KEY = "net.refractions.postgis";
   
-  private static final String SERVER = I18N.getText(PKG_KEY,KEY + ".server");
-  private static final String PORT = I18N.getText(PKG_KEY,KEY + ".port");
-  private static final String DATABASE = I18N.getText(PKG_KEY,KEY + ".database");
-  private static final String TABLE = I18N.getText(PKG_KEY,KEY + ".table");
-  private static final String USERNAME = I18N.getText(PKG_KEY,KEY + ".username");
-  private static final String PASSWORD = I18N.getText(PKG_KEY,KEY + ".password");
-  private static final String WHERE = I18N.getText(PKG_KEY,KEY + ".where");
+  private static final String SERVER = I18N.getString(KEY + ".server");
+  private static final String PORT = I18N.getString(KEY + ".port");
+  private static final String DATABASE = I18N.getString(KEY + ".database");
+  private static final String TABLE = I18N.getString(KEY + ".table");
+  private static final String USERNAME = I18N.getString(KEY + ".username");
+  private static final String PASSWORD = I18N.getString(KEY + ".password");
+  private static final String WHERE = I18N.getString(KEY + ".where");
   
   
   //These allow differnt objects to retain the same field values
