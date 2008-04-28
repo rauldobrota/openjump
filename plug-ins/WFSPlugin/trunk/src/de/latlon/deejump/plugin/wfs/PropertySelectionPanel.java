@@ -156,14 +156,20 @@ public class PropertySelectionPanel extends JPanel {
         PropertyType[] featProperties = featTypes[0].getProperties();
         for ( int i = 0; i < featProperties.length; i++ ) {
             if ( chosenProps.contains( featProperties[i].getName().getLocalName() ) ) {
-                sb.append( "<wfs:PropertyName>" ).append( ftQualiName.getPrefix() ).append( ":" );
+                sb.append( "<wfs:PropertyName>" );
+                if ( ftQualiName.getPrefix() != null && ftQualiName.getPrefix().length() > 0 ) {
+                    sb.append( ftQualiName.getPrefix() ).append( ":" );
+                }
                 sb.append( featProperties[i].getName().getLocalName() ).append( "</wfs:PropertyName>" );
             }
 
             // geom prop
             QualifiedName qn = (QualifiedName) geoPropsCombo.getSelectedItem();
             if ( qn.equals( featProperties[i].getName() ) ) {
-                sb.append( "<wfs:PropertyName>" ).append( ftQualiName.getPrefix() ).append( ":" );
+                sb.append( "<wfs:PropertyName>" );
+                if ( ftQualiName.getPrefix() != null && ftQualiName.getPrefix().length() > 0 ) {
+                    sb.append( ftQualiName.getPrefix() ).append( ":" );
+                }
                 sb.append( qn.getLocalName() ).append( "</wfs:PropertyName>" );
             }
 

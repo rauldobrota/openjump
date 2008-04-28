@@ -125,10 +125,17 @@ public abstract class AbstractWFSWrapper {
      * @return the full request String
      */
     public String getDescribeTypeURL( String baseURL, QualifiedName typename ) {
+        String url;
 
-        String url = baseURL + "SERVICE=WFS&REQUEST=DescribeFeatureType&version=" + getServiceVersion() + "&TYPENAME="
-                     + typename.getPrefix() + ":" + typename.getLocalName() + "&NAMESPACE=xmlns("
-                     + typename.getPrefix() + "=" + typename.getNamespace() + ")";
+        if ( typename.getPrefix() == null || typename.getPrefix().length() == 0 ) {
+            url = baseURL + "SERVICE=WFS&REQUEST=DescribeFeatureType&version=" + getServiceVersion() + "&TYPENAME="
+                  + typename.getLocalName();
+        } else {
+            url = baseURL + "SERVICE=WFS&REQUEST=DescribeFeatureType&version=" + getServiceVersion() + "&TYPENAME="
+                  + typename.getPrefix() + ":" + typename.getLocalName() + "&NAMESPACE=xmlns(" + typename.getPrefix()
+                  + "=" + typename.getNamespace() + ")";
+        }
+
         if ( logins != null && logins.getUsername() != null && logins.getPassword() != null ) {
             url += "&user=" + logins.getUsername() + "&password=" + logins.getPassword();
         }

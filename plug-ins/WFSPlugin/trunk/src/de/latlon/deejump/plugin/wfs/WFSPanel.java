@@ -585,8 +585,10 @@ public class WFSPanel extends JPanel {
         String ftName = (String) featureTypeCombo.getSelectedItem();
         QualifiedName ft = wfService.getFeatureTypeByName( ftName ).getName();
 
-        sb.append( "xmlns:" ).append( ft.getPrefix() ).append( "=\"" ).append( ft.getNamespace() );
-        sb.append( "\" " );
+        if ( ft.getPrefix() != null && ft.getPrefix().length() > 0 ) {
+            sb.append( "xmlns:" ).append( ft.getPrefix() ).append( "=\"" ).append( ft.getNamespace() );
+            sb.append( "\" " );
+        }
         sb.append( "srsName=\"" ).append( srs ).append( "\" " );
         sb.append( "typeName=\"" );
 

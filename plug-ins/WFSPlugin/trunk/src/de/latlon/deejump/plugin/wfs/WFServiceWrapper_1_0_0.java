@@ -137,10 +137,6 @@ public class WFServiceWrapper_1_0_0 extends AbstractWFSWrapper {
         return "1.0.0";
     }
 
-    protected String _createCapabilitiesOnlineResource() {
-        throw new UnsupportedOperationException( "TODO" );
-    }
-
     @Override
     public String getGetFeatureURL() {
         return createOnlineResourceForOperation( "GetFeature", "Post" );
