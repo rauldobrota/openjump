@@ -52,6 +52,7 @@ import com.vividsolutions.jump.workbench.plugin.Extension;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.WorkbenchToolBar;
 
+import de.latlon.deejump.plugin.AVLStylePlugin;
 import de.latlon.deejump.plugin.InstallDeegreeFileAdaptersPlugIn;
 import de.latlon.deejump.plugin.MapInfoStylePlugin;
 import de.latlon.deejump.plugin.wms.LayerAndWMSFeatureInfoTool;
@@ -74,6 +75,8 @@ public class OldDeeJUMPExtension extends Extension {
         new InstallDeegreeFileAdaptersPlugIn().initialize( context );
         LOG.debug( "Adding MapInfo styles importer..." );
         new MapInfoStylePlugin().initialize( context );
+        LOG.debug( "Adding AVL styles importer..." );
+        new AVLStylePlugin().initialize( context );
 
         WorkbenchContext wbcontext = context.getWorkbenchContext();
         WorkbenchToolBar toolbar = wbcontext.getWorkbench().getFrame().getToolBar();
