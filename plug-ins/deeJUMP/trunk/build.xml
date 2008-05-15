@@ -22,7 +22,7 @@
 <project name="deeJUMP" default="jar" basedir=".">
 
   <property name="src" value="src" />
-  <property name="build" value="classes" />
+  <property name="build" value="bin" />
   <property name="deegree.base" value="${user.home}/workspace/base" />
   <property name="openjump.base" value="${user.home}/workspace/openjump" />
   <property name="dist" value="dist" />
@@ -39,7 +39,7 @@
   <target name="init">
     <mkdir dir="${build}" />
     <mkdir dir="${dist}" />
-    <ant antfile="build.xml" dir="${deegree.base}" target="build-lib" />
+<!--     <ant antfile="build.xml" dir="${deegree.base}" target="build-lib" /> -->
   </target>
 
   <target name="compile" depends="init">

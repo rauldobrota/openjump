@@ -70,14 +70,14 @@ import de.latlon.deejump.i18n.I18N;
  * <code>AVLStylePlugin</code>
  * 
  * @author <a href="mailto:schmitz@lat-lon.de">Andreas Schmitz</a>
- * @author last edited by: $Author:$
+ * @author last edited by: $Author$
  * 
- * @version $Revision:$, $Date:$
+ * @version $Revision$, $Date$
  */
 public class AVLStylePlugin extends AbstractPlugIn {
 
-    // private static final ILogger LOG = getLogger( AVLStylePlugin.class );
-    //
+    private static final ILogger LOG = getLogger( AVLStylePlugin.class );
+
     @Override
     public void initialize( PlugInContext context ) {
         EnableCheckFactory enableCheckFactory = new EnableCheckFactory( context.getWorkbenchContext() );
@@ -136,6 +136,10 @@ public class AVLStylePlugin extends AbstractPlugIn {
             StyledLayerDescriptor sld = avl2sld.getStyledLayerDescriptor();
 
             XMLFragment doc = new XMLFragment( new StringReader( sld.exportAsXML() ), "http://www.systemid.org" );
+
+            if ( LOG.isDebug() ) {
+                LOG.logDebug( "Intermediate SLD document", doc.getAsPrettyString() );
+            }
 
             importSLD( doc.getRootElement().getOwnerDocument(), context );
         }
