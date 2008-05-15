@@ -1,4 +1,8 @@
 2008-04-28  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/util/data/JUMPFeatureFactory.java:
+        Long values are converted to int, since OpenJUMP does not know them.
+
+2008-04-28  Andreas Schmitz <schmitz@lat-lon.de>
         lib/deegree2.jar,
         src/de/latlon/deejump/plugin/wfs/PropertySelectionPanel.java,
         src/de/latlon/deejump/plugin/wfs/WFServiceWrapper_1_0_0.java,

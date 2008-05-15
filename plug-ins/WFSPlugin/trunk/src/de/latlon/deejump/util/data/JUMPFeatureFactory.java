@@ -416,7 +416,12 @@ public class JUMPFeatureFactory {
                     if ( fp != null ) {
                         value = fp.getValue();
                     }
-                    jf.setAttribute( j, value );
+                    // OpenJUMP only knows int values
+                    if ( value instanceof Long ) {
+                        jf.setAttribute( j, (int) ( (Long) value ).longValue() );
+                    } else {
+                        jf.setAttribute( j, value );
+                    }
                 }
             }
             jumpFC.add( jf );
