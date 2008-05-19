@@ -157,7 +157,7 @@ public abstract class AbstractWFSWrapper {
      * @param featureType
      * @return the GMLSchema object for the feature type
      */
-    public GMLSchema getSchemaForFeatureType( String featureType ) {
+    public synchronized GMLSchema getSchemaForFeatureType( String featureType ) {
         GMLSchema res = this.featureTypeToSchema.get( featureType );
         if ( res != null ) {
             return res;
@@ -211,9 +211,8 @@ public abstract class AbstractWFSWrapper {
      * 
      * @param featureTypeName
      *            the name of the feature type
-     * @throws Exception
      */
-    protected void createSchemaForFeatureType( String featureTypeName ) {
+    protected synchronized void createSchemaForFeatureType( String featureTypeName ) {
 
         try {
             // GMLSchema xsd = loadSchemaForFeatureType( featureTypeName );

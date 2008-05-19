@@ -68,14 +68,14 @@ public class WFServiceWrapper_1_0_0 extends AbstractWFSWrapper {
     }
 
     @Override
-    public String[] getFeatureTypes() {
+    public synchronized String[] getFeatureTypes() {
         if ( featureTypes == null ) {
             featureTypes = extractFeatureTypes();
         }
         return featureTypes;
     }
 
-    private String[] extractFeatureTypes() {
+    private synchronized String[] extractFeatureTypes() {
 
         String[] fts = null;
 

@@ -20,7 +20,6 @@ import org.deegree.framework.xml.DOMPrinter;
 import org.deegree.ogcwebservices.getcapabilities.DCPType;
 import org.deegree.ogcwebservices.getcapabilities.HTTP;
 import org.deegree.ogcwebservices.getcapabilities.InvalidCapabilitiesException;
-import org.deegree.ogcwebservices.wfs.capabilities.FeatureTypeList;
 import org.deegree.ogcwebservices.wfs.capabilities.WFSCapabilities;
 import org.deegree.ogcwebservices.wfs.capabilities.WFSCapabilitiesDocument;
 import org.deegree.ogcwebservices.wfs.capabilities.WFSFeatureType;
@@ -89,7 +88,7 @@ public class WFServiceWrapper_1_1_0 extends AbstractWFSWrapper {
         }
     }
 
-    private String[] extractFeatureTypes() {
+    private synchronized String[] extractFeatureTypes() {
 
         String[] fts = null;
 
@@ -144,18 +143,6 @@ public class WFServiceWrapper_1_1_0 extends AbstractWFSWrapper {
     @Override
     public String getCapabilitesAsString() {
         return this.capsString;
-    }
-
-    String getCrsForFeatureType( QualifiedName featureTypeName ) {
-        String crs = null;
-
-        FeatureTypeList ftl = this.wfsCapabilities.getFeatureTypeList();
-
-        QualifiedName qn = featureTypeName;
-        WFSFeatureType ft = ftl.getFeatureType( qn );
-        crs = ft.getDefaultSRS().toASCIIString();
-
-        return crs;
     }
 
     @Override
