@@ -87,7 +87,7 @@ public class AVLStylePlugin extends AbstractPlugIn {
         enableCheck.add( enableCheckFactory.createExactlyNLayerablesMustBeSelectedCheck( 1, Layerable.class ) );
 
         context.getFeatureInstaller().addMainMenuItem( this, new String[] { LAYER },
-                                                       get( "AVLStylePlugin.name" ) + "{pos:10}", false, null,
+                                                       get( "AVLStylePlugin.name" ) + "{pos:13}", false, null,
                                                        enableCheck );
     }
 

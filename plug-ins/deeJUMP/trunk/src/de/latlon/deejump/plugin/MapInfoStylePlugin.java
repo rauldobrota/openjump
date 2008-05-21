@@ -92,7 +92,7 @@ public class MapInfoStylePlugin extends AbstractPlugIn {
         enableCheck.add( enableCheckFactory.createExactlyNLayerablesMustBeSelectedCheck( 1, Layerable.class ) );
 
         context.getFeatureInstaller().addMainMenuItem( this, new String[] { LAYER },
-                                                       get( "MapInfoStylePlugin.name" ) + "{pos:10}", false, null,
+                                                       get( "MapInfoStylePlugin.name" ) + "{pos:13}", false, null,
                                                        enableCheck );
     }
 
