@@ -50,12 +50,18 @@ import static org.deegree.framework.log.LoggerFactory.getLogger;
 import java.awt.Color;
 import java.awt.Paint;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import javax.swing.JFileChooser;
 
 import org.deegree.framework.log.ILogger;
+import org.deegree.io.mapinfoapi.MIFStyle2SLD;
 import org.deegree.io.mapinfoapi.MapInfoReader;
 
 import com.vividsolutions.jump.util.Blackboard;
@@ -83,6 +89,31 @@ public class MapInfoStylePlugin extends AbstractPlugIn {
 
     private static final ILogger LOG = getLogger( MapInfoStylePlugin.class );
 
+    private static File POINTS;
+
+    static {
+        try {
+            POINTS = File.createTempFile( "points", ".zip" );
+            POINTS.deleteOnExit();
+
+            InputStream in = MIFStyle2SLD.class.getResourceAsStream( "points.zip" );
+            FileOutputStream out = new FileOutputStream( POINTS );
+
+            byte[] buf = new byte[16384];
+
+            int read;
+            if ( in != null ) {
+                while ( ( read = in.read( buf ) ) != -1 ) {
+                    out.write( buf, 0, read );
+                }
+                in.close();
+            }
+            out.close();
+        } catch ( IOException e ) {
+            LOG.logError( "Could not find the points zip file", e );
+        }
+    }
+
     @Override
     public void initialize( PlugInContext context ) {
         EnableCheckFactory enableCheckFactory = new EnableCheckFactory( context.getWorkbenchContext() );
@@ -96,79 +127,36 @@ public class MapInfoStylePlugin extends AbstractPlugIn {
                                                        enableCheck );
     }
 
-    private static void applySymbolStyle( HashMap<String, String> map, Layer layer ) {
+    private static void applySymbolStyle( HashMap<String, String> map, Layer layer )
+                            throws IOException {
         VertexStyle style = null;
         Color c = decode( map.get( "color" ) );
         int size = parseInt( map.get( "size" ) );
         int symbol = parseInt( map.get( "shape" ) );
 
-        style = new BitmapVertexStyle( "/home/stranger/svgpoints/" + ( symbol - 30 ) + ".svg" );
+        File tmp = File.createTempFile( "mapinfosymbol", null );
+
+        // if it's not found in the zip file, or no zip file, well, too bad...
+        ZipFile zip = new ZipFile( POINTS );
+        ZipEntry entry = zip.getEntry( symbol + ".svg" );
+        InputStream in = zip.getInputStream( entry );
+        FileOutputStream out = new FileOutputStream( tmp );
+        tmp.deleteOnExit();
+
+        byte[] buf = new byte[16384];
+        int read;
+        while ( ( read = in.read( buf ) ) != -1 ) {
+            out.write( buf, 0, read );
+        }
+
+        out.close();
+        in.close();
+        zip.close();
+
+        style = new BitmapVertexStyle( tmp.toString() );
         style.setSize( size );
         style.setFillColor( c );
         style.setLineColor( c );
-        // switch ( symbol ) {
-        // case 31:
-        // break;
-        // case 32:
-        // style = new SquareVertexStyle();
-        // style.setSize( size / 2 );
-        // l.getBasicStyle().setFillColor( c );
-        // l.getBasicStyle().setLineColor( black );
-        // break;
-        // case 34:
-        // style = new CircleVertexStyle();
-        // style.setSize( size / 2 );
-        // l.getBasicStyle().setFillColor( c );
-        // l.getBasicStyle().setLineColor( black );
-        // break;
-        // case 35:
-        // style = new StarVertexStyle();
-        // style.setSize( size / 2 );
-        // l.getBasicStyle().setFillColor( c );
-        // l.getBasicStyle().setLineColor( black );
-        // break;
-        // case 36:
-        // style = new TriangleVertexStyle();
-        // style.setSize( size / 2 );
-        // l.getBasicStyle().setFillColor( c );
-        // l.getBasicStyle().setLineColor( black );
-        // break;
-        // case 38:
-        // style = new SquareVertexStyle();
-        // style.setSize( size / 2 );
-        // l.getBasicStyle().setLineColor( c );
-        // style.setFilling( false );
-        // l.getBasicStyle().setRenderingFill( false );
-        // break;
-        // case 40:
-        // style = new CircleVertexStyle();
-        // style.setSize( size / 2 );
-        // l.getBasicStyle().setLineColor( c );
-        // style.setFilling( false );
-        // l.getBasicStyle().setRenderingFill( false );
-        // break;
-        // case 41:
-        // style = new StarVertexStyle();
-        // style.setSize( size / 2 );
-        // l.getBasicStyle().setLineColor( c );
-        // style.setFilling( false );
-        // l.getBasicStyle().setRenderingFill( false );
-        // break;
-        // case 42:
-        // style = new TriangleVertexStyle();
-        // style.setSize( size / 2 );
-        // l.getBasicStyle().setLineColor( c );
-        // style.setFilling( false );
-        // l.getBasicStyle().setRenderingFill( false );
-        // break;
-        // case 49:
-        // style = new CrossVertexStyle();
-        // style.setSize( size / 2 );
-        // l.getBasicStyle().setLineColor( c );
-        // style.setFilling( false );
-        // l.getBasicStyle().setRenderingFill( false );
-        // break;
-        // }
 
         if ( style != null ) {
             style.setEnabled( true );
@@ -274,10 +262,6 @@ public class MapInfoStylePlugin extends AbstractPlugIn {
         BasicStyle style = layer.getBasicStyle();
         int pattern = parseInt( map.get( "pattern" ) );
         Color fore = decode( map.get( "forecolor" ) );
-//        Color back = null;
-//        if ( map.get( "backcolor" ) != null ) {
-//            back = decode( map.get( "backcolor" ) );
-//        }
 
         style.setRenderingFillPattern( true );
         style.setRenderingFill( true );
@@ -285,6 +269,8 @@ public class MapInfoStylePlugin extends AbstractPlugIn {
 
         Paint[] patterns = new FillPatternFactory().createFillPatterns();
 
+        // the mapping could be better, but the better way is to use direct MIF2SLD export from
+        // deegree anyway
         switch ( pattern ) {
         case 1:
             style.setRenderingFillPattern( false );
