@@ -44,11 +44,17 @@ import static de.latlon.deejump.i18n.I18N.get;
 import static javax.swing.JFileChooser.APPROVE_OPTION;
 import static org.deegree.framework.log.LoggerFactory.getLogger;
 import static org.openjump.core.ui.plugin.style.ImportSLDPlugIn.importSLD;
+import static org.openjump.util.SLDImporter.NSCONTEXT;
+import static org.openjump.util.SLDImporter.OGCNS;
+import static org.openjump.util.SLDImporter.SLDNS;
+import static org.openjump.util.XPathUtils.getElement;
+import static org.openjump.util.XPathUtils.getElements;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import javax.swing.JFileChooser;
 
@@ -56,6 +62,7 @@ import org.deegree.framework.log.ILogger;
 import org.deegree.io.mapinfoapi.MIFStyle2SLD;
 import org.deegree.io.mapinfoapi.MapInfoReader;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.vividsolutions.jump.util.Blackboard;
 import com.vividsolutions.jump.workbench.model.Layerable;
@@ -135,6 +142,51 @@ public class MapInfoStylePlugin extends AbstractPlugIn {
 
             MIFStyle2SLD mif2sld = new MIFStyle2SLD( MIFStyle2SLD.class.getResource( "MAPSYM.TTF" ) );
             Document doc = mif2sld.getStyle( reader.getStyles(), f.getName() ).getRootElement().getOwnerDocument();
+
+            context.getLayerNamePanel().getSelectedLayers()[0].getBasicStyle().setEnabled( false );
+
+            // rework the SLD to be able to import it...
+            Element root = doc.getDocumentElement();
+            Element style = getElement( "//sld:FeatureTypeStyle", root, NSCONTEXT );
+
+            List<Element> lines = getElements( "//sld:Rule[sld:LineSymbolizer]", root, NSCONTEXT );
+            List<Element> polys = getElements( "//sld:Rule[sld:PolygonSymbolizer]", root, NSCONTEXT );
+            for ( Element e : lines ) {
+                Element filter = getElement( "ogc:Filter/ogc:Or", e, NSCONTEXT );
+                filter.getParentNode().removeChild( filter );
+                style.removeChild( e );
+            }
+            for ( Element e : polys ) {
+                Element filter = getElement( "ogc:Filter/ogc:Or", e, NSCONTEXT );
+                filter.getParentNode().removeChild( filter );
+                style.removeChild( e );
+            }
+
+            for ( Element line : lines ) {
+                for ( Element poly : polys ) {
+                    Element rule = doc.createElementNS( SLDNS, "sld:Rule" );
+                    Element name = doc.createElementNS( SLDNS, "sld:Name" );
+                    String styleid = getElement( "sld:Name", line, NSCONTEXT ).getTextContent() + "_"
+                                     + getElement( "sld:Name", poly, NSCONTEXT ).getTextContent();
+                    name.setTextContent( styleid );
+                    rule.appendChild( name );
+                    Element filter = doc.createElementNS( OGCNS, "ogc:Filter" );
+                    Element cond = doc.createElementNS( OGCNS, "ogc:PropertyIsEqualTo" );
+                    filter.appendChild( cond );
+                    rule.appendChild( filter );
+                    Element pn = doc.createElementNS( OGCNS, "ogc:PropertyName" );
+                    pn.setTextContent( "app:styleid" );
+                    cond.appendChild( pn );
+                    pn = doc.createElementNS( OGCNS, "ogc:Literal" );
+                    pn.setTextContent( styleid );
+                    cond.appendChild( pn );
+
+                    rule.appendChild( getElement( "sld:LineSymbolizer", line, NSCONTEXT ).cloneNode( true ) );
+                    rule.appendChild( getElement( "sld:PolygonSymbolizer", poly, NSCONTEXT ).cloneNode( true ) );
+
+                    style.appendChild( rule );
+                }
+            }
 
             importSLD( doc, context );
         }
