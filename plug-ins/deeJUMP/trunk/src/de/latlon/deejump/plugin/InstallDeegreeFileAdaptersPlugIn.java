@@ -11,6 +11,7 @@ import com.vividsolutions.jump.workbench.datasource.SaveFileDataSourceQueryChoos
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 
+import de.latlon.deejump.io.DeegreeReaderWriterFileDataSource.DeeCSVFile;
 import de.latlon.deejump.io.DeegreeReaderWriterFileDataSource.DeeGMLFile;
 import de.latlon.deejump.io.DeegreeReaderWriterFileDataSource.DeeMapInfoFile;
 import de.latlon.deejump.io.DeegreeReaderWriterFileDataSource.DeeShapefile;
@@ -29,6 +30,7 @@ public class InstallDeegreeFileAdaptersPlugIn extends AbstractPlugIn {
         final String shpDescrip = "deegree Shapefile adapter";
         final String gmlDescrip = "deegree GML adapter";
         final String mapinfoDescrip = "deegree MapInfo adapter";
+        final String csvDescrip = "deegree CSV adapter";
 
         // for SAVing
         DataSourceQueryChooserManager manager = DataSourceQueryChooserManager.get( context.getWorkbenchContext().getWorkbench().getBlackboard() );
@@ -84,6 +86,16 @@ public class InstallDeegreeFileAdaptersPlugIn extends AbstractPlugIn {
             protected void addFileFilters( JFileChooser chooser ) {
                 super.addFileFilters( chooser );
                 addCompressedFileFilter( mapinfoDescrip, chooser );
+            }
+        } );
+
+        manager.addLoadDataSourceQueryChooser( new LoadFileDataSourceQueryChooser( DeeCSVFile.class, csvDescrip,
+                                                                                   extensions( DeeCSVFile.class ),
+                                                                                   context.getWorkbenchContext() ) {
+            @Override
+            protected void addFileFilters( JFileChooser chooser ) {
+                super.addFileFilters( chooser );
+                addCompressedFileFilter( csvDescrip, chooser );
             }
         } );
 
