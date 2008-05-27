@@ -38,21 +38,30 @@
 
 package de.latlon.deejump.io;
 
+import static de.latlon.deejump.i18n.I18N.get;
 import static de.latlon.deejump.util.data.JUMPFeatureFactory.createFromDeegreeFC;
+
+import java.awt.Dialog;
+import java.util.List;
+
+import javax.swing.JDialog;
 
 import org.deegree.io.csv.CSVReader;
 
 import com.vividsolutions.jump.feature.FeatureCollection;
 import com.vividsolutions.jump.io.DriverProperties;
 import com.vividsolutions.jump.io.JUMPReader;
+import com.vividsolutions.jump.workbench.ui.OKCancelDialog;
+
+import de.latlon.deejump.ui.CSVSelectionPanel;
 
 /**
  * <code>DeegreeCSVReader</code>
  * 
  * @author <a href="mailto:schmitz@lat-lon.de">Andreas Schmitz</a>
- * @author last edited by: $Author:$
+ * @author last edited by: $Author$
  * 
- * @version $Revision:$, $Date:$
+ * @version $Revision$, $Date$
  */
 public class DeegreeCSVReader implements JUMPReader {
 
@@ -62,7 +71,20 @@ public class DeegreeCSVReader implements JUMPReader {
 
         CSVReader reader = new CSVReader( ',', fileRoot );
 
-        return createFromDeegreeFC( reader.parseFeatureCollection() );
+        List<String[]> header = reader.getHeader();
+
+        CSVSelectionPanel panel = new CSVSelectionPanel( header );
+        Dialog parent = new JDialog();
+        parent.setLocationRelativeTo( null );
+        OKCancelDialog dlg = new OKCancelDialog( parent, get( "General.question" ), true, panel, null );
+        dlg.setVisible( true );
+
+        if ( dlg.wasOKPressed() ) {
+            reader.setPointColumns( panel.getXColumn(), panel.getYColumn() );
+            return createFromDeegreeFC( reader.parseFeatureCollection() );
+        }
+
+        return null;
     }
 
 }
