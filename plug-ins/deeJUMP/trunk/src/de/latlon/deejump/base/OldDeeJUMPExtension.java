@@ -40,7 +40,7 @@
 
  
  ---------------------------------------------------------------------------*/
-package de.latlon.deejump.util;
+package de.latlon.deejump.base;
 
 import static org.apache.log4j.Logger.getLogger;
 import static org.openjump.OpenJumpConfiguration.postExtensionInitialization;
@@ -52,10 +52,10 @@ import com.vividsolutions.jump.workbench.plugin.Extension;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.ui.WorkbenchToolBar;
 
-import de.latlon.deejump.plugin.AVLStylePlugin;
-import de.latlon.deejump.plugin.InstallDeegreeFileAdaptersPlugIn;
-import de.latlon.deejump.plugin.MapInfoStylePlugin;
-import de.latlon.deejump.plugin.wms.LayerAndWMSFeatureInfoTool;
+import de.latlon.deejump.base.plugin.AVLStylePlugin;
+import de.latlon.deejump.base.plugin.InstallDeegreeFileAdaptersPlugIn;
+import de.latlon.deejump.base.plugin.LayerAndWMSFeatureInfoTool;
+import de.latlon.deejump.base.plugin.MapInfoStylePlugin;
 
 /**
  * ...

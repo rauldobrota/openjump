@@ -1,6 +1,6 @@
-package de.latlon.deejump.io;
+package de.latlon.deejump.base.io;
 
-import static de.latlon.deejump.util.data.JUMPFeatureFactory.createFromDeegreeFC;
+import static de.latlon.deejump.wfs.data.JUMPFeatureFactory.createFromDeegreeFC;
 
 import org.deegree.io.mapinfoapi.MapInfoReader;
 

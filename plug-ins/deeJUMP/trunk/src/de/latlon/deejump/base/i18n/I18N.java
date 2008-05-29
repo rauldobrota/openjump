@@ -6,7 +6,7 @@
  * This program is free software under the GPL (v2.0)
  * Read the file LICENSE.txt coming with the sources for details.
  */
-package de.latlon.deejump.i18n;
+package de.latlon.deejump.base.i18n;
 
 import java.io.IOException;
 import java.io.InputStream;

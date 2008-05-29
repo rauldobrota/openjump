@@ -36,7 +36,7 @@
  E-Mail: greve@giub.uni-bonn.de
  ---------------------------------------------------------------------------*/
 
-package de.latlon.deejump.ui;
+package de.latlon.deejump.base.ui;
 
 import static java.awt.GridBagConstraints.WEST;
 import static java.util.Arrays.asList;
@@ -58,9 +58,9 @@ import javax.swing.JRadioButton;
  * <code>CSVSelectionPanel</code>
  * 
  * @author <a href="mailto:schmitz@lat-lon.de">Andreas Schmitz</a>
- * @author last edited by: $Author:$
+ * @author last edited by: $Author$
  * 
- * @version $Revision:$, $Date:$
+ * @version $Revision$, $Date$
  */
 public class CSVSelectionPanel extends JPanel {
 
@@ -103,7 +103,7 @@ public class CSVSelectionPanel extends JPanel {
         xboxes = new JRadioButton[header.get( 0 ).length];
 
         gb.anchor = WEST;
-        add( new JLabel( de.latlon.deejump.i18n.I18N.get( "CSVSelectionPanel.useasx" ) ), gb );
+        add( new JLabel( de.latlon.deejump.base.i18n.I18N.get( "CSVSelectionPanel.useasx" ) ), gb );
         ++gb.gridx;
 
         for ( int i = 0; i < xboxes.length; ++i ) {
@@ -115,7 +115,7 @@ public class CSVSelectionPanel extends JPanel {
         ++gb.gridy;
         gb.gridx = 0;
         yboxes = new JRadioButton[header.get( 0 ).length];
-        add( new JLabel( de.latlon.deejump.i18n.I18N.get( "CSVSelectionPanel.useasy" ) ), gb );
+        add( new JLabel( de.latlon.deejump.base.i18n.I18N.get( "CSVSelectionPanel.useasy" ) ), gb );
         ++gb.gridx;
 
         for ( int i = 0; i < yboxes.length; ++i ) {

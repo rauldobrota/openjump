@@ -36,10 +36,10 @@
  E-Mail: greve@giub.uni-bonn.de
  ---------------------------------------------------------------------------*/
 
-package de.latlon.deejump.io;
+package de.latlon.deejump.base.io;
 
-import static de.latlon.deejump.i18n.I18N.get;
-import static de.latlon.deejump.util.data.JUMPFeatureFactory.createFromDeegreeFC;
+import static de.latlon.deejump.base.i18n.I18N.get;
+import static de.latlon.deejump.wfs.data.JUMPFeatureFactory.createFromDeegreeFC;
 
 import java.awt.Dialog;
 import java.util.List;
@@ -53,7 +53,7 @@ import com.vividsolutions.jump.io.DriverProperties;
 import com.vividsolutions.jump.io.JUMPReader;
 import com.vividsolutions.jump.workbench.ui.OKCancelDialog;
 
-import de.latlon.deejump.ui.CSVSelectionPanel;
+import de.latlon.deejump.base.ui.CSVSelectionPanel;
 
 /**
  * <code>DeegreeCSVReader</code>

@@ -36,7 +36,7 @@
  E-Mail: greve@giub.uni-bonn.de
  ---------------------------------------------------------------------------*/
 
-package de.latlon.deejump;
+package de.latlon.deejump.base;
 
 /**
  * <code>Version</code>

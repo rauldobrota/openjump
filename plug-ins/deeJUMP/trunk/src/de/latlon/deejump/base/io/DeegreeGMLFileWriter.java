@@ -4,7 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package de.latlon.deejump.io;
+package de.latlon.deejump.base.io;
 
 import java.io.FileOutputStream;
 
@@ -15,7 +15,7 @@ import com.vividsolutions.jump.io.DriverProperties;
 import com.vividsolutions.jump.io.IllegalParametersException;
 import com.vividsolutions.jump.io.JUMPWriter;
 
-import de.latlon.deejump.util.data.JUMPFeatureFactory;
+import de.latlon.deejump.wfs.data.JUMPFeatureFactory;
 
 /**
  * @author hamammi

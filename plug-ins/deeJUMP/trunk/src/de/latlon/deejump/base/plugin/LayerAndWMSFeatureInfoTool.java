@@ -30,7 +30,7 @@
  * www.vividsolutions.com
  */
 
-package de.latlon.deejump.plugin.wms;
+package de.latlon.deejump.base.plugin;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -67,7 +67,7 @@ import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.cursortool.SpecifyFeaturesTool;
 import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 
-import de.latlon.deejump.util.data.JUMPFeatureFactory;
+import de.latlon.deejump.wfs.data.JUMPFeatureFactory;
 
 /**
  * 

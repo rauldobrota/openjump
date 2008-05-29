@@ -41,7 +41,7 @@
  
  ---------------------------------------------------------------------------*/
 
-package de.latlon.deejump.io;
+package de.latlon.deejump.base.io;
 
 import com.vividsolutions.jump.io.datasource.StandardReaderWriterFileDataSource;
 

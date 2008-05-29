@@ -36,11 +36,11 @@
  E-Mail: greve@giub.uni-bonn.de
  ---------------------------------------------------------------------------*/
 
-package de.latlon.deejump.plugin;
+package de.latlon.deejump.base.plugin;
 
 import static com.vividsolutions.jump.workbench.ui.MenuNames.LAYER;
 import static com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn.get;
-import static de.latlon.deejump.i18n.I18N.get;
+import static de.latlon.deejump.base.i18n.I18N.get;
 import static javax.swing.JFileChooser.APPROVE_OPTION;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.showMessageDialog;
@@ -64,7 +64,7 @@ import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 
-import de.latlon.deejump.i18n.I18N;
+import de.latlon.deejump.base.i18n.I18N;
 
 /**
  * <code>AVLStylePlugin</code>

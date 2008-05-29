@@ -1,4 +1,4 @@
-package de.latlon.deejump.plugin;
+package de.latlon.deejump.base.plugin;
 
 import static com.vividsolutions.jump.workbench.datasource.InstallStandardDataSourceQueryChoosersPlugIn.addCompressedFileFilter;
 import static com.vividsolutions.jump.workbench.datasource.InstallStandardDataSourceQueryChoosersPlugIn.extensions;
@@ -11,9 +11,9 @@ import com.vividsolutions.jump.workbench.datasource.SaveFileDataSourceQueryChoos
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 
-import de.latlon.deejump.io.DeegreeReaderWriterFileDataSource.DeeGMLFile;
-import de.latlon.deejump.io.DeegreeReaderWriterFileDataSource.DeeMapInfoFile;
-import de.latlon.deejump.io.DeegreeReaderWriterFileDataSource.DeeShapefile;
+import de.latlon.deejump.base.io.DeegreeReaderWriterFileDataSource.DeeGMLFile;
+import de.latlon.deejump.base.io.DeegreeReaderWriterFileDataSource.DeeMapInfoFile;
+import de.latlon.deejump.base.io.DeegreeReaderWriterFileDataSource.DeeShapefile;
 
 /**
  * @author hamammi
