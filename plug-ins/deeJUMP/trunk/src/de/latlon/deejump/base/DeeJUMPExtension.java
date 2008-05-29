@@ -63,9 +63,9 @@ import de.latlon.deejump.base.plugin.MapInfoStylePlugin;
  * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei</a>
  * 
  */
-public class OldDeeJUMPExtension extends Extension {
+public class DeeJUMPExtension extends Extension {
 
-    private static final Logger LOG = getLogger( OldDeeJUMPExtension.class );
+    private static final Logger LOG = getLogger( DeeJUMPExtension.class );
 
     public void configure( PlugInContext context )
                             throws Exception {
