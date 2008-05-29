@@ -42,7 +42,7 @@
                 </copy>
                 <jar jarfile="${lib}/${appname}-${DSTAMP}.jar" basedir="${build}">
                   <manifest>
-                    <attribute name="Main-Class" value="de.latlon.deejump.plugin.wfs.Version" />
+                    <attribute name="Main-Class" value="de.latlon.deejump.wfs.Version" />
                   </manifest>
                 </jar>
         </target>
@@ -50,7 +50,7 @@
         <target name="dist" depends="compile" description="create the distribution">
                 <jar jarfile="${dist}/${appname}-${DSTAMP}.jar" basedir="${build}">
                   <manifest>
-                    <attribute name="Main-Class" value="de.latlon.deejump.plugin.wfs.Version" />
+                    <attribute name="Main-Class" value="de.latlon.deejump.wfs.Version" />
                   </manifest>
                 </jar>
         </target>
@@ -58,7 +58,7 @@
         <target name="simplejar" depends="compile" description="build a jar without timestamp">
                 <jar jarfile="${dist}/${appname}.jar" basedir="${build}">
                   <manifest>
-                    <attribute name="Main-Class" value="de.latlon.deejump.plugin.wfs.Version" />
+                    <attribute name="Main-Class" value="de.latlon.deejump.wfs.Version" />
                   </manifest>
                 </jar>
         </target>
