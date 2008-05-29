@@ -1,6 +1,7 @@
 2008-05-29  Andreas Schmitz <schmitz@lat-lon.de>
         Did a major refactoring.
         Adapted the build.xml.
+        Fixed the compile target not to build a .jar.
 
 2008-05-19  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/plugin/wfs/WFServiceWrapper_1_0_0.java,
