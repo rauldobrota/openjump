@@ -41,12 +41,12 @@ public class PostGISPlugIn implements PlugIn {
    */
   public void initialize(PlugInContext context) {
     PostGISDataSource dataSource = new PostGISDataSource();
-    PostGISLoadDataSourceQueryChooser loadChooser = new PostGISLoadDataSourceQueryChooser(dataSource);
+    //PostGISLoadDataSourceQueryChooser loadChooser = new PostGISLoadDataSourceQueryChooser(dataSource);
     PostGISSaveDataSourceQueryChooser saveChooser = new PostGISSaveDataSourceQueryChooser(dataSource);
     
     DataSourceQueryChooserManager.get(
       context.getWorkbenchContext().getWorkbench().getBlackboard()
-    ).addLoadDataSourceQueryChooser(loadChooser)
+    )/*.addLoadDataSourceQueryChooser(loadChooser)*/
     .addSaveDataSourceQueryChooser(saveChooser);
 
     PostGISOpenWizard postGISOpenWizard = new PostGISOpenWizard(context.getWorkbenchContext());
