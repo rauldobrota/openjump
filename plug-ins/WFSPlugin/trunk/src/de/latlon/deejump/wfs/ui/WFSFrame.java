@@ -8,6 +8,8 @@
  */
 package de.latlon.deejump.wfs.ui;
 
+import static de.latlon.deejump.wfs.Version.VERSION;
+
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -48,7 +50,7 @@ public class WFSFrame extends JFrame {
      *            an array with server addresses
      */
     public WFSFrame( WorkbenchContext context, String[] wfsURLs ) {
-        super( "WFSFrame v. " + WFSPanel.releaseVersion );
+        super( "WFSFrame v. " + VERSION );
         this.context = context;
         setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
         initGUI( wfsURLs );
@@ -136,8 +138,7 @@ public class WFSFrame extends JFrame {
     }
 
     /**
-     * Create the GUI and show it. For thread safety, this method should be invoked from the
-     * event-dispatching thread.
+     * Create the GUI and show it. For thread safety, this method should be invoked from the event-dispatching thread.
      */
     protected static void createAndShowGUI( String[] wfsURLs ) {
 

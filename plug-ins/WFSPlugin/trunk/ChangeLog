@@ -1,4 +1,9 @@
 2008-06-19  Andreas Schmitz <schmitz@lat-lon.de>
+        src/de/latlon/deejump/wfs/Version.java,
+        src/de/latlon/deejump/wfs/ui/WFSDialog.java,
+        src/de/latlon/deejump/wfs/ui/WFSPanel.java,
+        src/de/latlon/deejump/wfs/ui/WFSFrame.java:
+        Updated version constant to 1.2.0-dev.
         build.xml:
         Fixed the run target.
 

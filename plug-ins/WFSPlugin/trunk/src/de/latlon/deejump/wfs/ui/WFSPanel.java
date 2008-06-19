@@ -8,6 +8,9 @@
  */
 package de.latlon.deejump.wfs.ui;
 
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
+import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
+
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -75,8 +78,6 @@ public class WFSPanel extends JPanel {
 
     protected static final Logger LOG = Logger.getLogger( WFSPanel.class );
 
-    protected static final String releaseVersion = "1.0.0";
-
     // Constants for spatial search criteria type
     // also used by child panels
     /** Search uses no spatial criteria */
@@ -93,8 +94,7 @@ public class WFSPanel extends JPanel {
     private static File lastDirectory;
 
     /**
-     * The standard geometry type name (used when getting schemata and creating filters with spatial
-     * clauses
+     * The standard geometry type name (used when getting schemata and creating filters with spatial clauses
      */
     public static final String GEOMETRY_PROPERTY_NAME = "GEOM";
 
@@ -338,8 +338,7 @@ public class WFSPanel extends JPanel {
             public void itemStateChanged( ItemEvent e ) {
                 if ( e.getStateChange() == ItemEvent.SELECTED ) {
                     /*
-                     * String selected = extensibleComboBox.getSelectedItem().toString();
-                     * reinitService( selected );
+                     * String selected = extensibleComboBox.getSelectedItem().toString(); reinitService( selected );
                      */
                 }
             }
@@ -373,8 +372,7 @@ public class WFSPanel extends JPanel {
         }
 
         // ta.setLineWrap( true );
-        JScrollPane sp = new JScrollPane( xmlPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                          JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
+        JScrollPane sp = new JScrollPane( xmlPane, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED );
         sp.setMaximumSize( new Dimension( 600, 400 ) );
         sp.setPreferredSize( new Dimension( 800, 400 ) );
 
@@ -686,8 +684,8 @@ public class WFSPanel extends JPanel {
     }
 
     /**
-     * Convenience method to create XML tags mit "ogc" namespace. For example an input like MyTag
-     * will return <code>{"<ogc:MyTag>", "</ogc:MyTag>"}</code>
+     * Convenience method to create XML tags mit "ogc" namespace. For example an input like MyTag will return
+     * <code>{"<ogc:MyTag>", "</ogc:MyTag>"}</code>
      * 
      * @param tagName
      *            the tag name

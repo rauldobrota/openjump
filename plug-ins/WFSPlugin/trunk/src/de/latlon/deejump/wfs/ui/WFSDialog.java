@@ -9,6 +9,8 @@
 
 package de.latlon.deejump.wfs.ui;
 
+import static de.latlon.deejump.wfs.Version.VERSION;
+
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -21,12 +23,10 @@ import javax.swing.JDialog;
 
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 
-
 /**
- * This dialog presents a graphical user interface to OGC Filter operations. It encapsulates two
- * panels, one for attribute-based feature search and the other for geometry-based search. Both
- * search methods can be combined. The dialog generates a GetFeature request as an XML string. This
- * can be used to query a WFS.
+ * This dialog presents a graphical user interface to OGC Filter operations. It encapsulates two panels, one for
+ * attribute-based feature search and the other for geometry-based search. Both search methods can be combined. The
+ * dialog generates a GetFeature request as an XML string. This can be used to query a WFS.
  * 
  * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei </a>
  * 
@@ -41,8 +41,8 @@ public class WFSDialog extends JDialog {
     public static final String WFS_URL_LIST = "WFS_URL_LIST";
 
     /**
-     * Whether the dialog has enough info to produce a search or it makes sense to carry on. For
-     * example, when the user closed (cancelled) the dialog.
+     * Whether the dialog has enough info to produce a search or it makes sense to carry on. For example, when the user
+     * closed (cancelled) the dialog.
      */
     boolean canSearch = false;
 
@@ -60,15 +60,14 @@ public class WFSDialog extends JDialog {
      * @param title
      *            the name to appear on the window bar
      * @param urls
-     *            the address of the server. This is something like
-     *            http://my.domain.com/deegreewfs/wfs
+     *            the address of the server. This is something like http://my.domain.com/deegreewfs/wfs
      * @throws java.awt.HeadlessException
      */
     public WFSDialog( WorkbenchContext context, Frame owner, String title, String[] urls ) {
 
         super( owner, title, true );
         this.context = context;
-        setTitle( "WFSPlugin v. " + WFSPanel.releaseVersion );
+        setTitle( "WFSPlugin v. " + VERSION );
         setLocation( 0, 50 );
         addWindowListener( new WindowAdapter() {
             @Override
@@ -119,9 +118,9 @@ public class WFSDialog extends JDialog {
     }
 
     /**
-     * Whether it makes sense to ask for a GetFeature request. This is generally true, but clicking
-     * on the Cancel or clisong the dialog will return <code>false</code>, meaning that the user
-     * changed his mind and no requst should be sent.
+     * Whether it makes sense to ask for a GetFeature request. This is generally true, but clicking on the Cancel or
+     * clisong the dialog will return <code>false</code>, meaning that the user changed his mind and no requst should
+     * be sent.
      * 
      * @return a boolean value hinting whether to carry on or not
      */
