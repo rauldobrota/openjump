@@ -1,3 +1,7 @@
+2008-06-19  Andreas Schmitz <schmitz@lat-lon.de>
+        build.xml:
+        Fixed the run target.
+
 2008-05-29  Andreas Schmitz <schmitz@lat-lon.de>
         Did a major refactoring.
         Adapted the build.xml.
