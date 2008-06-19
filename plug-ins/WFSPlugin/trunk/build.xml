@@ -59,7 +59,7 @@
   </target>
 
   <target name="run" depends="compile" description="run the application like 'ant run -Dargs=http://your.wfs.host./wfsserver/wfs'">
-    <java classname="de.latlon.deejump.plugin.wfs.WFSFrame"
+    <java classname="de.latlon.deejump.wfs.ui.WFSFrame"
           fork="true"
           classpathref="classpath" >
       <arg line="${args}" />
