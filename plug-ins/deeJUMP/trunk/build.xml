@@ -61,7 +61,7 @@
   </target>
 
   <target name="jar" depends="compile">
-    <jar destfile="${dist}/deejump.jar" basedir="classes">
+    <jar destfile="${dist}/deejump.jar" basedir="bin">
       <manifest>
         <attribute name="Main-Class" value="de.latlon.deejump.base.Version" />
       </manifest>
