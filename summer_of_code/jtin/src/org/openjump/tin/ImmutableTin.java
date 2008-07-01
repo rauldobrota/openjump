@@ -6,7 +6,14 @@ package org.openjump.tin;
 import org.openjump.tin.io.JTFLayout;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.PrecisionModel;
 import com.vividsolutions.jts.util.Assert;
+import com.vividsolutions.jts.index.strtree.STRtree;
+import com.vividsolutions.jts.geom.GeometryFactory;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -37,8 +44,7 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	
 	private int SRID;
 	
-	// constants used in the formatting of passed triTables
-
+	private STRtree faceIndex;
 
 	
 	/**
@@ -51,7 +57,7 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	 */
 	public ImmutableTin (Coordinate[] points, int[][] triTable, 
 						 List<int[]> bl, List<int[]> bd, int spatialID) {
-		
+		faceIndex = new STRtree();
 		this.SRID = spatialID;
 		this.vertices = (Coordinate[])points.clone();
 		this.faceTable = new TinFace[triTable.length];
@@ -66,6 +72,7 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 										triTable[i][JTFLayout.TRITABLE_NEIGHBOR_1],
 										triTable[i][JTFLayout.TRITABLE_NEIGHBOR_2],
 										vertices, faceTable);
+			faceIndex.insert(this.faceTable[i].getEnvelope(), this.faceTable[i]);
 		}
 		
 		this.breaklines = new ArrayList<int[]>(bl.size());
@@ -80,6 +87,10 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 		for (Iterator<int[]> itr = bd.iterator(); itr.hasNext(); ) {
 			this.boundaries.add(itr.next().clone());
 		}
+	}
+	
+	public TriangulatedIrregularNetwork subset (Envelope envelope) {
+		return this;
 	}
 	
 	public int getNumVertices() {
@@ -111,12 +122,16 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	}
 
 	public int[] getTriangleArrayN (int n) {
-		return new int[] { faceTable[n].vertex0,
-				faceTable[n].vertex1,
-				faceTable[n].vertex2,
-				faceTable[n].neighbor0,
-				faceTable[n].neighbor1,
-				faceTable[n].neighbor2 };			
+		return new int[] { faceTable[n].getVertex0Index(),
+				faceTable[n].getVertex1Index(),
+				faceTable[n].getVertex2Index(),
+				faceTable[n].getNeighbor0Index(),
+				faceTable[n].getNeighbor1Index(),
+				faceTable[n].getNeighbor2Index() };			
+	}
+	
+	public TinFace getTriangleN (int n) {
+		return this.faceTable[n];
 	}
 	
 	public List<int[]> getBreaklines() {
@@ -126,6 +141,33 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	public List<int[]> getBoundaries() {
 		return boundaries;
 	}
+	
+	public MultiLineString getBreaklinesAsMultiLineString() {
+		GeometryFactory gf = new GeometryFactory(new PrecisionModel(), this.SRID);
+		return lineArrayListToMultiLineString(this.breaklines, gf);
+	}
+	
+	public MultiLineString getBoundariesAsMultiLineString() {
+		GeometryFactory gf = new GeometryFactory(new PrecisionModel(), this.SRID);
+		return lineArrayListToMultiLineString(this.boundaries, gf);
+	}
+	
+	protected MultiLineString lineArrayListToMultiLineString (List<int[]> lines, GeometryFactory gf) {
+		LineString[] linesArray = new LineString[lines.size()];
+		for (int i=0; i<lines.size(); i++) {
+			linesArray[i] = gf.createLineString(indexArrayToCoordinateArray(lines.get(i)));
+		}
+		return gf.createMultiLineString(linesArray);
+	}
+	
+	protected Coordinate[] indexArrayToCoordinateArray(int[] indexArray) {
+		Coordinate[] coords = new Coordinate[indexArray.length];
+		for (int i=0; i<indexArray.length; i++) {
+			coords[i] = this.vertices[indexArray[i]];
+		}
+		return coords;
+	}
+
 	
 	public String toString(){
 		StringBuffer verticesString = new StringBuffer("\n\nVertices:\n");

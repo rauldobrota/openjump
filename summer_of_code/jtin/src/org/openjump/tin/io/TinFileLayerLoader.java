@@ -6,6 +6,7 @@ package org.openjump.tin.io;
 import org.openjump.tin.io.JTFReader;
 import org.openjump.tin.ImmutableTin;
 import org.openjump.tin.TinLayer;
+import org.openjump.tin.TriangulatedIrregularNetwork;
 
 import java.net.URI;
 import java.util.List;
@@ -16,12 +17,13 @@ import java.io.IOException;
 import org.openjump.core.ui.io.file.AbstractFileLayerLoader;
 import org.openjump.core.ui.util.TaskUtil;
 
-
+import com.vividsolutions.jump.util.LangUtil;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.ui.ErrorHandler;
 import com.vividsolutions.jump.workbench.model.LayerManager;
 import com.vividsolutions.jump.workbench.model.Category;
+import com.vividsolutions.jts.util.Assert;
 
 
 
@@ -32,12 +34,9 @@ import com.vividsolutions.jump.workbench.model.Category;
  *
  */
 public class TinFileLayerLoader extends AbstractFileLayerLoader {
-
-	public final static int MARKER_BYTE_SIZE = 12; // six chars each two bytes big
-	public final static int NUM_INT_FIELDS = 6;
 	
 	/** The {@link TriangulatedIrregularNetwork} class. */
-	private Class tinClass;
+	private Class<ImmutableTin> tinClass;
 	
 	/** The workbench context. */
 	private WorkbenchContext workbenchContext;
@@ -48,7 +47,7 @@ public class TinFileLayerLoader extends AbstractFileLayerLoader {
 	 * @param description
 	 * @param extensions
 	 */
-	public TinFileLayerLoader(WorkbenchContext workbenchContext, Class tinClass, String description, List<String> extensions) {
+	public TinFileLayerLoader(WorkbenchContext workbenchContext, Class<ImmutableTin> tinClass, String description, List<String> extensions) {
 		super(description, extensions);
 		this.tinClass = tinClass;
 		this.workbenchContext = workbenchContext;
@@ -64,10 +63,18 @@ public class TinFileLayerLoader extends AbstractFileLayerLoader {
 	 * @return True if the file could be loaded false otherwise.
 	 */
 	public boolean open(TaskMonitor monitor, URI uri, Map<String, Object> options) {
-
-		BufferedInputStream in;
 		ImmutableTin tin;
+		BufferedInputStream in;
 		
+		/*
+		try {
+			tin = tinClass.newInstance();
+		}
+		catch (Exception e) {
+			Assert.shouldNeverReachHere("TinFileLayerLoader.open: "+e.toString());
+		}
+		*/
+
 		// open input stream
 		try {
 			in = new BufferedInputStream(uri.toURL().openStream());
@@ -89,7 +96,7 @@ public class TinFileLayerLoader extends AbstractFileLayerLoader {
 		}
 		
 		
-		// close input stream
+		/* close input stream
 		finally {
 			try {
 				in.close();
@@ -98,7 +105,7 @@ public class TinFileLayerLoader extends AbstractFileLayerLoader {
 				ErrorHandler errorHandler = workbenchContext.getErrorHandler();
 				errorHandler.handleThrowable(e);
 			}
-		}
+		}*/
 		
         LayerManager layerManager = workbenchContext.getLayerManager();
         TinLayer layer = new TinLayer (workbenchContext, uri.getPath(), layerManager, tin, tin.getSRID());

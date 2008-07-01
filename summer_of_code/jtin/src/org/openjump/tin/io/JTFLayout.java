@@ -1,18 +1,20 @@
 package org.openjump.tin.io;
 
 import java.lang.String;
+import java.nio.ByteOrder;
 
 /**
- * Constants describing the layout of a binary JTF file.
+ * This class contains constants and documentation describing the layout of a 
+ * binary JTF file.
  * <p>
- * File Format: .JTF
+ * <h1>File Format: .JTF</h1>
  * <p>
  * JTF stands for "JUMP TIN Format." It is a simple, efficient, geospatially 
  * aware standard file format for Triangular Irregular Networks (TINs). This 
  * format was initially designed to work with OpenJUMP/JTIN and allow for easy 
  * analysis and display.
  * <p>
- * Current format spec: JTF Version 1.0
+ * <h1>Current format specification: JTF Version 1.0</h1>
  * <p>
  * The file begins with a header, containing the following:
  * <p>
@@ -87,7 +89,7 @@ import java.lang.String;
  * <li>Vertex_IdxN	4 (int)	Last vertex: N = Boundary_Length
  * </ul>
  * 
- * @author paradox
+ * @author Christopher DeMars
  *
  */
 public class JTFLayout {
@@ -98,6 +100,8 @@ public class JTFLayout {
 	public final static int NUM_COORDINATES_PER_VERTEX = 3;
 	public final static int NUM_TRIANGLE_INT_FIELDS = 6;
 	public final static String FILE_NAME_EXTENSION = "jtf";
+	public final static ByteOrder BYTE_ORDER = ByteOrder.BIG_ENDIAN;
+	public final static String CHAR_SET = "UTF-16BE";
 
 	// format for triangle table arrangement. Value is equal to array index
 	// in the tritable.
@@ -107,6 +111,8 @@ public class JTFLayout {
 	public final static int TRITABLE_NEIGHBOR_0 = 3;
 	public final static int TRITABLE_NEIGHBOR_1 = 4;
 	public final static int TRITABLE_NEIGHBOR_2 = 5;
+	
+
 	
 	
 	public JTFLayout(){}
