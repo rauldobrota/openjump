@@ -1,5 +1,9 @@
 2008-07-04  Stephan Holl <stephan.holl@intevation.de>
 
+	* HowToRelease.txt: FTP-Upload not possible, changed to SFTP
+
+2008-07-04  Stephan Holl <stephan.holl@intevation.de>
+
 	prepared to the new release 1.1.0
 
 	* src/de/latlon/deejump/wfs/Version.java: adopted Version to 1.1.0
