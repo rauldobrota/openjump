@@ -1,3 +1,13 @@
+2008-07-04  Stephan Holl <stephan.holl@intevation.de>
+
+	prepared to the new release 1.1.0
+
+	* src/de/latlon/deejump/wfs/Version.java: adopted Version to 1.1.0
+
+	* Changes.txt: added new features of release 1.1.0
+
+	* HowToRelease: adopted Path to version, made it more generic
+
 2008-06-19  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/wfs/Version.java,
         src/de/latlon/deejump/wfs/ui/WFSDialog.java,

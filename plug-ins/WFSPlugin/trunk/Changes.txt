@@ -1,3 +1,26 @@
+Version 1.1.0 (2008-07-04)
+
+   This release includes the following new features and bugfixes:
+
+   Features:
+    - implemented WFS-T for WFS 1.1.0 (mainly tested against deegree
+      WFS-T-server
+    - added basic authentification-support for usage with deegree OWSProxy
+    - updated with current deegree2.jar 
+    - handling of empty featuretypes and fake geometries (useful for transactions)
+    - improved internal threading
+
+   Bugfixes:
+    - fix of WFSFrame for standalone usage
+    - fix for non-localized messages under Windows
+    - some cosmetics on the build-mechanism
+    - improved exceptions
+    - improved API for more generic use (outside the plugin)
+    - code-cleanup and
+    - fixed 'caching' of transaction requests
+    - fixed WFS 1.0.0 regarding feature types without namespaceregarding feature types without namespace
+    - convert long values to int since OpenJUMP dies not know them
+
 Version 1.0.0 (2007-06-03)
 
   This release includes more fixes.
