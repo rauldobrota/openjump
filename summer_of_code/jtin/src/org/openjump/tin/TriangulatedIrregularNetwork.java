@@ -28,4 +28,5 @@ public interface TriangulatedIrregularNetwork {
 	public MultiLineString getBoundariesAsMultiLineString();
 	public TinFace getTriangleN(int n);
 	public TriangulatedIrregularNetwork subset(Envelope envelope);
+	public List<TinFace> getSubsetTriangles(Envelope envelope);
 }

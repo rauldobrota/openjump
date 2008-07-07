@@ -59,29 +59,31 @@ public class BasicTinStyle implements TinStyle {
 	public void paint(TriangulatedIrregularNetwork tin, Graphics2D g,
 			Viewport viewport) throws Exception {
 
-		TriangulatedIrregularNetwork clippedTin = tin.subset(viewport.getEnvelopeInModelCoordinates());
+		List<TinFace> subsetTriangles = tin.getSubsetTriangles(viewport.getEnvelopeInModelCoordinates());
+		
 		Random rand = new Random();
 		
 		// paint the facets
-		for (int i = 0; i < clippedTin.getNumTriangles(); i++) {
+		for (TinFace face : subsetTriangles) {
 			try {
 				Color randColor = new Color(rand.nextInt(255), rand.nextInt(255), rand.nextInt(255), 255);
 		        g.setPaint(randColor);
 				g.setStroke(fillStroke);
-				TinFace face = clippedTin.getTriangleN(i);
 				Shape faceShape = face.toShape(viewport);
 		        g.fill(faceShape);
 			}
 			catch (Exception e) {
-				Assert.shouldNeverReachHere("BasicTinStyle.paint - face paint, face #"+i+": "+e.toString());
+				Assert.shouldNeverReachHere("BasicTinStyle.paint - face paint: "+e.toString());
 			}
 		}
 
 		
 		// draw the boundaries
+		lineStroke = new BasicStroke(5);
 		try {
+			Color randColor = new Color(rand.nextInt(255), rand.nextInt(255), rand.nextInt(255), 255);
 			StyleUtil.paint(tin.getBoundariesAsMultiLineString(), g, viewport,
-							false, null, null, true, lineStroke, lineColor);	
+							false, null, null, true, lineStroke, randColor);	
 		}
 		catch (Exception e) {
 			Assert.shouldNeverReachHere("BasicTINStyle.paint - boundary paint: "+e.toString());
@@ -89,8 +91,9 @@ public class BasicTinStyle implements TinStyle {
 		
 		// draw the breaklines
 		try {		
+			Color randColor = new Color(rand.nextInt(255), rand.nextInt(255), rand.nextInt(255), 255);
 			StyleUtil.paint(tin.getBreaklinesAsMultiLineString(), g, viewport,
-					false, null, null, true, lineStroke, lineColor);
+					false, null, null, true, lineStroke, randColor);
 		}
 		catch (Exception e) {
 			Assert.shouldNeverReachHere("BasicTINStyle.paint - breakline paint: "+e.toString());

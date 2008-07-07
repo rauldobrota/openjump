@@ -14,6 +14,9 @@ import com.vividsolutions.jts.util.Assert;
 import com.vividsolutions.jts.index.strtree.STRtree;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
+import java.util.Hashtable;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -63,8 +66,8 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 		this.faceTable = new TinFace[triTable.length];
 		
 		for (int i=0; i < triTable.length; i++) {
-			Assert.isTrue(triTable[i].length==6, 
-						  "Malformed triangle table: doesn't contain six fields for face #" + i + ".");
+			Assert.isTrue(triTable[i].length==JTFLayout.NUM_TRIANGLE_INT_FIELDS, 
+						  "Malformed triangle table: doesn't contain "+JTFLayout.NUM_TRIANGLE_INT_FIELDS+" fields for face #" + i + ".");
 			this.faceTable[i] = new TinFace (i, triTable[i][JTFLayout.TRITABLE_VERTEX_0], 
 										triTable[i][JTFLayout.TRITABLE_VERTEX_1], 
 										triTable[i][JTFLayout.TRITABLE_VERTEX_2],
@@ -90,7 +93,102 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	}
 	
 	public TriangulatedIrregularNetwork subset (Envelope envelope) {
-		return this;
+		List<TinFace> faceSubset = getSubsetTriangles(envelope);
+		int faceSubsetSize = faceSubset.size();
+
+		// collect the indexes of all the points and faces that are used in this subset
+		HashSet<Integer> pointSet= new HashSet<Integer>(faceSubsetSize);
+		HashSet<Integer> faceSet= new HashSet<Integer>(faceSubsetSize);
+		for (TinFace face : faceSubset) {
+			pointSet.add(new Integer(face.getVertex0Index()));
+			pointSet.add(new Integer(face.getVertex1Index()));
+			pointSet.add(new Integer(face.getVertex2Index()));
+			faceSet.add(new Integer(face.getThisIndex()));
+		}
+				
+		// convert pointSet and faceSet to arrays
+		Integer[] pointArray = new Integer[pointSet.size()];
+		pointSet.toArray(pointArray);
+		Integer[] faceArray = new Integer[faceSet.size()];
+		faceSet.toArray(faceArray);
+		
+		// create new point array for subset tin & create map between indexes of this.vertices and points
+		Coordinate[] points = new Coordinate[pointArray.length];
+		Hashtable<Integer, Integer> pointsHash = new Hashtable<Integer, Integer>(faceSubsetSize);
+		for (int i=0; i<pointArray.length; i++) {
+			points[i] = this.vertices[pointArray[i].intValue()];
+			pointsHash.put(pointArray[i], new Integer(i));
+		}
+		
+		// create map between faceAray and this.triTable indexes
+		Hashtable<Integer, Integer> facesHash = new Hashtable<Integer, Integer>(faceSubsetSize);
+		for (int i=0; i<faceArray.length; i++) {
+			facesHash.put(faceArray[i], new Integer(i));
+		}
+		
+		// create triangle table for this subset tin
+		int[][] triTable = new int[faceSet.size()][JTFLayout.NUM_TRIANGLE_INT_FIELDS];
+		for (int i=0; i<faceSet.size(); i++) {
+			int faceIndex = faceArray[i].intValue();
+			TinFace face = this.faceTable[faceIndex];
+			int vertex0SubsetIdx = pointsHash.get(new Integer(face.getVertex0Index())).intValue();
+			int vertex1SubsetIdx = pointsHash.get(new Integer(face.getVertex1Index())).intValue();
+			int vertex2SubsetIdx = pointsHash.get(new Integer(face.getVertex2Index())).intValue();
+			int neighbor0SubsetIdx = -1, neighbor1SubsetIdx = -1, neighbor2SubsetIdx = -1;
+			Integer n0 = new Integer(face.getNeighbor0Index());
+			Integer n1 = new Integer(face.getNeighbor1Index());
+			Integer n2 = new Integer(face.getNeighbor2Index());
+			if (faceSet.contains(n0))
+				neighbor0SubsetIdx = facesHash.get(n0).intValue();
+			if (faceSet.contains(n1))
+				neighbor1SubsetIdx = facesHash.get(n1).intValue();
+			if (faceSet.contains(n2))
+				neighbor2SubsetIdx = facesHash.get(n2).intValue();
+			
+			triTable[i][JTFLayout.TRITABLE_VERTEX_0] = vertex0SubsetIdx;
+			triTable[i][JTFLayout.TRITABLE_VERTEX_1] = vertex1SubsetIdx;
+			triTable[i][JTFLayout.TRITABLE_VERTEX_2] = vertex2SubsetIdx;
+			triTable[i][JTFLayout.TRITABLE_NEIGHBOR_0] = neighbor0SubsetIdx;
+			triTable[i][JTFLayout.TRITABLE_NEIGHBOR_1] = neighbor1SubsetIdx;
+			triTable[i][JTFLayout.TRITABLE_NEIGHBOR_2] = neighbor2SubsetIdx;
+		}
+		
+		// get subset of breaklines that are within this envelope by going 
+		// through each breakline and seeing if the current point in the line
+		// is contained in this subset. If it is, translate that point to the
+		// subset point array and add it to a temp buffer.
+		LinkedList<int[]> bk = lineSubset(this.breaklines, pointSet, pointsHash);
+		LinkedList<int[]> bd = lineSubset(this.boundaries, pointSet, pointsHash);
+
+		return new ImmutableTin(points, triTable, bk, bd, this.SRID);
+	}
+	
+	private LinkedList<int[]> lineSubset (List<int[]> lineList, HashSet<Integer> pointSet, Hashtable<Integer, Integer> pointHash) {
+		LinkedList<int[]> returnLine = new LinkedList<int[]>();
+		for (int[] line : lineList) {
+			LinkedList<Integer> tmpLine = new LinkedList<Integer>();
+			for (int i=0; i<line.length; i++) {
+				Integer tmpPointIdx = new Integer(line[i]);
+				if (pointSet.contains(tmpPointIdx))
+					tmpLine.add(pointHash.get(tmpPointIdx));
+				else if (tmpLine.size() > 1) {
+					int[] nextLine = new int[tmpLine.size()];
+					int j=0;
+					for (Integer pt : tmpLine) {
+						nextLine[j] = pt.intValue();
+						j++;
+					}
+					returnLine.add(nextLine);
+					tmpLine.clear();
+				}
+			}
+		}
+		return returnLine;
+	}
+	
+	
+	public List<TinFace> getSubsetTriangles(Envelope envelope) {
+		return (List<TinFace>)faceIndex.query(envelope);
 	}
 	
 	public int getNumVertices() {
@@ -201,6 +299,8 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 				boundariesString.toString() +
 				breaklinesString.toString());
 	}
+
+
 }
 
 
