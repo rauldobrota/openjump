@@ -43,7 +43,6 @@
 package de.latlon.deejump.base;
 
 import static org.apache.log4j.Logger.getLogger;
-import static org.openjump.OpenJumpConfiguration.postExtensionInitialization;
 
 import org.apache.log4j.Logger;
 
@@ -83,8 +82,6 @@ public class DeeJUMPExtension extends Extension {
 
         LOG.debug( "Adding FeatureInfo tool for WMS GetFeatureInfo requests..." );
         toolbar.addCursorTool( new LayerAndWMSFeatureInfoTool() );
-
-        postExtensionInitialization( context.getWorkbenchContext() );
     }
 
 }
