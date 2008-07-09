@@ -2,23 +2,40 @@ package de.latlon.deejump.base.plugin;
 
 import static com.vividsolutions.jump.workbench.datasource.InstallStandardDataSourceQueryChoosersPlugIn.addCompressedFileFilter;
 import static com.vividsolutions.jump.workbench.datasource.InstallStandardDataSourceQueryChoosersPlugIn.extensions;
+import static de.latlon.deejump.base.i18n.I18N.get;
 import static java.util.Arrays.asList;
+import static org.deegree.framework.log.LoggerFactory.getLogger;
 import static org.openjump.core.ui.io.file.FileLayerLoader.KEY;
 
+import java.awt.Dialog;
+import java.io.IOException;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 
+import org.deegree.framework.log.ILogger;
+import org.deegree.io.csv.CSVReader;
 import org.openjump.core.ui.io.file.DataSourceFileLayerLoader;
 
+import com.vividsolutions.jump.I18N;
+import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.datasource.DataSourceQueryChooserManager;
 import com.vividsolutions.jump.workbench.datasource.SaveFileDataSourceQueryChooser;
 import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.registry.Registry;
+import com.vividsolutions.jump.workbench.ui.HTMLFrame;
+import com.vividsolutions.jump.workbench.ui.OKCancelDialog;
+import com.vividsolutions.jump.workbench.ui.WorkbenchFrame;
 
 import de.latlon.deejump.base.io.DeegreeReaderWriterFileDataSource.DeeCSVFile;
 import de.latlon.deejump.base.io.DeegreeReaderWriterFileDataSource.DeeGMLFile;
 import de.latlon.deejump.base.io.DeegreeReaderWriterFileDataSource.DeeMapInfoFile;
 import de.latlon.deejump.base.io.DeegreeReaderWriterFileDataSource.DeeShapefile;
+import de.latlon.deejump.base.ui.CSVSelectionPanel;
 
 /**
  * @author hamammi
@@ -28,8 +45,10 @@ import de.latlon.deejump.base.io.DeegreeReaderWriterFileDataSource.DeeShapefile;
  */
 public class InstallDeegreeFileAdaptersPlugIn extends AbstractPlugIn {
 
+    static final ILogger LOG = getLogger( InstallDeegreeFileAdaptersPlugIn.class );
+
     @Override
-    public void initialize( PlugInContext context )
+    public void initialize( final PlugInContext context )
                             throws Exception {
 
         final String shpDescrip = "deegree Shapefile adapter";
@@ -50,7 +69,41 @@ public class InstallDeegreeFileAdaptersPlugIn extends AbstractPlugIn {
 
         registry.createEntry( KEY, new DataSourceFileLayerLoader( context.getWorkbenchContext(), DeeCSVFile.class,
                                                                   "deegree CSV adapter",
-                                                                  asList( extensions( DeeCSVFile.class ) ) ) );
+                                                                  asList( extensions( DeeCSVFile.class ) ) ) {
+            @Override
+            public boolean open( TaskMonitor monitor, URI uri, Map<String, Object> options ) {
+
+                CSVReader reader;
+                try {
+                    String fileRoot = uri.toURL().getFile();
+                    reader = new CSVReader( ',', fileRoot );
+                } catch ( IOException e ) {
+                    LOG.logError( "Unknown error", e );
+                    WorkbenchFrame workbenchFrame = context.getWorkbenchFrame();
+                    HTMLFrame outputFrame = workbenchFrame.getOutputFrame();
+                    outputFrame.createNewDocument();
+                    workbenchFrame.warnUser( I18N.get( "datasource.LoadDatasetPlugIn.problems-were-encountered" ) );
+                    return false;
+                }
+
+                List<String[]> header = reader.getHeader();
+
+                CSVSelectionPanel panel = new CSVSelectionPanel( header );
+                Dialog parent = new JDialog();
+                parent.setLocationRelativeTo( context.getWorkbenchFrame() );
+                OKCancelDialog dlg = new OKCancelDialog( parent, get( "General.question" ), true, panel, null );
+                dlg.setVisible( true );
+
+                if ( dlg.wasOKPressed() ) {
+                    // have to put Strings here, else the Hashtable#putAll does not copy them...
+                    options.put( "xcol", "" + panel.getXColumn() );
+                    options.put( "ycol", "" + panel.getYColumn() );
+                    return super.open( monitor, uri, options );
+                }
+
+                return false;
+            }
+        } );
 
         // for SAVing
         DataSourceQueryChooserManager manager = DataSourceQueryChooserManager.get( context.getWorkbenchContext().getWorkbench().getBlackboard() );
