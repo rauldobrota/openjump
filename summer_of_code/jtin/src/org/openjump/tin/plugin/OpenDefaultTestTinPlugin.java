@@ -43,13 +43,7 @@ public class OpenDefaultTestTinPlugin extends AbstractPlugIn {
 	}
 	
 	public boolean execute (PlugInContext context) throws Exception {
-/*
-		ArrayList<String> extensions = new ArrayList<String>(1);
-		extensions.add(".jtf");
-		context.getWorkbenchContext().getRegistry().createEntry(FileLayerLoader.KEY, 
-				new TinFileLayerLoader(context.getWorkbenchContext(), ImmutableTin.class,
-						"OpenJUMP TIN file", extensions));
-*/
+
 		return true;
 	}
 

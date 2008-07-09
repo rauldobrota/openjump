@@ -48,24 +48,18 @@ public class TinRenderer implements Renderer {
 		this.style = style;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.vividsolutions.jump.workbench.ui.renderer.Renderer#cancel()
-	 */
+
 	public void cancel() {
 	    cancelled = true;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.vividsolutions.jump.workbench.ui.renderer.Renderer#clearImageCache()
-	 */
+
 	public void clearImageCache() {
 		// TODO Auto-generated method stub
 
 	}
 
-	/* (non-Javadoc)
-	 * @see com.vividsolutions.jump.workbench.ui.renderer.Renderer#copyTo(java.awt.Graphics2D)
-	 */
+	
 	public void copyTo(Graphics2D graphics) {
 		try {		
 			rendering = true;			      
@@ -134,7 +128,6 @@ public class TinRenderer implements Renderer {
 		Viewport viewport = layerViewPanel.getViewport();
 		
 		try {
-			//style.paint(this.tinLayer.getTin(), graphics, layerViewPanel.getViewport());
 			this.style.paint(tin, graphics, viewport);
 		}
 		catch (Exception e) {

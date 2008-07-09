@@ -18,7 +18,7 @@ import java.awt.geom.NoninvertibleTransformException;
  * Array indices are used instead of a more object oriented approach in order
  * to eliminate duplicated Coordinates.
  * 
- * @author paradox
+ * @author Christopher DeMars
  *
  */
 public class TinFace {
@@ -44,26 +44,45 @@ public class TinFace {
 	// the index of this TinFace in the tinTriangles array.
 	private int thisIndex;
 	
-	/*
-	// constructor that creates a new TinFace with default values of -1
-	public TinFace() {
-		this.setVertex0Index(-1);
-		this.setVertex1Index(-1);
-		this.setVertex2Index(-1);
-		this.setNeighbor0Index(-1);
-		this.setNeighbor1Index(-1);
-		this.setNeighbor2Index(-1);
-		this.setThisIndex(-1);
-		this.tinVertices = null;
-		this.tinTriangles = null;
-	}
-	*/
-	
-	// construct a new TinFace with the given indices
+	/**
+	 * Create a new TinFace.
+	 * v0, v1, v2 should be in clockwise order.
+	 * n0, n1, n2 should be equal to the bordering neighbors opposite of point
+	 * 		v0, v1, and v2 respectfully.
+	 * 
+	 * @param idx	the index in <code>tfs</code> that points to this TinFace
+	 * @param v0	the index in <code>vts</code> that points to the first 
+	 * 				vertex of this triangle.
+	 * @param v1	the index in <code>vts</code> that points to the second 
+	 * 				vertex of this triangle.
+	 * @param v2	the index in <code>vts</code> that points to the third 
+	 * 				vertex of this triangle.
+	 * @param n0	the neighboring TinFace opposite vertex v0
+	 * @param n1	the neighboring TinFace opposite vertex v1
+	 * @param n2	the neighboring TinFace opposite vertex v2
+	 * @param vts	an array of points composing the TIN of which this face is
+	 * 				a member of
+	 * @param tfs	an array of TinFaces composing the TIN of which this face
+	 * 				is a member of
+	 */
 	public TinFace (int idx,
 					int v0, int v1, int v2,
 					int n0, int n1, int n2,
 					Coordinate[] vts, TinFace[] tfs) {
+		Assert.isTrue(idx>=0 && idx<tfs.length, 
+				"TinFace constructor: array index out of bounds, idx = "+idx);
+		Assert.isTrue(v0>=0 && v0<vts.length, 
+				"TinFace constructor: array index out of bounds, v0 = "+vts);
+		Assert.isTrue(v1>=0 && v1<vts.length, 
+				"TinFace constructor: array index out of bounds, v1 = "+vts);
+		Assert.isTrue(v2>=0 && v2<vts.length, 
+				"TinFace constructor: array index out of bounds, v2 = "+vts);
+		Assert.isTrue(n0>=0 && n0<tfs.length, 
+				"TinFace constructor: array index out of bounds, n0 = "+tfs);
+		Assert.isTrue(n1>=0 && n1<tfs.length, 
+				"TinFace constructor: array index out of bounds, n1 = "+tfs);
+		Assert.isTrue(n2>=0 && n2<tfs.length, 
+				"TinFace constructor: array index out of bounds, n2 = "+tfs);
 		this.setThisIndex(idx);
 		this.setVertex0Index(v0);
 		this.setVertex1Index(v1);
@@ -76,13 +95,25 @@ public class TinFace {
 		
 	}
 	
-	
+	/**
+	 * Convert this TinFace to a human readable string.
+	 * 
+	 * @return a string describing each vertex and the index of each neighbor
+	 */
 	public String toString() {
-		return("v0: " + getVertex0Index() + "\tv1: " + getVertex1Index() + "\tv2: " + getVertex2Index() +
-				"\tn0: " + getNeighbor0Index() + "\tn1: " + getNeighbor0Index() + "\tn2: " + getNeighbor0Index());
+		return("v0: " + getVertex0Index() + "\tv1: " + getVertex1Index() +
+				"\tv2: " + getVertex2Index() + "\tn0: " + getNeighbor0Index() +
+				"\tn1: " + getNeighbor0Index() + "\tn2: " + getNeighbor0Index());
 	}
 	
-	
+	/**
+	 * Calculate and return the envelope that fully encloses this face. The
+	 * minimum x and y pair are found by finding the smallest x and smallest y
+	 * value among the three vertexes. The maximum x,y pair are similarly found
+	 * by finding the largest x and largest y value among the three vertexes.
+	 * 
+	 * @return an envelope that fully encloses this face.
+	 */
 	public Envelope getEnvelope() {
 		double x1, x2, y1, y2;
 		
@@ -103,9 +134,18 @@ public class TinFace {
 		return new Envelope (x1, x2, y1, y2);
 	}
 	
+	
+	/**
+	 * Converts this TinFace to a java.awt.Shape by using a given viewport's
+	 * Java2DConverter
+	 * 
+	 * @param viewport	The JUMP viewport that will be used  to convert this 
+	 * 					TinFace model
+	 * @return 			A Shape that represents this triangular TinFace within
+	 * 					the given viewport
+	 */
 	public Shape toShape (Viewport viewport) {
 		Coordinate[] modelShell = { getVertex0(), getVertex1(), getVertex2(), getVertex0() };
-		//Assert.isTrue(false, "TinFace.toShape: modelShell = "+modelShell.toString());
 		try {
 			Coordinate[] viewShell = viewport.getJava2DConverter().toViewCoordinates(modelShell);
 			PolygonShape shape = new PolygonShape();
@@ -147,6 +187,7 @@ public class TinFace {
 	protected int getVertex2Index() {
 		return vertex2;
 	}
+	
 	protected int getNeighbor0Index() {
 		return neighbor0;
 	}

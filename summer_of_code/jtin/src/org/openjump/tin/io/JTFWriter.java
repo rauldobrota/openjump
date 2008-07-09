@@ -25,8 +25,8 @@ public class JTFWriter {
 	 * Method to convert a TriangulatedIrregularNetwork into a binary stream
 	 * in accordance with JTFLayout.
 	 * 
-	 * @param tin
-	 * @param out
+	 * @param tin			The TIN to write out
+	 * @param out			The stream to write to
 	 * @throws IOException
 	 * @see JTFLayout
 	 * @see JTFReader
@@ -99,10 +99,10 @@ public class JTFWriter {
 	/**
 	 * Accessory method to be used with both breaklines and boundaries.
 	 * 
-	 * @param out: the output stream. First integer of the stream is the number
-	 * 			of following points. Each point is an integer that represents
-	 * 			an index to an external array of points.
-	 * @return an array of integers describing the line
+	 * @param out	the output stream. First integer of the stream is the number
+	 * 				of following points. Each point is an integer that represents
+	 * 				an index to an external array of points.
+	 * @return 		an array of integers describing the line
 	 */	
 	private static void writeLine (OutputStream out, int[] line) throws IOException {
 		byte[] tmpByteArray;

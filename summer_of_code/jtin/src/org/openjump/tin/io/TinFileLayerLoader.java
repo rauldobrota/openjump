@@ -17,20 +17,21 @@ import java.io.IOException;
 import org.openjump.core.ui.io.file.AbstractFileLayerLoader;
 import org.openjump.core.ui.util.TaskUtil;
 
-import com.vividsolutions.jump.util.LangUtil;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.ui.ErrorHandler;
 import com.vividsolutions.jump.workbench.model.LayerManager;
 import com.vividsolutions.jump.workbench.model.Category;
-import com.vividsolutions.jts.util.Assert;
 
 
 
 
 
 /**
- * @author paradox
+ * Loads a TIN from a JTF file into a TinLayer.
+ * 
+ * @see		JTFLayout
+ * @author Christopher DeMars
  *
  */
 public class TinFileLayerLoader extends AbstractFileLayerLoader {
@@ -42,10 +43,12 @@ public class TinFileLayerLoader extends AbstractFileLayerLoader {
 	private WorkbenchContext workbenchContext;
 	  
 	/**
+	 * Standard constructor
 	 * 
-	 * @param workbenchContext
-	 * @param description
-	 * @param extensions
+	 * @param workbenchContext	the JUMP workbench this tin is being loaded into
+	 * @param tinClass			the TIN to be loaded
+	 * @param description		a description of the file type
+	 * @param extensions		a list of extensions associated with that type
 	 */
 	public TinFileLayerLoader(WorkbenchContext workbenchContext, Class<ImmutableTin> tinClass, String description, List<String> extensions) {
 		super(description, extensions);
@@ -57,23 +60,14 @@ public class TinFileLayerLoader extends AbstractFileLayerLoader {
 	/**
 	 * Open the file specified by the URI with the map of option values.
 	 * 
-	 * @param monitor The TaskMonitor.
-	 * @param uri The URI to the file to load.
-	 * @param options The map of options.
-	 * @return True if the file could be loaded false otherwise.
+	 * @param monitor 	The TaskMonitor.
+	 * @param uri 		The URI to the file to load.
+	 * @param options 	The map of options.
+	 * @return 			True if the file could be loaded false otherwise.
 	 */
 	public boolean open(TaskMonitor monitor, URI uri, Map<String, Object> options) {
 		ImmutableTin tin;
 		BufferedInputStream in;
-		
-		/*
-		try {
-			tin = tinClass.newInstance();
-		}
-		catch (Exception e) {
-			Assert.shouldNeverReachHere("TinFileLayerLoader.open: "+e.toString());
-		}
-		*/
 
 		// open input stream
 		try {
@@ -95,18 +89,6 @@ public class TinFileLayerLoader extends AbstractFileLayerLoader {
 			return false;
 		}
 		
-		
-		/* close input stream
-		finally {
-			try {
-				in.close();
-			}
-			catch (IOException e) {
-				ErrorHandler errorHandler = workbenchContext.getErrorHandler();
-				errorHandler.handleThrowable(e);
-			}
-		}*/
-		
         LayerManager layerManager = workbenchContext.getLayerManager();
         TinLayer layer = new TinLayer (workbenchContext, uri.getPath(), layerManager, tin, tin.getSRID());
         Category category = TaskUtil.getSelectedCategoryName(workbenchContext);
@@ -114,5 +96,5 @@ public class TinFileLayerLoader extends AbstractFileLayerLoader {
         
         return true;
 	}
-
+	
 }
