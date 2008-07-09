@@ -96,6 +96,10 @@ public class InstallDeegreeFileAdaptersPlugIn extends AbstractPlugIn {
 
                 if ( dlg.wasOKPressed() ) {
                     // have to put Strings here, else the Hashtable#putAll does not copy them...
+                    int wkt = panel.getWKTColumn();
+                    if ( wkt != -1 ) {
+                        options.put( "wkt", "" + wkt );
+                    }
                     options.put( "xcol", "" + panel.getXColumn() );
                     options.put( "ycol", "" + panel.getYColumn() );
                     return super.open( monitor, uri, options );

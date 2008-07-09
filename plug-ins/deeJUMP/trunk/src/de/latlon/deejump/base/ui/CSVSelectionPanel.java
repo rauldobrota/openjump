@@ -38,6 +38,7 @@
 
 package de.latlon.deejump.base.ui;
 
+import static de.latlon.deejump.base.i18n.I18N.get;
 import static java.awt.GridBagConstraints.WEST;
 import static java.util.Arrays.asList;
 
@@ -66,15 +67,23 @@ public class CSVSelectionPanel extends JPanel {
 
     private static final long serialVersionUID = 6912663538834912547L;
 
-    private JRadioButton[] xboxes, yboxes;
+    JRadioButton[] xbuttons;
+
+    JRadioButton[] ybuttons;
+
+    JRadioButton[] wktbuttons;
+
+    JRadioButton usexy;
+
+    JRadioButton usewkt;
 
     /**
      * @param header
      * 
      */
     public CSVSelectionPanel( List<String[]> header ) {
-        if ( header.isEmpty() || header.get( 0 ).length < 2 ) {
-            throw new IllegalArgumentException( "The number of csv colums must be at least two." );
+        if ( header.isEmpty() || header.get( 0 ).length < 1 ) {
+            throw new IllegalArgumentException( "The number of csv colums must be at least one." );
         }
 
         setLayout( new GridBagLayout() );
@@ -83,10 +92,43 @@ public class CSVSelectionPanel extends JPanel {
         gb.gridx = 0;
         gb.gridy = 0;
 
-        setupButtons( gb, header );
+        setupGUI( gb, header );
+    }
+
+    private void setupGUI( GridBagConstraints gb, List<String[]> header ) {
+        usexy = new JRadioButton( get( "CSVSelectionPanel.usexy" ) );
+        usewkt = new JRadioButton( get( "CSVSelectionPanel.usewkt" ) );
+
+        xbuttons = new JRadioButton[header.get( 0 ).length];
+
+        gb.anchor = WEST;
+
+        add( usexy, gb );
+        ++gb.gridy;
+        add( new JLabel( get( "CSVSelectionPanel.useasx" ) ), gb );
+        ++gb.gridx;
+
+        for ( int i = 0; i < xbuttons.length; ++i ) {
+            xbuttons[i] = new JRadioButton();
+            add( xbuttons[i], gb );
+            ++gb.gridx;
+        }
 
         ++gb.gridy;
-        gb.gridx = 1;
+        gb.gridx = 0;
+
+        ybuttons = new JRadioButton[header.get( 0 ).length];
+        add( new JLabel( get( "CSVSelectionPanel.useasy" ) ), gb );
+        ++gb.gridx;
+
+        for ( int i = 0; i < ybuttons.length; ++i ) {
+            ybuttons[i] = new JRadioButton();
+            add( ybuttons[i], gb );
+            ++gb.gridx;
+        }
+
+        ++gb.gridy;
+        gb.gridx = 0;
 
         // add the values from the header
         for ( String[] line : header ) {
@@ -97,48 +139,55 @@ public class CSVSelectionPanel extends JPanel {
                 ++gb.gridx;
             }
         }
-    }
 
-    private void setupButtons( GridBagConstraints gb, List<String[]> header ) {
-        xboxes = new JRadioButton[header.get( 0 ).length];
-
-        gb.anchor = WEST;
-        add( new JLabel( de.latlon.deejump.base.i18n.I18N.get( "CSVSelectionPanel.useasx" ) ), gb );
-        ++gb.gridx;
-
-        for ( int i = 0; i < xboxes.length; ++i ) {
-            xboxes[i] = new JRadioButton();
-            add( xboxes[i], gb );
-            ++gb.gridx;
-        }
-
-        ++gb.gridy;
+        wktbuttons = new JRadioButton[header.get( 0 ).length];
         gb.gridx = 0;
-        yboxes = new JRadioButton[header.get( 0 ).length];
-        add( new JLabel( de.latlon.deejump.base.i18n.I18N.get( "CSVSelectionPanel.useasy" ) ), gb );
+        ++gb.gridy;
+        add( usewkt, gb );
+        ++gb.gridy;
+        add( new JLabel( get( "CSVSelectionPanel.useaswkt" ) ), gb );
         ++gb.gridx;
 
-        for ( int i = 0; i < yboxes.length; ++i ) {
-            yboxes[i] = new JRadioButton();
-            add( yboxes[i], gb );
+        for ( int i = 0; i < wktbuttons.length; ++i ) {
+            wktbuttons[i] = new JRadioButton();
+            add( wktbuttons[i], gb );
             ++gb.gridx;
         }
 
-        ActionListener listener = getXYListener( xboxes, yboxes );
+        ActionListener listener = getXYListener( xbuttons, ybuttons );
         ButtonGroup group = new ButtonGroup();
-        for ( JRadioButton b : xboxes ) {
+        for ( JRadioButton b : xbuttons ) {
             b.addActionListener( listener );
             group.add( b );
         }
 
         group = new ButtonGroup();
-        for ( JRadioButton b : yboxes ) {
+        for ( JRadioButton b : ybuttons ) {
             b.addActionListener( listener );
             group.add( b );
         }
 
-        xboxes[0].setSelected( true );
-        yboxes[1].setSelected( true );
+        group = new ButtonGroup();
+        for ( JRadioButton b : wktbuttons ) {
+            group.add( b );
+        }
+
+        group = new ButtonGroup();
+        group.add( usexy );
+        group.add( usewkt );
+        usexy.setSelected( true );
+
+        listener = getSwitchListener();
+        usexy.addActionListener( listener );
+        usewkt.addActionListener( listener );
+
+        xbuttons[0].setSelected( true );
+        if ( ybuttons.length > 1 ) {
+            ybuttons[1].setSelected( true );
+        }
+        wktbuttons[0].setSelected( true );
+
+        updateEnabledState();
     }
 
     private static ActionListener getXYListener( final JRadioButton[] bs1, final JRadioButton[] bs2 ) {
@@ -177,8 +226,8 @@ public class CSVSelectionPanel extends JPanel {
      * @return the selected x column index
      */
     public int getXColumn() {
-        for ( int i = 0; i < xboxes.length; ++i ) {
-            if ( xboxes[i].isSelected() ) {
+        for ( int i = 0; i < xbuttons.length; ++i ) {
+            if ( xbuttons[i].isSelected() ) {
                 return i;
             }
         }
@@ -190,8 +239,8 @@ public class CSVSelectionPanel extends JPanel {
      * @return the selected y column index
      */
     public int getYColumn() {
-        for ( int i = 0; i < yboxes.length; ++i ) {
-            if ( yboxes[i].isSelected() ) {
+        for ( int i = 0; i < ybuttons.length; ++i ) {
+            if ( ybuttons[i].isSelected() ) {
                 return i;
             }
         }
@@ -199,4 +248,42 @@ public class CSVSelectionPanel extends JPanel {
         return -1;
     }
 
+    /**
+     * @return the selected wkt column index, or -1 if wkt was not selected
+     */
+    public int getWKTColumn() {
+        if ( !usewkt.isSelected() ) {
+            return -1;
+        }
+
+        for ( int i = 0; i < wktbuttons.length; ++i ) {
+            if ( wktbuttons[i].isSelected() ) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    void updateEnabledState() {
+        boolean state = usexy.isSelected();
+
+        for ( JRadioButton b : xbuttons ) {
+            b.setEnabled( state );
+        }
+        for ( JRadioButton b : ybuttons ) {
+            b.setEnabled( state );
+        }
+        for ( JRadioButton b : wktbuttons ) {
+            b.setEnabled( !state );
+        }
+    }
+
+    private ActionListener getSwitchListener() {
+        return new ActionListener() {
+            public void actionPerformed( ActionEvent evt ) {
+                updateEnabledState();
+            }
+        };
+    }
 }

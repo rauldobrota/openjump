@@ -41,7 +41,9 @@ package de.latlon.deejump.base.io;
 import static de.latlon.deejump.base.i18n.I18N.get;
 import static de.latlon.deejump.wfs.data.JUMPFeatureFactory.createFromDeegreeFC;
 import static java.lang.Integer.parseInt;
+import static org.deegree.framework.log.LoggerFactory.getLogger;
 
+import org.deegree.framework.log.ILogger;
 import org.deegree.io.csv.CSVReader;
 
 import com.vividsolutions.jump.feature.FeatureCollection;
@@ -58,17 +60,25 @@ import com.vividsolutions.jump.io.JUMPReader;
  */
 public class DeegreeCSVReader implements JUMPReader {
 
+    private static final ILogger LOG = getLogger( DeegreeCSVReader.class );
+
     public FeatureCollection read( DriverProperties dp )
                             throws Exception {
         String fileRoot = dp.getProperty( "File" );
 
         CSVReader reader = new CSVReader( ',', fileRoot );
 
-        reader.setPointColumns( parseInt( dp.getProperty( "xcol" ) ), parseInt( dp.getProperty( "ycol" ) ) );
+        String wkt = dp.getProperty( "wkt" );
+        if ( wkt != null ) {
+            reader.setWKTColumn( parseInt( wkt ) );
+        } else {
+            reader.setPointColumns( parseInt( dp.getProperty( "xcol" ) ), parseInt( dp.getProperty( "ycol" ) ) );
+        }
 
         try {
             return createFromDeegreeFC( reader.parseFeatureCollection() );
         } catch ( NumberFormatException nfe ) {
+            LOG.logError( "Original exception", nfe );
             throw new Exception( get( "General.numberparsed" ) + " " + nfe.getMessage() );
         }
     }
