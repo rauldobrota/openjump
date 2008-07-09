@@ -1,6 +1,9 @@
 2008-07-09  Andreas Schmitz <schmitz@lat-lon.de>
-        lib/deegree2.jar:
-        Updated deegree lib to make more crs names available.
+
+        * lib/deegree2.jar: Updated deegree lib to make more crs names
+        available.
+
+        * src/de/latlon/deejump/wfs/Version.java: Updated version to 1.1.0-dev.
 
 2008-07-04  Stephan Holl <stephan.holl@intevation.de>
 
