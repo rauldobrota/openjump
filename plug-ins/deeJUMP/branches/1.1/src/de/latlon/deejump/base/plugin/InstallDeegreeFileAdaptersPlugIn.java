@@ -3,6 +3,7 @@ package de.latlon.deejump.base.plugin;
 import static com.vividsolutions.jump.workbench.datasource.InstallStandardDataSourceQueryChoosersPlugIn.addCompressedFileFilter;
 import static com.vividsolutions.jump.workbench.datasource.InstallStandardDataSourceQueryChoosersPlugIn.extensions;
 import static de.latlon.deejump.base.i18n.I18N.get;
+import static java.net.URLDecoder.decode;
 import static java.util.Arrays.asList;
 import static org.deegree.framework.log.LoggerFactory.getLogger;
 import static org.openjump.core.ui.io.file.FileLayerLoader.KEY;
@@ -75,7 +76,7 @@ public class InstallDeegreeFileAdaptersPlugIn extends AbstractPlugIn {
 
                 CSVReader reader;
                 try {
-                    String fileRoot = uri.toURL().getFile();
+                    String fileRoot = decode( uri.toURL().getFile(), "UTF-8" );
                     reader = new CSVReader( ',', fileRoot );
                 } catch ( IOException e ) {
                     LOG.logError( "Unknown error", e );
