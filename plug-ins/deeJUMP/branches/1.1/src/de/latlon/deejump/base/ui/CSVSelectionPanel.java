@@ -39,6 +39,7 @@
 package de.latlon.deejump.base.ui;
 
 import static de.latlon.deejump.base.i18n.I18N.get;
+import static de.latlon.deejump.base.util.MiscTools.limitedString;
 import static java.awt.GridBagConstraints.WEST;
 import static java.util.Arrays.asList;
 
@@ -135,7 +136,7 @@ public class CSVSelectionPanel extends JPanel {
             ++gb.gridy;
             gb.gridx = 1;
             for ( String s : line ) {
-                add( new JLabel( s ), gb );
+                add( new JLabel( limitedString( s, 10 ) ), gb );
                 ++gb.gridx;
             }
         }
