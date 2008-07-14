@@ -77,7 +77,7 @@ public class InstallDeegreeFileAdaptersPlugIn extends AbstractPlugIn {
                 CSVReader reader;
                 try {
                     String fileRoot = decode( uri.toURL().getFile(), "UTF-8" );
-                    reader = new CSVReader( ',', fileRoot );
+                    reader = new CSVReader( fileRoot );
                 } catch ( IOException e ) {
                     LOG.logError( "Unknown error", e );
                     WorkbenchFrame workbenchFrame = context.getWorkbenchFrame();

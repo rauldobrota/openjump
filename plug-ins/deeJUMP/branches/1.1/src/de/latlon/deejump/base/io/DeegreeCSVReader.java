@@ -66,7 +66,7 @@ public class DeegreeCSVReader implements JUMPReader {
                             throws Exception {
         String fileRoot = dp.getProperty( "File" );
 
-        CSVReader reader = new CSVReader( ',', fileRoot );
+        CSVReader reader = new CSVReader( fileRoot );
 
         String wkt = dp.getProperty( "wkt" );
         if ( wkt != null ) {
