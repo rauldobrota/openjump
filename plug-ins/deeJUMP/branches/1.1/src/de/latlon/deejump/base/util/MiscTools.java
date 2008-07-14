@@ -42,9 +42,9 @@ package de.latlon.deejump.base.util;
  * <code>MiscTools</code>
  * 
  * @author <a href="mailto:schmitz@lat-lon.de">Andreas Schmitz</a>
- * @author last edited by: $Author:$
+ * @author last edited by: $Author$
  * 
- * @version $Revision:$, $Date:$
+ * @version $Revision$, $Date$
  */
 public class MiscTools {
 
@@ -54,6 +54,10 @@ public class MiscTools {
      * @return a string limited to limit + 3 chars (including ...)
      */
     public static String limitedString( String str, int limit ) {
+        if ( str == null ) {
+            return null;
+        }
+
         if ( str.length() > limit ) {
             str = str.substring( 0, limit ) + "...";
         }
