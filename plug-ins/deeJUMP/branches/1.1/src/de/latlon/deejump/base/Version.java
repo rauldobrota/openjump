@@ -52,7 +52,7 @@ public class Version {
      * @param args
      */
     public static void main( String[] args ) {
-        System.out.println( "This is the deeJUMP plugin, version 1.1-dev." );
+        System.out.println( "This is the deeJUMP plugin, version 1.1rc1." );
     }
 
 }
