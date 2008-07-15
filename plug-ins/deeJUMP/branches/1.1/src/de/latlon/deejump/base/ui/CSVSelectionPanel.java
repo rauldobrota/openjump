@@ -52,6 +52,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -67,6 +68,8 @@ import javax.swing.JRadioButton;
 public class CSVSelectionPanel extends JPanel {
 
     private static final long serialVersionUID = 6912663538834912547L;
+
+    JCheckBox ignoreFirstLine;
 
     JRadioButton[] xbuttons;
 
@@ -97,12 +100,17 @@ public class CSVSelectionPanel extends JPanel {
     }
 
     private void setupGUI( GridBagConstraints gb, List<String[]> header ) {
+        ignoreFirstLine = new JCheckBox( get( "CSVSelectionPanel.ignorefirstline" ) );
+
         usexy = new JRadioButton( get( "CSVSelectionPanel.usexy" ) );
         usewkt = new JRadioButton( get( "CSVSelectionPanel.usewkt" ) );
 
         xbuttons = new JRadioButton[header.get( 0 ).length];
 
         gb.anchor = WEST;
+
+        add( ignoreFirstLine, gb );
+        ++gb.gridy;
 
         add( usexy, gb );
         ++gb.gridy;
@@ -264,6 +272,13 @@ public class CSVSelectionPanel extends JPanel {
         }
 
         return -1;
+    }
+
+    /**
+     * @return whether to ignore the first line
+     */
+    public boolean ignoreFirstLine() {
+        return ignoreFirstLine.isSelected();
     }
 
     void updateEnabledState() {

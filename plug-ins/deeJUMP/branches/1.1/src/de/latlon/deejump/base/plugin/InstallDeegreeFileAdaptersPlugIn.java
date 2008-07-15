@@ -77,7 +77,7 @@ public class InstallDeegreeFileAdaptersPlugIn extends AbstractPlugIn {
                 CSVReader reader;
                 try {
                     String fileRoot = decode( uri.toURL().getFile(), "UTF-8" );
-                    reader = new CSVReader( fileRoot );
+                    reader = new CSVReader( fileRoot, false );
                 } catch ( IOException e ) {
                     LOG.logError( "Unknown error", e );
                     WorkbenchFrame workbenchFrame = context.getWorkbenchFrame();
@@ -103,6 +103,7 @@ public class InstallDeegreeFileAdaptersPlugIn extends AbstractPlugIn {
                     }
                     options.put( "xcol", "" + panel.getXColumn() );
                     options.put( "ycol", "" + panel.getYColumn() );
+                    options.put( "ignorefirstline", "" + panel.ignoreFirstLine() );
                     return super.open( monitor, uri, options );
                 }
 
