@@ -1,3 +1,12 @@
+2008-07-15  Andreas Schmitz <schmitz@lat-lon.de>
+
+        * src/de/latlon/deejump/wfs/i18n/messages_fi.properties:
+        * src/de/latlon/deejump/wfs/i18n/messages_en.properties:
+        * src/de/latlon/deejump/wfs/i18n/messages_fr.properties:
+        * src/de/latlon/deejump/wfs/i18n/messages_de.properties:
+        * src/de/latlon/deejump/wfs/ui/WFSPanel.java:
+        Added save button when running as plugin.
+
 2008-07-09  Andreas Schmitz <schmitz@lat-lon.de>
 
         * lib/deegree2.jar: Updated deegree lib to make more crs names
