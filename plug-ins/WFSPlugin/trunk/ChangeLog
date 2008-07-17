@@ -1,4 +1,10 @@
 2008-07-17  Andreas Schmitz <schmitz@lat-lon.de>
+        * lib/deegree2.jar
+        * src/de/latlon/deejump/wfs/data/JUMPFeatureFactory.java
+        * src/de/latlon/deejump/wfs/plugin/WFSPlugIn.java
+        Fixed problems with xs:date values.
+
+2008-07-17  Andreas Schmitz <schmitz@lat-lon.de>
         * src/de/latlon/deejump/wfs/i18n/I18N.java
         * src/de/latlon/deejump/wfs/i18n/messages_fi.properties
         * src/de/latlon/deejump/wfs/i18n/messages_en.properties

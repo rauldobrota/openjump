@@ -150,9 +150,9 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
         if ( wfs.getGeometryProperties( ftName.getLocalName() ).length == 0 ) {
             LOG.info( "No geometry was found, using default point at (0, 0)." );
             Point point = new GeometryFactory().createPoint( new Coordinate( 0, 0 ) );
-            dataset = JUMPFeatureFactory.createFromDeegreeFC( dfc, point, wfs, ftName, false );
+            dataset = JUMPFeatureFactory.createFromDeegreeFC( dfc, point, wfs, ftName );
         } else {
-            dataset = JUMPFeatureFactory.createFromDeegreeFC( dfc, null, wfs, ftName, false );
+            dataset = JUMPFeatureFactory.createFromDeegreeFC( dfc, null, wfs, ftName );
         }
 
         monitor.report( "Adding Layer" );

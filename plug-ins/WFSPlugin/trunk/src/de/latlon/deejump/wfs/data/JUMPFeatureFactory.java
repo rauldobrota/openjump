@@ -8,6 +8,10 @@
  */
 package de.latlon.deejump.wfs.data;
 
+import static com.vividsolutions.jump.feature.AttributeType.GEOMETRY;
+import static de.latlon.deejump.wfs.client.WFSClientHelper.createResponsefromWFS;
+import static org.deegree.model.spatialschema.JTSAdapter.export;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
@@ -58,7 +62,6 @@ import com.vividsolutions.jump.feature.FeatureSchema;
 
 import de.latlon.deejump.wfs.DeeJUMPException;
 import de.latlon.deejump.wfs.client.AbstractWFSWrapper;
-import de.latlon.deejump.wfs.client.WFSClientHelper;
 import de.latlon.deejump.wfs.jump.WFSFeature;
 
 /**
@@ -72,8 +75,6 @@ public class JUMPFeatureFactory {
     private static Logger LOG = Logger.getLogger( JUMPFeatureFactory.class );
 
     private static int maxFeatures = 100;
-
-    // Integer.parseInt( DeeJUMPProperties.getString("maxFeatures") );
 
     /**
      * Creates a JUMP FeatureCollection from a deegree FeatureCollection [UT]
@@ -175,7 +176,7 @@ public class JUMPFeatureFactory {
                                                                                       QualifiedName featureType )
                             throws DeeJUMPException {
 
-        String s = WFSClientHelper.createResponsefromWFS( server.getGetFeatureURL(), request );
+        String s = createResponsefromWFS( server.getGetFeatureURL(), request );
 
         if ( s.indexOf( "<Exception>" ) >= 0 || s.indexOf( "<ServiceExceptionReport" ) >= 0 ) { //$NON-NLS-1$ //$NON-NLS-2$
             RuntimeException re = new RuntimeException( "Couldn't get data from WFS:\n" //$NON-NLS-1$
@@ -287,7 +288,7 @@ public class JUMPFeatureFactory {
      */
     public static FeatureCollection createFromDeegreeFC( org.deegree.model.feature.FeatureCollection fc, Geometry geom )
                             throws DeeJUMPException {
-        return createFromDeegreeFC( fc, geom, null, null, false );
+        return createFromDeegreeFC( fc, geom, null, null );
     }
 
     /**
@@ -304,14 +305,12 @@ public class JUMPFeatureFactory {
      *            if the data came from a wfs, this can be used to determine the feature type even without any features
      * @param ftName
      *            the requested feature type from the above wfs
-     * @param addids
-     *            whether to add the GML ids as field
      * @return the new JUMP FeatureCollection
      * @throws DeeJUMPException
      */
     public static FeatureCollection createFromDeegreeFC( org.deegree.model.feature.FeatureCollection deegreeFeatCollec,
                                                          Geometry defaultGeometry, AbstractWFSWrapper wfs,
-                                                         QualifiedName ftName, boolean addids )
+                                                         QualifiedName ftName )
                             throws DeeJUMPException
 
     {
@@ -355,15 +354,11 @@ public class JUMPFeatureFactory {
 
         boolean addedGeometry = false;
 
-        if ( addids ) {
-            fs.addAttribute( "Internal ID", AttributeType.STRING );
-        }
-
         // populate JUMP schema
         for ( int j = 0; j < featTypeProps.length; j++ ) {
             String name = featTypeProps[j].getName().getLocalName();
             AttributeType type = findType( featTypeProps[j].getType() );
-            if ( type == AttributeType.GEOMETRY ) {
+            if ( type == GEOMETRY ) {
                 if ( !addedGeometry ) {
                     addedGeometry = true;
                 } else {
@@ -376,7 +371,7 @@ public class JUMPFeatureFactory {
         if ( defaultGeometry == null && fs.getGeometryIndex() == -1 ) {
             throw new RuntimeException( "No geometry property found!" );
         } else if ( defaultGeometry != null && fs.getGeometryIndex() == -1 ) {
-            fs.addAttribute( "FAKE_GEOMETRY", AttributeType.GEOMETRY ); //$NON-NLS-1$
+            fs.addAttribute( "FAKE_GEOMETRY", GEOMETRY );
         }
 
         // populate FC with data
@@ -387,7 +382,7 @@ public class JUMPFeatureFactory {
 
             if ( addedGeometry ) {
                 try {
-                    Geometry geom = JTSAdapter.export( geoObject );
+                    Geometry geom = export( geoObject );
                     jf.setGeometry( geom );
 
                 } catch ( Exception e ) {
@@ -399,14 +394,10 @@ public class JUMPFeatureFactory {
 
             int geoIndex = fs.getGeometryIndex();
 
-            if ( addids ) {
-                jf.setAttribute( 0, feats[i].getId() );
-            }
-
-            for ( int j = addids ? 1 : 0; j < fs.getAttributeCount(); j++ ) {
+            for ( int j = 0; j < fs.getAttributeCount(); j++ ) {
                 if ( j != geoIndex ) {
                     QualifiedName qn = new QualifiedName( fs.getAttributeName( j ),
-                                                          featTypeProps[addids ? j - 1 : j].getName().getNamespace() );
+                                                          featTypeProps[j].getName().getNamespace() );
 
                     FeatureProperty fp = feats[i].getDefaultProperty( qn );
                     Object value = null;
@@ -436,7 +427,7 @@ public class JUMPFeatureFactory {
         // assumes integer for SQL's NUMERIC
         String xsd = Types.getXSDTypeForSQLType( type, 0 );
 
-        if ( xsd.equals( "dateTime" ) ) {
+        if ( xsd.equals( "dateTime" ) || xsd.equals( "date" ) ) {
             return AttributeType.DATE;
         }
 
