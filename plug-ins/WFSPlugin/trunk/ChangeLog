@@ -1,4 +1,8 @@
 2008-07-17  Andreas Schmitz <schmitz@lat-lon.de>
+        * lib/deegree2.jar: Fixed bug in deegree2 GML parser so the
+        featureMembers element can be used.
+
+2008-07-17  Andreas Schmitz <schmitz@lat-lon.de>
         * lib/deegree2.jar
         * src/de/latlon/deejump/wfs/data/JUMPFeatureFactory.java
         * src/de/latlon/deejump/wfs/plugin/WFSPlugIn.java
