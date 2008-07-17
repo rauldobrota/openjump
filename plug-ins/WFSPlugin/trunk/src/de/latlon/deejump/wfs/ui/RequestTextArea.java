@@ -62,7 +62,7 @@ class RequestTextArea extends JPanel {
     }
 
     private JComponent createValidationtButton() {
-        validateReq = new JButton( I18N.getString( "FeatureResearchDialog.validateRequest" ) );
+        validateReq = new JButton( I18N.get( "FeatureResearchDialog.validateRequest" ) );
 
         validateReq.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
@@ -83,7 +83,7 @@ class RequestTextArea extends JPanel {
                     }
                 } catch ( Exception ex ) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog( wfsPanel, ex.getMessage(), I18N.getString( "error" ),
+                    JOptionPane.showMessageDialog( wfsPanel, ex.getMessage(), I18N.get( "error" ),
                                                    JOptionPane.ERROR_MESSAGE );
                 }
             }
@@ -92,7 +92,7 @@ class RequestTextArea extends JPanel {
     }
 
     private JComponent createRequestButton() {
-        createReqButton = new JButton( I18N.getString( "FeatureResearchDialog.createWFSRequest" ) );
+        createReqButton = new JButton( I18N.get( "FeatureResearchDialog.createWFSRequest" ) );
         createReqButton.setBounds( 260, 20, 80, 20 );
         createReqButton.setAlignmentX( 0.5f );
         createReqButton.addActionListener( new ActionListener() {

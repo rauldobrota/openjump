@@ -107,7 +107,7 @@ class SpatialCriteriaPanel extends JPanel {
         geomPropsCombo = new JComboBox( gg );
 
         JPanel p = new JPanel();
-        p.add( new JLabel( I18N.getString( "SpatialResearchPanel.geometryName" ) ) );
+        p.add( new JLabel( I18N.get( "SpatialResearchPanel.geometryName" ) ) );
         p.add( geomPropsCombo );
         add( p );
         return p;
@@ -119,7 +119,7 @@ class SpatialCriteriaPanel extends JPanel {
         srsCombo.setEnabled( false );
 
         JPanel p = new JPanel();
-        p.add( new JLabel( I18N.getString( "SpatialResearchPanel.srs" ) ) );
+        p.add( new JLabel( I18N.get( "SpatialResearchPanel.srs" ) ) );
         p.add( srsCombo );
         add( p );
         return p;
@@ -163,10 +163,10 @@ class SpatialCriteriaPanel extends JPanel {
         String simpleName = getClass().getSimpleName();
         for ( int i = 0; i < OPERATION_NAMES.length; i++ ) {
             String txt = simpleName + "." + OPERATION_NAMES[i];
-            String buttonTxt = I18N.getString( txt );
+            String buttonTxt = I18N.get( txt );
             opButtons[i] = new JRadioButton( buttonTxt );
             txt += ".descrip";
-            buttonTxt = I18N.getString( txt );
+            buttonTxt = I18N.get( txt );
             opButtons[i].setToolTipText( buttonTxt );
             opButtons[i].setActionCommand( OPERATION_NAMES[i] );
             opButtons[i].addActionListener( bal );
@@ -190,7 +190,7 @@ class SpatialCriteriaPanel extends JPanel {
 
         opButtons[0].doClick();
         JPanel combiPanel = new JPanel();
-        combiPanel.setBorder( BorderFactory.createTitledBorder( I18N.getString( "SpatialResearchPanel.spatialOperation" ) ) );
+        combiPanel.setBorder( BorderFactory.createTitledBorder( I18N.get( "SpatialResearchPanel.spatialOperation" ) ) );
         combiPanel.setLayout( new GridLayout( 1, 2 ) );
         combiPanel.add( opsPanel );
         combiPanel.add( opsFieldPanel );

@@ -74,7 +74,7 @@ public class WFSOptionsPanel2 extends JPanel {
             }
         } );
         JPanel dummy = new JPanel();
-        dummy.add( new JLabel( I18N.getString( "WFSOptions.maxNumberOfFeatures" ) ) );
+        dummy.add( new JLabel( I18N.get( "WFSOptions.maxNumberOfFeatures" ) ) );
         dummy.add( maxFeaturesField );
 
         add( dummy );
@@ -127,7 +127,7 @@ public class WFSOptionsPanel2 extends JPanel {
 
     private Component createProtocolPanel() {
         protocolPanel = new JPanel();
-        protocolPanel.setBorder( BorderFactory.createTitledBorder( I18N.getString( "WFSOptions.protocols" ) ) );
+        protocolPanel.setBorder( BorderFactory.createTitledBorder( I18N.get( "WFSOptions.protocols" ) ) );
         protocolPanel.setLayout( new BoxLayout( protocolPanel, BoxLayout.Y_AXIS ) );
         protocolPanel.setMaximumSize( new Dimension( 150, 100 ) );
         protocolPanel.setAlignmentX( 1f );
@@ -137,7 +137,7 @@ public class WFSOptionsPanel2 extends JPanel {
     private JComponent createOutputFormatChooser() {
 
         outputFormatChooser = new JComboBox();
-        Border b1 = BorderFactory.createTitledBorder( I18N.getString( "WFSOptions.outputFormats" ) );
+        Border b1 = BorderFactory.createTitledBorder( I18N.get( "WFSOptions.outputFormats" ) );
         Border b2 = BorderFactory.createEmptyBorder( 2, 4, 4, 4 );
 
         outputFormatChooser.setBorder( BorderFactory.createCompoundBorder( b1, b2 ) );

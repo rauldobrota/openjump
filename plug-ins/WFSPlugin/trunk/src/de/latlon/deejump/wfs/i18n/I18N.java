@@ -20,8 +20,8 @@ import org.deegree.framework.util.BootLogger;
 /**
  * @author sncho
  * 
- * TODO To change the template for this generated type comment go to Window - Preferences - Java -
- * Code Style - Code Templates
+ * TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style - Code
+ * Templates
  */
 public class I18N {
     private static final Properties props = new Properties();
@@ -77,7 +77,7 @@ public class I18N {
      * @param arguments
      * @return a translated string
      */
-    public static String getString( String key, Object... arguments ) {
+    public static String get( String key, Object... arguments ) {
         String s = props.getProperty( key );
         if ( s != null ) {
             return MessageFormat.format( s, arguments );

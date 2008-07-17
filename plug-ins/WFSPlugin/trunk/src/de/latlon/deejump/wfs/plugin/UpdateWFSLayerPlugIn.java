@@ -38,7 +38,7 @@ import static com.vividsolutions.jump.workbench.model.FeatureEventType.GEOMETRY_
 import static com.vividsolutions.jump.workbench.model.LayerEventType.METADATA_CHANGED;
 import static com.vividsolutions.jump.workbench.model.LayerEventType.REMOVED;
 import static com.vividsolutions.jump.workbench.ui.images.IconLoader.icon;
-import static de.latlon.deejump.wfs.i18n.I18N.getString;
+import static de.latlon.deejump.wfs.i18n.I18N.get;
 import static de.latlon.deejump.wfs.transaction.TransactionFactory.createCommonUpdateTransaction;
 import static de.latlon.deejump.wfs.transaction.TransactionFactory.createTransaction;
 import static de.latlon.deejump.wfs.transaction.TransactionFactory.createUpdateTransaction;
@@ -191,6 +191,10 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
                                              geoPropName, newFeatures, false ).toString() );
         }
 
+        if ( requests.size() == 0 ) {
+            context.getWorkbenchFrame().warnUser( get( "UpdateWFSLayerPlugIn.nothingtoupdate" ) );
+        }
+
         return true;
 
     }
@@ -313,8 +317,8 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
         if ( code == 200 ) {
             result.load( post.getResponseBodyAsStream(), "http://www.systemid.org" );
         } else {
-            showMessageDialog( null, getString( "UpdateWFSLayerPlugIn.answernotxml", post.getResponseBodyAsString() ),
-                               getString( "error" ), ERROR_MESSAGE );
+            showMessageDialog( null, get( "UpdateWFSLayerPlugIn.answernotxml", post.getResponseBodyAsString() ),
+                               get( "error" ), ERROR_MESSAGE );
             return null;
         }
 

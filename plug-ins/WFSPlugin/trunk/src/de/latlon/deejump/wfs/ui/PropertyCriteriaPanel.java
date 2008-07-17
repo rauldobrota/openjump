@@ -129,7 +129,7 @@ class PropertyCriteriaPanel extends JPanel {
         setLayout( lm );
 
         JPanel p = new JPanel();
-        describeFTButton = new JButton( I18N.getString( "AttributeResearchPanel.describeFeatType" ) );
+        describeFTButton = new JButton( I18N.get( "AttributeResearchPanel.describeFeatType" ) );
         describeFTButton.setEnabled( false );
         describeFTButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
@@ -174,18 +174,18 @@ class PropertyCriteriaPanel extends JPanel {
         JPanel criteriaPanel = new JPanel();
         criteriaPanel.setLayout( null );
         criteriaPanel.setPreferredSize( new Dimension( 360, 125 ) );
-        criteriaPanel.setBorder( BorderFactory.createTitledBorder( I18N.getString( "AttributeResearchPanel.attributeBasedCriteria" ) ) );
+        criteriaPanel.setBorder( BorderFactory.createTitledBorder( I18N.get( "AttributeResearchPanel.attributeBasedCriteria" ) ) );
         criteriaPanel.setBounds( LEFT_MARGIN, 70, 360, 125 );
 
-        attLabel = new JLabel( I18N.getString( "AttributeResearchPanel.attribute" ) );
+        attLabel = new JLabel( I18N.get( "AttributeResearchPanel.attribute" ) );
         attLabel.setBounds( LEFT_MARGIN, 18, SECOND_COL - LEFT_MARGIN, STD_HEIGHT );
         criteriaPanel.add( attLabel );
 
-        operLabel = new JLabel( I18N.getString( "AttributeResearchPanel.operator" ) );
+        operLabel = new JLabel( I18N.get( "AttributeResearchPanel.operator" ) );
         operLabel.setBounds( LEFT_MARGIN + SECOND_COL + 5, 18, THIRD_COL - SECOND_COL, STD_HEIGHT );
         criteriaPanel.add( operLabel );
 
-        valLabel = new JLabel( I18N.getString( "AttributeResearchPanel.comparisonValue" ) );
+        valLabel = new JLabel( I18N.get( "AttributeResearchPanel.comparisonValue" ) );
 
         valLabel.setBounds( LEFT_MARGIN + THIRD_COL + 5, 18, SECOND_COL - LEFT_MARGIN, STD_HEIGHT );
         criteriaPanel.add( valLabel );
@@ -212,12 +212,12 @@ class PropertyCriteriaPanel extends JPanel {
     /** Creates the And/Or radio buttons, their button group and a panel for them */
     private JComponent createLogicalButtons() {
 
-        andButton = new JRadioButton( I18N.getString( "AttributeResearchPanel.logicalAnd" ) );
+        andButton = new JRadioButton( I18N.get( "AttributeResearchPanel.logicalAnd" ) );
         andButton.setBorder( BorderFactory.createEmptyBorder( 2, 10, 2, 10 ) );
         andButton.setActionCommand( logicalRelationships[0] );
         andButton.doClick();
 
-        orButton = new JRadioButton( I18N.getString( "AttributeResearchPanel.logicalOr" ) );
+        orButton = new JRadioButton( I18N.get( "AttributeResearchPanel.logicalOr" ) );
         orButton.setBorder( BorderFactory.createEmptyBorder( 2, 10, 5, 10 ) );
         orButton.setActionCommand( logicalRelationships[1] );
 
@@ -237,7 +237,7 @@ class PropertyCriteriaPanel extends JPanel {
         LayoutManager lm = new BoxLayout( b, BoxLayout.PAGE_AXIS );
         b.setLayout( lm );
         b.setAlignmentX( Component.LEFT_ALIGNMENT );
-        b.setBorder( BorderFactory.createTitledBorder( I18N.getString( "AttributeResearchPanel.logicalLink" ) ) );
+        b.setBorder( BorderFactory.createTitledBorder( I18N.get( "AttributeResearchPanel.logicalLink" ) ) );
 
         // add a bit of space
         b.add( Box.createRigidArea( new Dimension( 20, 10 ) ) );
@@ -252,7 +252,7 @@ class PropertyCriteriaPanel extends JPanel {
     /** Creates buttons for adding and removing criteria and a panel for them */
     private JComponent createCriteriaButtons() {
 
-        newCriteriaButton = new JButton( I18N.getString( "AttributeResearchPanel.addCriteria" ) );
+        newCriteriaButton = new JButton( I18N.get( "AttributeResearchPanel.addCriteria" ) );
 
         newCriteriaButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
@@ -276,7 +276,7 @@ class PropertyCriteriaPanel extends JPanel {
             }
         } );
 
-        remCriteriaButton = new JButton( I18N.getString( "AttributeResearchPanel.delCriteria" ) );
+        remCriteriaButton = new JButton( I18N.get( "AttributeResearchPanel.delCriteria" ) );
         remCriteriaButton.setEnabled( false );
         remCriteriaButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
@@ -319,13 +319,13 @@ class PropertyCriteriaPanel extends JPanel {
         // label.setBounds(LEFT_MARGIN + 2, 370,200,18);
         // add(label);
 
-        noCritButton = new JRadioButton( I18N.getString( "AttributeResearchPanel.none" ) );
+        noCritButton = new JRadioButton( I18N.get( "AttributeResearchPanel.none" ) );
         noCritButton.setActionCommand( WFSPanel.NONE );
         noCritButton.doClick();
-        bboxCritButton = new JRadioButton( I18N.getString( "AttributeResearchPanel.bbox" ) );
+        bboxCritButton = new JRadioButton( I18N.get( "AttributeResearchPanel.bbox" ) );
         bboxCritButton.setActionCommand( WFSPanel.BBOX );
         bboxCritButton.setBounds( 10, 30, 200, STD_HEIGHT );
-        selecGeoButton = new JRadioButton( I18N.getString( "AttributeResearchPanel.selectedGeometry" ) );
+        selecGeoButton = new JRadioButton( I18N.get( "AttributeResearchPanel.selectedGeometry" ) );
         selecGeoButton.setActionCommand( WFSPanel.SELECTED_GEOM );
 
         ActionListener bal = new ActionListener() {
@@ -345,7 +345,7 @@ class PropertyCriteriaPanel extends JPanel {
 
         Box b = Box.createVerticalBox();
         b.setAlignmentX( 0.95f );
-        b.setBorder( BorderFactory.createTitledBorder( I18N.getString( "AttributeResearchPanel.spatialCriteria" ) ) );
+        b.setBorder( BorderFactory.createTitledBorder( I18N.get( "AttributeResearchPanel.spatialCriteria" ) ) );
 
         b.add( noCritButton );
         b.add( bboxCritButton );

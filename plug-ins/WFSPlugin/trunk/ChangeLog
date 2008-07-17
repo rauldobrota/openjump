@@ -1,4 +1,24 @@
 2008-07-17  Andreas Schmitz <schmitz@lat-lon.de>
+        * src/de/latlon/deejump/wfs/i18n/I18N.java
+        * src/de/latlon/deejump/wfs/i18n/messages_fi.properties
+        * src/de/latlon/deejump/wfs/i18n/messages_en.properties
+        * src/de/latlon/deejump/wfs/i18n/messages_fr.properties
+        * src/de/latlon/deejump/wfs/i18n/messages_de.properties
+        * src/de/latlon/deejump/wfs/auth/LoginDialog.java
+        * src/de/latlon/deejump/wfs/ui/WFSPanel.java
+        * src/de/latlon/deejump/wfs/ui/SpatialCriteriaPanel.java
+        * src/de/latlon/deejump/wfs/ui/RequestTextArea.java
+        * src/de/latlon/deejump/wfs/ui/PropertyCriteriaPanel.java
+        * src/de/latlon/deejump/wfs/ui/PropertySelectionPanel.java
+        * src/de/latlon/deejump/wfs/ui/WFSFrame.java
+        * src/de/latlon/deejump/wfs/ui/WFSOptionsPanel2.java
+        * src/de/latlon/deejump/wfs/ui/WFSPanelButtons.java
+        * src/de/latlon/deejump/wfs/plugin/UpdateWFSLayerPlugIn.java
+        * src/de/latlon/deejump/wfs/plugin/WFSPlugIn.java:
+        Fixed bug when loading a feature type twice and doing transactions.
+        Also renamed I18N method name.
+
+2008-07-17  Andreas Schmitz <schmitz@lat-lon.de>
         * src/de/latlon/deejump/wfs/transaction/TransactionFactory.java:
         * src/de/latlon/deejump/wfs/data/JUMPFeatureFactory.java:
         * src/de/latlon/deejump/wfs/jump/WFSLayerListener.java:

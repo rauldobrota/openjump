@@ -64,7 +64,7 @@ public class PropertySelectionPanel extends JPanel {
 
         JPanel p = new JPanel();
         p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
-        p.setBorder( BorderFactory.createTitledBorder( I18N.getString( "PropertySelectionPanel.downloadProps" ) ) );
+        p.setBorder( BorderFactory.createTitledBorder( I18N.get( "PropertySelectionPanel.downloadProps" ) ) );
 
         propertiesList = new JList();
         JScrollPane scrollPane = new JScrollPane( propertiesList );
@@ -86,7 +86,7 @@ public class PropertySelectionPanel extends JPanel {
         geoPropsCombo.setPreferredSize( dim );
         geoPropsCombo.setMinimumSize( dim );
 
-        geoPropsCombo.setBorder( BorderFactory.createTitledBorder( I18N.getString( "SpatialResearchPanel.geometryName" ) ) );
+        geoPropsCombo.setBorder( BorderFactory.createTitledBorder( I18N.get( "SpatialResearchPanel.geometryName" ) ) );
 
         add( geoPropsCombo );
 

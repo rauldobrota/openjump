@@ -52,10 +52,9 @@ import de.latlon.deejump.wfs.ui.WFSDialog;
 import de.latlon.deejump.wfs.ui.WFSPanel;
 
 /**
- * JUMP plug-in providing a GUI for complex filter operations. Whole process is controlled by a
- * FeatureResearchDialog. This contains two panel, one for attribute-based (re-)search and the other
- * allowing the user to choose the spatial operation to be performed (when he has selected a
- * geometry on the map view).
+ * JUMP plug-in providing a GUI for complex filter operations. Whole process is controlled by a FeatureResearchDialog.
+ * This contains two panel, one for attribute-based (re-)search and the other allowing the user to choose the spatial
+ * operation to be performed (when he has selected a geometry on the map view).
  * 
  * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei</a>
  * 
@@ -81,8 +80,8 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
         // also create menu item
         /*
          * Disabled due to incompatibility to Vivid solutions JUMP1.2 SH, 2007-05-08
-         * context.getFeatureInstaller().addMainMenuItem(this, new String[] { MenuNames.LAYER },
-         * getName(), false, getIcon(), mec);
+         * context.getFeatureInstaller().addMainMenuItem(this, new String[] { MenuNames.LAYER }, getName(), false,
+         * getIcon(), mec);
          */
     }
 
@@ -92,7 +91,7 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
 
         if ( rd == null ) {
             rd = new WFSDialog( context.getWorkbenchContext(), context.getWorkbenchFrame(),
-                                I18N.getString( "WFSResearchPlugIn.mainDialogTitle" ),
+                                I18N.get( "WFSResearchPlugIn.mainDialogTitle" ),
                                 createUrlList( context.getWorkbenchContext() ) );
         }
 
@@ -133,7 +132,7 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
         WorkbenchFrame wbframe = context.getWorkbenchFrame();
         WorkbenchContext wbcontext = context.getWorkbenchContext();
 
-        monitor.report( I18N.getString( "WFSSearch.searching" ) );
+        monitor.report( I18N.get( "WFSSearch.searching" ) );
 
         WFSPanel panel = rd.getWFSPanel();
         String request = panel.getRequest();
@@ -175,7 +174,7 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
                                            ftName, geoQN, crs, wfs );
 
             synchronized ( layerManager ) {
-                WFSLayerListener listener = new WFSLayerListener( displayName );
+                WFSLayerListener listener = new WFSLayerListener( layer.getName() );
                 layer.setLayerListener( listener );
                 layerManager.addLayerListener( listener );
                 layer.setServerURL( this.wfsUrl );
@@ -184,12 +183,12 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
             }
 
             if ( dataset.size() == JUMPFeatureFactory.getMaxFeatures() ) {
-                wbframe.warnUser( I18N.getString( "WFSPlugin.maxnumber" ) + " " + JUMPFeatureFactory.getMaxFeatures() );
+                wbframe.warnUser( I18N.get( "WFSPlugin.maxnumber" ) + " " + JUMPFeatureFactory.getMaxFeatures() );
             }
 
         } else {
 
-            showMessageDialog( wbframe, I18N.getString( "WFSPlugin.nodata" ), "Info", WARNING_MESSAGE );
+            showMessageDialog( wbframe, I18N.get( "WFSPlugin.nodata" ), "Info", WARNING_MESSAGE );
 
         }
 
@@ -216,7 +215,7 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
         GeometryFactory gf = new GeometryFactory();
         Geometry geo = gf.buildGeometry( geoCollec );
         if ( geo instanceof GeometryCollection ) {
-            throw new WorkbenchException( I18N.getString( "WFSResearchPlugIn.invalideGeomType" ) );
+            throw new WorkbenchException( I18N.get( "WFSResearchPlugIn.invalideGeomType" ) );
         }
         org.deegree.model.spatialschema.Geometry geoObj = JTSAdapter.wrap( geo );
 

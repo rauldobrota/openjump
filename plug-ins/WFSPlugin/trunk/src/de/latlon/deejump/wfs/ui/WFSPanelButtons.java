@@ -86,14 +86,14 @@ class WFSPanelButtons extends JPanel {
         Box box = Box.createHorizontalBox();
         box.setBorder( BorderFactory.createEmptyBorder( 20, 5, 10, 5 ));
         
-        okButton = new JButton( I18N.getString( "OK" ) );
+        okButton = new JButton( I18N.get( "OK" ) );
         
         okButton.setEnabled( true );
         okButton.setFocusable( true );
 
-        cancelButton = new JButton( I18N.getString( "CANCEL" ) );
+        cancelButton = new JButton( I18N.get( "CANCEL" ) );
         cancelButton.setAlignmentX( 0.5f );
-        final String optionsTxt = I18N.getString( "WFSPanel.options" );
+        final String optionsTxt = I18N.get( "WFSPanel.options" );
         JButton optionsbutton = new JButton(optionsTxt);
         optionsbutton.addActionListener( new ActionListener(){
             public void actionPerformed( ActionEvent e ) {
@@ -105,8 +105,8 @@ class WFSPanelButtons extends JPanel {
             }
         });
         
-        final String showAdvanced =  I18N.getString( "WFSPanel.showAdvanced" );
-        final String hideAdvanced = I18N.getString( "WFSPanel.hideAdvanced" );
+        final String showAdvanced =  I18N.get( "WFSPanel.showAdvanced" );
+        final String hideAdvanced = I18N.get( "WFSPanel.hideAdvanced" );
 
         JButton extrasButton = new JButton( showAdvanced );
         extrasButton.setBounds( 260, 20, 80, 20 );

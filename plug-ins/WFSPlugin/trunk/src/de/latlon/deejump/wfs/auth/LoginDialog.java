@@ -88,11 +88,11 @@ public class LoginDialog extends JDialog {
         gb.gridx = 0;
         gb.gridy = 0;
         gb.insets = new Insets(5, 2, 0, 2);
-        getContentPane().add(new JLabel(I18N.getString("LoginDialog.service")), gb);
+        getContentPane().add(new JLabel(I18N.get("LoginDialog.service")), gb);
         ++gb.gridy;
-        getContentPane().add(new JLabel(I18N.getString("LoginDialog.username")), gb);
+        getContentPane().add(new JLabel(I18N.get("LoginDialog.username")), gb);
         ++gb.gridy;
-        getContentPane().add(new JLabel(I18N.getString("LoginDialog.password")), gb);
+        getContentPane().add(new JLabel(I18N.get("LoginDialog.password")), gb);
 
         gb.gridy = 0;
         ++gb.gridx;
@@ -107,7 +107,7 @@ public class LoginDialog extends JDialog {
         passwordField = new JPasswordField();
         getContentPane().add(passwordField, gb);
 
-        JButton ok = new JButton(I18N.getString("LoginDialog.ok"));
+        JButton ok = new JButton(I18N.get("LoginDialog.ok"));
         ok.addActionListener(
             new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -124,7 +124,7 @@ public class LoginDialog extends JDialog {
         gb.gridx = 0;
         getContentPane().add(ok, gb);
         
-        JButton cancel = new JButton(I18N.getString("LoginDialog.cancel"));
+        JButton cancel = new JButton(I18N.get("LoginDialog.cancel"));
         cancel.addActionListener(
              new ActionListener() {
                  public void actionPerformed(ActionEvent e) {
