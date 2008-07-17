@@ -31,20 +31,16 @@
 
 package de.latlon.deejump.wfs.transaction;
 
-import java.text.SimpleDateFormat;
+import static org.deegree.framework.util.DateUtil.formatISO8601Date;
+
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.deegree.datatypes.QualifiedName;
 import org.deegree.model.crs.CRSFactory;
 import org.deegree.model.crs.CoordinateSystem;
-import org.deegree.model.filterencoding.AbstractOperation;
-import org.deegree.model.filterencoding.Literal;
-import org.deegree.model.filterencoding.PropertyIsCOMPOperation;
-import org.deegree.model.filterencoding.PropertyName;
 import org.deegree.model.spatialschema.GMLGeometryAdapter;
 import org.deegree.model.spatialschema.GeometryImpl;
 import org.deegree.model.spatialschema.JTSAdapter;
@@ -57,6 +53,7 @@ import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.model.FeatureEventType;
 
 import de.latlon.deejump.wfs.auth.UserData;
+import de.latlon.deejump.wfs.jump.WFSFeature;
 
 /**
  * Factory class to generate WFS transaction requests.
@@ -78,8 +75,6 @@ public class TransactionFactory {
                                                  + "xmlns:ogc='http://www.opengis.net/ogc' xmlns:wfs='http://www.opengis.net/wfs' "
                                                  + "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
                                                  + "xsi:schemaLocation='http://www.opengis.net/wfs/1.1.0/WFS-transaction.xsd' ";
-
-    private static final SimpleDateFormat formatter = new SimpleDateFormat( "yyyy-MM-dd'T'hh:mm:ss" );
 
     /**
      * Combines geometry update xml with attribute update xml into a common transaction update xml
@@ -130,19 +125,15 @@ public class TransactionFactory {
      * Generates an update transcation request.
      * 
      * @param fet
-     *            the feature event type (FeatureEventType.GEOMETRY_MODIFIED or
-     *            FeatureEventType.ATTRIBUTE_MODIFIED)
+     *            the feature event type (FeatureEventType.GEOMETRY_MODIFIED or FeatureEventType.ATTRIBUTE_MODIFIED)
      * @param featureType
      *            the name of the WFS feature type
      * @param newFeatures
      *            list containing features to be updated
-     * @param oldFeatures
-     *            list containing original features (those are used as filter)
      * @return an XML fragment containing an update transaction
      */
     public static final StringBuffer createUpdateTransaction( FeatureEventType fet, QualifiedName featureType,
-                                                              ArrayList<Feature> newFeatures,
-                                                              HashMap<Feature, Feature> oldFeatures ) {
+                                                              ArrayList<Feature> newFeatures ) {
         StringBuffer sb = new StringBuffer();
         if ( featureType == null ) {
             return sb;
@@ -151,7 +142,7 @@ public class TransactionFactory {
             return sb;
         }
 
-        appendUpdate( fet, sb, featureType, newFeatures, oldFeatures );
+        appendUpdate( fet, sb, featureType, newFeatures );
 
         return sb;
     }
@@ -210,25 +201,19 @@ public class TransactionFactory {
      *            the feature type name
      * @param features
      *            the list of features
-     * @param oldFeatures
-     *            a ap containing the old features
      */
     private static final void appendUpdate( FeatureEventType fet, StringBuffer sb, QualifiedName featureType,
-                                            ArrayList<Feature> features, HashMap<Feature, Feature> oldFeatures ) {
-
+                                            ArrayList<Feature> features ) {
         for ( Iterator<Feature> iter = features.iterator(); iter.hasNext(); ) {
 
             Feature feat = iter.next();
-            sb.append( "<wfs:Update typeName='" ).append( featureType.getPrefix() ).append( ":" ).append(
-                                                                                                          featureType.getLocalName() ).append(
-                                                                                                                                               "'>" );
+            sb.append( "<wfs:Update typeName='" ).append( featureType.getPrefix() ).append( ":" );
+            sb.append( featureType.getLocalName() ).append( "'>" );
             sb.append( createPropertiesFragment( featureType, fet, feat ) );
 
-            Feature oldFeat = oldFeatures.get( feat );
-            StringBuffer s = createOperationFragment( oldFeat, featureType );
-            if ( s.length() > 0 ) {
+            if ( feat instanceof WFSFeature ) {
                 sb.append( "<ogc:Filter>" );
-                sb.append( s );
+                sb.append( "<ogc:GmlObjectId gml:id=\"" ).append( ( (WFSFeature) feat ).getGMLId() ).append( "\"/>" );
                 sb.append( "</ogc:Filter>" );
             }
 
@@ -248,20 +233,16 @@ public class TransactionFactory {
      */
     private static final void appendInsert( StringBuffer sb, QualifiedName featureType, QualifiedName geoPropName,
                                             ArrayList<Feature> features, boolean useExisting ) {
-
         sb.append( "<wfs:Insert handle='insert1' idgen='" + ( useExisting ? "UseExisting" : "GenerateNew" ) + "' >" );
 
         for ( Iterator<Feature> iter = features.iterator(); iter.hasNext(); ) {
-            Feature feat = iter.next();
-            String s = featureType.getPrefix() + ":" + featureType.getLocalName();
+            WFSFeature feat = (WFSFeature) iter.next();
+
+            String s = featureType.getPrefixedName();
 
             sb.append( "<" ).append( s );
             if ( useExisting ) {
-                String id = (String) feat.getAttribute( "Internal ID" );
-                if ( !id.startsWith( featureType.getLocalName().toUpperCase() ) ) {
-                    id = featureType.getLocalName().toUpperCase() + "_" + id;
-                    feat.setAttribute( "Internal ID", id );
-                }
+                String id = feat.getGMLId();
                 sb.append( " gml:id=\"" ).append( id ).append( "\"" );
             }
             sb.append( ">" );
@@ -284,15 +265,14 @@ public class TransactionFactory {
      */
     private static final void appendDelete( StringBuffer sb, QualifiedName featureType, ArrayList<Feature> features ) {
         for ( Iterator<Feature> iter = features.iterator(); iter.hasNext(); ) {
-            sb.append( "<wfs:Delete typeName='" ).append( featureType.getPrefix() ).append( ":" ).append(
-                                                                                                          featureType.getLocalName() ).append(
-                                                                                                                                               "'>" );
+            sb.append( "<wfs:Delete typeName='" ).append( featureType.getPrefix() ).append( ":" );
+            sb.append( featureType.getLocalName() ).append( "'>" );
 
             Feature feat = iter.next();
-            StringBuffer s = createOperationFragment( feat, featureType );
-            if ( s.length() > 0 ) {
+
+            if ( feat instanceof WFSFeature ) {
                 sb.append( "<ogc:Filter>" );
-                sb.append( s );
+                sb.append( "<ogc:GmlObjectId gml:id=\"" ).append( ( (WFSFeature) feat ).getGMLId() ).append( "\"/>" );
                 sb.append( "</ogc:Filter>" );
             }
 
@@ -357,17 +337,12 @@ public class TransactionFactory {
             LOG.debug( "Shall we insert attribute " + attName + "?" );
 
             if ( ( ( !( fs.getAttributeType( j ) == AttributeType.GEOMETRY ) ) && fet == FeatureEventType.ATTRIBUTES_MODIFIED ) ) {
-                if ( fs.getAttributeName( j ).equals( "Internal ID" ) ) {
-                    LOG.debug( "Skipping fake id attribute." );
-                    continue;
-                }
-
                 LOG.debug( "Inserting modified attribute." );
 
                 if ( fs.getAttributeType( j ) == AttributeType.DATE ) {
                     Date attValue = (Date) bf.getAttribute( j );
                     if ( attValue != null ) {
-                        String val = formatter.format( attValue );
+                        String val = formatISO8601Date( attValue );
                         LOG.debug( "Inserting date value of " + val );
                         sb.append( "<wfs:Property><wfs:Name>" ).append( featureType.getPrefix() ).append( ":" );
                         sb.append( attName ).append( "</wfs:Name>" ).append( "<wfs:Value>" ).append( val );
@@ -420,17 +395,12 @@ public class TransactionFactory {
                 if ( featSchema.getAttributeType( j ) == AttributeType.DATE ) {
                     Date attValue = (Date) bf.getAttribute( j );
                     if ( attValue != null ) {
-                        String val = formatter.format( attValue );
+                        String val = formatISO8601Date( attValue );
                         sb.append( "<" ).append( featureType.getPrefix() ).append( ":" ).append( attName ).append( ">" );
                         sb.append( val );
                         sb.append( "</" ).append( featureType.getPrefix() ).append( ":" ).append( attName ).append( ">" );
                     }
                 } else {
-                    if ( featSchema.getAttributeName( j ).equals( "Internal ID" ) ) {
-                        LOG.debug( "Skipping fake id attribute." );
-                        continue;
-                    }
-
                     Object attValue = bf.getAttribute( j );
                     if ( attValue != null ) {
                         sb.append( "<" ).append( featureType.getPrefix() ).append( ":" ).append( attName ).append( ">" );
@@ -453,82 +423,6 @@ public class TransactionFactory {
                 sb.append( attName.equals( "GEOMETRY" ) ? geoAttName.getLocalName() : attName ).append( ">" );
             }
         }
-        return sb;
-    }
-
-    private static final StringBuffer createOperationFragment( Feature bf, QualifiedName featureType ) {
-        if ( bf.getSchema().hasAttribute( "Internal ID" ) ) {
-            StringBuffer sb = new StringBuffer( 512 );
-            sb.append( "<ogc:GmlObjectId gml:id='" + bf.getAttribute( "Internal ID" ) + "' />" );
-            LOG.debug( "Using GML id as filter." );
-            return sb;
-        }
-
-        StringBuffer sb = new StringBuffer();
-        Object[] os = bf.getAttributes();
-        FeatureSchema fs = bf.getSchema();
-        int featCount = 0;
-        for ( int j = 0; j < os.length; j++ ) {
-
-            String attName = fs.getAttributeName( j );
-
-            if ( attName.equals( "Internal ID" ) ) {
-                LOG.debug( "Skipping fake id attribute." );
-                continue;
-            }
-
-            if ( attName.equals( "FAKE_GEOMETRY" ) ) {
-                LOG.debug( "Skipping fake geometry." );
-                continue;
-            }
-
-            if ( !( fs.getAttributeType( j ) == AttributeType.GEOMETRY ) ) {
-                if ( fs.getAttributeType( j ) == AttributeType.DATE ) {
-                    Date attValue = (Date) bf.getAttribute( j );
-                    if ( attValue != null ) {
-                        String attNameWoPrefix = attName.substring( attName.indexOf( ":" ) + 1, attName.length() );
-                        QualifiedName qn = new QualifiedName( featureType.getPrefix(), attNameWoPrefix,
-                                                              featureType.getNamespace() );
-                        PropertyIsCOMPOperation oper;
-                        oper = new PropertyIsCOMPOperation( 100, new PropertyName( qn ),
-                                                            new Literal( formatter.format( attValue ) ) );
-                        sb.append( oper.toXML() );
-                        featCount++;
-                    }
-                } else {
-                    Object attValue = bf.getAttribute( j );
-
-                    if ( attValue != null ) {
-
-                        double value = 0.1;
-
-                        try {
-                            value = Double.parseDouble( attValue.toString() );
-
-                        } catch ( NumberFormatException e ) {
-                            value = 0d;
-                        }
-
-                        value = value - (int) value;
-                        if ( value == 0d ) {
-                            String attNameWoPrefix = attName.substring( attName.indexOf( ":" ) + 1, attName.length() );
-                            QualifiedName qn = new QualifiedName( featureType.getPrefix(), attNameWoPrefix,
-                                                                  featureType.getNamespace() );
-                            AbstractOperation oper = new PropertyIsCOMPOperation( 100, new PropertyName( qn ),
-                                                                                  new Literal( attValue.toString() ) );
-                            sb.append( oper.toXML() );
-                            featCount++;
-                        }
-                    }
-                }
-            }
-        }
-
-        if ( featCount > 1 ) {
-            sb.insert( 0, "<ogc:And>" );
-            sb.append( "</ogc:And>" );
-        }
-
         return sb;
     }
 

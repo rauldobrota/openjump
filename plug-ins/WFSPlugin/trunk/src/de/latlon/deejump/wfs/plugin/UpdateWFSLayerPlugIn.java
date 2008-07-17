@@ -35,11 +35,25 @@ import static com.vividsolutions.jump.workbench.model.FeatureEventType.ADDED;
 import static com.vividsolutions.jump.workbench.model.FeatureEventType.ATTRIBUTES_MODIFIED;
 import static com.vividsolutions.jump.workbench.model.FeatureEventType.DELETED;
 import static com.vividsolutions.jump.workbench.model.FeatureEventType.GEOMETRY_MODIFIED;
+import static com.vividsolutions.jump.workbench.model.LayerEventType.METADATA_CHANGED;
+import static com.vividsolutions.jump.workbench.model.LayerEventType.REMOVED;
+import static com.vividsolutions.jump.workbench.ui.images.IconLoader.icon;
+import static de.latlon.deejump.wfs.i18n.I18N.getString;
+import static de.latlon.deejump.wfs.transaction.TransactionFactory.createCommonUpdateTransaction;
+import static de.latlon.deejump.wfs.transaction.TransactionFactory.createTransaction;
+import static de.latlon.deejump.wfs.transaction.TransactionFactory.createUpdateTransaction;
 import static de.latlon.deejump.wfs.transaction.TransactionFactory.setCrs;
+import static java.awt.Color.LIGHT_GRAY;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.showMessageDialog;
+import static javax.xml.transform.TransformerFactory.newInstance;
+import static org.deegree.framework.util.CharsetUtils.getSystemCharset;
+import static org.deegree.framework.xml.DOMPrinter.nodeToString;
+import static org.deegree.framework.xml.XMLTools.getNodeAsString;
+import static org.deegree.framework.xml.XMLTools.getNodesAsStringList;
+import static org.deegree.framework.xml.XMLTools.parse;
+import static org.deegree.ogcbase.CommonNamespaces.getNamespaceContext;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.io.IOException;
 import java.io.StringReader;
@@ -68,11 +82,9 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.log4j.Logger;
 import org.deegree.datatypes.QualifiedName;
-import org.deegree.framework.util.CharsetUtils;
-import org.deegree.framework.xml.DOMPrinter;
+import org.deegree.framework.xml.NamespaceContext;
 import org.deegree.framework.xml.XMLException;
 import org.deegree.framework.xml.XMLFragment;
-import org.deegree.framework.xml.XMLTools;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -89,11 +101,9 @@ import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.ThreadedBasePlugIn;
 import com.vividsolutions.jump.workbench.ui.HTMLFrame;
 import com.vividsolutions.jump.workbench.ui.WorkbenchToolBar;
-import com.vividsolutions.jump.workbench.ui.images.IconLoader;
 
-import de.latlon.deejump.wfs.i18n.I18N;
+import de.latlon.deejump.wfs.jump.WFSFeature;
 import de.latlon.deejump.wfs.jump.WFSLayer;
-import de.latlon.deejump.wfs.transaction.TransactionFactory;
 
 /**
  * Plug-in to update a wfs layer
@@ -104,6 +114,8 @@ import de.latlon.deejump.wfs.transaction.TransactionFactory;
 public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
 
     private static Logger LOG = Logger.getLogger( UpdateWFSLayerPlugIn.class );
+
+    private static final NamespaceContext nsContext = getNamespaceContext();
 
     private List<String> requests = new LinkedList<String>();
 
@@ -128,13 +140,14 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
         if ( candidatelayer instanceof WFSLayer ) {
             layer = (WFSLayer) candidatelayer;
         } else {
+            LOG.debug( "Not a WFS layer." );
             return false;
         }
 
         // flush: attempt to force events to be processed
         // LayerEventType.METADATA_CHANGED is not taken into account by
         // listener...
-        context.getLayerManager().fireLayerChanged( layer, LayerEventType.METADATA_CHANGED );
+        context.getLayerManager().fireLayerChanged( layer, METADATA_CHANGED );
 
         setCrs( layer.getCrs() );
 
@@ -143,8 +156,6 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
 
         ArrayList<Feature> updateGeomFeatures = changedFeaturesMap.get( GEOMETRY_MODIFIED );
         ArrayList<Feature> updateAttrFeatures = changedFeaturesMap.get( ATTRIBUTES_MODIFIED );
-        HashMap<Feature, Feature> oldGeomFeatures = layer.getLayerListener().getOldGeomFeaturesMap();
-        HashMap<Feature, Feature> oldAttrFeatures = layer.getLayerListener().getOldAttrFeaturesMap();
         ArrayList<Feature> delFeatures = changedFeaturesMap.get( DELETED );
         ArrayList<Feature> newFeatures = changedFeaturesMap.get( ADDED );
 
@@ -154,34 +165,30 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
 
         // UPDATE Geom
         if ( updateGeomFeatures.size() > 0 ) {
-            updateGeom = TransactionFactory.createUpdateTransaction( GEOMETRY_MODIFIED, layer.getQualifiedName(),
-                                                                     updateGeomFeatures, oldGeomFeatures );
+            updateGeom = createUpdateTransaction( GEOMETRY_MODIFIED, layer.getQualifiedName(), updateGeomFeatures );
         }
 
         // UPDATE Attr
         if ( updateAttrFeatures.size() > 0 ) {
-            updateAttr = TransactionFactory.createUpdateTransaction( ATTRIBUTES_MODIFIED, layer.getQualifiedName(),
-                                                                     updateAttrFeatures, oldAttrFeatures );
+            updateAttr = createUpdateTransaction( ATTRIBUTES_MODIFIED, layer.getQualifiedName(), updateAttrFeatures );
         }
 
         if ( updateAttrFeatures.size() > 0 || updateGeomFeatures.size() > 0 ) {
             // now CONCAT updates into one request
-            requests.add( TransactionFactory.createCommonUpdateTransaction( context.getWorkbenchContext(),
-                                                                            layer.getQualifiedName(), updateGeom,
-                                                                            updateAttr ).toString() );
+            requests.add( createCommonUpdateTransaction( context.getWorkbenchContext(), layer.getQualifiedName(),
+                                                         updateGeom, updateAttr ).toString() );
         }
 
         // DELETE
         if ( delFeatures.size() > 0 ) {
-            requests.add( TransactionFactory.createTransaction( context.getWorkbenchContext(), DELETED,
-                                                                layer.getQualifiedName(), null, delFeatures, false ).toString() );
+            requests.add( createTransaction( context.getWorkbenchContext(), DELETED, layer.getQualifiedName(), null,
+                                             delFeatures, false ).toString() );
         }
 
         // INSERT
         if ( newFeatures.size() > 0 ) {
-            requests.add( TransactionFactory.createTransaction( context.getWorkbenchContext(), ADDED,
-                                                                layer.getQualifiedName(), geoPropName, newFeatures,
-                                                                false ).toString() );
+            requests.add( createTransaction( context.getWorkbenchContext(), ADDED, layer.getQualifiedName(),
+                                             geoPropName, newFeatures, false ).toString() );
         }
 
         return true;
@@ -195,7 +202,7 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
         area.setWrapStyleWord( true );
         area.setColumns( 40 );
         area.setRows( 5 );
-        area.setBackground( Color.LIGHT_GRAY );
+        area.setBackground( LIGHT_GRAY );
         showMessageDialog( parent, new JScrollPane( area ), title, type );
     }
 
@@ -208,12 +215,15 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
 
         while ( !requests.isEmpty() ) {
             if ( error ) {
+                LOG.debug( "Some error occurred." );
                 break;
             }
 
             String request = requests.remove( 0 );
 
             try {
+
+                ArrayList<Feature> newFeatures = layer.getLayerListener().getChangedFeaturesMap().get( ADDED );
 
                 XMLFragment doc = doTransaction( request, layer.getServerURL() );
 
@@ -226,9 +236,9 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
                 String msg;
 
                 if ( root.equals( "ServiceExceptionReport" ) || root.equals( "ExceptionReport" ) ) {
-                    msg = XMLTools.getNodeAsString( doc.getRootElement(), "ServiceException", null, null );
+                    msg = getNodeAsString( doc.getRootElement(), "ServiceException", null, null );
                     if ( msg == null ) {
-                        msg = XMLTools.getNodeAsString( doc.getRootElement(), "Exception", null, null );
+                        msg = getNodeAsString( doc.getRootElement(), "Exception", null, null );
                     }
 
                     showLongMsg( context.getWorkbenchFrame(), "The Server responded with an error: " + msg, "Error",
@@ -240,12 +250,19 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
 
                 showOutput( context, new StringBuffer( doc.getAsPrettyString() ) );
 
+                List<String> featureIds = getNodesAsStringList( doc.getRootElement(), "//ogc:FeatureId/@fid", nsContext );
+
+                for ( Feature f : newFeatures ) {
+                    ( (WFSFeature) f ).setGMLId( featureIds.get( 0 ) );
+                    featureIds.remove( 0 );
+                }
+
                 // clean up listener and mark layer as saved
                 layer.getLayerListener().reset();
                 layer.setFeatureCollectionModified( false );
 
                 LOG.debug( "Removing and re-adding layer." );
-                layer.fireLayerChanged( LayerEventType.REMOVED );
+                layer.fireLayerChanged( REMOVED );
                 layer.fireLayerChanged( LayerEventType.ADDED );
 
             } catch ( HttpException e ) {
@@ -296,9 +313,8 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
         if ( code == 200 ) {
             result.load( post.getResponseBodyAsStream(), "http://www.systemid.org" );
         } else {
-            showMessageDialog( null, I18N.getString( "UpdateWFSLayerPlugIn.answernotxml",
-                                                     post.getResponseBodyAsString() ), I18N.getString( "error" ),
-                               ERROR_MESSAGE );
+            showMessageDialog( null, getString( "UpdateWFSLayerPlugIn.answernotxml", post.getResponseBodyAsString() ),
+                               getString( "error" ), ERROR_MESSAGE );
             return null;
         }
 
@@ -321,11 +337,11 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
         out.createNewDocument();
         out.addHeader( 2, "WFS Transaction" );
 
-        Document doc = XMLTools.parse( new StringReader( mesg.toString() ) );
+        Document doc = parse( new StringReader( mesg.toString() ) );
 
         URL url = UpdateWFSLayerPlugIn.class.getResource( "response2html.xsl" );
 
-        String s = DOMPrinter.nodeToString( doc, CharsetUtils.getSystemCharset() );
+        String s = nodeToString( doc, getSystemCharset() );
 
         s = doXSLTransform( url, s );
         out.append( s );
@@ -340,7 +356,7 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
      * @return an Icon object
      */
     public static ImageIcon getIcon() {
-        return IconLoader.icon( "Data.gif" );
+        return icon( "Data.gif" );
     }
 
     private static String doXSLTransform( URL xsltUrl, String content ) {
@@ -354,7 +370,7 @@ public class UpdateWFSLayerPlugIn extends ThreadedBasePlugIn {
 
         try {
             Source source = new StreamSource( new StringReader( content ) );
-            TransformerFactory tFactory = TransformerFactory.newInstance();
+            TransformerFactory tFactory = newInstance();
             Transformer transformer = tFactory.newTransformer( new StreamSource( xsltUrl.openStream() ) );
             transformer.transform( source, new StreamResult( sw ) );
 
