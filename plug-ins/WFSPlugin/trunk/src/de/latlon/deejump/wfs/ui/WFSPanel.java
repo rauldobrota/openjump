@@ -8,6 +8,9 @@
  */
 package de.latlon.deejump.wfs.ui;
 
+import static javax.swing.JFileChooser.APPROVE_OPTION;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import static javax.swing.JOptionPane.showMessageDialog;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
@@ -60,6 +63,7 @@ import de.latlon.deejump.wfs.auth.LoginDialog;
 import de.latlon.deejump.wfs.auth.MD5Hasher;
 import de.latlon.deejump.wfs.auth.UserData;
 import de.latlon.deejump.wfs.client.AbstractWFSWrapper;
+import de.latlon.deejump.wfs.client.WFSClientHelper;
 import de.latlon.deejump.wfs.client.WFServiceWrapper_1_0_0;
 import de.latlon.deejump.wfs.client.WFServiceWrapper_1_1_0;
 import de.latlon.deejump.wfs.i18n.I18N;
@@ -91,7 +95,7 @@ public class WFSPanel extends JPanel {
 
     private List<String> servers = new ArrayList<String>();
 
-    private static File lastDirectory;
+    static File lastDirectory;
 
     /**
      * The standard geometry type name (used when getting schemata and creating filters with spatial clauses
@@ -214,6 +218,34 @@ public class WFSPanel extends JPanel {
 
         loginButton.setEnabled( context != null );
 
+        JButton saveButton = new JButton( I18N.getString( "General.save" ) );
+        if ( context != null ) {
+            saveButton.addActionListener( new ActionListener() {
+                public void actionPerformed( ActionEvent evt ) {
+                    JFileChooser jfc = new JFileChooser();
+                    if ( lastDirectory != null ) {
+                        jfc.setCurrentDirectory( lastDirectory );
+                    }
+                    int i = jfc.showSaveDialog( WFSPanel.this );
+                    if ( i == APPROVE_OPTION ) {
+                        try {
+                            String txt = WFSClientHelper.createResponsefromWFS( getWfService().getGetFeatureURL(),
+                                                                                getRequest() );
+                            FileWriter fw = new FileWriter( jfc.getSelectedFile() );
+                            fw.write( txt );
+                            fw.close();
+                            lastDirectory = jfc.getSelectedFile().getParentFile();
+                        } catch ( Exception e ) {
+                            showMessageDialog( WFSPanel.this, e.getMessage(), "Error!", ERROR_MESSAGE );
+                            e.printStackTrace();
+                        }
+
+                    }
+
+                }
+            } );
+        }
+
         JPanel p = new JPanel();
         p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
 
@@ -224,6 +256,9 @@ public class WFSPanel extends JPanel {
         innerPanel.add( connecButton );
         innerPanel.add( capabilitiesButton );
         innerPanel.add( loginButton );
+        if ( context != null ) {
+            innerPanel.add( saveButton );
+        }
         p.add( innerPanel );
 
         featureTypeCombo = createFeatureTypeCombo();

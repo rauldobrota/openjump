@@ -1,16 +1,32 @@
+2008-07-15  Andreas Schmitz <schmitz@lat-lon.de>
+
+        * src/de/latlon/deejump/wfs/i18n/messages_fi.properties:
+        * src/de/latlon/deejump/wfs/i18n/messages_en.properties:
+        * src/de/latlon/deejump/wfs/i18n/messages_fr.properties:
+        * src/de/latlon/deejump/wfs/i18n/messages_de.properties:
+        * src/de/latlon/deejump/wfs/ui/WFSPanel.java:
+        Added save button when running as plugin.
+
+2008-07-09  Andreas Schmitz <schmitz@lat-lon.de>
+
+        * lib/deegree2.jar: Updated deegree lib to make more crs names
+        available.
+
+        * src/de/latlon/deejump/wfs/Version.java: Updated version to 1.1.0-dev.
+
 2008-07-04  Stephan Holl <stephan.holl@intevation.de>
 
-	* HowToRelease.txt: FTP-Upload not possible, changed to SFTP
+        * HowToRelease.txt: FTP-Upload not possible, changed to SFTP
 
 2008-07-04  Stephan Holl <stephan.holl@intevation.de>
 
-	prepared to the new release 1.1.0
+        prepared to the new release 1.1.0
 
-	* src/de/latlon/deejump/wfs/Version.java: adopted Version to 1.1.0
+        * src/de/latlon/deejump/wfs/Version.java: adopted Version to 1.1.0
 
-	* Changes.txt: added new features of release 1.1.0
+        * Changes.txt: added new features of release 1.1.0
 
-	* HowToRelease: adopted Path to version, made it more generic
+        * HowToRelease: adopted Path to version, made it more generic
 
 2008-06-19  Andreas Schmitz <schmitz@lat-lon.de>
         src/de/latlon/deejump/wfs/Version.java,
