@@ -96,7 +96,7 @@ public class TinLayer extends AbstractLayerable {
 		return this.blackboard;
 	}
 	
-	public int getSrid() {
+	public int getSRID() {
 		return this.srid;
 	}
 	

@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Random;
 import java.awt.Shape;
 
+import javax.vecmath.Vector3d;
+
 import org.openjump.tin.TriangulatedIrregularNetwork;
 import org.openjump.tin.TinFace;
 
@@ -22,9 +24,10 @@ import com.vividsolutions.jump.workbench.ui.renderer.style.StyleUtil;
 
 public class BasicTinStyle implements TinStyle {
 
-	public static final Color       DEFAULT_FILL_COLOR  = new Color(0, 0, 0, 255);
+	//public static final Color       DEFAULT_FILL_COLOR  = new Color(0, 0, 0, 255);
+	public static final Color       DEFAULT_FILL_COLOR  = new Color(0, 193, 0, 255);
 	public static final Color       DEFAULT_LINE_COLOR  = DEFAULT_FILL_COLOR;
-	public static final BasicStroke DEFAULT_FILL_STROKE = new BasicStroke(1);
+	public static final BasicStroke DEFAULT_FILL_STROKE = new BasicStroke(0);
 
 	private Color fillColor = DEFAULT_FILL_COLOR;
 	private Color lineColor = DEFAULT_LINE_COLOR;
@@ -33,6 +36,10 @@ public class BasicTinStyle implements TinStyle {
 	private Stroke fillStroke = DEFAULT_FILL_STROKE;
 	private boolean enabled = true;
 	private String linePattern = "3";    
+	
+	private boolean debug = false;
+	
+	private Vector3d lightVector = new Vector3d(0, 0, 1);
 	
     /*
     private LineStringStyle boundaryStyle;
@@ -52,7 +59,6 @@ public class BasicTinStyle implements TinStyle {
      * shown. Don't need to check whether the layer is visible.
      */
 	public void initialize(Layer layer) {
-		// TODO Auto-generated method stub
 	}
 
 
@@ -60,16 +66,22 @@ public class BasicTinStyle implements TinStyle {
 			Viewport viewport) throws Exception {
 
 		List<TinFace> subsetTriangles = tin.getSubsetTriangles(viewport.getEnvelopeInModelCoordinates());
-		
+		if (debug) System.out.println("Number of triangles rendered: "+subsetTriangles.size());
 		Random rand = new Random();
 		
 		// paint the facets
 		for (TinFace face : subsetTriangles) {
 			try {
-				Color randColor = new Color(rand.nextInt(255), rand.nextInt(255), rand.nextInt(255), 255);
-		        g.setPaint(randColor);
+				//Color randColor = new Color(rand.nextInt(255), rand.nextInt(255), rand.nextInt(255), 255);
+				Double red = Math.abs(this.fillColor.getRed() * face.getShadingDotProduct(this.lightVector));
+				Double green = Math.abs(this.fillColor.getGreen() * face.getShadingDotProduct(this.lightVector));
+				Double blue = Math.abs(this.fillColor.getBlue() * face.getShadingDotProduct(this.lightVector));
+				if (debug) System.out.println("face dot product: "+face.getShadingDotProduct(this.lightVector)+"\tR.d: "+red+" R.i: "+red.intValue()+"\tG.d "+green+" G.i: "+green.intValue()+"\tB.d: "+blue+" B.i: "+blue.intValue());
+				Color faceColor = new Color(red.intValue(), green.intValue(), blue.intValue(), 255);
+		        g.setPaint(faceColor);
 				g.setStroke(fillStroke);
 				Shape faceShape = face.toShape(viewport);
+		        g.draw(faceShape);
 		        g.fill(faceShape);
 			}
 			catch (Exception e) {
@@ -80,6 +92,7 @@ public class BasicTinStyle implements TinStyle {
 		
 		// draw the boundaries
 		lineStroke = new BasicStroke(5);
+		if (tin.getBoundaries() != null)
 		try {
 			Color randColor = new Color(rand.nextInt(255), rand.nextInt(255), rand.nextInt(255), 255);
 			StyleUtil.paint(tin.getBoundariesAsMultiLineString(), g, viewport,
@@ -90,6 +103,7 @@ public class BasicTinStyle implements TinStyle {
 		}
 		
 		// draw the breaklines
+		if (tin.getBreaklines() != null)
 		try {		
 			Color randColor = new Color(rand.nextInt(255), rand.nextInt(255), rand.nextInt(255), 255);
 			StyleUtil.paint(tin.getBreaklinesAsMultiLineString(), g, viewport,

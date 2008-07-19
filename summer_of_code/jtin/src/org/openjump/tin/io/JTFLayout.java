@@ -98,13 +98,13 @@ public class JTFLayout {
 	public final static int MARKER_BYTE_SIZE = FILE_MARKER.length() * Character.SIZE / Byte.SIZE;
 	public final static int NUM_HEADER_INT_FIELDS = 6;
 	public final static int NUM_COORDINATES_PER_VERTEX = 3;
-	public final static int NUM_TRIANGLE_INT_FIELDS = 6;
 	public final static String FILE_NAME_EXTENSION = "jtf";
 	public final static ByteOrder BYTE_ORDER = ByteOrder.BIG_ENDIAN;
 	public final static String CHAR_SET = "UTF-16BE";
 
 	// format for triangle table arrangement. Value is equal to array index
 	// in the tritable.
+	public final static int NUM_TRIANGLE_INT_FIELDS = 6;
 	public final static int TRITABLE_VERTEX_0 = 0;
 	public final static int TRITABLE_VERTEX_1 = 1;
 	public final static int TRITABLE_VERTEX_2 = 2;

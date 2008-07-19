@@ -47,7 +47,7 @@ public class TinExtension extends Extension {
 	      | JFrame.MAXIMIZED_BOTH);
 	    workbenchFrame.getNodeClassToPopupMenuMap().put(TinLayer.class, tinLayerPopupMenu);
 	    
-	    new OpenDefaultTestTinPlugin().initialize(context);
+	    new CreateTinFromVectorLayerPlugin().initialize(context);
 	}
 
 }

@@ -141,4 +141,14 @@ public interface TriangulatedIrregularNetwork {
 	 * 					with the given envelope.
 	 */
 	public List<TinFace> getSubsetTriangles(Envelope envelope);
+	
+	/**
+	 * Returns a list of the TinFaces that have all three vertexes within the
+	 * envelope. The returned faces are not copies.
+	 * 
+	 * @param envelope	the bounding box that the faces are tested against
+	 * @return			a list of TinFaces that have an envelope that overlap
+	 * 					with the given envelope.
+	 */
+	public List<TinFace> getStrictSubsetTriangles(Envelope envelope);
 }

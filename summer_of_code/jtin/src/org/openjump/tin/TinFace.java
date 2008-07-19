@@ -8,6 +8,9 @@ import com.vividsolutions.jump.workbench.ui.renderer.java2D.PolygonShape;
 import java.awt.Shape;
 import java.awt.geom.NoninvertibleTransformException;
 
+import javax.vecmath.Tuple3d;
+import javax.vecmath.Vector3d;
+
 
 
 /**
@@ -44,6 +47,11 @@ public class TinFace {
 	// the index of this TinFace in the tinTriangles array.
 	private int thisIndex;
 	
+	// the normal vector of this face, used for shading
+	private Vector3d normalVector;
+	
+	boolean debug = false;
+	
 	/**
 	 * Create a new TinFace.
 	 * v0, v1, v2 should be in clockwise order.
@@ -65,24 +73,24 @@ public class TinFace {
 	 * @param tfs	an array of TinFaces composing the TIN of which this face
 	 * 				is a member of
 	 */
-	public TinFace (int idx,
-					int v0, int v1, int v2,
-					int n0, int n1, int n2,
-					Coordinate[] vts, TinFace[] tfs) {
+	public TinFace (final int idx,
+					final int v0, final int v1, final int v2,
+					final int n0, final int n1, final int n2,
+					final Coordinate[] vts, final TinFace[] tfs) {
 		Assert.isTrue(idx>=0 && idx<tfs.length, 
 				"TinFace constructor: array index out of bounds, idx = "+idx);
 		Assert.isTrue(v0>=0 && v0<vts.length, 
-				"TinFace constructor: array index out of bounds, v0 = "+vts);
+				"TinFace constructor: array index out of bounds, v0 = "+v0);
 		Assert.isTrue(v1>=0 && v1<vts.length, 
-				"TinFace constructor: array index out of bounds, v1 = "+vts);
+				"TinFace constructor: array index out of bounds, v1 = "+v1);
 		Assert.isTrue(v2>=0 && v2<vts.length, 
-				"TinFace constructor: array index out of bounds, v2 = "+vts);
-		Assert.isTrue(n0>=0 && n0<tfs.length, 
-				"TinFace constructor: array index out of bounds, n0 = "+tfs);
-		Assert.isTrue(n1>=0 && n1<tfs.length, 
-				"TinFace constructor: array index out of bounds, n1 = "+tfs);
-		Assert.isTrue(n2>=0 && n2<tfs.length, 
-				"TinFace constructor: array index out of bounds, n2 = "+tfs);
+				"TinFace constructor: array index out of bounds, v2 = "+v2);
+		Assert.isTrue(n0>=-1 && n0<tfs.length, 
+				"TinFace constructor: array index out of bounds, n0 = "+n0);
+		Assert.isTrue(n1>=-1 && n1<tfs.length, 
+				"TinFace constructor: array index out of bounds, n1 = "+n1);
+		Assert.isTrue(n2>=-1 && n2<tfs.length, 
+				"TinFace constructor: array index out of bounds, n2 = "+n2);
 		this.setThisIndex(idx);
 		this.setVertex0Index(v0);
 		this.setVertex1Index(v1);
@@ -93,8 +101,47 @@ public class TinFace {
 		this.tinVertices = vts;
 		this.tinTriangles = tfs;
 		
+		this.normalVector = calculateNormal();
 	}
 	
+	
+	/**
+	 * Calculates the normal vector of this TinFace
+	 * 
+	 * @return a vector normal to this TinFace
+	 */
+	protected Vector3d calculateNormal() {
+		Vector3d vec0 = new Vector3d(getVertex0().x, getVertex0().y, getVertex0().z);
+		Vector3d vec1 = new Vector3d(getVertex1().x, getVertex1().y, getVertex1().z);
+		Vector3d vec2 = new Vector3d(getVertex2().x, getVertex2().y, getVertex2().z);
+		
+		Vector3d vec0to1 = new Vector3d();
+		Vector3d vec1to2 = new Vector3d();
+		vec0to1.sub(vec0, vec1);
+		vec1to2.sub(vec1, vec2);
+		
+		if (debug) System.out.println("vec0to1: "+vec0to1+"\tvec1to2"+vec1to2);
+		
+		Vector3d normal = new Vector3d();
+		normal.cross(vec0to1, vec1to2);
+		normal.normalize();
+		return normal;
+	}
+	
+	
+	/**
+	 * Return the dot product of <code>lightVector</code> and this face's normal vector
+	 * 
+	 * @param lightVector	the vector representing the direction of lighting
+	 * @return				the dot product of <code>lightVector</code> and 
+	 * 						this face's normal vector
+	 */
+	public double getShadingDotProduct(final Vector3d lightVector) {
+		if (debug) System.out.println("Normal vector = "+this.normalVector+"\tlightVector = "+lightVector);
+		return this.normalVector.dot(lightVector);
+	}
+	
+
 	/**
 	 * Convert this TinFace to a human readable string.
 	 * 
@@ -144,7 +191,7 @@ public class TinFace {
 	 * @return 			A Shape that represents this triangular TinFace within
 	 * 					the given viewport
 	 */
-	public Shape toShape (Viewport viewport) {
+	public Shape toShape (final Viewport viewport) {
 		Coordinate[] modelShell = { getVertex0(), getVertex1(), getVertex2(), getVertex0() };
 		try {
 			Coordinate[] viewShell = viewport.getJava2DConverter().toViewCoordinates(modelShell);
@@ -201,25 +248,25 @@ public class TinFace {
 		return thisIndex;
 	}
 	
-	protected void setThisIndex(int thisIndex) {
+	protected void setThisIndex(final int thisIndex) {
 		this.thisIndex = thisIndex;
 	}
-	protected void setNeighbor2Index(int neighbor2) {
+	protected void setNeighbor2Index(final int neighbor2) {
 		this.neighbor2 = neighbor2;
 	}
-	protected void setNeighbor1Index(int neighbor1) {
+	protected void setNeighbor1Index(final int neighbor1) {
 		this.neighbor1 = neighbor1;
 	}
-	protected void setNeighbor0Index(int neighbor0) {
+	protected void setNeighbor0Index(final int neighbor0) {
 		this.neighbor0 = neighbor0;
 	}
-	protected void setVertex2Index(int vertex2) {
+	protected void setVertex2Index(final int vertex2) {
 		this.vertex2 = vertex2;
 	}
-	protected void setVertex1Index(int vertex1) {
+	protected void setVertex1Index(final int vertex1) {
 		this.vertex1 = vertex1;
 	}
-	protected void setVertex0Index(int vertex0) {
+	protected void setVertex0Index(final int vertex0) {
 		this.vertex0 = vertex0;
 	}
 	 

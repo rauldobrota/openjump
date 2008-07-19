@@ -20,7 +20,7 @@ import com.vividsolutions.jts.util.Assert;
 
 
 /**
- * @author paradox
+ * @author Christopher DeMars
  *
  */
 public class TinRenderer implements Renderer {
