@@ -122,7 +122,7 @@ public class LayerAndWMSFeatureInfoTool extends SpecifyFeaturesTool {
             if ( layer.getName().equals( FenceLayerFinder.LAYER_NAME ) ) {
                 continue;
             }
-            Collection<?> features = (Collection) map.get( layer );
+            Collection<?> features = (Collection<?>) map.get( layer );
             infoFrame.getModel().add( layer, features );
 
         }
