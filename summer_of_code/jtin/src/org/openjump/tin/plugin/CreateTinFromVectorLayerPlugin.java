@@ -3,15 +3,20 @@
  */
 package org.openjump.tin.plugin;
 
+import java.awt.Component;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JRootPane;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.util.Assert;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
@@ -23,13 +28,17 @@ import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.ThreadedPlugIn;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
-import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
+//import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
+import com.vividsolutions.jump.workbench.ui.MenuNames;
 
-import org.openjump.core.graph.delauneySimplexInsert.*;
-import org.openjump.tin.ImmutableTin;
 import org.openjump.tin.TinLayer;
 import org.openjump.tin.TriangulatedIrregularNetwork;
 import org.openjump.tin.triangulation.ChewUnconstrainedDelaunayTriangulator;
+import org.openjump.tin.ui.MultiInputDialog;
+import org.openjump.tin.ui.SelectFilePanel;
+import org.openjump.tin.i18n.I18NPlug;
+import org.openjump.tin.io.JTFLayout;
+import org.openjump.tin.io.JTFWriter;
 
 
 
@@ -40,13 +49,21 @@ import org.openjump.tin.triangulation.ChewUnconstrainedDelaunayTriangulator;
  */
 public class CreateTinFromVectorLayerPlugin extends AbstractPlugIn implements ThreadedPlugIn {
 
-    private String sName = "Create TIN From Vector Layer";
-    private String CLAYER = "select point layer";
-    private String sideBarText = "Creates a Delaunay triangulation and returns a TIN layer.";
-    private String msgCreateDG = "create triangulation";
-    private String msgCreatePolys = "create TIN";
+    private String menuName = "Create TIN From Vector Layer";
+    private String chooseLayer = "select point layer";
+    private String sideBarText = "Creates a TIN Layer from a Delaunay Triangulation of the selected Point Layer";
+    private String msgCreateDG = "Triangulating";
+    private String msgSaveTIN = "Saving TIN to disk";
+    private String msgCreatePolys = "Building TIN";
     private String msgNoPoint = "no point geometry";
+	private String msgErrorSavingTIN = "Error saving TIN";
+   private String fileNameBox = "File name for created TIN";
+    private String tinFileDescription = "OpenJUMP TIN file";
     private Layer itemlayer = null;
+    private String fileName;
+    
+    private static String pluginname = "createtinfromvectorlayerplugin";
+
     
 	/**
 	 * 
@@ -65,9 +82,28 @@ public class CreateTinFromVectorLayerPlugin extends AbstractPlugIn implements Th
 	
 	
 	public void initialize (PlugInContext context) throws Exception {
+        I18NPlug.setPlugInRessource(pluginname, "org.openjump.tin.i18n.resources.createtinfromvectorlayerplugin");
+        
+		//-- initialize country specific strings 
+		if (I18NPlug.jumpi18n == true) {
+			this.menuName = I18NPlug.get(pluginname, "CreateTinFromVectorLayerPlugin.CreateTinFromVectorLayer");
+			this.chooseLayer = I18NPlug.get(pluginname, "CreateTinFromVectorLayerPlugin.SelectPointLayer");
+			this.sideBarText = I18NPlug.get(pluginname, "CreateTinFromVectorLayerPlugin.CreatesATINLayerFromADelaunayTriangulationOfSelectedPoints");
+			this.msgCreateDG = I18NPlug.get(pluginname, "CreateTinFromVectorLayerPlugin.Triangulating");
+			this.msgSaveTIN = I18NPlug.get(pluginname, "CreateTinFromVectorLayerPlugin.SavingTINToDisk");
+			this.msgErrorSavingTIN = I18NPlug.get(pluginname, "CreateTinFromVectorLayerPlugin.ErrorSavingTINToDisk");
+			this.msgCreatePolys = I18NPlug.get(pluginname, "CreateTinFromVectorLayerPlugin.BuildingTIN");
+			this.msgNoPoint = I18NPlug.get(pluginname, "CreateTinFromVectorLayerPlugin.NoPointGeometry");
+			this.fileNameBox = I18NPlug.get(pluginname, "CreateTinFromVectorLayerPlugin.FileNameForTIN");
+			this.tinFileDescription = I18NPlug.get(pluginname, "CreateTinFromVectorLayerPlugin.OpenJUMPTINFile");
+		}
+		
 		context.getFeatureInstaller().addMainMenuItem(this, 
-				new String[] {"Tools", "Surface Analysis"} , getName(), false, null, 
+				new String[] {MenuNames.LAYER}, 
+				getName(), false, null, 
 				createEnableCheck(context.getWorkbenchContext()));
+		  
+
 	}
 	
     public static MultiEnableCheck createEnableCheck(WorkbenchContext workbenchContext) {
@@ -93,16 +129,23 @@ public class CreateTinFromVectorLayerPlugin extends AbstractPlugIn implements Th
 	
    private void setDialogValues(MultiInputDialog dialog, PlugInContext context){
 	    dialog.setSideBarDescription(this.sideBarText);	    
-    	JComboBox addLayerComboBoxBuild = dialog.addLayerComboBox(this.CLAYER, context.getCandidateLayer(0), null, context.getLayerManager());    	
+    	dialog.addLayerComboBox(this.chooseLayer, context.getCandidateLayer(0), null, context.getLayerManager());
+
+    	dialog.addRow(this.fileNameBox, new JLabel(this.fileNameBox), 
+    			new SelectFilePanel(this.tinFileDescription, new String[] {JTFLayout.FILE_NAME_EXTENSION}, false),
+    			null, null);
    }
 
    private void getDialogValues(MultiInputDialog dialog) {
-	   this.itemlayer = dialog.getLayer(this.CLAYER);
+	   this.itemlayer = dialog.getLayer(this.chooseLayer);
+
+	   SelectFilePanel sfp = (SelectFilePanel)dialog.getComponent(this.fileNameBox);
+	   this.fileName = sfp.getSelectedPath();
    }
 	
 	
 	public String getName() {
-        return "Create TIN from vector layer";
+        return this.menuName;
     }
 
     public void run(TaskMonitor monitor, PlugInContext context) throws Exception{            		
@@ -119,7 +162,6 @@ public class CreateTinFromVectorLayerPlugin extends AbstractPlugIn implements Th
 	    int srid = 0;
 	    Envelope envelope = new Envelope();
 	    
-	    //for (Iterator iter = features.iterator(); iter.hasNext();) {
 	    for (Feature feature : features) {
             Geometry g = feature.getGeometry();
             if(g instanceof Point){
@@ -137,6 +179,16 @@ public class CreateTinFromVectorLayerPlugin extends AbstractPlugIn implements Th
 		    
 		    monitor.report(this.msgCreatePolys);
 		    TriangulatedIrregularNetwork tin = dt.getTin(srid, envelope);
+		    
+	    	monitor.report(this.msgSaveTIN);
+	    	try {
+	    		FileOutputStream fout = new FileOutputStream(this.fileName);
+	    		JTFWriter.write(tin, fout);
+	    	}
+	    	catch (Exception e) {
+	    		context.getWorkbenchFrame().warnUser(this.msgErrorSavingTIN+": "+e.toString());
+	    	}	    			    
+		    
 		    context.getLayerManager().addLayerable(StandardCategoryNames.WORKING, 
 		    		new TinLayer(context.getWorkbenchContext(), this.itemlayer.getName()+" TIN",
 		    				context.getLayerManager(), tin, srid));

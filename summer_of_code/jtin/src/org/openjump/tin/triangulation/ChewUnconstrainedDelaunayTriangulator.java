@@ -19,6 +19,7 @@ import org.openjump.tin.TriangulatedIrregularNetwork;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 import com.vividsolutions.jts.util.Assert;
 
 
@@ -232,7 +233,7 @@ public class ChewUnconstrainedDelaunayTriangulator implements
 			triTable[index][JTFLayout.TRITABLE_NEIGHBOR_2] = n2idx;
 		}
 		
-		return new ImmutableTin(points, triTable, null, null, SRID);
+		return new ImmutableTin(new CoordinateArraySequence(points), triTable, null, null, SRID);
 	}
 	
 	public TriangulatedIrregularNetwork getTin(int SRID, Envelope envelope) {

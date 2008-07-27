@@ -7,6 +7,8 @@ import com.vividsolutions.jump.workbench.ui.renderer.java2D.PolygonShape;
 
 import java.awt.Shape;
 import java.awt.geom.NoninvertibleTransformException;
+import java.util.List;
+import java.util.Set;
 
 import javax.vecmath.Tuple3d;
 import javax.vecmath.Vector3d;
@@ -27,7 +29,7 @@ import javax.vecmath.Vector3d;
 public class TinFace {
 	
 	// vertex array shared among all the TinFaces
-	private Coordinate[] tinVertices;
+	private CoordinateSequence tinVertices;
 	
 	// array of TinFaces of which this Face is a member
 	private TinFace[] tinTriangles;
@@ -49,8 +51,12 @@ public class TinFace {
 	
 	// the normal vector of this face, used for shading
 	private Vector3d normalVector;
+
+	private Vector3d lightVector;
 	
-	boolean debug = false;
+	private double shadingDotProduct = Double.NaN;
+	
+	private boolean debug = false;
 	
 	/**
 	 * Create a new TinFace.
@@ -76,14 +82,15 @@ public class TinFace {
 	public TinFace (final int idx,
 					final int v0, final int v1, final int v2,
 					final int n0, final int n1, final int n2,
-					final Coordinate[] vts, final TinFace[] tfs) {
+					final CoordinateSequence vts, final TinFace[] tfs,
+					Vector3d lightVector) {
 		Assert.isTrue(idx>=0 && idx<tfs.length, 
 				"TinFace constructor: array index out of bounds, idx = "+idx);
-		Assert.isTrue(v0>=0 && v0<vts.length, 
+		Assert.isTrue(v0>=0 && v0<vts.size(), 
 				"TinFace constructor: array index out of bounds, v0 = "+v0);
-		Assert.isTrue(v1>=0 && v1<vts.length, 
+		Assert.isTrue(v1>=0 && v1<vts.size(), 
 				"TinFace constructor: array index out of bounds, v1 = "+v1);
-		Assert.isTrue(v2>=0 && v2<vts.length, 
+		Assert.isTrue(v2>=0 && v2<vts.size(), 
 				"TinFace constructor: array index out of bounds, v2 = "+v2);
 		Assert.isTrue(n0>=-1 && n0<tfs.length, 
 				"TinFace constructor: array index out of bounds, n0 = "+n0);
@@ -101,7 +108,9 @@ public class TinFace {
 		this.tinVertices = vts;
 		this.tinTriangles = tfs;
 		
+		this.lightVector = lightVector;
 		this.normalVector = calculateNormal();
+		this.shadingDotProduct = this.normalVector.dot(this.lightVector);
 	}
 	
 	
@@ -138,10 +147,25 @@ public class TinFace {
 	 */
 	public double getShadingDotProduct(final Vector3d lightVector) {
 		if (debug) System.out.println("Normal vector = "+this.normalVector+"\tlightVector = "+lightVector);
-		return this.normalVector.dot(lightVector);
+		if (!this.lightVector.equals(lightVector))
+			this.lightVector = lightVector;
+		this.shadingDotProduct = this.normalVector.dot(this.lightVector);
+		return this.shadingDotProduct;
 	}
 	
-
+	
+	/**
+	 * Return the dot product of <code>lightVector</code> and this face's normal vector
+	 * 
+	 * @param lightVector	the vector representing the direction of lighting
+	 * @return				the dot product of <code>lightVector</code> and 
+	 * 						this face's normal vector
+	 */
+	public double getShadingDotProduct() {
+		return this.shadingDotProduct;
+	}
+	
+	
 	/**
 	 * Convert this TinFace to a human readable string.
 	 * 
@@ -181,6 +205,9 @@ public class TinFace {
 		return new Envelope (x1, x2, y1, y2);
 	}
 	
+	public boolean isLevel() {
+		return (getVertex0().z == getVertex1().z && getVertex0().z == getVertex2().z);
+	}
 	
 	/**
 	 * Converts this TinFace to a java.awt.Shape by using a given viewport's
@@ -203,15 +230,28 @@ public class TinFace {
 		}
 	}
 	
+	public double getZMin() {
+		double zReturn = getVertex0().z;
+		if (getVertex1().z < zReturn) zReturn = getVertex1().z;
+		if (getVertex2().z < zReturn) zReturn = getVertex2().z;
+		return zReturn;
+	}
 
+	public double getZMax() {
+		double zReturn = getVertex0().z;
+		if (getVertex1().z > zReturn) zReturn = getVertex1().z;
+		if (getVertex2().z > zReturn) zReturn = getVertex2().z;
+		return zReturn;
+	}
+	
 	public Coordinate getVertex0() {
-		return tinVertices[getVertex0Index()];
+		return tinVertices.getCoordinate(getVertex0Index());
 	}	
 	public Coordinate getVertex1() {
-		return tinVertices[getVertex1Index()];
+		return tinVertices.getCoordinate(getVertex1Index());
 	}	
 	public Coordinate getVertex2() {
-		return tinVertices[getVertex2Index()];
+		return tinVertices.getCoordinate(getVertex2Index());
 	}
 	
 	public TinFace getNeighbor0() {

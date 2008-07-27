@@ -9,6 +9,7 @@ import org.openjump.tin.io.JTFLayout;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiLineString;
 
 /**
@@ -151,4 +152,54 @@ public interface TriangulatedIrregularNetwork {
 	 * 					with the given envelope.
 	 */
 	public List<TinFace> getStrictSubsetTriangles(Envelope envelope);
+	
+	/**
+	 * Returns a list of the TinFaces that intersect the given value along
+	 * their z axis.
+	 * 
+	 * @param z		the height band that all returned triangles will intersect
+	 * @return		a list of TinFaces that intersect the given height
+	 */
+	public List<TinFace> getTrianglesAtHeight(final double z);
+	
+	/**
+	 * Returns a list of the TinFaces that lie within the given height range
+	 * at some point
+	 * 
+	 * @param z1	one end of the height band that all returned triangles will intersect
+	 * @param z2	the other end the height band that all returned triangles will intersect
+	 * @return		a list of TinFaces that intersect the given height range
+	 */
+	public List<TinFace> getTrianglesAtHeight(final double z1, final double z2);
+	
+	/**
+	 * Returns a collection of LineStrings that represents all the contour 
+	 * lines of this TIN at the given height. The lines are equivalent to
+	 * the intersection of the surface this TIN models with the (x, y, height)
+	 * plane.
+	 *  
+	 * @param height	the height of the intersection plane
+	 * @return			all contour lines at the given height packaged as a 
+	 * 					MultiLineString. Closed contour lines should be 
+	 * 					represented as LinearRings.
+	 */
+	public Geometry getContourLinesAtHeight(final double height);
+	
+	/**
+	 * Returns a Coordinate with x, y, and z all set to the maximum value of 
+	 * each among this TIN's point set.
+	 * 
+	 * @return 	a Coordinate representing the maximum corner of a bounding cube
+	 * 			that encompasses this TIN's point set 
+	 */
+	public Coordinate getMaxBoundingCoordinate();
+	
+	/**
+	 * Returns a Coordinate with x, y, and z all set to the minimum value of 
+	 * each among this TIN's point set.
+	 * 
+	 * @return 	a Coordinate representing the minimum corner of a bounding cube
+	 * 			that encompasses this TIN's point set 
+	 */
+	public Coordinate getMinBoundingCoordinate();
 }

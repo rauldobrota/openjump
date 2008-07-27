@@ -39,7 +39,6 @@ public class BasicTinStyle implements TinStyle {
 	
 	private boolean debug = false;
 	
-	private Vector3d lightVector = new Vector3d(0, 0, 1);
 	
     /*
     private LineStringStyle boundaryStyle;
@@ -73,10 +72,10 @@ public class BasicTinStyle implements TinStyle {
 		for (TinFace face : subsetTriangles) {
 			try {
 				//Color randColor = new Color(rand.nextInt(255), rand.nextInt(255), rand.nextInt(255), 255);
-				Double red = Math.abs(this.fillColor.getRed() * face.getShadingDotProduct(this.lightVector));
-				Double green = Math.abs(this.fillColor.getGreen() * face.getShadingDotProduct(this.lightVector));
-				Double blue = Math.abs(this.fillColor.getBlue() * face.getShadingDotProduct(this.lightVector));
-				if (debug) System.out.println("face dot product: "+face.getShadingDotProduct(this.lightVector)+"\tR.d: "+red+" R.i: "+red.intValue()+"\tG.d "+green+" G.i: "+green.intValue()+"\tB.d: "+blue+" B.i: "+blue.intValue());
+				Double red = Math.abs(this.fillColor.getRed() * face.getShadingDotProduct());
+				Double green = Math.abs(this.fillColor.getGreen() * face.getShadingDotProduct());
+				Double blue = Math.abs(this.fillColor.getBlue() * face.getShadingDotProduct());
+				if (debug) System.out.println("face dot product: "+face.getShadingDotProduct()+"\tR.d: "+red+" R.i: "+red.intValue()+"\tG.d "+green+" G.i: "+green.intValue()+"\tB.d: "+blue+" B.i: "+blue.intValue());
 				Color faceColor = new Color(red.intValue(), green.intValue(), blue.intValue(), 255);
 		        g.setPaint(faceColor);
 				g.setStroke(fillStroke);

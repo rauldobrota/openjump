@@ -14,6 +14,7 @@ import org.openjump.tin.io.JTFReader;
 import org.openjump.tin.io.JTFWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 
 public class JTFReaderWriterTester {
@@ -85,7 +86,7 @@ public class JTFReaderWriterTester {
 		 breaklines.add(new int[] {0,5,10,15});
 		 boundaries.add(new int[] {0,1,2,3,7,11,15,14,13,12,8,4,0});
 		 
-		 tin1 = new ImmutableTin(points, triTable, breaklines, boundaries, spatialID);
+		 tin1 = new ImmutableTin(new CoordinateArraySequence(points), triTable, breaklines, boundaries, spatialID);
 		 
 		 // see what the tin thinks it is
 		 System.out.println("Hard Coded tin = \n" + tin1.toString() + "\n\n");

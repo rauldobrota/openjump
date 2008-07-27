@@ -79,11 +79,13 @@ public class JTFWriter {
 			out.write(tmpByteArray);
 			
 			// write the breaklines
-			for (int[] line : tin.getBreaklines()) {
-				writeLine(out, line);
-			}
+			if (tin.getNumBreaklines() > 0)
+				for (int[] line : tin.getBreaklines()) {
+					writeLine(out, line);
+				}
 			
 			// write the Boundaries
+			if (tin.getNumBoundaries() > 0)
 			for (int[] line : tin.getBoundaries()) {
 				writeLine(out, line);
 			}

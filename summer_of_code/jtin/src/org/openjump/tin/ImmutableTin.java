@@ -6,14 +6,19 @@ package org.openjump.tin;
 import org.openjump.tin.io.JTFLayout;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import com.vividsolutions.jts.util.Assert;
+import com.vividsolutions.jts.index.strtree.SIRtree;
 import com.vividsolutions.jts.index.strtree.STRtree;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
+import com.vividsolutions.jts.operation.linemerge.LineSequencer;
 
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -22,6 +27,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import javax.vecmath.Point3d;
+import javax.vecmath.Vector3d;
 
 
 
@@ -35,7 +43,8 @@ import java.util.Iterator;
 public final class ImmutableTin implements TriangulatedIrregularNetwork {
 
 	// list of vertices that compose the tin
-	private Coordinate[] vertices;
+	//private Coordinate[] vertices;
+	private CoordinateArraySequence vertices;
 	
 	// the faces of the tin. Each TinFace is a collection of array indices.
 	// Three indices point to the vertices array above, delineating the points
@@ -57,7 +66,18 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	// subset creation.
 	private STRtree faceIndex;
 	
+	// a spatial index of the height ranges of each face, used for elevation
+	// sorting, height bands, and contour lines
+	private SIRtree faceZIndex;
+	
+	// default light source vector used for hillshading
+	private Vector3d lightVector = new Vector3d(0, 0, 1);
+	
 	private boolean debug = false;
+	
+	// these two coordinates describe a bounding cube that will encompass all
+	// points and triangles. Min = lowest (x, y, z) value, Max = highest
+	private Coordinate min = null, max = null;
 
 	
 	/**
@@ -75,15 +95,55 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	 * @param spatialID		An OpenJUMP compatible spatial ID
 	 * @see 				JTFLayout
 	 */
-	public ImmutableTin (final Coordinate[] points, final int[][] triTable, 
+	public ImmutableTin (final CoordinateSequence points, final int[][] triTable, 
 						 final List<int[]> breaklines, final List<int[]> boundaries, 
 						 final int spatialID) {
 		
 		// initialize global datastructures
 		this.faceIndex = new STRtree();
+		this.faceZIndex = new SIRtree();
 		this.SRID = spatialID;
-		this.vertices = (Coordinate[])points.clone();
-		this.faceTable = triTableToFaceTable(triTable, this.vertices, this.faceIndex);
+		// make sure we have our own copy of the given point set
+		CoordinateArraySequence tmpCAS = new CoordinateArraySequence(points.toCoordinateArray());
+		this.vertices = (CoordinateArraySequence)tmpCAS.clone();
+		this.faceTable = new TinFace[triTable.length];
+		
+		// find bounding cube of point cloud
+		this.min = new Coordinate(this.vertices.getCoordinate(0));
+		this.max = new Coordinate(this.vertices.getCoordinate(0));
+		for (int i=1; i < this.vertices.size(); i++) {
+			if (this.vertices.getCoordinate(i).x < this.min.x) 
+				this.min.x = this.vertices.getCoordinate(i).x;
+			if (this.vertices.getCoordinate(i).y < this.min.y) 
+				this.min.y = this.vertices.getCoordinate(i).y;
+			if (this.vertices.getCoordinate(i).z < this.min.z) 
+				this.min.z = this.vertices.getCoordinate(i).z;
+			
+			if (this.vertices.getCoordinate(i).x > this.max.x) 
+				this.max.x = this.vertices.getCoordinate(i).x;
+			if (this.vertices.getCoordinate(i).y > this.max.y) 
+				this.max.y = this.vertices.getCoordinate(i).y;
+			if (this.vertices.getCoordinate(i).z > this.max.z) 
+				this.max.z = this.vertices.getCoordinate(i).z;
+		}
+				
+		// fill the face table by converting the triangle table to an array of 
+		// TinFace then enter that face into the spatial index
+		for (int i=0; i < triTable.length; i++) {
+			Assert.isTrue(triTable[i].length==JTFLayout.NUM_TRIANGLE_INT_FIELDS, 
+						  "Malformed triangle table: doesn't contain "+
+						  JTFLayout.NUM_TRIANGLE_INT_FIELDS+" fields for face #"
+						  + i + ".");
+			faceTable[i] = new TinFace (i, triTable[i][JTFLayout.TRITABLE_VERTEX_0], 
+										triTable[i][JTFLayout.TRITABLE_VERTEX_1], 
+										triTable[i][JTFLayout.TRITABLE_VERTEX_2],
+										triTable[i][JTFLayout.TRITABLE_NEIGHBOR_0],
+										triTable[i][JTFLayout.TRITABLE_NEIGHBOR_1],
+										triTable[i][JTFLayout.TRITABLE_NEIGHBOR_2],
+										vertices, faceTable, this.lightVector);
+			faceIndex.insert(faceTable[i].getEnvelope(), faceTable[i]);
+			faceZIndex.insert(faceTable[i].getZMin(), faceTable[i].getZMax(), faceTable[i]);
+		}
 		
 		// initialize then fill the breaklines and boundaries datastructures
 		if (breaklines != null)	{		
@@ -98,44 +158,6 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 				this.boundaries.add(itr.next().clone());
 			}
 		}
-	}
-	
-	
-	/**
-	 * Given a face table in a JTFLayout format, make then return a TinFace
-	 * 
-	 * @param triTable		the triangle table in a JTFLayout format
-	 * @param vertices		the vertices that the entries in the 
-	 * 						<code>triTable</code> point to
-	 * @param faceIndex		the index that each face should be placed
-	 * @see JTFLayout
-	 * @return				A <code>TinFace</code> array that describes the 
-	 * 						same set of triangles as <code>triTable</code>
-	 */
-	protected TinFace[] triTableToFaceTable (final int[][] triTable, 
-			final Coordinate[] vertices, SpatialIndex faceIndex) {
-		
-		TinFace[] faceTable = new TinFace[triTable.length];
-		
-		
-		// fill the face table by converting the triangle table to an array of 
-		// TinFace then enter that face into the spatial index
-		for (int i=0; i < triTable.length; i++) {
-			Assert.isTrue(triTable[i].length==JTFLayout.NUM_TRIANGLE_INT_FIELDS, 
-						  "Malformed triangle table: doesn't contain "+
-						  JTFLayout.NUM_TRIANGLE_INT_FIELDS+" fields for face #"
-						  + i + ".");
-			faceTable[i] = new TinFace (i, triTable[i][JTFLayout.TRITABLE_VERTEX_0], 
-										triTable[i][JTFLayout.TRITABLE_VERTEX_1], 
-										triTable[i][JTFLayout.TRITABLE_VERTEX_2],
-										triTable[i][JTFLayout.TRITABLE_NEIGHBOR_0],
-										triTable[i][JTFLayout.TRITABLE_NEIGHBOR_1],
-										triTable[i][JTFLayout.TRITABLE_NEIGHBOR_2],
-										vertices, faceTable);
-			faceIndex.insert(faceTable[i].getEnvelope(), faceTable[i]);
-		}
-		
-		return faceTable;
 	}
 	
 	
@@ -159,9 +181,10 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	public ImmutableTin (final List<TinFace> faceSubset, final List<int[]> breaklines, 
 			final List<int[]> boundaries, final int SRID) {
 		int idx;
-		int faceSubsetSize = faceSubset.size() + 1;
+		int faceSubsetSize = faceSubset.size();
 		if (debug) System.out.println("faceSubsetSize = "+faceSubsetSize);
 		this.faceIndex = new STRtree();
+		this.faceZIndex = new SIRtree();
 		this.SRID = SRID;
 		
 		// collect a map between the old points and the old point indexes, 
@@ -176,31 +199,52 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 		}
 		HashSet<Coordinate> pointSet= new HashSet<Coordinate>(pointToOldPointIndexMap.keySet());
 		HashSet<Integer> oldPointIndexSet = new HashSet<Integer>(pointToOldPointIndexMap.values());
-		this.vertices = new Coordinate[pointSet.size()];
-		this.vertices = pointSet.toArray(this.vertices);
+		// make sure we have a copy of and not a reference to the previous TIN's points
+		CoordinateArraySequence tmpCAS = new CoordinateArraySequence(pointSet.toArray(new Coordinate[pointSet.size()]));
+		this.vertices = (CoordinateArraySequence)tmpCAS.clone();
 		
-		
-		//create map between vertex and array index
+		// create map between vertex and array index &
+		// find min and max in the point cloud
 		HashMap<Coordinate, Integer> pointToNewIndexMap = new HashMap<Coordinate, Integer>(faceSubsetSize);
-		for (int i=0; i<this.vertices.length; i++) {
-			pointToNewIndexMap.put(this.vertices[i], new Integer(i));
+		for (int i=0; i<this.vertices.size(); i++) {
+			pointToNewIndexMap.put(this.vertices.getCoordinate(i), new Integer(i));
+			
+			// find bounding cube of point cloud
+			if (i == 0) {
+				this.min = new Coordinate(this.vertices.getCoordinate(0));
+				this.max = new Coordinate(this.vertices.getCoordinate(0));
+			}
+			if (this.vertices.getCoordinate(i).x < this.min.x) 
+				this.min.x = this.vertices.getCoordinate(i).x;
+			if (this.vertices.getCoordinate(i).y < this.min.y) 
+				this.min.y = this.vertices.getCoordinate(i).y;
+			if (this.vertices.getCoordinate(i).z < this.min.z) 
+				this.min.z = this.vertices.getCoordinate(i).z;
+			
+			if (this.vertices.getCoordinate(i).x > this.max.x) 
+				this.max.x = this.vertices.getCoordinate(i).x;
+			if (this.vertices.getCoordinate(i).y > this.max.y) 
+				this.max.y = this.vertices.getCoordinate(i).y;
+			if (this.vertices.getCoordinate(i).z > this.max.z) 
+				this.max.z = this.vertices.getCoordinate(i).z;			
 		}
 		
 		// create map between old point array index and new point array index
 		Hashtable<Integer, Integer> oldPointIndexToNewIndexMap = new Hashtable<Integer, Integer>(faceSubsetSize);
-		for (int i=0; i<this.vertices.length; i++) {
-			oldPointIndexToNewIndexMap.put(pointToOldPointIndexMap.get(this.vertices[i]), new Integer(i));
+		for (int i=0; i<this.vertices.size(); i++) {
+			oldPointIndexToNewIndexMap.put(pointToOldPointIndexMap.get(this.vertices.getCoordinate(i)), new Integer(i));
 		}
 		
 		// for each face is faceSubset, add a new face to this.faceTable with
 		// the vertices set to the index in the new point array that is 
 		// equivalent to the coordinates of the old face we're working with,
-		// then add a maping between the old face and the new face indexes.
+		// then add a mapping between the old face and the new face indexes.
 		HashMap<Integer, Integer> oldFaceIndexToNewIndexMap = new HashMap<Integer, Integer>(faceSubsetSize);
 		this.faceTable = new TinFace[faceSubsetSize];
 		idx=0;
 		for (TinFace face : faceSubset) {
-			oldFaceIndexToNewIndexMap.put(new Integer(face.getThisIndex()), new Integer(idx++));
+			oldFaceIndexToNewIndexMap.put(new Integer(face.getThisIndex()), new Integer(idx));
+			idx++;
 		}
 		
 		// for each face in faceSubset, set the neighbors of the equivalent
@@ -222,14 +266,16 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 			if (debug) System.out.println("idx = "+newFaceIndex+
 					"\tv0 = "+newVertex0Index+"\tv1 = "+newVertex1Index+"\tv2 = "+newVertex2Index+
 					"\tn0 = "+newNeighbor0Index+"\tn1 = "+newNeighbor1Index+"\tn2 = "+newNeighbor2Index+
-					"\tvertices.length = "+this.vertices.length+"\tthis.faceTable.length = "+this.faceTable.length);
+					"\tvertices.length = "+this.vertices.size()+"\tthis.faceTable.length = "+this.faceTable.length);
 			
-			this.faceTable[newFaceIndex] = new TinFace (idx, 
+			this.faceTable[newFaceIndex] = new TinFace (newFaceIndex, 
 					newVertex0Index, newVertex1Index, newVertex2Index, 
 					newNeighbor0Index, newNeighbor1Index, newNeighbor2Index,
-					this.vertices, this.faceTable);
+					this.vertices, this.faceTable, this.lightVector);
 			
 			faceIndex.insert(faceTable[newFaceIndex].getEnvelope(), faceTable[newFaceIndex]);
+			faceZIndex.insert(faceTable[newFaceIndex].getZMin(), faceTable[newFaceIndex].getZMax(), faceTable[newFaceIndex]);
+
 		}
 		
 		// get subset of breaklines and boundaries that are within this envelope.
@@ -277,7 +323,7 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 		Coordinate[] points = new Coordinate[pointArray.length];
 		Hashtable<Integer, Integer> pointsHash = new Hashtable<Integer, Integer>(faceSubsetSize);
 		for (int i=0; i<pointArray.length; i++) {
-			points[i] = this.vertices[pointArray[i].intValue()];
+			points[i] = this.vertices.getCoordinate(pointArray[i].intValue());
 			pointsHash.put(pointArray[i], new Integer(i));
 		}
 		
@@ -320,7 +366,7 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 		LinkedList<int[]> bk = lineSubset(this.breaklines, pointSet, pointsHash);
 		LinkedList<int[]> bd = lineSubset(this.boundaries, pointSet, pointsHash);
 
-		return new ImmutableTin(points, triTable, bk, bd, this.SRID);
+		return new ImmutableTin(new CoordinateArraySequence(points), triTable, bk, bd, this.SRID);
 	}
 	
 	
@@ -386,6 +432,160 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	}
 	
 	/**
+	 * Returns a list of the TinFaces that intersect the given value along
+	 * their z axis.
+	 * 
+	 * @param z		the height band that all returned triangles will intersect
+	 * @return		a list of TinFaces that intersect the given height
+	 */
+	public List<TinFace> getTrianglesAtHeight(final double z) {
+		return (List<TinFace>)faceZIndex.query(z);
+	}
+	
+	/**
+	 * Returns a list of the TinFaces that lie within the given height range
+	 * at some point
+	 * 
+	 * @param z1	one end of the height band that all returned triangles will intersect
+	 * @param z2	the other end the height band that all returned triangles will intersect
+	 * @return		a list of TinFaces that intersect the given height range
+	 */
+	public List<TinFace> getTrianglesAtHeight(final double z1, final double z2) {
+		return (List<TinFace>)faceZIndex.query(z1, z2);
+	}
+	
+	/**
+	 * Returns a collection of LineStrings that represents all the contour 
+	 * lines of this TIN at the given height. The lines are equivalent to
+	 * the intersection of the surface this TIN models with the (x, y, height)
+	 * plane.
+	 *  
+	 * @param height	the height of the intersection plane
+	 * @return			all contour lines at the given height packaged as a 
+	 * 					MultiLineString. Closed contour lines should be 
+	 * 					represented as LinearRings.
+	 */
+	public Geometry getContourLinesAtHeight(final double height) {
+
+		Vector3d planeNormal = new Vector3d(0.0, 0.0, 1.0);
+		Point3d planePoint = new Point3d(0.0, 0.0, height);
+		
+		GeometryFactory gf = new GeometryFactory(new PrecisionModel(), this.SRID);
+		
+		// get list of TinFaces that intersect the given height
+		List<TinFace> faceList = getTrianglesAtHeight(height);
+		
+		LinkedList<LineString> lineList = new LinkedList<LineString>();
+		
+		// for each face in faceList
+		for (TinFace face : faceList) {
+			
+			HashSet<Coordinate> pointsAtHeight = new HashSet<Coordinate>(3);
+
+			if (face.getVertex0().z == height) pointsAtHeight.add(face.getVertex0());
+			if (face.getVertex1().z == height) pointsAtHeight.add(face.getVertex1());
+			if (face.getVertex2().z == height) pointsAtHeight.add(face.getVertex2());
+
+			// drop faces that are level with the current height band, should do something more elegant
+			if (pointsAtHeight.size() == 3) continue;
+
+			// if there are two vertexes that are at the height, we have our line, 
+			// otherwise get points where the edges cross the height plane
+			if (pointsAtHeight.size() != 2) {
+				pointsAtHeight.add(linePlaneIntersection(planePoint, planeNormal, face.getVertex0(), face.getVertex1()));
+				pointsAtHeight.add(linePlaneIntersection(planePoint, planeNormal, face.getVertex1(), face.getVertex2()));
+				pointsAtHeight.add(linePlaneIntersection(planePoint, planeNormal, face.getVertex2(), face.getVertex0()));
+			}
+			pointsAtHeight.remove(null);
+			
+			// if only one vertex is touching the height plane, go to the next face
+			if (pointsAtHeight.size() == 1) continue;
+			Assert.isTrue(pointsAtHeight.size() == 2, "pointsAtHeight.size() = "+pointsAtHeight.size());
+
+			Coordinate[] pah = new Coordinate[2];
+			pah = pointsAtHeight.toArray(pah);
+
+			if (debug) System.out.println("height = "+height+"\tpointsAtHeight = "+pah[0]+"\t"+pah[1]);
+			lineList.add(new LineString(new CoordinateArraySequence(pah), gf));
+		}
+		
+		LineSequencer sequencer = new LineSequencer();
+		sequencer.add(lineList);
+		return sequencer.getSequencedLineStrings();
+	}
+
+	protected boolean lineIntersectsHeight (Coordinate p1, Coordinate p2, double height) {
+		return ((height-p1.z)*(height-p2.z) <= 0);
+	}
+	
+
+	
+	/**
+	 * 
+	 * Math cribbed from "Intersection of a plane and a line" by Paul Bourke
+	 * http://local.wasp.uwa.edu.au/~pbourke/geometry/planeline/
+	 * 
+	 * @param planePoint
+	 * @param planeNormal
+	 * @param linePoint1
+	 * @param linePoint2
+	 * @return
+	 */
+	protected Coordinate linePlaneIntersection (final Point3d planePoint, 
+			final Vector3d planeNormal, final Point3d linePoint1, 
+			final Point3d linePoint2) {
+		
+		Point3d p1, p2;
+		if (linePoint1.z < linePoint2.z) {
+			p1 = linePoint1;
+			p2 = linePoint2;
+		} else {
+			p1 = linePoint2;
+			p2 = linePoint1;
+		}
+		
+		Vector3d P3subP1 = new Vector3d(planePoint);
+		P3subP1.sub(p1);
+		
+		Vector3d P2subP1 = new Vector3d(p2);
+		P2subP1.sub(p1);
+		
+		double NdotP2subP1 = planeNormal.dot(P2subP1);
+		
+		// line coplanar
+		if (NdotP2subP1 == 0) 
+			return null; 
+		
+		double u = planeNormal.dot(P3subP1) / planeNormal.dot(P2subP1);
+		
+		// intersection lies outside the given line segment
+		if (u < 0 || u > 1)
+			return null;
+		
+		Point3d intersection = p1;
+		P2subP1.scale(u);
+		intersection.add(P2subP1);
+		
+		if (debug) System.out.println("intersection = "+intersection);
+		
+		return new Coordinate(intersection.x, intersection.y, intersection.z);
+	}	
+	protected Coordinate linePlaneIntersection (final Coordinate planePoint, 
+			final Vector3d planeNormal, final Coordinate linePoint1,
+			final Coordinate linePoint2) {
+		return linePlaneIntersection (new Point3d(planePoint.x, planePoint.y, planePoint.z),
+				planeNormal, new Point3d(linePoint1.x, linePoint1.y, linePoint1.z),
+				new Point3d(linePoint2.x, linePoint2.y, linePoint2.z));
+	}
+	protected Coordinate linePlaneIntersection (final Point3d planePoint, 
+			final Vector3d planeNormal, final Coordinate linePoint1,
+			final Coordinate linePoint2) {
+		return linePlaneIntersection (new Point3d(planePoint.x, planePoint.y, planePoint.z),
+				planeNormal, new Point3d(linePoint1.x, linePoint1.y, linePoint1.z),
+				new Point3d(linePoint2.x, linePoint2.y, linePoint2.z));
+	}
+	
+	/**
 	 * Returns a list of the TinFaces that have all three vertexes within the
 	 * envelope. The returned faces are not copies.
 	 * 
@@ -413,7 +613,7 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	 * @return	number of points in the TIN
 	 */
 	public int getNumVertices() {
-		return vertices.length;
+		return vertices.size();
 	}
 	
 	/**
@@ -440,7 +640,7 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	 * @return a count of breaklines present in this TIN.
 	 */
 	public int getNumBreaklines() {
-		return breaklines.size();
+		return (breaklines != null) ? breaklines.size() : 0;
 	}
 	
 	/**
@@ -449,7 +649,7 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	 * @return a count of boundaries present in this TIN.
 	 */
 	public int getNumBoundaries() {
-		return boundaries.size();
+		return (boundaries != null) ? boundaries.size() : 0;
 	}
 	
 	/**
@@ -461,7 +661,7 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	public Coordinate getVertexN (final int n) {
 		Assert.isTrue(n>=0 && n<getNumVertices(), 
 				"ImmutableTin.getVertexN: index out of bounds, N="+n);
-		return vertices[n];
+		return vertices.getCoordinate(n);
 	}
 
 	/**
@@ -471,7 +671,7 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	 * @return all the vertices that compose this TIN.
 	 */
 	public Coordinate[] getVertices() {
-		return vertices;
+		return vertices.toCoordinateArray();
 	}
 
 	/**
@@ -486,6 +686,7 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	public int[] getTriangleArrayN (final int n) {
 		Assert.isTrue(n>=0 && n<getNumTriangles(),
 				"ImmutableTin.getTriangleArrayN: index out of bounds, N="+n);
+		if (debug) System.out.println("getTriangleArrayN: N = "+n+"\tTinFace(N) = "+faceTable[n]);
 		return new int[] { faceTable[n].getVertex0Index(),
 				faceTable[n].getVertex1Index(),
 				faceTable[n].getVertex2Index(),
@@ -584,14 +785,36 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	 * 							indexArray[i].
 	 */
 	protected Coordinate[] indexArrayToCoordinateArray(final int[] indexArray, 
-			final Coordinate[] coordinateArray) {
+			final CoordinateSequence coordinateArray) {
 		Coordinate[] coords = new Coordinate[indexArray.length];
 		for (int i=0; i<indexArray.length; i++) {
-			coords[i] = coordinateArray[indexArray[i]];
+			coords[i] = coordinateArray.getCoordinate(indexArray[i]);
 		}
 		return coords;
 	}
+	
+	/**
+	 * Returns a Coordinate with x, y, and z all set to the minimum value of 
+	 * each among this TIN's point set.
+	 * 
+	 * @return 	a Coordinate representing the minimum corner of a bounding cube
+	 * 			that encompasses this TIN's point set 
+	 */
+	public Coordinate getMinBoundingCoordinate() {
+		return this.min;
+	}
 
+	/**
+	 * Returns a Coordinate with x, y, and z all set to the maximum value of 
+	 * each among this TIN's point set.
+	 * 
+	 * @return 	a Coordinate representing the maximum corner of a bounding cube
+	 * 			that encompasses this TIN's point set 
+	 */
+	public Coordinate getMaxBoundingCoordinate() {
+		return this.max;
+	}
+	
 	/**
 	 * Convert this TIN to a human readable string.
 	 * 
@@ -603,8 +826,8 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 		StringBuffer boundariesString = new StringBuffer("\n\nBoundaries:\n");
 		StringBuffer breaklinesString = new StringBuffer("\n\nBreaklines:\n");
 		
-		for (int i=0; i<vertices.length; i++) {
-			verticesString.append(vertices[i].toString() + "\n");
+		for (int i=0; i<vertices.size(); i++) {
+			verticesString.append(vertices.getCoordinate(i).toString() + "\n");
 		}
 		
 		for (int i=0; i<faceTable.length; i++) {

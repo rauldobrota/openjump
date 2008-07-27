@@ -4,6 +4,7 @@ import org.openjump.tin.ImmutableTin;
 import org.openjump.tin.io.JTFLayout;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -110,7 +111,7 @@ public class JTFReader {
 			in.close();
 		}
 		
-		return new ImmutableTin(vertices, triTable, breaklines, boundaries, srid);
+		return new ImmutableTin(new CoordinateArraySequence(vertices), triTable, breaklines, boundaries, srid);
 	}
 	
 	
