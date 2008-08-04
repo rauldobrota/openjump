@@ -116,9 +116,9 @@ public interface TriangulatedIrregularNetwork {
 	 * @param n		the face to be returned, should be between 
 	 * 				0..getNumTriangles()
 	 * @return		the TinFace that represents face #N in the TIN.
-	 * @see			TinFace
+	 * @see			ImmutableArrayTinFacet
 	 */
-	public TinFace getTriangleN(int n);
+	public TinFacet getTriangleN(int n);
 	
 	/**
 	 * Returns an ImmutableTin that contains a copy of this tin containing all 
@@ -141,7 +141,7 @@ public interface TriangulatedIrregularNetwork {
 	 * @return			a list of TinFaces that have an envelope that overlap
 	 * 					with the given envelope.
 	 */
-	public List<TinFace> getSubsetTriangles(Envelope envelope);
+	public List<ImmutableArrayTinFacet> getSubsetTriangles(Envelope envelope);
 	
 	/**
 	 * Returns a list of the TinFaces that have all three vertexes within the
@@ -151,7 +151,7 @@ public interface TriangulatedIrregularNetwork {
 	 * @return			a list of TinFaces that have an envelope that overlap
 	 * 					with the given envelope.
 	 */
-	public List<TinFace> getStrictSubsetTriangles(Envelope envelope);
+	public List<ImmutableArrayTinFacet> getStrictSubsetTriangles(Envelope envelope);
 	
 	/**
 	 * Returns a list of the TinFaces that intersect the given value along
@@ -160,7 +160,7 @@ public interface TriangulatedIrregularNetwork {
 	 * @param z		the height band that all returned triangles will intersect
 	 * @return		a list of TinFaces that intersect the given height
 	 */
-	public List<TinFace> getTrianglesAtHeight(final double z);
+	public List<ImmutableArrayTinFacet> getTrianglesAtHeight(final double z);
 	
 	/**
 	 * Returns a list of the TinFaces that lie within the given height range
@@ -170,7 +170,7 @@ public interface TriangulatedIrregularNetwork {
 	 * @param z2	the other end the height band that all returned triangles will intersect
 	 * @return		a list of TinFaces that intersect the given height range
 	 */
-	public List<TinFace> getTrianglesAtHeight(final double z1, final double z2);
+	public List<ImmutableArrayTinFacet> getTrianglesAtHeight(final double z1, final double z2);
 	
 	/**
 	 * Returns a collection of LineStrings that represents all the contour 

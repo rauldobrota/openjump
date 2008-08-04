@@ -50,7 +50,7 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	// Three indices point to the vertices array above, delineating the points
 	// of the triangle. The other three indices point to the faceTable array
 	// itself and create a connectedness map of the triangles.
-	private TinFace[] faceTable;
+	private ImmutableArrayTinFacet[] faceTable;
 	
 	// a list of arrays with each array containing the indices to the vertices
 	// array that compose the given line. If the line is closed, the first and
@@ -106,7 +106,7 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 		// make sure we have our own copy of the given point set
 		CoordinateArraySequence tmpCAS = new CoordinateArraySequence(points.toCoordinateArray());
 		this.vertices = (CoordinateArraySequence)tmpCAS.clone();
-		this.faceTable = new TinFace[triTable.length];
+		this.faceTable = new ImmutableArrayTinFacet[triTable.length];
 		
 		// find bounding cube of point cloud
 		this.min = new Coordinate(this.vertices.getCoordinate(0));
@@ -134,7 +134,7 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 						  "Malformed triangle table: doesn't contain "+
 						  JTFLayout.NUM_TRIANGLE_INT_FIELDS+" fields for face #"
 						  + i + ".");
-			faceTable[i] = new TinFace (i, triTable[i][JTFLayout.TRITABLE_VERTEX_0], 
+			faceTable[i] = new ImmutableArrayTinFacet (i, triTable[i][JTFLayout.TRITABLE_VERTEX_0], 
 										triTable[i][JTFLayout.TRITABLE_VERTEX_1], 
 										triTable[i][JTFLayout.TRITABLE_VERTEX_2],
 										triTable[i][JTFLayout.TRITABLE_NEIGHBOR_0],
@@ -178,7 +178,7 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	 * 						<code>faceSubset</code>
 	 * @param SRID			The spatial reference ID for this TIN
 	 */
-	public ImmutableTin (final List<TinFace> faceSubset, final List<int[]> breaklines, 
+	public ImmutableTin (final List<ImmutableArrayTinFacet> faceSubset, final List<int[]> breaklines, 
 			final List<int[]> boundaries, final int SRID) {
 		int idx;
 		int faceSubsetSize = faceSubset.size();
@@ -192,7 +192,7 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 		// and a set of coordinates. Make this.vertices equal to the set of
 		// coordinates.
 		HashMap<Coordinate, Integer> pointToOldPointIndexMap = new HashMap<Coordinate, Integer>(faceSubsetSize);
-		for (TinFace face : faceSubset) {
+		for (ImmutableArrayTinFacet face : faceSubset) {
 			pointToOldPointIndexMap.put(face.getVertex0(), new Integer(face.getVertex0Index()));
 			pointToOldPointIndexMap.put(face.getVertex1(), new Integer(face.getVertex1Index()));
 			pointToOldPointIndexMap.put(face.getVertex2(), new Integer(face.getVertex2Index()));
@@ -240,9 +240,9 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 		// equivalent to the coordinates of the old face we're working with,
 		// then add a mapping between the old face and the new face indexes.
 		HashMap<Integer, Integer> oldFaceIndexToNewIndexMap = new HashMap<Integer, Integer>(faceSubsetSize);
-		this.faceTable = new TinFace[faceSubsetSize];
+		this.faceTable = new ImmutableArrayTinFacet[faceSubsetSize];
 		idx=0;
-		for (TinFace face : faceSubset) {
+		for (ImmutableArrayTinFacet face : faceSubset) {
 			oldFaceIndexToNewIndexMap.put(new Integer(face.getThisIndex()), new Integer(idx));
 			idx++;
 		}
@@ -250,7 +250,7 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 		// for each face in faceSubset, set the neighbors of the equivalent
 		// face in the new faceTable to be the same as those in the face we're
 		// working with. Then add the new face to the spatial face index.
-		for (TinFace face : faceSubset) {
+		for (ImmutableArrayTinFacet face : faceSubset) {
 			int newFaceIndex = oldFaceIndexToNewIndexMap.get(face.getThisIndex()).intValue();
 			int newVertex0Index = pointToNewIndexMap.get(face.getVertex0()).intValue();
 			int newVertex1Index = pointToNewIndexMap.get(face.getVertex1()).intValue();
@@ -268,7 +268,7 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 					"\tn0 = "+newNeighbor0Index+"\tn1 = "+newNeighbor1Index+"\tn2 = "+newNeighbor2Index+
 					"\tvertices.length = "+this.vertices.size()+"\tthis.faceTable.length = "+this.faceTable.length);
 			
-			this.faceTable[newFaceIndex] = new TinFace (newFaceIndex, 
+			this.faceTable[newFaceIndex] = new ImmutableArrayTinFacet (newFaceIndex, 
 					newVertex0Index, newVertex1Index, newVertex2Index, 
 					newNeighbor0Index, newNeighbor1Index, newNeighbor2Index,
 					this.vertices, this.faceTable, this.lightVector);
@@ -298,14 +298,14 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	 * 					given envelope.
 	 */
 	public TriangulatedIrregularNetwork subset (final Envelope envelope) {
-		List<TinFace> faceSubset = getSubsetTriangles(envelope);
+		List<ImmutableArrayTinFacet> faceSubset = getSubsetTriangles(envelope);
 		int faceSubsetSize = faceSubset.size();
 
 		// collect the indexes of all the points and faces that are used in 
 		// this subset
 		HashSet<Integer> pointSet= new HashSet<Integer>(faceSubsetSize);
 		HashSet<Integer> faceSet= new HashSet<Integer>(faceSubsetSize);
-		for (TinFace face : faceSubset) {
+		for (ImmutableArrayTinFacet face : faceSubset) {
 			pointSet.add(new Integer(face.getVertex0Index()));
 			pointSet.add(new Integer(face.getVertex1Index()));
 			pointSet.add(new Integer(face.getVertex2Index()));
@@ -337,7 +337,7 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 		int[][] triTable = new int[faceSet.size()][JTFLayout.NUM_TRIANGLE_INT_FIELDS];
 		for (int i=0; i<faceSet.size(); i++) {
 			int faceIndex = faceArray[i].intValue();
-			TinFace face = this.faceTable[faceIndex];
+			ImmutableArrayTinFacet face = this.faceTable[faceIndex];
 			int vertex0SubsetIdx = pointsHash.get(new Integer(face.getVertex0Index())).intValue();
 			int vertex1SubsetIdx = pointsHash.get(new Integer(face.getVertex1Index())).intValue();
 			int vertex2SubsetIdx = pointsHash.get(new Integer(face.getVertex2Index())).intValue();
@@ -427,8 +427,8 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	 * @return			a list of TinFaces that have an envelope that overlap
 	 * 					with the given envelope.
 	 */
-	public List<TinFace> getSubsetTriangles(final Envelope envelope) {
-		return (List<TinFace>)faceIndex.query(envelope);
+	public List<ImmutableArrayTinFacet> getSubsetTriangles(final Envelope envelope) {
+		return (List<ImmutableArrayTinFacet>)faceIndex.query(envelope);
 	}
 	
 	/**
@@ -438,8 +438,8 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	 * @param z		the height band that all returned triangles will intersect
 	 * @return		a list of TinFaces that intersect the given height
 	 */
-	public List<TinFace> getTrianglesAtHeight(final double z) {
-		return (List<TinFace>)faceZIndex.query(z);
+	public List<ImmutableArrayTinFacet> getTrianglesAtHeight(final double z) {
+		return (List<ImmutableArrayTinFacet>)faceZIndex.query(z);
 	}
 	
 	/**
@@ -450,8 +450,8 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	 * @param z2	the other end the height band that all returned triangles will intersect
 	 * @return		a list of TinFaces that intersect the given height range
 	 */
-	public List<TinFace> getTrianglesAtHeight(final double z1, final double z2) {
-		return (List<TinFace>)faceZIndex.query(z1, z2);
+	public List<ImmutableArrayTinFacet> getTrianglesAtHeight(final double z1, final double z2) {
+		return (List<ImmutableArrayTinFacet>)faceZIndex.query(z1, z2);
 	}
 	
 	/**
@@ -473,12 +473,12 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 		GeometryFactory gf = new GeometryFactory(new PrecisionModel(), this.SRID);
 		
 		// get list of TinFaces that intersect the given height
-		List<TinFace> faceList = getTrianglesAtHeight(height);
+		List<ImmutableArrayTinFacet> faceList = getTrianglesAtHeight(height);
 		
 		LinkedList<LineString> lineList = new LinkedList<LineString>();
 		
 		// for each face in faceList
-		for (TinFace face : faceList) {
+		for (TinFacet face : faceList) {
 			
 			HashSet<Coordinate> pointsAtHeight = new HashSet<Coordinate>(3);
 
@@ -593,12 +593,12 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	 * @return			a list of TinFaces that have an envelope that overlap
 	 * 					with the given envelope.
 	 */
-	public List<TinFace> getStrictSubsetTriangles(final Envelope envelope) {
-		List<TinFace> subset = getSubsetTriangles(envelope);
-		LinkedList<TinFace> returnSubset = new LinkedList<TinFace>();
+	public List<ImmutableArrayTinFacet> getStrictSubsetTriangles(final Envelope envelope) {
+		List<ImmutableArrayTinFacet> subset = getSubsetTriangles(envelope);
+		LinkedList<ImmutableArrayTinFacet> returnSubset = new LinkedList<ImmutableArrayTinFacet>();
 		
 		// make sure each face is totally within the given envelope
-		for (TinFace face : subset) {
+		for (ImmutableArrayTinFacet face : subset) {
 			if (envelope.intersects(face.getVertex0()) &&
 					envelope.intersects(face.getVertex1()) &&
 					envelope.intersects(face.getVertex2()))
@@ -701,9 +701,9 @@ public final class ImmutableTin implements TriangulatedIrregularNetwork {
 	 * @param n		the face to be returned, should be between 
 	 * 				0..getNumTriangles()
 	 * @return		the TinFace that represents face #N in the TIN.
-	 * @see			TinFace
+	 * @see			ImmutableArrayTinFacet
 	 */
-	public TinFace getTriangleN (final int n) {
+	public TinFacet getTriangleN (final int n) {
 		Assert.isTrue(n>=0 && n<getNumTriangles(),
 				"ImmutableTin.getTriangleArrayN: index out of bounds, N="+n);
 		return this.faceTable[n];

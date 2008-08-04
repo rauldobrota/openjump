@@ -12,8 +12,9 @@ import java.awt.Shape;
 
 import javax.vecmath.Vector3d;
 
+import org.openjump.tin.TinFacet;
 import org.openjump.tin.TriangulatedIrregularNetwork;
-import org.openjump.tin.TinFace;
+import org.openjump.tin.ImmutableArrayTinFacet;
 
 import com.vividsolutions.jump.workbench.model.Layer;
 import com.vividsolutions.jump.workbench.ui.Viewport;
@@ -64,12 +65,12 @@ public class BasicTinStyle implements TinStyle {
 	public void paint(TriangulatedIrregularNetwork tin, Graphics2D g,
 			Viewport viewport) throws Exception {
 
-		List<TinFace> subsetTriangles = tin.getSubsetTriangles(viewport.getEnvelopeInModelCoordinates());
+		List<ImmutableArrayTinFacet> subsetTriangles = tin.getSubsetTriangles(viewport.getEnvelopeInModelCoordinates());
 		if (debug) System.out.println("Number of triangles rendered: "+subsetTriangles.size());
 		Random rand = new Random();
 		
 		// paint the facets
-		for (TinFace face : subsetTriangles) {
+		for (TinFacet face : subsetTriangles) {
 			try {
 				//Color randColor = new Color(rand.nextInt(255), rand.nextInt(255), rand.nextInt(255), 255);
 				Double red = Math.abs(this.fillColor.getRed() * face.getShadingDotProduct());
