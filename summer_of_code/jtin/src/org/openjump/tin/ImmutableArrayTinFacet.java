@@ -26,7 +26,7 @@ import javax.vecmath.Vector3d;
  * @author Christopher DeMars
  *
  */
-public class TinFace implements TinFacet {
+public class ImmutableArrayTinFacet implements TinFacet {
 	
 	// vertex array shared among all the TinFaces
 	private CoordinateSequence tinVertices;
@@ -79,10 +79,10 @@ public class TinFace implements TinFacet {
 	 * @param tfs	an array of TinFaces composing the TIN of which this face
 	 * 				is a member of
 	 */
-	public TinFace (final int idx,
+	public ImmutableArrayTinFacet (final int idx,
 					final int v0, final int v1, final int v2,
 					final int n0, final int n1, final int n2,
-					final CoordinateSequence vts, final TinFacet[] tfs,
+					final CoordinateSequence vts, final ImmutableArrayTinFacet[] tfs,
 					Vector3d lightVector) {
 		Assert.isTrue(idx>=0 && idx<tfs.length, 
 				"TinFace constructor: array index out of bounds, idx = "+idx);

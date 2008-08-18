@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -25,6 +26,7 @@ import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
+import com.vividsolutions.jump.workbench.plugin.ThreadedBasePlugIn;
 import com.vividsolutions.jump.workbench.plugin.ThreadedPlugIn;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
@@ -37,8 +39,7 @@ import org.openjump.tin.triangulation.ChewUnconstrainedDelaunayTriangulator;
 import org.openjump.tin.ui.MultiInputDialog;
 import org.openjump.tin.i18n.I18NPlug;
 
-public class ContourLinesFromTINPlugin extends AbstractPlugIn implements
-		ThreadedPlugIn {
+public class ContourLinesFromTINPlugin extends ThreadedBasePlugIn {
 
 	    
 	private String menuName = "Countour Lines From TIN";
@@ -66,10 +67,13 @@ public class ContourLinesFromTINPlugin extends AbstractPlugIn implements
 	 * @param name
 	 */
     public ContourLinesFromTINPlugin() { };
-	public ContourLinesFromTINPlugin(String name) {
+
+    /*
+    public ContourLinesFromTINPlugin(String name) {
 		super(name);
 		// TODO Auto-generated constructor stub
 	}
+	*/
 	
 	
 	public void initialize (PlugInContext context) throws Exception {
@@ -114,7 +118,9 @@ public class ContourLinesFromTINPlugin extends AbstractPlugIn implements
 	}
 	
    private void setDialogValues(MultiInputDialog dialog, PlugInContext context){
-	    dialog.setSideBarDescription(this.sideBarText);	    
+	    dialog.setSideBarDescription(this.sideBarText);	
+	    dialog.setSideBarImage(new ImageIcon(getClass().getResource("ContourLinesFromTIN.png")));
+
 	    List<TinLayer> tinLayers = (List<TinLayer>)context.getLayerManager().getLayerables(TinLayer.class);	    
 	    dialog.addLayerableComboBox(this.chooseLayer, tinLayers.get(0), null, tinLayers);
 	    dialog.addPositiveDoubleField(this.deltaHeightText, this.deltaHeight, 6);

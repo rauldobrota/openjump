@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -26,6 +27,7 @@ import com.vividsolutions.jump.workbench.plugin.AbstractPlugIn;
 import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
+import com.vividsolutions.jump.workbench.plugin.ThreadedBasePlugIn;
 import com.vividsolutions.jump.workbench.plugin.ThreadedPlugIn;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
 //import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
@@ -47,7 +49,7 @@ import org.openjump.tin.io.JTFWriter;
  * @author paradox
  *
  */
-public class CreateTinFromVectorLayerPlugin extends AbstractPlugIn implements ThreadedPlugIn {
+public class CreateTinFromVectorLayerPlugin extends ThreadedBasePlugIn {
 
     private String menuName = "Create TIN From Vector Layer";
     private String chooseLayer = "select point layer";
@@ -74,11 +76,12 @@ public class CreateTinFromVectorLayerPlugin extends AbstractPlugIn implements Th
 
 	/**
 	 * @param name
-	 */
+	 *
 	public CreateTinFromVectorLayerPlugin(String name) {
 		super(name);
 		// TODO Auto-generated constructor stub
 	}
+	*/
 	
 	
 	public void initialize (PlugInContext context) throws Exception {
@@ -128,7 +131,11 @@ public class CreateTinFromVectorLayerPlugin extends AbstractPlugIn implements Th
 	}
 	
    private void setDialogValues(MultiInputDialog dialog, PlugInContext context){
-	    dialog.setSideBarDescription(this.sideBarText);	    
+	    dialog.setSideBarDescription(this.sideBarText);	 
+	    dialog.setSideBarImage(new ImageIcon( CreateTinFromVectorLayerPlugin.class.getResource( "CreateTinFromVectorLayer.png" ) ));
+
+	    //dialog.setSideBarImage(new ImageIcon(getClass().getResource("CreateTinFromVectorLayer.png")));
+
     	dialog.addLayerComboBox(this.chooseLayer, context.getCandidateLayer(0), null, context.getLayerManager());
 
     	dialog.addRow(this.fileNameBox, new JLabel(this.fileNameBox), 
