@@ -8,9 +8,6 @@
  */
 package de.latlon.deejump.wfs.plugin;
 
-import static javax.swing.JOptionPane.WARNING_MESSAGE;
-import static javax.swing.JOptionPane.showMessageDialog;
-
 import java.util.Collection;
 
 import javax.swing.ImageIcon;
@@ -147,7 +144,9 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
 
         FeatureCollection dataset;
 
-        if ( wfs.getGeometryProperties( ftName.getLocalName() ).length == 0 ) {
+        QualifiedName[] geoms = wfs.getGeometryProperties( ftName.getLocalName() );
+
+        if ( geoms == null || geoms.length == 0 ) {
             LOG.info( "No geometry was found, using default point at (0, 0)." );
             Point point = new GeometryFactory().createPoint( new Coordinate( 0, 0 ) );
             dataset = JUMPFeatureFactory.createFromDeegreeFC( dfc, point, wfs, ftName );
@@ -157,39 +156,31 @@ public class WFSPlugIn extends ThreadedBasePlugIn {
 
         monitor.report( "Adding Layer" );
 
-        if ( dfc != null ) {
+        LayerManager layerManager = context.getLayerManager();
 
-            LayerManager layerManager = context.getLayerManager();
+        QualifiedName geoQN = panel.getChosenGeoProperty();
 
-            QualifiedName geoQN = panel.getChosenGeoProperty();
+        if ( geoQN == null ) {
+            geoQN = new QualifiedName( "GEOMETRY" );
+            LOG.warn( "Could not determine the qualified name of the geometry property. Setting it to 'GEOMETRY'." );
+        }
+        geoQN = new QualifiedName( ftName.getPrefix(), geoQN.getLocalName(), ftName.getNamespace() );
 
-            if ( geoQN == null ) {
-                geoQN = new QualifiedName( "GEOMETRY" );
-                LOG.warn( "Could not determine the qualified name of the geometry property. Setting it to 'GEOMETRY'." );
-            }
-            geoQN = new QualifiedName( ftName.getPrefix(), geoQN.getLocalName(), ftName.getNamespace() );
+        String displayName = AbstractWFSWrapper.WFS_PREFIX + ":" + ftName.getLocalName();
+        WFSLayer layer = new WFSLayer( displayName, layerManager.generateLayerFillColor(), dataset, layerManager,
+                                       ftName, geoQN, crs, wfs );
 
-            String displayName = AbstractWFSWrapper.WFS_PREFIX + ":" + ftName.getLocalName();
-            WFSLayer layer = new WFSLayer( displayName, layerManager.generateLayerFillColor(), dataset, layerManager,
-                                           ftName, geoQN, crs, wfs );
+        synchronized ( layerManager ) {
+            WFSLayerListener listener = new WFSLayerListener( layer.getName() );
+            layer.setLayerListener( listener );
+            layerManager.addLayerListener( listener );
+            layer.setServerURL( this.wfsUrl );
+            layerManager.addLayer( StandardCategoryNames.SYSTEM, layer );
+            layer.setEditable( true );
+        }
 
-            synchronized ( layerManager ) {
-                WFSLayerListener listener = new WFSLayerListener( layer.getName() );
-                layer.setLayerListener( listener );
-                layerManager.addLayerListener( listener );
-                layer.setServerURL( this.wfsUrl );
-                layerManager.addLayer( StandardCategoryNames.SYSTEM, layer );
-                layer.setEditable( true );
-            }
-
-            if ( dataset.size() == JUMPFeatureFactory.getMaxFeatures() ) {
-                wbframe.warnUser( I18N.get( "WFSPlugin.maxnumber" ) + " " + JUMPFeatureFactory.getMaxFeatures() );
-            }
-
-        } else {
-
-            showMessageDialog( wbframe, I18N.get( "WFSPlugin.nodata" ), "Info", WARNING_MESSAGE );
-
+        if ( dataset.size() == JUMPFeatureFactory.getMaxFeatures() ) {
+            wbframe.warnUser( I18N.get( "WFSPlugin.maxnumber" ) + " " + JUMPFeatureFactory.getMaxFeatures() );
         }
 
         String[] urls = panel.getWFSList().toArray( new String[] {} );

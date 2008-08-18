@@ -1,3 +1,7 @@
+2008-08-18  Andreas Schmitz <schmitz@lat-lon.de>
+        * src/de/latlon/deejump/wfs/plugin/WFSPlugIn.java: Removed unnecessary
+        checks.
+
 2008-07-17  Andreas Schmitz <schmitz@lat-lon.de>
         * lib/deegree2.jar: Fixed bug in deegree2 GML parser so the
         featureMembers element can be used.
