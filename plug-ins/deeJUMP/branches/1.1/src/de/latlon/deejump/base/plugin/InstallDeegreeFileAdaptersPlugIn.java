@@ -5,17 +5,22 @@ import static com.vividsolutions.jump.workbench.datasource.InstallStandardDataSo
 import static de.latlon.deejump.base.i18n.I18N.get;
 import static java.net.URLDecoder.decode;
 import static java.util.Arrays.asList;
+import static javax.swing.BoxLayout.Y_AXIS;
 import static org.deegree.framework.log.LoggerFactory.getLogger;
 import static org.openjump.core.ui.io.file.FileLayerLoader.KEY;
 
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.BoxLayout;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import org.deegree.framework.log.ILogger;
 import org.deegree.io.csv.CSVReader;
@@ -41,8 +46,8 @@ import de.latlon.deejump.base.ui.CSVSelectionPanel;
 /**
  * @author hamammi
  * 
- * TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style - Code
- * Templates
+ *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style -
+ *         Code Templates
  */
 public class InstallDeegreeFileAdaptersPlugIn extends AbstractPlugIn {
 
@@ -89,10 +94,22 @@ public class InstallDeegreeFileAdaptersPlugIn extends AbstractPlugIn {
 
                 List<String[]> header = reader.getHeader();
 
+                // calc scroll pane size etc.
                 CSVSelectionPanel panel = new CSVSelectionPanel( header );
+                JScrollPane sp = new JScrollPane( panel );
+
+                Dimension d = sp.getPreferredSize();
+                int width = d.width > 600 ? 600 : d.width;
+                int height = d.height + 20;
+
+                JPanel p = new JPanel();
+                p.setLayout( new BoxLayout( p, Y_AXIS ) );
+                p.add( sp );
+                sp.setPreferredSize( new Dimension( width, height ) );
+
                 Dialog parent = new JDialog();
                 parent.setLocationRelativeTo( context.getWorkbenchFrame() );
-                OKCancelDialog dlg = new OKCancelDialog( parent, get( "General.question" ), true, panel, null );
+                OKCancelDialog dlg = new OKCancelDialog( parent, get( "General.question" ), true, p, null );
                 dlg.setVisible( true );
 
                 if ( dlg.wasOKPressed() ) {
