@@ -72,9 +72,7 @@ public class TransactionFactory {
     private static final String REQUEST_HEADER = "<?xml version='1.0' encoding='ISO-8859-1'?>"
                                                  + "<wfs:Transaction version='1.1.0' service='WFS' "
                                                  + "xmlns:gml='http://www.opengis.net/gml' "
-                                                 + "xmlns:ogc='http://www.opengis.net/ogc' xmlns:wfs='http://www.opengis.net/wfs' "
-                                                 + "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
-                                                 + "xsi:schemaLocation='http://www.opengis.net/wfs/1.1.0/WFS-transaction.xsd' ";
+                                                 + "xmlns:ogc='http://www.opengis.net/ogc' xmlns:wfs='http://www.opengis.net/wfs' ";
 
     /**
      * Combines geometry update xml with attribute update xml into a common transaction update xml
