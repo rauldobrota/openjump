@@ -32,6 +32,8 @@
 
 package de.latlon.deejump.base.plugin;
 
+import static org.deegree.enterprise.WebUtils.enableProxyUsage;
+
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.geom.NoninvertibleTransformException;
@@ -39,6 +41,7 @@ import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -71,8 +74,8 @@ import de.latlon.deejump.wfs.data.JUMPFeatureFactory;
 
 /**
  * 
- * This class is basically copied from FeatureInfoTool to extend functionality so as to provide
- * FeatureInfo on WMSLayers.
+ * This class is basically copied from FeatureInfoTool to extend functionality so as to provide FeatureInfo on
+ * WMSLayers.
  * 
  * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei</a>
  * 
@@ -212,6 +215,7 @@ public class LayerAndWMSFeatureInfoTool extends SpecifyFeaturesTool {
                     LOG.debug( "GetFeatureInfo request: " + ir );
 
                     HttpClient client = new HttpClient();
+                    enableProxyUsage( client, new URL( ir ) );
                     GetMethod get = new GetMethod( ir );
                     client.executeMethod( get );
 
