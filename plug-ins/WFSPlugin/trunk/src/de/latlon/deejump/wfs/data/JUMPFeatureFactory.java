@@ -65,8 +65,8 @@ import de.latlon.deejump.wfs.client.AbstractWFSWrapper;
 import de.latlon.deejump.wfs.jump.WFSFeature;
 
 /**
- * Utility functions to create different kinds of FeatureDatasets. <br/>Further methods provided for JUMPlon implemented
- * by UT
+ * Utility functions to create different kinds of FeatureDatasets. <br/>
+ * Further methods provided for JUMPlon implemented by UT
  * 
  * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei </a>
  */
@@ -92,8 +92,9 @@ public class JUMPFeatureFactory {
     }
 
     /**
-     * Creates a deegree <code>WFSGetFeatureRequest</code> based on the WFS version, the feature name (<code>typeName</code>)
-     * and the <code>envelope</code>. <br/>This method was adapted from <code>DownloadListener</code>.
+     * Creates a deegree <code>WFSGetFeatureRequest</code> based on the WFS version, the feature name (
+     * <code>typeName</code>) and the <code>envelope</code>. <br/>
+     * This method was adapted from <code>DownloadListener</code>.
      * 
      * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei </a>
      * @param version
@@ -327,7 +328,12 @@ public class JUMPFeatureFactory {
 
         FeatureType ft = null;
         if ( wfs != null && ftName != null ) {
-            ft = wfs.getSchemaForFeatureType( ftName.getLocalName() ).getFeatureType( ftName );
+            GMLSchema schema = wfs.getSchemaForFeatureType( ftName.getLocalName() );
+            if ( schema != null ) {
+                ft = schema.getFeatureType( ftName );
+            } else {
+                throw new DeeJUMPException( "No data found" );
+            }
         } else {
             if ( feats.length > 0 ) {
                 ft = feats[0].getFeatureType();
