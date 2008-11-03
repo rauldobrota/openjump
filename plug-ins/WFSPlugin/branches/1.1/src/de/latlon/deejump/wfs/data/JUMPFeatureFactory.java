@@ -62,8 +62,8 @@ import de.latlon.deejump.wfs.client.AbstractWFSWrapper;
 import de.latlon.deejump.wfs.client.WFSClientHelper;
 
 /**
- * Utility functions to create different kinds of FeatureDatasets. <br/>Further methods provided for
- * JUMPlon implemented by UT
+ * Utility functions to create different kinds of FeatureDatasets. <br/>
+ * Further methods provided for JUMPlon implemented by UT
  * 
  * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei </a>
  */
@@ -91,9 +91,9 @@ public class JUMPFeatureFactory {
     }
 
     /**
-     * Creates a deegree <code>WFSGetFeatureRequest</code> based on the WFS version, the feature
-     * name (<code>typeName</code>) and the <code>envelope</code>. <br/>This method was
-     * adapted from <code>DownloadListener</code>.
+     * Creates a deegree <code>WFSGetFeatureRequest</code> based on the WFS version, the feature name (
+     * <code>typeName</code>) and the <code>envelope</code>. <br/>
+     * This method was adapted from <code>DownloadListener</code>.
      * 
      * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei </a>
      * @param version
@@ -139,8 +139,7 @@ public class JUMPFeatureFactory {
     }
 
     /**
-     * Creates a deegree <code>FeatureCollection</code> from a given GetFeature request to a
-     * server.
+     * Creates a deegree <code>FeatureCollection</code> from a given GetFeature request to a server.
      * 
      * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei </a>
      * @param serverUrl
@@ -160,8 +159,7 @@ public class JUMPFeatureFactory {
     }
 
     /**
-     * Creates a deegree <code>FeatureCollection</code> from a given GetFeature request to a
-     * server.
+     * Creates a deegree <code>FeatureCollection</code> from a given GetFeature request to a server.
      * 
      * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei </a>
      * @param server
@@ -294,9 +292,9 @@ public class JUMPFeatureFactory {
     }
 
     /**
-     * Creates a JUMP FeatureCollection from a deegree FeatureCollection [UT] and a specified
-     * JUMP/JTS Geometry object. The new JUMP FeatureCollection returned will have the
-     * <code>defaultGeometry</code> as its <code>GEOM</code> attribute
+     * Creates a JUMP FeatureCollection from a deegree FeatureCollection [UT] and a specified JUMP/JTS Geometry object.
+     * The new JUMP FeatureCollection returned will have the <code>defaultGeometry</code> as its <code>GEOM</code>
+     * attribute
      * 
      * @author <a href="mailto:taddei@lat-lon.de">Ugo Taddei </a>
      * @param deegreeFeatCollec
@@ -304,8 +302,7 @@ public class JUMPFeatureFactory {
      * @param defaultGeometry
      *            the geometry of the returned FeatureCollection
      * @param wfs
-     *            if the data came from a wfs, this can be used to determine the feature type even
-     *            without any features
+     *            if the data came from a wfs, this can be used to determine the feature type even without any features
      * @param ftName
      *            the requested feature type from the above wfs
      * @param addids
@@ -332,7 +329,12 @@ public class JUMPFeatureFactory {
 
         FeatureType ft = null;
         if ( wfs != null && ftName != null ) {
-            ft = wfs.getSchemaForFeatureType( ftName.getLocalName() ).getFeatureType( ftName );
+            GMLSchema schema = wfs.getSchemaForFeatureType( ftName.getLocalName() );
+            if ( schema != null ) {
+                ft = schema.getFeatureType( ftName );
+            } else {
+                throw new DeeJUMPException( "No data found" );
+            }
         } else {
             if ( feats.length > 0 ) {
                 ft = feats[0].getFeatureType();
@@ -508,8 +510,8 @@ public class JUMPFeatureFactory {
                                                                      new QualifiedName( type, XSNS ), true );
 
                     /*
-                     * ftp[i] = FeatureFactory .createFeatureProperty( propType[i].getName(),
-                     * feature.getAttribute( schema.getAttributeName(i) ) );
+                     * ftp[i] = FeatureFactory .createFeatureProperty( propType[i].getName(), feature.getAttribute(
+                     * schema.getAttributeName(i) ) );
                      */
 
                 } else {
@@ -520,8 +522,8 @@ public class JUMPFeatureFactory {
                                                                      new QualifiedName( type, GMLNS ), true );
 
                     /*
-                     * ftp[i] = FeatureFactory .createFeatureProperty( propType[0].getName() ,
-                     * feature.getAttribute( schema.getAttributeName(i) ));
+                     * ftp[i] = FeatureFactory .createFeatureProperty( propType[0].getName() , feature.getAttribute(
+                     * schema.getAttributeName(i) ));
                      */
                 }
             }
