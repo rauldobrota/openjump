@@ -74,7 +74,7 @@ public class JUMPFeatureFactory {
 
     private static Logger LOG = Logger.getLogger( JUMPFeatureFactory.class );
 
-    private static int maxFeatures = 100;
+    private static int maxFeatures = 1000;
 
     /**
      * Creates a JUMP FeatureCollection from a deegree FeatureCollection [UT]
